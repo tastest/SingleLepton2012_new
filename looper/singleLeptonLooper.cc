@@ -2493,7 +2493,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       //phi-corrected type1 met
       pair<float, float> p_t1metphicorr = 
-	getPhiCorrMET( t1met10_, t1met10phi_, evt_pfsumet(), !isData, isperiodA);
+	getPhiCorrMET( t1met10_, t1met10phi_, evt_pfsumet(), !isData, true);
       t1metphicorr_    = p_t1metphicorr.first;
       t1metphicorrphi_ = p_t1metphicorr.second;
 
@@ -3925,6 +3925,7 @@ std::vector<float> singleLeptonLooper::totalIso( int thisPf , float coneR , floa
   return isos;
 }
 
+/*
 pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool isA)
 {
   float metx = met * cos( metphi );
@@ -3966,37 +3967,38 @@ pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, fl
   pair<float, float> phicorrmet = make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
   return phicorrmet;
 }
+*/
 
-// //VERSION FOR RUNNING ON 8 TEV AND COMBINED 7 TEV
-// pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV ){
+//VERSION FOR RUNNING ON 8 TEV AND COMBINED 7 TEV
+pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV ){
 
-//   //using met phi correction values from location
-//   //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py?revision=1.3&view=markup
+  //using met phi correction values from location
+  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py?revision=1.3&view=markup
 
-//   float metx = met * cos( metphi );
-//   float mety = met * sin( metphi );
-  
-//   float shiftx = 0.;
-//   float shifty = 0.;
+  float metx = met * cos( metphi );
+  float mety = met * sin( metphi );
 
-//   //use correction for data vs. mc and 7 TeV vs. 8 TeV
-//   if (is8TeV) {
-//     cout<<"RUNNING WITH 8 TEV SETTINGS! This is a check that you are paying attention! Comment out line "
-// 	<<__LINE__<<" and rerun"<<endl;
-//     shiftx = ismc ? (+1.77344e-01 - 1.34333e-03*sumet)
-//       : (-7.67892e-01 + 5.76983e-03*sumet);
-//     shifty = ismc ? (+8.08402e-01 - 2.84264e-03*sumet)
-//       : (+5.54005e-01 - 2.94046e-03*sumet);
-//   } else {
-//     shiftx = ismc ? (-4.53909e-02 - 2.55863e-05*sumet)
-//       : (-5.65217e-01 + 5.42436e-03*sumet);
-//     shifty = ismc ? (+1.27947e-01 - 3.62604e-03*sumet)
-//       : (+4.54054e-01 - 6.73607e-03*sumet);
-//   }
+  float shiftx = 0.;
+  float shifty = 0.;
 
-//   metx -= shiftx;
-//   mety -= shifty;
+  //use correction for data vs. mc and 7 TeV vs. 8 TeV
+  if (is8TeV) {
+    // cout<<"RUNNING WITH 8 TEV SETTINGS! This is a check that you are paying attention! Comment out line "
+    // 	<<__LINE__<<" and rerun"<<endl;
+    shiftx = ismc ? (+1.77344e-01 - 1.34333e-03*sumet)
+      : (-7.67892e-01 + 5.76983e-03*sumet);
+    shifty = ismc ? (+8.08402e-01 - 2.84264e-03*sumet)
+      : (+5.54005e-01 - 2.94046e-03*sumet);
+  } else {
+    shiftx = ismc ? (-4.53909e-02 - 2.55863e-05*sumet)
+      : (-5.65217e-01 + 5.42436e-03*sumet);
+    shifty = ismc ? (+1.27947e-01 - 3.62604e-03*sumet)
+      : (+4.54054e-01 - 6.73607e-03*sumet);
+  }
 
-//   pair<float, float> phicorrmet = make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
-//   return phicorrmet;
-// }
+  metx -= shiftx;
+  mety -= shifty;
+
+  pair<float, float> phicorrmet = make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
+  return phicorrmet;
+}
