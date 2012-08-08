@@ -41,8 +41,8 @@ void doAll(bool skipFWLite = true)
   // choose version, output will be written to output/[version]
   //---------------------------------------------------------------
   
-  const char* version    = "V00-04-09";
-  const char* jsonfile   = "jsons/Cert_160404-180252_7TeV_mergePromptMay10Aug5_JSON_goodruns.txt";
+  const char* version    = "V00-00-01";
+  const char* jsonfile   = "jsons/Cert_190456-196531_8TeV_PromptReco_Collisions12_JSON_goodruns.txt"; // 5.10/fb
   const bool  useMCSkims = true;
 
   cout << "Version : " << version     << endl;
@@ -92,9 +92,9 @@ void doAll(bool skipFWLite = true)
   int prettV      = 1;
  
   // flags for files to run over
-  bool rundata     = 0;
+  bool rundata     = 1;
   bool runttall    = 1;
-  bool runWjets    = 1;
+  bool runWjets    = 0;
   bool runVV       = 0;
   bool runQCD      = 0;
   bool runMuQCD    = 0;
@@ -140,6 +140,9 @@ void doAll(bool skipFWLite = true)
   TChain* chQCD = new  TChain("Events");
 
   if(runQCD){
+    cout << "UPDATE 7 TeV QCD SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     string skimdir = "/home/users/benhoob/filters/output/";
     pickSkimIfExists(chQCD, skimdir+"QCD_Pt-15to30_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1/V04-02-31/SingleLeptonSkim/merged*root");
     pickSkimIfExists(chQCD, skimdir+"QCD_Pt-30to50_TuneZ2_7TeV_pythia6_Summer11-PU_S4_START42_V11-v1/V04-02-31/SingleLeptonSkim/merged*root");
@@ -156,6 +159,8 @@ void doAll(bool skipFWLite = true)
   TChain* chMuQCD = new  TChain("Events");
 
   if(runMuQCD){
+    cout << "UPDATE 7 TeV MU-ENRICHED QCD SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
 
     string skimdir = "/hadoop/cms/store/user/vimartin/SingleLeptonAndTwoJets/";
     string cms2dir = "/nfs-7/userdata/cms2/";
@@ -184,10 +189,8 @@ void doAll(bool skipFWLite = true)
 
   TChain* chtopall = new TChain("Events");
   if (runttall) {
-    pickSkimIfExists(chtopall,"/hadoop/cms/store/user/vimartin/CMS2_V04-02-29/TTJets_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v2/ntuple_1454_0_Psq.root");
-    //pickSkimIfExists(chtopall,"/hadoop/cms/store/user/vimartin/CMS2_V04-02-29/TTJets_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v2/ntuple*.root");
-    //    pickSkimIfExists(chtopall,"/nfs-7/userdata/cms2/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29_singleLepton/merged_ntuple_35.root");
-    //    pickSkimIfExists(chtopall,"/nfs-7/userdata/cms2/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29_singleLepton/merged*root");
+    pickSkimIfExists(chtopall,"/nfs-6/userdata/cms2/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged_ntuple.root");
+    //pickSkimIfExists(chtopall,"/nfs-6/userdata/cms2/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged_ntuple*root");
   }
 
   //----------------------------------------
@@ -373,145 +376,23 @@ void doAll(bool skipFWLite = true)
   }
 
   //----------------------------------------
-  // DATA: May10
-  //----------------------------------------
-
-  TChain* chdatamay10 = new  TChain("Events");
-
-  if(rundatamay10){
-
-    cout << "adding ElectronHad, MuHad, SingleMu May10 data" << endl;
-    
-    // May10
-    pickSkimIfExists(chdatamay10,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdatamay10,"/nfs-7/userdata/cms2/MuHad_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdatamay10,"/nfs-3/userdata/cms2/SingleMu_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
-
-  }
-
-  //----------------------------------------
-  // DATA: PRv4
-  //----------------------------------------
-
-  TChain* chdataprv4 = new  TChain("Events");
-
-  if(rundataprv4){
-    
-    cout << "adding ElectronHad, MuHad, SingleMu PRv4 data" << endl;
-
-    // PRv4
-    pickSkimIfExists(chdataprv4,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-PromptReco-v4_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdataprv4,"/nfs-7/userdata/cms2/MuHad_Run2011A-PromptReco-v4_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdataprv4,"/nfs-3/userdata/cms2/SingleMu_Run2011A-PromptReco-v4_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
-  }
-
-  //----------------------------------------
-  // DATA: Aug05
-  //----------------------------------------
-
-  TChain* chdataaug05 = new  TChain("Events");
-
-  if(rundataaug05){
-    
-    cout << "adding ElectronHad, MuHad, SingleMu Aug05 data" << endl;
-    
-    // Aug05
-    pickSkimIfExists(chdataaug05,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-05Aug2011-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdataaug05,"/nfs-7/userdata/cms2/MuHad_Run2011A-05Aug2011-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdataaug05,"/nfs-3/userdata/cms2/SingleMu_Run2011A-05Aug2011-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
-
-  }
-
-  //----------------------------------------
-  // DATA: PRv6
-  //----------------------------------------
-
-  TChain* chdataprv6     = new  TChain("Events");
-
-  if(rundataprv6){
-    
-    cout << "adding ElectronHad, MuHad, SingleMu PRv6 data" << endl;
-
-    // PRv6
-    pickSkimIfExists(chdataprv6,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-PromptReco-v6_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdataprv6,"/nfs-7/userdata/cms2/MuHad_Run2011A-PromptReco-v6_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdataprv6,"/nfs-3/userdata/cms2/SingleMu_Run2011A-PromptReco-v6_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
-  }
-
-  //----------------------------------------
-  // DATA: 2011B V33
-  //----------------------------------------
-
-  TChain* chdata2011b33 = new  TChain("Events");
-
-  if(rundata2011b33){
-    
-    cout << "adding ElectronHad, MuHad, SingleMu 2011B V33 data" << endl;
-
-    // 2011B
-    pickSkimIfExists(chdata2011b33,"/nfs-7/userdata/cms2/ElectronHad_Run2011B-PromptReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata2011b33,"/nfs-7/userdata/cms2/MuHad_Run2011B-PromptReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata2011b33,"/nfs-3/userdata/cms2/SingleMu_Run2011B-PromptReco-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
-
-  }
-
-  //----------------------------------------
-  // DATA: 2011B V34
-  //----------------------------------------
-
-  TChain* chdata2011b34 = new  TChain("Events");
-
-  if(rundata2011b34){
-    
-    cout << "adding ElectronHad, MuHad, SingleMu 2011B V34 data" << endl;
-    // 2011B
-    pickSkimIfExists(chdata2011b34,"/nfs-7/userdata/cms2/ElectronHad_Run2011B-PromptReco-v1_AOD/V04-02-34/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata2011b34,"/nfs-7/userdata/cms2/MuHad_Run2011B-PromptReco-v1_AOD/V04-02-35/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata2011b34,"/nfs-3/userdata/cms2/SingleMu_Run2011B-PromptReco-v1_AOD/V04-02-34/SingleLeptonAndTwoJets/merged*root");
-    
-  }
-
-  //----------------------------------------
-  // DATA
+  // data
   //----------------------------------------
 
   TChain* chdata     = new  TChain("Events");
 
   if(rundata){
     
-    cout << "adding ElectronHad and MuHad or SingleMu data" << endl;
+    cout << "adding SingleMu and SingleElectron data" << endl;
 
-    pickSkimIfExists(chdata,"/hadoop/cms/store/user/vimartin/SingleLeptonAndTwoJets/SingleMu_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged_ntuple_999999_0_skim.root");//l+2j filtered
-    /*
-    // May10
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/MuHad_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-3/userdata/cms2/SingleMu_Run2011A-May10ReReco-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");   
-    // PRv4
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-PromptReco-v4_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/MuHad_Run2011A-PromptReco-v4_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-3/userdata/cms2/SingleMu_Run2011A-PromptReco-v4_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
+    pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged_ntuple_193336_0_4.root");
 
-    // Aug05
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-05Aug2011-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/MuHad_Run2011A-05Aug2011-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-3/userdata/cms2/SingleMu_Run2011A-05Aug2011-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
+    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged*root");
+    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012A-PromptReco-v1_AOD/merged/merged*root");
 
-    // PRv6
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/ElectronHad_Run2011A-PromptReco-v6_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/MuHad_Run2011A-PromptReco-v6_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-3/userdata/cms2/SingleMu_Run2011A-PromptReco-v6_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
+    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012B-PromptReco-v1_AOD/merged/merged*root");
+    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012B-PromptReco-v1_AOD/merged/merged*root");
 
-    // 2011B
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/ElectronHad_Run2011B-PromptReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/MuHad_Run2011B-PromptReco-v1_AOD/V04-02-33/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-3/userdata/cms2/SingleMu_Run2011B-PromptReco-v1_AOD/V04-02-33/SingleLeptonAndTwoJets/merged*root");
-
-    // 2011B
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/ElectronHad_Run2011B-PromptReco-v1_AOD/V04-02-34/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-7/userdata/cms2/MuHad_Run2011B-PromptReco-v1_AOD/V04-02-35/SingleLeptonAndJets/merged*root");
-    pickSkimIfExists(chdata,"/nfs-3/userdata/cms2/SingleMu_Run2011B-PromptReco-v1_AOD/V04-02-34/SingleLeptonAndTwoJets/merged*root");
-    */
   }
 
 
