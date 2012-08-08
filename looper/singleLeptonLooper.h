@@ -243,13 +243,15 @@ class singleLeptonLooper
 	Float_t lep2pfjetdr_;
 
 	// HLT variables
-	Int_t   ldi_;
-	Int_t   ltri_;
-	Int_t   smu_;
-	Int_t   smu30_;
-	Int_t   trgmu30_;
-	Int_t   trg2mu30_;
-	Int_t   dil_;
+	/* Int_t   ldi_; */
+	/* Int_t   ltri_; */
+	/* Int_t   smu_; */
+	/* Int_t   smu30_; */
+	Int_t   trgmu1_;
+	Int_t   trgmu2_;
+	Int_t   trgel1_;
+	Int_t   trgel2_;
+	//Int_t   dil_;
 
 	// MC truth vars
 	Int_t   npartons_;
@@ -346,7 +348,17 @@ class singleLeptonLooper
         Int_t qgjet4_; 
         Int_t qgjet5_; 
         Int_t qgjet6_; 
+	Int_t hyptype_;
 
+	Int_t mm_;
+	Int_t mmtk_;
+	Int_t me_;
+	Int_t em_;
+	Int_t mu_;
+	Int_t ee_;
+	Int_t isomu24_;
+	Int_t ele27wp80_;
+	
  	LorentzVector*  nonisoel_;   
  	LorentzVector*  nonisomu_;   
 
@@ -500,12 +512,11 @@ class singleLeptonLooper
 	Float_t ptjetF23_;
 	Float_t ptjetO23_;
 	Float_t cosphijz_;
-	Int_t   ndavtx_;
 	Int_t   nels_;
 	Int_t   nmus_;
 	Int_t   ntaus_;
 	Int_t   nleps_;
-	Float_t ndavtxweight_;
+	Float_t nvtxweight_;
 	Float_t n3dvtxweight_;
 	Float_t etasc1_;
 	Float_t etasc2_;

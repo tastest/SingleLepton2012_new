@@ -1032,6 +1032,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       cms2.GetEntry(z);
 
+      // PrintTriggers();
+      // exit(0);
+
       if( cms2.evt_ww_rho_vor() != cms2.evt_ww_rho_vor() ){
 	cout << "Skipping event with rho = nan!!!" << endl;
 	continue;
@@ -1045,24 +1048,24 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	cout << "-------------------------------------------------------"   << endl;
 	cout << "Event " << z                                               << endl;
 	cout << "File  " << currentFile->GetTitle()                         << endl;
-	cout << evt_dataset() << " " << evt_run() << " " << evt_lumiBlock() << " " << evt_event() << endl;
+	cout << evt_dataset().at(0) << " " << evt_run() << " " << evt_lumiBlock() << " " << evt_event() << endl;
 	cout << "-------------------------------------------------------"   << endl;
       }
 
-      TString datasetname(evt_dataset());
+      TString datasetname(evt_dataset().at(0));
       bool isperiodA = datasetname.Contains("2011A") ? true : false;
       //      cout<<"dataset: "<<datasetname.Data()<<" isperiodA: "<<isperiodA<<endl;
 
       // skip stop-pair events with m(stop) > 850 GeV
-      if( TString(prefix).Contains("T2") ){
-	if( sparm_mG() > 600.0 ) continue;
-      }
+      // if( TString(prefix).Contains("T2") ){
+      // 	if( sparm_mG() > 600.0 ) continue;
+      // }
 
       //---------------------------------------------
       // event cleaning and good run list
       //---------------------------------------------
 
-      if( !cleaning_goodDAVertexApril2011() )                        continue;
+      if( !cleaning_goodVertexApril2011() )                          continue;
       if( isData && !goodrun(cms2.evt_run(), cms2.evt_lumiBlock()) ) continue;
 
       //---------------------
@@ -1232,6 +1235,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       dilrecoilparl_ = -999.;
       dilrecoilperp_ = -999.;
 
+      hyptype_ = -1;
+
       if( ngoodlep_ > 1 ){
 
 	maxpt = -1;
@@ -1257,6 +1262,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	lep2dpt_     = lepdpt.at(imaxpt2);
 	index2       = lepIndex.at(imaxpt2);
 	dilmass_     = sqrt((goodLeptons.at(imaxpt) + goodLeptons.at(imaxpt2)).mass2());
+
+	if     ( abs(id1_) == 11 && abs(id2_) == 11 ) hyptype_ = 3;
+	else if( abs(id1_) == 13 && abs(id2_) == 13 ) hyptype_ = 0;
+	else if( abs(id1_) == 11 && abs(id2_) == 13 ) hyptype_ = 2;
+	else if( abs(id1_) == 13 && abs(id2_) == 11 ) hyptype_ = 1;
+	else{
+	  cout << "ERROR! " << id1_ << " " << id2_ << endl;
+	}
 
 	if( id1_ > 0 && id2_ < 0 ){
 	  lepp_ = &goodLeptons.at(imaxpt);
@@ -1348,8 +1361,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       // require trigger
       //--------------------------------
 
-      int hypType = (leptype_==1) ? 0 : 3;//lepton type for dilepton triggers
-      if( !passSingleLepSUSYTrigger2011_v1( isData , leptype_ ) && !passSUSYTrigger2011_v1( isData , hypType , true ) ) continue;
+      //int hypType = (leptype_==1) ? 0 : 3;//lepton type for dilepton triggers
+      //if( !passSingleLepSUSYTrigger2011_v1( isData , leptype_ ) && !passSUSYTrigger2011_v1( isData , hypType , true ) ) continue;
 
       //-----------------------------------------------------------------
       // number of OS generic electrons *in addition to* primary lepton
@@ -1494,7 +1507,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if ( strcmp(prefix , "DYtautau" ) == 0 &&  ntaus != 2  ) continue;
 	
 	//splice together the DY samples - if its madgraph, then we do nothing
-	if(TString(prefix).Contains("DY") && TString(evt_dataset()).Contains("madgraph") == false) {	
+	if(TString(prefix).Contains("DY") && TString(evt_dataset().at(0)).Contains("madgraph") == false) {	
 	  bool doNotContinue = false;
 	  for(unsigned int i = 0; i < genps_p4().size(); i++){
 	    if(abs(genps_id()[i]) == 23 && genps_p4()[i].M() > 50.)
@@ -2148,12 +2161,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     
       for (size_t v = 0; v < cms2.vtxs_position().size(); ++v){
 	if(isGoodVertex(v)) ++nvtx_;
-      }
-
-      ndavtx_ = 0;
-    
-      for (size_t v = 0; v < cms2.davtxs_position().size(); ++v){
-	if(isGoodDAVertex(v)) ++ndavtx_;
       }
 
       npu_ = 0;
@@ -2846,19 +2853,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       weight_ = -1.;
 
       if( TString(prefix).Contains("T2") ){
-	mG_ = sparm_mG();
-	mL_ = sparm_mL();
-	x_  = sparm_mf();
+	mG_ = -999; //sparm_mG();
+	mL_ = -999; //sparm_mL();
+	x_  = -999; //sparm_mf();
 
-	weight_ = lumi * stopPairCrossSection(mG_) * (1000./50000.);
+	weight_ = -999; //lumi * stopPairCrossSection(mG_) * (1000./50000.);
 
 	if( doTenPercent )	  weight_ *= 10;
       }
 
       else if(strcmp(prefix,"LMscan") == 0){ 
 
-	m0_  = sparm_m0();
-	m12_ = sparm_m12();
+	m0_  = -999; //sparm_m0();
+	m12_ = -999; //sparm_m12();
 
 	ksusy_     = kfactorSUSY(m0_,m12_,"tanbeta10");
 	ksusyup_   = kfactorSUSY(m0_,m12_,"tanbeta10Scale20");
@@ -2990,12 +2997,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       topmass_      = -999;//topMass;                      //topepton mass //REPLACE TOPMASS
       y_	    = pfmet_ / sqrt( ht_ ); //y=MET/sqrt(HT)
 
-      strcpy(dataset_, cms2.evt_dataset().Data());  //dataset name
-      run_          = evt_run();                    //run
-      lumi_         = evt_lumiBlock();              //lumi
-      event_        = evt_event();                  //event
-      ndavtxweight_ = vtxweight(isData,true);
-
+      strcpy(dataset_, cms2.evt_dataset().at(0).Data());  //dataset name
+      run_          = evt_run();                          //run
+      lumi_         = evt_lumiBlock();                    //lumi
+      event_        = evt_event();                        //event
+      nvtxweight_   = vtxweight(isData);
       hbhe_         = evt_hbheFilter();
 
       k_ = 1;
@@ -3046,51 +3052,62 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       // triggers
       //-------------------------------------
 
-      //eltrijet_ = passHLTTrigger("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30_v3") ? 1 : 0;
-      //mutrijet_ = passHLTTrigger("HLT_IsoMu17_eta2p1_TriCentralPFJet30_v3") ? 1 : 0;
+      isomu24_   = passUnprescaledHLTTriggerPattern("HLT_IsoMu24_v"   )  ? 1 : 0;
+      ele27wp80_ = passUnprescaledHLTTriggerPattern("HLT_Ele27_WP80_v")  ? 1 : 0;
+      mm_        = passUnprescaledHLTTriggerPattern("HLT_Mu17_Mu8_v")                                     ? 1 : 0;
+      mmtk_      = passUnprescaledHLTTriggerPattern("HLT_Mu17_TkMu8_v")                                   ? 1 : 0;
+      me_        = passUnprescaledHLTTriggerPattern("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
+      em_        = passUnprescaledHLTTriggerPattern("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
+      ee_        = passUnprescaledHLTTriggerPattern("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
+   
 
-      ldi_  = passSingleLep2JetSUSYTrigger2011( isData , leptype_ ) ? 1 : 0;
-      ltri_ = passSingleLep3JetSUSYTrigger2011( isData , leptype_ ) ? 1 : 0;
-      smu_  = passSingleMuTrigger2011(          isData , leptype_ ) ? 1 : 0;
-      smu30_= passSingleMuTrigger2011_pt30(     isData , leptype_ ) ? 1 : 0;
-      dil_  = passSUSYTrigger2011_v1(     isData , hypType , true ) ? 1 : 0;
+      char* isomutrigname = (char*) "HLT_IsoMu24_v";
+      if( !isData ) isomutrigname = (char*) "HLT_IsoMu24_eta2p1_v";
 
-      trgmu30_  = -1;
-      trg2mu30_ = -1;
+      trgmu1_    = objectPassTrigger( *lep1_ , isomutrigname        , 0.1 ) ? 1 : 0;
+      if( ngoodlep_ > 1 )
+	trgmu2_    = objectPassTrigger( *lep2_ , isomutrigname      , 0.1 ) ? 1 : 0;
 
-      if( isData ){
- 	if( cms2.evt_run() >= 173212 ) trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
-	else                           trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_v"        , 0.1 ) ? 1 : 0;
+      trgel1_    = objectPassTrigger( *lep1_ , (char*) "HLT_Ele27_WP80_v"     , 0.1 ) ? 1 : 0;
+      if( ngoodlep_ > 1 )
+	trgel2_    = objectPassTrigger( *lep2_ , (char*) "HLT_Ele27_WP80_v"   , 0.1 ) ? 1 : 0;
+
+      // trgmu30_  = -1;
+      // trg2mu30_ = -1;
+
+      // if( isData ){
+      // 	if( cms2.evt_run() >= 173212 ) trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
+      // 	else                           
 	
-	if( ngoodlep_ > 1 ){
-	  if( cms2.evt_run() >= 173212 ) trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
-	  else                           trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_v"        , 0.1 ) ? 1 : 0;
-	}
+      // 	if( ngoodlep_ > 1 ){
+      // 	  if( cms2.evt_run() >= 173212 ) trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
+      // 	  else                           trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_v"        , 0.1 ) ? 1 : 0;
+      // 	}
 
-      }
+      // }
 
-      else{
+      // else{
 
-	// for MC, some samples have IsoMu30 and some have IsoMu30_eta2p1, so we need to check
+      // 	// for MC, some samples have IsoMu30 and some have IsoMu30_eta2p1, so we need to check
 
-	TString isoMuName    = triggerName("HLT_IsoMu30_v");
-	TString isoMu2p1Name = triggerName("HLT_IsoMu30_eta2p1_v");
+      // 	TString isoMuName    = triggerName("HLT_IsoMu30_v");
+      // 	TString isoMu2p1Name = triggerName("HLT_IsoMu30_eta2p1_v");
 
-	if( !isoMuName.Contains("TRIGGER_NOT_FOUND") ){
-	  trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_v" , 0.1 ) ? 1 : 0;
-	  if( ngoodlep_ > 1 ) 	  trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_v" , 0.1 ) ? 1 : 0;
-	}
+      // 	if( !isoMuName.Contains("TRIGGER_NOT_FOUND") ){
+      // 	  trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_v" , 0.1 ) ? 1 : 0;
+      // 	  if( ngoodlep_ > 1 ) 	  trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_v" , 0.1 ) ? 1 : 0;
+      // 	}
 	
-	else if( !isoMu2p1Name.Contains("TRIGGER_NOT_FOUND") ){
-	  trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
-	  if( ngoodlep_ > 1 ) 	  trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
-	}
+      // 	else if( !isoMu2p1Name.Contains("TRIGGER_NOT_FOUND") ){
+      // 	  trgmu30_ = objectPassTrigger( *lep1_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
+      // 	  if( ngoodlep_ > 1 ) 	  trg2mu30_ = objectPassTrigger( *lep2_ , (char*) "HLT_IsoMu30_eta2p1_v" , 0.1 ) ? 1 : 0;
+      // 	}
 
-	else{
-	  trgmu30_ = -2;
-	}
+      // 	else{
+      // 	  trgmu30_ = -2;
+      // 	}
 
-      }
+      // }
 
       //set trigger weight
       mutrigweight_  = getMuTriggerWeight   ( lep1_->pt() , lep1_->eta() );
@@ -3518,6 +3535,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("ptttbar",         &ptttbar_,          "ptttbar/F");
   outTree->Branch("mttbar",          &mttbar_,           "mttbar/F");
   outTree->Branch("npartons",        &npartons_,         "npartons/I");
+  outTree->Branch("hyptype",         &hyptype_,          "hyptype/I");
   outTree->Branch("maxpartonpt",     &maxpartonpt_,      "maxpartonpt/F");
   outTree->Branch("etattbar",        &etattbar_,         "etatbar/F");
   outTree->Branch("njetsoffset",     &njetsoffset_,      "njetsoffset/I");
@@ -3550,13 +3568,13 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("mult",            &mult_,             "mult/I");
   //outTree->Branch("eltrijet",        &eltrijet_,         "eltrijet/I");
   //outTree->Branch("mutrijet",        &mutrijet_,         "mutrijet/I");
-  outTree->Branch("ldi",             &ldi_,              "ldi/I");
-  outTree->Branch("ltri",            &ltri_,             "ltri/I");
-  outTree->Branch("smu",             &smu_,              "smu/I");
-  outTree->Branch("smu30",           &smu30_,            "smu30/I");
-  outTree->Branch("trgmu30",         &trgmu30_,          "trgmu30/I");
-  outTree->Branch("trg2mu30",        &trg2mu30_,         "trg2mu30/I");
-  outTree->Branch("dil",             &dil_,              "dil/I");
+  //outTree->Branch("ldi",             &ldi_,              "ldi/I");
+  //outTree->Branch("ltri",            &ltri_,             "ltri/I");
+  //outTree->Branch("smu",             &smu_,              "smu/I");
+  //outTree->Branch("smu30",           &smu30_,            "smu30/I");
+  //outTree->Branch("trgmu30",         &trgmu30_,          "trgmu30/I");
+  //outTree->Branch("trg2mu30",        &trg2mu30_,         "trg2mu30/I");
+  //outTree->Branch("dil",             &dil_,              "dil/I");
   outTree->Branch("mullgen",         &mullgen_,          "mullgen/I");
   outTree->Branch("multgen",         &multgen_,          "multgen/I");
   outTree->Branch("proc",            &proc_,             "proc/I");
@@ -3594,6 +3612,20 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("dildphi",         &dildphi_,          "dildphi/F");
   outTree->Branch("ngenjets",        &ngenjets_,         "ngenjets/I");
   outTree->Branch("njpt",            &njpt_,             "njpt/I");
+
+  outTree->Branch("trgmu1"         ,  &trgmu1_          ,    "trgmu1/I"      );
+  outTree->Branch("trgmu2"         ,  &trgmu2_          ,    "trgmu2/I"      );
+  outTree->Branch("trgel1"         ,  &trgel1_          ,    "trgel1/I"      );
+  outTree->Branch("trgel2"         ,  &trgel2_          ,    "trgel2/I"      );
+
+  outTree->Branch("isomu24"        ,  &isomu24_         ,    "isomu24/I"     );
+  outTree->Branch("ele27wp80"      ,  &ele27wp80_       ,    "ele27wp80/I"   );
+  outTree->Branch("mm"             ,  &mm_              ,    "mm/I"          );
+  outTree->Branch("mmtk"           ,  &mmtk_            ,    "mmtk/I"        );
+  outTree->Branch("me"             ,  &me_              ,    "me/I"          );
+  outTree->Branch("em"             ,  &em_              ,    "em/I"          );
+  outTree->Branch("mu"             ,  &mu_              ,    "mu/I"          );
+  outTree->Branch("ee"             ,  &ee_              ,    "ee/I"          );
 
   // pfjets L1FastL2L3Res
   outTree->Branch("npfjets30",        &npfjets30_,        "npfjets30/I");
@@ -3682,8 +3714,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("npuMinusOne",      &npuMinusOne_,      "npuMinusOne/I");
   outTree->Branch("npuPlusOne",       &npuPlusOne_,       "npuPlusOne/I");
   outTree->Branch("nvtx",             &nvtx_,             "nvtx/I");
-  outTree->Branch("ndavtx",           &ndavtx_,           "ndavtx/I");
-  outTree->Branch("ndavtxweight",     &ndavtxweight_,     "ndavtxweight/F");
+  outTree->Branch("nvtxweight",       &nvtxweight_,       "nvtxweight/F");
   outTree->Branch("n3dvtxweight",     &n3dvtxweight_,     "n3dvtxweight/F");
   outTree->Branch("pdfid1",           &pdfid1_,           "pdfid1/I");
   outTree->Branch("pdfid2",           &pdfid2_,           "pdfid2/I");
@@ -3887,21 +3918,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
 //--------------------------------------------------------------------
 
-vector<int> goodDAVertices(){
-
-  vector<int> myVertices;
-  myVertices.clear();
-  
-  for (size_t v = 0; v < cms2.davtxs_position().size(); ++v){
-    if( !isGoodDAVertex(v) ) continue;
-    myVertices.push_back(v);
-  }
-  
-  return myVertices;
-}
-
-//--------------------------------------------------------------------
-
 float singleLeptonLooper::dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx ){
   
   return ((cms2.trks_vertex_p4()[trkidx].z()-cms2.vtxs_position()[vtxidx].z()) - ((cms2.trks_vertex_p4()[trkidx].x()-cms2.vtxs_position()[vtxidx].x()) * cms2.trks_trk_p4()[trkidx].px() + (cms2.trks_vertex_p4()[trkidx].y() - cms2.vtxs_position()[vtxidx].y()) * cms2.trks_trk_p4()[trkidx].py())/cms2.trks_trk_p4()[trkidx].pt() * cms2.trks_trk_p4()[trkidx].pz()/cms2.trks_trk_p4()[trkidx].pt());
@@ -3936,9 +3952,9 @@ float singleLeptonLooper::trackIso( int thisPf , float coneR , float dz_thresh ,
     int vtxi    = -1;
       
     if (dovtxcut) {
-      for (unsigned int ivtx = 0; ivtx < cms2.davtxs_position().size(); ivtx++) {
+      for (unsigned int ivtx = 0; ivtx < cms2.vtxs_position().size(); ivtx++) {
 	
-	if(!isGoodDAVertex(ivtx)) continue;
+	if(!isGoodVertex(ivtx)) continue;
 	
 	float mydz = dz_trk_vtx(itrk,ivtx);
 	fillOverFlow( h_dz_vtx_trk , mydz );
