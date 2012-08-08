@@ -47,8 +47,9 @@
 #include "BtagFuncs.h"
 //#include "../Tools/bTagEff_BTV.h"
 
-bool verbose        = false;
-bool doTenPercent   = false;
+bool verbose              = false;
+bool doTenPercent         = false;
+bool vetoTransition       = true;
 
 //#include "../CORE/topmass/getTopMassEstimate.icc" // REPLACETOPMASS
 //#include "../CORE/triggerUtils.cc"
@@ -864,6 +865,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     cout << "setting json " << g_json << endl;
     set_goodrun_file( g_json );
 
+    set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS7_5p1fb_Zselection.root",true);
+
+    /*
     //set vtx reweighting hist - depends on pileup scenario
     if( TString(prefix).Contains("ttall") || TString(prefix).Contains("mcatnlo") 
      || TString(prefix).Contains("scaleup") || TString(prefix).Contains("scaledw") 
@@ -873,6 +877,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer11-PU_S3_START42_V11_4p7fb_ttbar.root",true);
     else
       set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer11MC_PUS4_4p7fb_Zselection.root",true);
+    */
 
     //    weight3D_init( "vtxreweight/Weight3D.root" );
 
@@ -896,19 +901,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   //string caloUncertaintyFile;
 
   if ( isData ) {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_42_V23_AK5PF_L1FastJet.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_42_V23_AK5PF_L2Relative.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_42_V23_AK5PF_L3Absolute.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_42_V23_AK5PF_L2L3Residual.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L1FastJet_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L2Relative_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L3Absolute_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L2L3Residual_AK5PF.txt");
 
-    pfUncertaintyFile = "jetCorrections/GR_R_42_V23_AK5PF_Uncertainty.txt";
+    pfUncertaintyFile = "jetCorrections/GR_R_52_V9_Uncertainty_AK5PF.txt";
   } 
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN42_V17_AK5PF_L1FastJet.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN42_V17_AK5PF_L2Relative.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN42_V17_AK5PF_L3Absolute.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START52_V9B_L1FastJet_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START52_V9B_L2Relative_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START52_V9B_L3Absolute_AK5PF.txt");
     
-    pfUncertaintyFile = "jetCorrections/DESIGN42_V17_AK5PF_Uncertainty.txt";
+    pfUncertaintyFile = "jetCorrections/START52_V9B_Uncertainty_AK5PF.txt";
   }
 
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
@@ -1116,8 +1121,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ngoodmu_  = 0;
             
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
-	if( els_p4().at(iel).pt() < 10 )                                              continue;
-	if( !pass_electronSelection( iel , electronSelection_ssV5 , false , false ) ) continue;
+	if( els_p4().at(iel).pt() < 10 )                                                continue;
+        if( !passElectronSelection_Stop2012_v1( iel , vetoTransition,vetoTransition) )  continue;
+
 	goodLeptons.push_back( els_p4().at(iel) );
 	lepchi2ndf.push_back( -9999. );
 	lepdpt.push_back( -9999. );
@@ -1131,7 +1137,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
           
       for( unsigned int imu = 0 ; imu < mus_p4().size(); ++imu ){
 	if( mus_p4().at(imu).pt() < 10 )           continue;
-	if( !muonId( imu , OSGeneric_v3 ))         continue;
+	if( !muonId( imu , ZMet2012_v1 ))         continue;
+
 	goodLeptons.push_back( mus_p4().at(imu) );
 	//in original OSGeneric_v3 version, cut on chi2ndf is at 10
 	lepchi2ndf.push_back( cms2.mus_gfit_chi2().at(imu)/cms2.mus_gfit_ndof().at(imu) );
@@ -1796,18 +1803,18 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    if( ID == 1 ){
 	      mlepid_       = 11 * els_charge().at(imatch);
 	      mlep_         = &els_p4().at(imatch);
-	      mleppassid_   = pass_electronSelection( imatch , electronSelection_ssV5_noIso ) ? 1 : 0;
-	      mleppassiso_  = pass_electronSelection( imatch , electronSelection_ssV5_iso   ) ? 1 : 0;
-	      mlepiso_      = electronIsolation_rel_v1(imatch, true );
+	      mleppassid_   = passElectronSelection_Stop2012_v1_NoIso( imatch , vetoTransition,vetoTransition) ? 1 : 0;
+	      mleppassiso_  = passElectronSelection_Stop2012_v1_Iso  ( imatch , vetoTransition,vetoTransition) ? 1 : 0;
+	      mlepiso_      = electronIsoValuePF2012_FastJetEffArea( imatch , 0.3 , 0 );
 	    }
 
 	    // found matched muon
 	    else if( ID == 2 ){
 	      mlepid_       = 13 * mus_charge().at(imatch);
 	      mlep_         = &mus_p4().at(imatch);
-	      mleppassid_   = muonIdNotIsolated( imatch , OSGeneric_v3 ) ? 1 : 0;
-	      mleppassiso_  = muonIsoValue(imatch,false) < 0.15 ? 1 : 0;
-	      mlepiso_      = muonIsoValue(imatch,false);
+	      mleppassid_   = muonIdNotIsolated( imatch , ZMet2012_v1 )   ? 1 : 0;
+	      mleppassiso_  = muonIsoValuePF2012_deltaBeta(imatch) < 0.15 ? 1 : 0;
+	      mlepiso_      = muonIsoValuePF2012_deltaBeta(imatch);
 	    }
 
 	    mlepdr_ = dRbetweenVectors( *mlep_ , *mclep2_ );
@@ -2666,8 +2673,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
 
-	if( els_p4().at(iel).pt() < 10 )                                                    continue;
-	if( !pass_electronSelection( iel , electronSelection_ssV5_noIso , false , false ) ) continue;
+	if( els_p4().at(iel).pt() < 10 )                                                         continue;
+	if( !passElectronSelection_Stop2012_v1_NoIso( iel , vetoTransition,vetoTransition))      continue;
 
 	// don't count the leptons that we already counted as good
 	bool isGoodLepton = false;
@@ -2697,7 +2704,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( unsigned int imu = 0 ; imu < mus_p4().size(); ++imu ){
 
 	if( mus_p4().at(imu).pt() < 10 )                   continue;
-	if( !muonIdNotIsolated(imu , OSGeneric_v3 ) )      continue;
+	if( !muonIdNotIsolated(imu , ZMet2012_v1 ) )       continue;
 
 	// don't count the leptons that we already counted as good
 	bool isGoodLepton = false;
@@ -3275,220 +3282,6 @@ void fillHistos(TProfile *h2[4][4],float xvalue, float yvalue, int myType, int n
   h2[myType][3]        -> Fill(xvalue, yvalue);      
   h2[3][nJetsIdx]      -> Fill(xvalue, yvalue);      
   h2[3][3]             -> Fill(xvalue, yvalue);      
-}
-
-//*****************************************************************
-// get the FR weight
-//*****************************************************************
-
-double singleLeptonLooper::getFRWeight(const int hypIdx, SimpleFakeRate* mufr, SimpleFakeRate * elfr, FREnum frmode, bool isData) {
-
-  //std::cout<<"Called singleLeptonLooper::getFRWeight"<<std::endl;
-
-  bool  estimateQCD   = false;
-  bool  estimateWJets = false;
-
-  if ( frmode == e_qcd ) {
-    estimateQCD   = true;
-    estimateWJets = false;
-  } 
-  else if( frmode == e_wjets ) {
-    estimateQCD   = false;
-    estimateWJets = true;
-  }
-  else {
-    std::cout<<"singleLeptonLooper::getFRWeight: bad FR mode given, fix this!"<<std::endl;
-    return -9999.;
-  }
-
-  if(hyp_type()[hypIdx] == 0) {
-
-    bool isGoodMut = false;
-    bool isGoodMul = false;
-    bool isFOMut   = false;
-    bool isFOMul   = false;
-    
-    unsigned int iMut = hyp_lt_index()[hypIdx];
-    unsigned int iMul = hyp_ll_index()[hypIdx];
-    
-    if( muonId( iMut , OSGeneric_v3 ) ) {
-      isGoodMut = true;
-    }
-    if( muonId( iMul , OSGeneric_v3 ) ) {
-      isGoodMul = true;
-    }
-    if( muonId( iMut , OSGeneric_v3_FO ) ) {
-      isFOMut = true;
-    }
-    if( muonId( iMul , OSGeneric_v3_FO ) ) {
-      isFOMul = true;
-    }
-
-    //for both WJets and QCD, we need both to be FOs at least
-    if(!isFOMut || !isFOMul)
-      return -9999.;
-
-    //if we want to estimate the fakes for QCD, then we ask that 
-    //both are not num objects, and that both are FO
-    if(estimateQCD) {
-      
-      //if at least one is a Numerator lepton, we return
-      if( isGoodMut || isGoodMul) 
-        return -9999.;
-      
-      double FRMut = mufr->getFR(mus_p4()[iMut].pt(), mus_p4()[iMut].eta());
-      double FRMul = mufr->getFR(mus_p4()[iMul].pt(), mus_p4()[iMul].eta());
-      return (FRMut/(1-FRMut))*(FRMul/(1-FRMul));
-    } 
-    else if(estimateWJets) {
-      
-      //need one to be a Numerator lepton, and the other to be FO but not num
-      if( isGoodMut && !isGoodMul && isFOMul) {
-        double FR = mufr->getFR(mus_p4()[iMul].pt(), mus_p4()[iMul].eta());
-        //cout << "mm, FR and FR/(1-FR) " << FR << ", " << FR/(1-FR) << endl;
-        return FR/(1-FR);
-      }
-      
-      //check the other muon
-      if( isGoodMul && !isGoodMut && isFOMut) {
-        double FR = mufr->getFR(mus_p4()[iMut].pt(), mus_p4()[iMut].eta());
-        //cout << "mm, FR and FR/(1-FR) " << FR << ", " << FR/(1-FR) << endl;
-        return FR/(1-FR);
-      }
-    }//estimate WJets
-    return -9999.;
-  }//mumu case
-  
-
-  //now we do the ee case
-  if(hyp_type()[hypIdx] == 3) {
-	  
-    unsigned int iElt = hyp_lt_index()[hypIdx];
-    unsigned int iEll = hyp_ll_index()[hypIdx];
-	  
-    bool isGoodElt = false;
-    bool isGoodEll = false;
-    bool isFOElt   = false;
-    bool isFOEll   = false;
-
-    if( pass_electronSelection( iElt , electronSelection_ssV5 ) ) {
-      isGoodElt = true;
-    }
-    if( pass_electronSelection( iEll , electronSelection_ssV5 ) ) {
-      isGoodEll = true;
-    }
-    if( pass_electronSelection( iElt , electronSelectionFOV5_ssVBTF80_v1 ) ) {
-      isFOElt   = true;
-    }
-    if( pass_electronSelection( iEll , electronSelectionFOV5_ssVBTF80_v1 ) ) {
-      isFOEll   = true;
-    }
-    
-    //for both WJets and QCD, we need both to be FOs at least
-    //if both are good, we continue
-    if( !isFOElt || !isFOEll)
-      return -9999.;
-
-    if(estimateQCD) {
-      
-      //if at least one is a Numerator object, then we return -9999.
-      if( isGoodElt || isGoodEll) 
-        return -9999.;
-      
-      double FRElt = elfr->getFR(els_p4()[iElt].pt(), els_p4()[iElt].eta());
-      double FREll = elfr->getFR(els_p4()[iEll].pt(), els_p4()[iEll].eta());
-      //cout << "ee, FRlt, FRll, FR " << FRElt << " " << FREll << " " << (FRElt/(1-FRElt))*(FREll/(1-FREll)) << endl;
-      return (FRElt/(1-FRElt))*(FREll/(1-FREll));
-    } 
-    else if(estimateWJets) {
-      
-      if(isGoodElt && !isGoodEll && isFOEll) {
-        double FR = elfr->getFR(els_p4()[iEll].pt(), els_p4()[iEll].eta());
-        //cout << "ee, FR and FR/(1-FR) " << FR << ", " << FR/(1-FR) << endl;
-        return FR/(1-FR);
-      }
-      //check the other electron 
-      if(isGoodEll && !isGoodElt && isFOElt) {
-        double FR = elfr->getFR(els_p4()[iElt].pt(), els_p4()[iElt].eta());
-        //cout << "ee, FR and FR/(1-FR) " << FR << ", " << FR/(1-FR) << endl;
-        return FR/(1-FR);
-      }
-      return -9999.;
-    }//estimateWJets
-    
-  }//ee case
-
-  if(hyp_type()[hypIdx] == 1 || hyp_type()[hypIdx] == 2) {
-
-    int iEl = 0;
-    int iMu = 0;
-    
-    if     ( abs(hyp_ll_id()[hypIdx])==11 && abs(hyp_lt_id()[hypIdx])==13 ){
-      iEl = hyp_ll_index()[hypIdx];
-      iMu = hyp_lt_index()[hypIdx];
-    }
-    else if( abs(hyp_ll_id()[hypIdx])==13 && abs(hyp_lt_id()[hypIdx])==11 ){
-      iEl = hyp_lt_index()[hypIdx];
-      iMu = hyp_ll_index()[hypIdx];
-    }
-    else{
-      cout << "ID ll " << hyp_ll_id()[hypIdx] << endl;
-      cout << "ID lt " << hyp_lt_id()[hypIdx] << endl;
-      cout << "Error in getFRWeight, quitting!" << endl;
-      exit(0); 
-    }
-
-    bool isGoodEl = false;
-    bool isFOEl   = false;
-    bool isGoodMu = false;
-    bool isFOMu   = false;
-
-    if( pass_electronSelection( iEl , electronSelection_ssV5 ) ){
-      isGoodEl = true;
-    }
-    if( muonId( iMu , OSGeneric_v3 ) ) { 
-      isGoodMu = true;
-    }
-    if( pass_electronSelection( iEl , electronSelectionFOV5_ssVBTF80_v1 ) ){
-      isFOEl = true;
-    }
-    if( muonId( iMu , OSGeneric_v3_FO ) ) { 
-      isFOMu = true;
-    }
-    
-    //if either fail FO, return!!!
-    if(!isFOMu || !isFOEl)
-      return -9999.;
-    
-    if(estimateQCD ) {
-      
-      //if at least one is a numerator, then we fail
-      if(isGoodMu || isGoodEl)
-        return -9999.;
-      
-      double FRMu = mufr->getFR(mus_p4()[iMu].pt(), mus_p4()[iMu].eta());
-      double FREl = elfr->getFR(els_p4()[iEl].pt(), els_p4()[iEl].eta());
-      return FRMu*FREl/(1-FRMu)/(1-FREl);
-    } 
-    else if(estimateWJets) {
-      
-      //need one to be a numerator lepton and the other to be a FO
-      if(isGoodMu && !isGoodEl && isFOEl) {
-        double FR = elfr->getFR(els_p4()[iEl].pt(), els_p4()[iEl].eta());
-        //cout << "emu, el FR, FR/(1-FR): " << FR << ", " << FR/(1-FR) << endl;
-        return FR/(1-FR);
-      }
-      
-      if(isGoodEl && !isGoodMu && isFOMu) {
-        double FR = mufr->getFR(mus_p4()[iMu].pt(), mus_p4()[iMu].eta());
-        //cout << "emu, mu FR, FR/(1-FR): " << FR << ", " << FR/(1-FR) << endl;
-        return FR/(1-FR);
-      }
-      return -9999.;
-    }
-  } //emu case
-
-  return -9999.;
 }
 
 //--------------------------------------------------------------------

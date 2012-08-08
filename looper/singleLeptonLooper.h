@@ -537,9 +537,6 @@ class singleLeptonLooper
 	Float_t mbb_;
 	Int_t   isdata_;
 
-        // for fakeRates
-        double getFRWeight(const int hypIdx, SimpleFakeRate *mufr, SimpleFakeRate *elfr, FREnum frmode, bool isData);
-
         // Lots and lots of histograms
         TH1F* h_PU_trkpt;
         TH1F* h_dz_vtx_trk;
