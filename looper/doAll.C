@@ -41,7 +41,7 @@ void doAll(bool skipFWLite = true)
   // choose version, output will be written to output/[version]
   //---------------------------------------------------------------
   
-  const char* version    = "V00-00-01";
+  const char* version    = "V00-00-02";
   const char* jsonfile   = "jsons/Cert_190456-196531_8TeV_PromptReco_Collisions12_JSON_goodruns.txt"; // 5.10/fb
   const bool  useMCSkims = true;
 
@@ -107,16 +107,13 @@ void doAll(bool skipFWLite = true)
   bool runT2bw     = 0;
   bool runT2bw_few = 0;
 
-  bool rundatamay10   = 0;
-  bool rundataprv4    = 0;
-  bool rundataaug05   = 0;
-  bool rundataprv6    = 0;
-  bool rundata2011b33 = 0;
-  bool rundata2011b34 = 0;
-
-  bool rundimu     = 0;
-  bool runmueg     = 0;
-  bool rundiel     = 0;
+  bool rundata2012a      = 0;
+  bool rundata2012b      = 0;
+  bool rundatasinglemu   = 0;
+  bool rundatasingleele  = 0;
+  bool rundatadimu       = 0;
+  bool rundatadiele      = 0;
+  bool rundatamueg       = 0;
 
   //alternative ttbar samples
   bool runtt_scaleup = 0;
@@ -189,8 +186,10 @@ void doAll(bool skipFWLite = true)
 
   TChain* chtopall = new TChain("Events");
   if (runttall) {
-    pickSkimIfExists(chtopall,"/nfs-6/userdata/cms2/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged_ntuple.root");
-    //pickSkimIfExists(chtopall,"/nfs-6/userdata/cms2/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged_ntuple*root");
+    //single file for testing
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S6_START52_V9-v1/V05-02-28/SingleOrDiLepton/merged_ntuple_112.root");
+    //    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S6_START52_V9-v1/V05-02-28/SingleOrDiLepton/merged*.root");
+
   }
 
   //----------------------------------------
@@ -199,45 +198,75 @@ void doAll(bool skipFWLite = true)
 
   TChain* chtt_scaleup = new TChain("Events");
   if (runtt_scaleup) {
+    cout << "UPDATE 7 TeV TT SCALEUP SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     //    pickSkimIfExists(chtt_scaleup,"/nfs-4/userdata/cms2/TTjets_TuneZ2_scaleup_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
     pickSkimIfExists(chtt_scaleup,"/hadoop/cms/store/group/snt/papers2011/Fall11MC/TTjets_TuneZ2_scaleup_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1/V04-02-29/*.root");
   }
   TChain* chtt_scaledw = new TChain("Events");
   if (runtt_scaledw) {
+    cout << "UPDATE 7 TeV TT SCALEDOWN SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     //    pickSkimIfExists(chtt_scaledw,"/nfs-4/userdata/cms2/TTjets_TuneZ2_scaledown_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
     pickSkimIfExists(chtt_scaledw,"/nfs-6/userdata/cms2/TTjets_TuneZ2_scaledown_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v2/V04-02-29/merged*root");
   }
   TChain* chtt_matchup = new TChain("Events");
   if (runtt_matchup) {
+    cout << "UPDATE 7 TeV TT MATCHUP SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     //    pickSkimIfExists(chtt_matchup,"/nfs-4/userdata/cms2/TTjets_TuneZ2_matchingup_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
     pickSkimIfExists(chtt_matchup,"/hadoop/cms/store/user/vimartin/CMS2_V04-02-29/TTjets_TuneZ2_matchingup_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v2/*.root");
   }
   TChain* chtt_matchdw = new TChain("Events");
   if (runtt_matchdw) {
+    cout << "UPDATE 7 TeV TT MATCH DOWN SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_matchdw,"/nfs-4/userdata/cms2/TTjets_TuneZ2_matchingdown_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
   }
   TChain* chtt_massup = new TChain("Events");
   if (runtt_massup) {
+    cout << "UPDATE 7 TeV TT MASS UP SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_massup,"/nfs-4/userdata/cms2/TTJets_TuneZ2_mass178_5_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v3/V04-02-29/merged*root");
   }
   TChain* chtt_massdw = new TChain("Events");
   if (runtt_massdw) {
+    cout << "UPDATE 7 TeV TT MASS DOWN SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_massdw,"/nfs-4/userdata/cms2/TTJets_TuneZ2_mass166_5_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v3/V04-02-29/merged*root");
   }
   TChain* chtt_pythia = new TChain("Events");
   if (runtt_pythia) {
+    cout << "UPDATE 7 TeV TT PYTHIA SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_pythia,"/nfs-7/userdata/cms2/TT_TuneZ2_7TeV-pythia6-tauola_Summer11-PU_S3_START42_V11-v2/V04-02-29/merged*root");
   }
   TChain* chtt_mcatnlo = new TChain("Events");
   if (runtt_mcatnlo) {
+    cout << "UPDATE 7 TeV TT MCATNLO SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_mcatnlo,"/nfs-6/userdata/cms2/TT_TuneZ2_7TeV-mcatnlo_Fall11-PU_S6_START42_V14B-v1_genfix/V04-02-29/merged*root");
   }
   TChain* chtt_powheg = new TChain("Events");
   if (runtt_powheg) {
+    cout << "UPDATE 7 TeV TT POWHEG SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_powheg,"/hadoop/cms/store/group/snt/papers2011/Summer11MC/TT_TuneZ2_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
   }
   TChain* chtt_notauola = new TChain("Events");
   if (runtt_notauola) {
+    cout << "UPDATE 7 TeV TT POWHEG NO TAUOLA SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chtt_notauola,"/nfs-4/userdata/cms2/TTTo2L2Nu2B_7TeV-powheg-pythia6_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
   }
 
@@ -247,8 +276,12 @@ void doAll(bool skipFWLite = true)
 
   TChain* chWjets = new  TChain("Events");
   if(runWjets){
-    //pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2011/Summer11MC/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2011/Summer11MC/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLepton/merged_ntuple.root");
+
+    //single file for testing
+    pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged_ntuple_455.root");
+
+    //pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*root");
+
   }
 
   //----------------------------------------                                                                                                                                                                
@@ -257,6 +290,9 @@ void doAll(bool skipFWLite = true)
 
   TChain* chVV = new  TChain("Events");
   if(runVV){
+    cout << "UPDATE 7 TeV DIBOSON SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chVV, "/hadoop/cms/store/group/snt/papers2011/Summer11MC/WW_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLepton/merged*root");
     pickSkimIfExists(chVV, "/hadoop/cms/store/group/snt/papers2011/Summer11MC/WZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLepton/merged*root");
     pickSkimIfExists(chVV, "/hadoop/cms/store/group/snt/papers2011/Summer11MC/ZZ_TuneZ2_7TeV_pythia6_tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLepton/merged*root");
@@ -279,6 +315,9 @@ void doAll(bool skipFWLite = true)
 
   TChain* chVVV = new  TChain("Events");
   if(runVVV){
+    cout << "UPDATE 7 TeV TRIBOSON SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chVVV, "/nfs-3/userdata/cms2/WWPhoton_TuneZ2_7TeV-madgraphCMSSW42xPUv1_spadhi-WWPhoton_TuneZ2_7TeV-madgraphCMSSW42xPUv1-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*root");
     pickSkimIfExists(chVVV, "/nfs-3/userdata/cms2/WWZNoGstar_TuneZ2_7TeV-madgraphCMSSW42xPUv1_spadhi-WWZNoGstar_TuneZ2_7TeV-madgraphCMSSW42xPUv1-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*root");
     pickSkimIfExists(chVVV, "/nfs-3/userdata/cms2/WWW_TuneZ2_7TeV-madgraphCMSSW42xPUv1_spadhi-WWW_TuneZ2_7TeV-madgraphCMSSW42xPUv1-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*root");
@@ -292,16 +331,9 @@ void doAll(bool skipFWLite = true)
 
   TChain* chDYtot = new  TChain("Events");
   if(runDYtot){
-    string dypath = "/hadoop/cms/store/user/vimartin/SingleLeptonAndTwoJets/";
-    //pickSkimIfExists(chDYtot,dypath+"DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    pickSkimIfExists(chDYtot,dypath+"DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged_ntuple_skim.root");
-    // samples in specific decay modes
-    // pickSkimIfExists(chDYtot,dypath+"DYToTauTau_M-10To20_TuneZ2_7TeV-pythia6-tauola_Summer11-PU_S3_START42_V11-v2/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    // pickSkimIfExists(chDYtot,dypath+"DYToTauTau_M-20_CT10_TuneZ2_7TeV-powheg-pythia-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    // pickSkimIfExists(chDYtot,dypath+"DYToMuMu_M-10To20_CT10_TuneZ2_7TeV-powheg-pythia_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    // pickSkimIfExists(chDYtot,dypath+"DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    // pickSkimIfExists(chDYtot,dypath+"DYToEE_M-10To20_CT10_TuneZ2_7TeV-powheg-pythia_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
-    // pickSkimIfExists(chDYtot,dypath+"DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia_Summer11-PU_S4_START42_V11-v1/V04-02-29/SingleLeptonAndTwoJets/merged*root");
+
+    pickSkimIfExists(chDYtot,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12-PU_S7_START52_V9-v2/V05-02-27/NewCopy/merged*.root");
+
   }
 
   //----------------------------------------
@@ -310,12 +342,14 @@ void doAll(bool skipFWLite = true)
   
   TChain* chtW = new  TChain("Events");
   if (runtW) {
-    pickSkimIfExists(chtW,"/nfs-7/userdata/benhoob/cms2/T_TuneZ2_s-channel_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
-    pickSkimIfExists(chtW,"/nfs-7/userdata/benhoob/cms2/Tbar_TuneZ2_s-channel_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
-    pickSkimIfExists(chtW,"/nfs-7/userdata/benhoob/cms2/T_TuneZ2_t-channel_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
-    pickSkimIfExists(chtW,"/nfs-7/userdata/benhoob/cms2/Tbar_TuneZ2_t-channel_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
-    pickSkimIfExists(chtW,"/nfs-7/userdata/benhoob/cms2/T_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
-    pickSkimIfExists(chtW,"/nfs-7/userdata/benhoob/cms2/Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29/merged*root");
+
+    pickSkimIfExists(chtW,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*.root");
+    pickSkimIfExists(chtW,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*.root");
+    pickSkimIfExists(chtW,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*.root");
+    pickSkimIfExists(chtW,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*.root");
+    pickSkimIfExists(chtW,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*.root");
+    pickSkimIfExists(chtW,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/Tbar_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/merged*.root");
+
   }
 
   //----------------------------------------
@@ -324,7 +358,10 @@ void doAll(bool skipFWLite = true)
   
   TChain* chttV = new  TChain("Events");
   if (runttV) {
-      pickSkimIfExists(chttV,"/nfs-3/userdata/cms2/TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi-TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*.root");
+    cout << "UPDATE 7 TeV TTV SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
+    pickSkimIfExists(chttV,"/nfs-3/userdata/cms2/TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2_spadhi-TTW_TuneZ2_7TeV-madgraphCMSSW42xPUv2-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*.root");
     pickSkimIfExists(chttV,"/nfs-6/userdata/cms2/TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi-TTZ_TuneZ2_7TeV-madgraphCMSSW42xPUv3-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*.root");
     pickSkimIfExists(chttV,"/nfs-3/userdata/cms2/TTPhoton_TuneZ2_7TeV-madgraphCMSSW42xPUv3_spadhi-TTPhoton_TuneZ2_7TeV-madgraphCMSSW42xPUv3-9ab11d163a88ab8f3641ab081403ebc5_singleLepton/CMS2_VB04-02-29_FastSim/merged*.root");
   }
@@ -335,6 +372,9 @@ void doAll(bool skipFWLite = true)
 
   TChain *chT2tt_few = new TChain("Events");
   if (runT2tt_few) {
+    cout << "UPDATE 7 TeV T2TT SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     //350/100 (from ATLAS paper)
     // pickSkimIfExists(chT2tt_few,"/nfs-7/userdata/cms2/SMS-T2tt_Mstop-225to1200_mLSP-50to1025_7TeV-Pythia6Z_Summer11-PU_START42_V11_FastSim-v1/V04-02-20-04/merged_ntuple_122.root");
     // pickSkimIfExists(chT2tt_few,"/nfs-7/userdata/cms2/SMS-T2tt_Mstop-225to1200_mLSP-50to1025_7TeV-Pythia6Z_Summer11-PU_START42_V11_FastSim-v1/V04-02-20-04/merged_ntuple_274.root");
@@ -354,6 +394,9 @@ void doAll(bool skipFWLite = true)
 
   TChain *chT2tt = new TChain("Events");
   if (runT2tt) {
+    cout << "UPDATE 7 TeV T2TT SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chT2tt,"/nfs-7/userdata/cms2/SMS-T2tt_Mstop-225to1200_mLSP-50to1025_7TeV-Pythia6Z_Summer11-PU_START42_V11_FastSim-v1/V04-02-20-04/merged*root");
   }
 
@@ -363,6 +406,9 @@ void doAll(bool skipFWLite = true)
 
   TChain *chT2bw = new TChain("Events");
   if (runT2bw) {
+    cout << "UPDATE 7 TeV T2BW SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chT2bw,"/nfs-7a/userdata/cms2/SMS-T2bw_x-0p25to0p75_mStop-50to850_mLSP-50to800_7TeV-Pythia6Z_Summer11-PU_START42_V11_FSIM-v1/VB04-02-29_Fastsim/merged*root");
   }
 
@@ -372,6 +418,9 @@ void doAll(bool skipFWLite = true)
 
   TChain *chT2bw_few = new TChain("Events");
   if (runT2bw_few) {
+    cout << "UPDATE 7 TeV T2BW SAMPLE!!!! QUITTING!!!" << endl;
+    exit(0);
+
     pickSkimIfExists(chT2bw_few,"");
   }
 
@@ -385,60 +434,90 @@ void doAll(bool skipFWLite = true)
     
     cout << "adding SingleMu and SingleElectron data" << endl;
 
-    pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged_ntuple_193336_0_4.root");
+    //    pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged_ntuple_193336_0_4.root");
 
-    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged*root");
-    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012A-PromptReco-v1_AOD/merged/merged*root");
+    pickSkimIfExists(chdata,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdata,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
+    
+    pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
+    
+  }
 
-    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012B-PromptReco-v1_AOD/merged/merged*root");
-    // pickSkimIfExists(chdata,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012B-PromptReco-v1_AOD/merged/merged*root");
+  TChain* chdata2012a     = new  TChain("Events");
+
+  if(rundata2012a){
+    
+    cout << "adding SingleMu and SingleElectron data for 2012A" << endl;
+
+    pickSkimIfExists(chdata2012a,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdata2012a,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    
+  }
+
+  TChain* chdata2012b     = new  TChain("Events");
+
+  if(rundata2012b){
+    
+    cout << "adding SingleMu and SingleElectron data for 2012B" << endl;
+
+    pickSkimIfExists(chdata2012b,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdata2012b,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
+    
+  }
+
+  TChain* chdatasinglemu     = new  TChain("Events");
+
+  if(rundatasinglemu){
+    
+    cout << "adding SingleMu data" << endl;
+
+    pickSkimIfExists(chdatasinglemu,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdatasinglemu,"/hadoop/cms/store/user/jaehyeok/CMSSW_5_2_3_patch4_V05-02-27/SingleMu_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
 
   }
 
+  TChain* chdatasingleele     = new  TChain("Events");
+
+  if(rundatasingleele){
+    
+    cout << "adding SingleElectron data" << endl;
+
+    pickSkimIfExists(chdatasingleele,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdatasingleele,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/SingleElectron_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
+
+  }
 
   TChain* chdimu     = new  TChain("Events");
 
-  if(rundimu){
+  if(rundatadimu){
     
     cout << "adding DoubleMuon data" << endl;
 
-    pickSkimIfExists(chdimu,"/nfs-4/userdata/cms2/DoubleMu_Run2011A-May10ReReco-v1_AOD/V04-02-20/SSignSkim/skim*root");
-    pickSkimIfExists(chdimu,"/nfs-4/userdata/cms2/DoubleMu_Run2011A-PromptReco-v4_AOD/V04-02-20/DoubleMuTriggerSkim/skim*root");
-    pickSkimIfExists(chdimu,"/nfs-6/userdata/cms2/DoubleMu_Run2011A-05Aug2011-v1_AOD/V04-02-30/DoubleMuTriggerSkim/skim*root");
-    pickSkimIfExists(chdimu,"/nfs-6/userdata/cms2/DoubleMu_Run2011A-PromptReco-v6_AOD/V04-02-30/DoubleMuTriggerSkim/skim*root");   
-    pickSkimIfExists(chdimu,"/nfs-6/userdata/cms2/DoubleMu_Run2011B-PromptReco-v1_AOD/V04-02-30/DoubleMuTriggerSkim/skim*root");
-    pickSkimIfExists(chdimu,"/nfs-6/userdata/cms2/DoubleMu_Run2011B-PromptReco-v1_AOD/V04-02-34/DoubleMuTriggerSkim/skim*root");
-
+    pickSkimIfExists(chdimu,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/DoubleMu_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdimu,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/DoubleMu_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
 
   }
 
   TChain* chmueg     = new  TChain("Events");
 
-  if(runmueg){
+  if(rundatamueg){
     
     cout << "adding MuEG data" << endl;
 
-    pickSkimIfExists(ch,"/nfs-4/userdata/cms2/MuEG_Run2011A-May10ReReco-v1_AOD/V04-02-20/SSignSkim/skim*root");
-    pickSkimIfExists(ch,"/hadoop/cms/store/user/yanjuntu/CMSSW_4_2_4_V04-02-20/MuEG_Run2011A-PromptReco-v4_AOD/CMSSW_4_2_4_V04-02-20_merged/V04-02-20/merged*root");
-    pickSkimIfExists(ch,"/nfs-6/userdata/cms2/MuEG_Run2011A-05Aug2011-v1_AOD/V04-02-30/SSignSkim/skim*root");
-    pickSkimIfExists(ch,"/nfs-6/userdata/cms2/MuEG_Run2011A-PromptReco-v6_AOD/V04-02-30/SSignSkim/skim*root");
-    pickSkimIfExists(ch,"/nfs-6/userdata/cms2/MuEG_Run2011B-PromptReco-v1_AOD/V04-02-30/SSignSkim/skim*root");
-    pickSkimIfExists(ch,"/nfs-6/userdata/cms2/MuEG_Run2011B-PromptReco-v1_AOD/V04-02-34/SSignSkim/skim*root");
+    pickSkimIfExists(chmueg,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/MuEG_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chmueg,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/MuEG_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
 
   }
   
   TChain* chdiel     = new  TChain("Events");
 
-  if(rundiel){
+  if(rundatadiel){
     
     cout << "adding DoubleElectron data" << endl;
 
-    pickSkimIfExists(chdiel,"/nfs-4/userdata/cms2/DoubleElectron_Run2011A-May10ReReco-v1_AOD/V04-02-20/SSignSkim/skim*root");
-    pickSkimIfExists(chdiel,"/nfs-4/userdata/cms2/DoubleElectron_Run2011A-PromptReco-v4_AOD/V04-02-20/DoubleElectronTriggerSkim/skim*root");
-    pickSkimIfExists(chdiel,"/nfs-6/userdata/cms2/DoubleElectron_Run2011A-05Aug2011-v1_AOD/V04-02-30/DoubleElectronTriggerSkim/skim*root");
-    pickSkimIfExists(chdiel,"/nfs-6/userdata/cms2/DoubleElectron_Run2011A-PromptReco-v6_AOD/V04-02-30/DoubleElectronTriggerSkim/skim*root");
-    pickSkimIfExists(chdiel,"/nfs-6/userdata/cms2/DoubleElectron_Run2011B-PromptReco-v1_AOD/V04-02-30/DoubleElectronTriggerSkim/skim*root");
-    pickSkimIfExists(chdiel,"/nfs-6/userdata/cms2/DoubleElectron_Run2011B-PromptReco-v1_AOD/V04-02-34/DoubleElectronTriggerSkim/skim*root");
+    pickSkimIfExists(chdiel,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/DoubleElectron_Run2012A-PromptReco-v1_AOD/merged/merged*.root");
+    pickSkimIfExists(chdiel,"/hadoop/cms/store/user/yanjuntu/CMSSW_5_2_3_patch4_V05-02-27/DoubleElectron_Run2012B-PromptReco-v1_AOD/merged/merged*.root");
 
   }
   
@@ -449,40 +528,52 @@ void doAll(bool skipFWLite = true)
   float lumi              = 1.0; 
   
   //--------------------------------------------------------------------
-  if (rundatamay10) {
-    cout << "Processing datamay10" << endl;
-    looper->ScanChain(chdatamay10,"datamay10", 1, 1, lumi);
-    cout << "Done processing datamay10" << endl;
+  if (rundata) {
+    cout << "Processing data" << endl;
+    looper->ScanChain(chdata,"data", 1, 1, lumi);
+    cout << "Done processing data" << endl;
   }
   //--------------------------------------------------------------------
-  if (rundataprv4) {
-    cout << "Processing dataprv4" << endl;
-    looper->ScanChain(chdataprv4,"dataprv4", 1, 1, lumi);
-    cout << "Done processing dataprv4" << endl;
+  if (rundata2012a) {
+    cout << "Processing data2012a" << endl;
+    looper->ScanChain(chdata2012a,"data2012a", 1, 1, lumi);
+    cout << "Done processing data2012a" << endl;
   }
   //--------------------------------------------------------------------
-  if (rundataaug05) {
-    cout << "Processing dataaug05" << endl;
-    looper->ScanChain(chdataaug05,"dataaug05", 1, 1, lumi);
-    cout << "Done processing dataaug05" << endl;
-  }
-		  //--------------------------------------------------------------------
-  if (rundataprv6) {
-    cout << "Processing dataprv6" << endl;
-    looper->ScanChain(chdataprv6,"dataprv6", 1, 1, lumi);
-    cout << "Done processing dataprv6" << endl;
+  if (rundata2012b) {
+    cout << "Processing data2012b" << endl;
+    looper->ScanChain(chdata2012b,"data2012b", 1, 1, lumi);
+    cout << "Done processing data2012b" << endl;
   }
   //--------------------------------------------------------------------
-  if (rundata2011b33) {
-    cout << "Processing data2011b33" << endl;
-    looper->ScanChain(chdata2011b33,"data2011b33", 1, 1, lumi);
-    cout << "Done processing data2011b33" << endl;
+  if (runsinglemu) {
+    cout << "Processing single muon" << endl;
+    looper->ScanChain(chsinglemu,"singlemu", 1, 1, lumi);
+    cout << "Done processing single muon" << endl;
+  }
+//--------------------------------------------------------------------
+  if (runsingleele) {
+    cout << "Processing single electron" << endl;
+    looper->ScanChain(chsingleele,"singleele", 1, 1, lumi);
+    cout << "Done processing single electron" << endl;
   }
   //--------------------------------------------------------------------
-  if (rundata2011b34) {
-    cout << "Processing data2011b34" << endl;
-    looper->ScanChain(chdata2011b34,"data2011b34", 1, 1, lumi);
-    cout << "Done processing data2011b34" << endl;
+  if (rundatadimu) {
+    cout << "Processing dimuon data" << endl;
+    looper->ScanChain(chdimu,"dimu", 1, 1, lumi);
+    cout << "Done processing dimuon" << endl;
+  }
+  //--------------------------------------------------------------------
+  if (rundatamueg) {
+    cout << "Processing MuEG data" << endl;
+    looper->ScanChain(chmueg,"mueg", 1, 1, lumi);
+    cout << "Done processing MuEG" << endl;
+  }
+  //--------------------------------------------------------------------
+  if (rundatadiel) {
+    cout << "Processing dielectron data" << endl;
+    looper->ScanChain(chdiel,"diel", 1, 1, lumi);
+    cout << "Done processing Dielectron" << endl;
   }
   //--------------------------------------------------------------------
   if (runttall) {
@@ -621,30 +712,6 @@ void doAll(bool skipFWLite = true)
     cout << "Processing T2bw few.. " << endl;
     looper->ScanChain(chT2bw_few,"T2bw_few", 1, 1, lumi);
     cout << "Done processing T2bw few.. " << endl;
-  }
-  //--------------------------------------------------------------------
-  if (rundata) {
-    cout << "Processing data" << endl;
-    looper->ScanChain(chdata,"data", 1, 1, lumi);
-    cout << "Done processing data" << endl;
-  }
-  //--------------------------------------------------------------------
-  if (rundimu) {
-    cout << "Processing dimuon data" << endl;
-    looper->ScanChain(chdimu,"dimu", 1, 1, lumi);
-    cout << "Done processing Dimuon" << endl;
-  }
-  //--------------------------------------------------------------------
-  if (runmueg) {
-    cout << "Processing MuEG data" << endl;
-    looper->ScanChain(chmueg,"mueg", 1, 1, lumi);
-    cout << "Done processing MuEG" << endl;
-  }
-  //--------------------------------------------------------------------
-  if (rundiel) {
-    cout << "Processing dielectron data" << endl;
-    looper->ScanChain(chdiel,"diel", 1, 1, lumi);
-    cout << "Done processing Dielectron" << endl;
   }
   //--------------------------------------------------------------------
   

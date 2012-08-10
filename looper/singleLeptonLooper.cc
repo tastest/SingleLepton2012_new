@@ -846,7 +846,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
   bool isLM = TString(prefix).Contains("LM");
   bool isData = false;
-  if( TString(prefix).Contains("data") || TString(prefix).Contains("2011") 
+  if( TString(prefix).Contains("data") || TString(prefix).Contains("2012") 
       || TString(prefix).Contains("dimu") || TString(prefix).Contains("diel")
       || TString(prefix).Contains("mueg") ){
     cout << "DATA!!!" << endl;
