@@ -512,7 +512,7 @@ void doAll(bool skipFWLite = true)
   
   TChain* chdiel     = new  TChain("Events");
 
-  if(rundatadiel){
+  if(rundatadiele){
     
     cout << "adding DoubleElectron data" << endl;
 
@@ -546,13 +546,13 @@ void doAll(bool skipFWLite = true)
     cout << "Done processing data2012b" << endl;
   }
   //--------------------------------------------------------------------
-  if (runsinglemu) {
+  if (rundatasinglemu) {
     cout << "Processing single muon" << endl;
     looper->ScanChain(chsinglemu,"singlemu", 1, 1, lumi);
     cout << "Done processing single muon" << endl;
   }
 //--------------------------------------------------------------------
-  if (runsingleele) {
+  if (rundatasingleele) {
     cout << "Processing single electron" << endl;
     looper->ScanChain(chsingleele,"singleele", 1, 1, lumi);
     cout << "Done processing single electron" << endl;
@@ -570,7 +570,7 @@ void doAll(bool skipFWLite = true)
     cout << "Done processing MuEG" << endl;
   }
   //--------------------------------------------------------------------
-  if (rundatadiel) {
+  if (rundatadiele) {
     cout << "Processing dielectron data" << endl;
     looper->ScanChain(chdiel,"diel", 1, 1, lumi);
     cout << "Done processing Dielectron" << endl;
