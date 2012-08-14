@@ -81,8 +81,9 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   //-------------------------------------
   char* sample;
   //MC
-  if (infile.Contains("TTJets_MassiveBinDECAY_TuneZ2star_8TeV")) sample = Form("ttall_%s",              outfileid.Data());
-  else if (infile.Contains("TTJets_TuneZ2star_8TeV"))            sample = Form("ttall_nomassivebin_%s", outfileid.Data());
+  if (infile.Contains("TTJets_MassiveBinDECAY_TuneZ2star_8TeV")) sample = Form("ttall_massivebin%s",   outfileid.Data());
+  else if (infile.Contains("TTJets_TuneZ2star_8TeV"))            sample = Form("ttall_%s",             outfileid.Data());
+  //  else if (infile.Contains("TTJets_TuneZ2star_8TeV"))            sample = Form("ttall_nomassivebin_%s", outfileid.Data());
   else if (infile.Contains("WJetsToLNu"))                        sample = Form("wjets_%s",              outfileid.Data());
   else if (infile.Contains("DYJetsToLL"))                        sample = Form("DYtot_%s",              outfileid.Data());
   else if (infile.Contains("T_s-channel"))                       sample = Form("tschan_%s",             outfileid.Data());

@@ -865,7 +865,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     cout << "setting json " << g_json << endl;
     set_goodrun_file( g_json );
 
-    set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS7_5p1fb_Zselection.root",true);
+    if( TString(prefix).Contains("ttall_massivebin") ) 
+      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS6.root",true);
+    else
+      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS7_5p1fb_Zselection.root",true);
 
     /*
     //set vtx reweighting hist - depends on pileup scenario
@@ -2891,10 +2894,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       else{
 
-        if( TString(prefix).Contains("ttall") )
-          weight_ = kFactor * lumi * 157.5/44514744.*1000.;
-        else
-          weight_ = kFactor * evt_scale1fb() * lumi;
+	weight_ = kFactor * evt_scale1fb() * lumi;
         //do a signed weight for mcatnlo
         if ( TString(prefix).Contains("mcatnlo") && genps_weight()<0) weight_ *= -1.;
 
@@ -3058,8 +3058,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       //-------------------------------------
       // triggers
       //-------------------------------------
-
-      isomu24_   = passUnprescaledHLTTriggerPattern("HLT_IsoMu24_v"   )  ? 1 : 0;
+      if (evt_run()<193806 || !isData)
+	isomu24_   = passUnprescaledHLTTriggerPattern("HLT_IsoMu24_eta2p1_v")  ? 1 : 0;
+      else   
+	isomu24_   = passUnprescaledHLTTriggerPattern("HLT_IsoMu24_v")  ? 1 : 0;
+      //      isomu24_   = passUnprescaledHLTTriggerPattern("HLT_IsoMu24_v"   )  ? 1 : 0;
       ele27wp80_ = passUnprescaledHLTTriggerPattern("HLT_Ele27_WP80_v")  ? 1 : 0;
       mm_        = passUnprescaledHLTTriggerPattern("HLT_Mu17_Mu8_v")                                     ? 1 : 0;
       mmtk_      = passUnprescaledHLTTriggerPattern("HLT_Mu17_TkMu8_v")                                   ? 1 : 0;
@@ -3067,9 +3070,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       em_        = passUnprescaledHLTTriggerPattern("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
       ee_        = passUnprescaledHLTTriggerPattern("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
    
-
-      char* isomutrigname = (char*) "HLT_IsoMu24_v";
-      if( !isData ) isomutrigname = (char*) "HLT_IsoMu24_eta2p1_v";
+      char* isomutrigname = (evt_run()<193806 || !isData) ? 
+	(char*) "HLT_IsoMu24_eta2p1_v" : (char*) "HLT_IsoMu24_v";
+      // char* isomutrigname = (char*) "HLT_IsoMu24_v";
+      // if( !isData ) isomutrigname = (char*) "HLT_IsoMu24_eta2p1_v";
 
       trgmu1_    = objectPassTrigger( *lep1_ , isomutrigname        , 0.1 ) ? 1 : 0;
       if( ngoodlep_ > 1 )
