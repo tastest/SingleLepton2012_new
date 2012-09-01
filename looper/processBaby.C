@@ -42,7 +42,7 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   //---------------------------------------------------------------
   
   const char* version    = "V00-00-02";
-  const char* jsonfile   = "jsons/Cert_190456-196531_8TeV_PromptReco_Collisions12_JSON_goodruns.txt"; // 5.10/fb
+  const char* jsonfile   = "jsons/Cert_190456-201678_8TeV_PromptReco_Collisions12_JSON_goodruns.txt"; // 5.10/fb
   const bool  useMCSkims = true;
 
   cout << "Version : " << version     << endl;
