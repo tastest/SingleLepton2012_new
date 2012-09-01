@@ -395,7 +395,15 @@ class singleLeptonLooper
         Float_t costhetaweight_;
 	Int_t   njpt_;
 	Float_t htjpt_;
+
+	Int_t   csc_;
+	Int_t   hcallaser_;
+	Int_t   ecaltp_;
+	Int_t   trkfail_;
+	Int_t   eebadsc_;
+	Int_t   hbhenew_;
         Int_t   hbhe_;
+
 	Int_t   jetid_;
 	Int_t   jetid30_;
         Int_t   mull_;

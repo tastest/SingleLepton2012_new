@@ -3010,7 +3010,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       lumi_         = evt_lumiBlock();                    //lumi
       event_        = evt_event();                        //event
       nvtxweight_   = vtxweight(isData);
-      hbhe_         = evt_hbheFilter();
+
+      csc_       = cms2.evt_cscTightHaloId();
+      hbhe_      = cms2.evt_hbheFilter();
+      hcallaser_ = cms2.filt_hcalLaser();
+      ecaltp_    = cms2.filt_ecalTP();
+      trkfail_   = cms2.filt_trackingFailure();
+      eebadsc_   = 1;
+      if( isData ) eebadsc_ = cms2.filt_eeBadSc();
+      hbhenew_   = passHBHEFilter();
 
       k_ = 1;
       if     ( strcmp( prefix , "LM0"  )    == 0 ) k_ = kfactorSUSY( "lm0"  );
@@ -3321,7 +3329,15 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("acc_2010",        &acc_2010_,         "acc_2010/I");
   outTree->Branch("acc_highmet",     &acc_highmet_,      "acc_highmet/I");
   outTree->Branch("acc_highht",      &acc_highht_,       "acc_highht/I");
-  outTree->Branch("hbhe",            &hbhe_,             "hbhe/I");
+
+  outTree->Branch("csc"       ,  &csc_       ,  "csc/I");  
+  outTree->Branch("hbhe"      ,  &hbhe_      ,  "hbhe/I");  
+  outTree->Branch("hbhenew"   ,  &hbhenew_   ,  "hbhenew/I");  
+  outTree->Branch("hcallaser" ,  &hcallaser_ ,  "hcallaser/I");  
+  outTree->Branch("ecaltp"    ,  &ecaltp_    ,  "ecaltp/I");  
+  outTree->Branch("trkfail"   ,  &trkfail_   ,  "trkfail/I");  
+  outTree->Branch("eebadsc"   ,  &eebadsc_   ,  "eebadsc/I");  
+
   outTree->Branch("isdata",          &isdata_,           "isdata/I");
   outTree->Branch("jetid",           &jetid_,            "jetid/I");
   outTree->Branch("jetid30",         &jetid30_,          "jetid30/I");
