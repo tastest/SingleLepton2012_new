@@ -41,7 +41,7 @@ void doAll(bool skipFWLite = true)
   // choose version, output will be written to output/[version]
   //---------------------------------------------------------------
   
-  const char* version    = "V00-00-02";
+  const char* version    = "V00-01-00";
   const char* jsonfile   = "jsons/Cert_190456-196531_8TeV_PromptReco_Collisions12_JSON_goodruns.txt"; // 5.10/fb
   const bool  useMCSkims = true;
 
@@ -92,7 +92,7 @@ void doAll(bool skipFWLite = true)
   int prettV      = 1;
  
   // flags for files to run over
-  bool rundata     = 1;
+  bool rundata     = 0;
   bool runttall    = 1;
   bool runWjets    = 0;
   bool runVV       = 0;
@@ -187,7 +187,8 @@ void doAll(bool skipFWLite = true)
   TChain* chtopall = new TChain("Events");
   if (runttall) {
     //single file for testing
-    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S6_START52_V9-v1/V05-02-28/SingleOrDiLepton/merged_ntuple_112.root");
+    //pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S6_START52_V9-v1/V05-02-28/SingleOrDiLepton/merged_ntuple_112.root");
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_157.root");
     //    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S6_START52_V9-v1/V05-02-28/SingleOrDiLepton/merged*.root");
 
   }
