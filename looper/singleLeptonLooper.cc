@@ -58,7 +58,21 @@ bool useOldIsolation      = false;
 using namespace std;
 using namespace tas;
 
-typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
+typedef vector< P4 > VofP4;
+//typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
+
+struct indP4{
+  LorentzVector p4obj;
+  int p4ind;
+};
+
+typedef vector< indP4 > VofiP4;
+
+inline bool sortIP4ByPt(indP4 iP41, indP4 iP42) {
+  return iP41.p4obj.pt() > iP42.p4obj.pt();
+}
+
 
 //mSUGRA scan parameters-----------------------------
 
@@ -194,16 +208,57 @@ int isGenQGMatched ( LorentzVector p4, float dR ) {
   for (int igen = (cms2.genps_p4().size()-1); igen >-1; igen--) {
     float deltaR = dRbetweenVectors( p4 , cms2.genps_p4().at(igen) );
     if ( deltaR > dR ) continue;
-    int id = abs(cms2.genps_id().at(igen));
-    int mothid = abs(genps_id_mother().at(igen));
+    int id = cms2.genps_id().at(igen);
+    int mothid = genps_id_mother().at(igen);
     // cout<<"status 3 particle ID "<<id<<" mother "<<mothid
     // 	<<" dR to jet "<<deltaR<<endl;
-    if (id<6 && mothid==24) return 2;
-    if (id==5 && mothid==6) return 1;
-    if (id==21) return 3;
-    if (id<6) return 4;
+    if (abs(id)<6 && abs(mothid)==24) 
+      return (mothid>0) ? 2 : -2;
+    if (abs(id)==5 && abs(mothid)==6) 
+      return (mothid>0) ? 1 : -1;
+    if (abs(id)==21) return 3;
+    if (abs(id)<6) return 4;
   }
-  return -1;
+  return -9;
+}
+
+//--------------------------------------------------------------------
+
+float dRGenJet ( LorentzVector p4, float genminpt = 20.) {
+
+  //return dR to closest gen-jet with pT > genminpt
+  float mindeltaR = 9999.;
+  for (unsigned int igen = 0; igen < cms2.genjets_p4().size(); igen++) {
+    LorentzVector vgenj = cms2.genjets_p4().at(igen);
+    if ( vgenj.Pt() < genminpt ) continue;
+    float deltaR = dRbetweenVectors( p4 , vgenj );
+    if ( deltaR< mindeltaR ) mindeltaR = deltaR;
+  }
+  return mindeltaR;
+
+}
+
+//--------------------------------------------------------------------
+
+int isSSVMTagged ( int ijet ) {
+
+  if ( pfjets_simpleSecondaryVertexHighEffBJetTag().at(ijet) > 1.74 )
+    return 1;
+
+  return 0;
+
+}
+
+//--------------------------------------------------------------------
+
+int isCSVTagged ( int ijet ) {
+  
+  float discrim = pfjets_combinedSecondaryVertexBJetTag().at(ijet);
+  if ( discrim > 0.679 ) return 1;//medium
+  if ( discrim > 0.244 ) return 2;//loose
+
+  return 0;
+
 }
 
 //--------------------------------------------------------------------
@@ -525,24 +580,30 @@ void singleLeptonLooper::InitBaby(){
   pfjet5_	= 0;
   pfjet6_	= 0;
 
-  bjet1_      = -1; 
-  bjet2_      = -1; 
-  bjet3_      = -1; 
-  bjet4_      = -1; 
-  bjet5_      = -1; 
-  bjet6_      = -1; 
-  lepjet1_    = -1; 
-  lepjet2_    = -1; 
-  lepjet3_    = -1; 
-  lepjet4_    = -1; 
-  lepjet5_    = -1; 
-  lepjet6_    = -1; 
-  qgjet1_     = -1; 
-  qgjet2_     = -1; 
-  qgjet3_     = -1; 
-  qgjet4_     = -1; 
-  qgjet5_     = -1; 
-  qgjet6_     = -1; 
+  bjet1_      = -999; 
+  bjet2_      = -999; 
+  bjet3_      = -999; 
+  bjet4_      = -999; 
+  bjet5_      = -999; 
+  bjet6_      = -999; 
+  lepjet1_    = -999; 
+  lepjet2_    = -999; 
+  lepjet3_    = -999; 
+  lepjet4_    = -999; 
+  lepjet5_    = -999; 
+  lepjet6_    = -999; 
+  qgjet1_     = -999; 
+  qgjet2_     = -999; 
+  qgjet3_     = -999; 
+  qgjet4_     = -999; 
+  qgjet5_     = -999; 
+  qgjet6_     = -999; 
+  genjetdr1_  = 9999.; 
+  genjetdr2_  = 9999.; 
+  genjetdr3_  = 9999.; 
+  genjetdr4_  = 9999.; 
+  genjetdr5_  = 9999.; 
+  genjetdr6_  = 9999.; 
 
   lep1chi2ndf_	= -9999.;
   lep2chi2ndf_	= -9999.;
@@ -828,11 +889,11 @@ float getMuTriggerWeightNew( float pt, float eta ) {
 
 //--------------------------------------------------------------------
 
-float getminjdr( VofP4 jets, LorentzVector *particle ) {
+float getminjdr( VofiP4 jets, LorentzVector *particle ) {
   float mindr = 9999.;
   if (jets.size()==0 || particle==0) return mindr;
   for ( unsigned int ijet = 0; ijet<jets.size(); ++ijet ) {
-    float partjdr = dRbetweenVectors(jets.at(ijet),*particle);
+    float partjdr = dRbetweenVectors(jets.at(ijet).p4obj,*particle);
     if ( partjdr<mindr ) mindr = partjdr;
   }
   return mindr;
@@ -866,22 +927,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     cout << "setting json " << g_json << endl;
     set_goodrun_file( g_json );
 
-    if( TString(prefix).Contains("ttall_massivebin") ) 
-      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS6.root",true);
-    else
-      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS7_5p1fb_Zselection.root",true);
-
-    /*
-    //set vtx reweighting hist - depends on pileup scenario
-    if( TString(prefix).Contains("ttall") || TString(prefix).Contains("mcatnlo") 
-     || TString(prefix).Contains("scaleup") || TString(prefix).Contains("scaledw") 
-     || TString(prefix).Contains("matchup") )
-      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Fall11MC_PUS6_4p7fb_Zselection.root",true);
-    else if( TString(prefix).Contains("pythia") )
-      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer11-PU_S3_START42_V11_4p7fb_ttbar.root",true);
-    else
-      set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer11MC_PUS4_4p7fb_Zselection.root",true);
-    */
+    //    if( TString(prefix).Contains("ttall_massivebin") ) 
+    set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root",true);
 
     //    weight3D_init( "vtxreweight/Weight3D.root" );
 
@@ -2210,10 +2257,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float maxjetpt  = -1.;
       float ht_ = 0.;
 
-      VofP4 vpfjets_p4;
+      //      VofP4 vpfjets_p4;
       VofP4 vpfrawjets_p4;
-      vpfjets_p4.clear();
+      //      vpfjets_p4.clear();
       vpfrawjets_p4.clear();
+      VofiP4 vipfjets_p4;
+      vipfjets_p4.clear();
 
       vector<float> fullcors;
       vector<float> l2l3cors;
@@ -2258,6 +2307,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 
 	LorentzVector vjet      = corr    * pfjets_p4().at(ijet);
+	indP4 ivjet = { vjet, ijet };
 
 	//---------------------------------------------------------------------------
 	// get JES uncertainty
@@ -2321,7 +2371,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	// store L1FastL2L3Residual jet p4's pt > 15 GeV
 	if( vjet.pt() > 15 && fabs( vjet.eta() ) < 2.5 ){
-	  vpfjets_p4.push_back( vjet );
+	  //	  vpfjets_p4.push_back( vjet );
+	  vipfjets_p4.push_back( ivjet );
 	}
 
 	// njets JEC up
@@ -2375,35 +2426,35 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// b-tag counting
 	//-------------------------------------
 	
-	// btag variables: SSV
-	float discrimssv = pfjets_simpleSecondaryVertexHighEffBJetTag().at(ijet);
-	bool isbtagssv = ( discrimssv > 1.74 ) ? true : false;
-	if (isbtagssv)     {
-	  nbtagsssv_++;
+	// btag variables: CSVM
+	float discrimcsv = pfjets_combinedSecondaryVertexBJetTag().at(ijet);
+	bool isbtagcsvm = ( discrimcsv > 0.679 ) ? true: false;
+	if (isbtagcsvm) {  
+	  nbtagscsvm_++;
 	  mediumBJets.push_back(vjet);
 	}
 
-	// btag variables: TCHEL
-	float discrimtche = pfjets_trackCountingHighEffBJetTag().at(ijet);
-	bool isbtagtcl = ( discrimtche > 1.7 ) ? true: false;
-	if (isbtagtcl)     nbtagstcl_++;
-
-	// btag variables: TCHEM
-	bool isbtagtcm = ( discrimtche > 3.3 ) ? true: false;
-	if (isbtagtcm)     nbtagstcm_++;
-
 	// btag variables: CSVL
-	float discrimcsv = pfjets_combinedSecondaryVertexBJetTag().at(ijet);
 	bool isbtagcsvl = ( discrimcsv > 0.244 ) ? true: false;
 	if (isbtagcsvl)     nbtagscsvl_++;
-
-	// btag variables: CSVM
-	bool isbtagcsvm = ( discrimcsv > 0.679 ) ? true: false;
-	if (isbtagcsvm)     nbtagscsvm_++;
 
 	// btag variables: CSVT
 	bool isbtagcsvt = ( discrimcsv > 0.898 ) ? true: false;
 	if (isbtagcsvt)     nbtagscsvt_++;
+
+	// btag variables: SSV -- not supported anymore
+	float discrimssv = pfjets_simpleSecondaryVertexHighEffBJetTag().at(ijet);
+	bool isbtagssv = ( discrimssv > 1.74 ) ? true : false;
+	if (isbtagssv) nbtagsssv_++;
+
+	// btag variables: TCHEL -- not supported anymore
+	float discrimtche = pfjets_trackCountingHighEffBJetTag().at(ijet);
+	bool isbtagtcl = ( discrimtche > 1.7 ) ? true: false;
+	if (isbtagtcl)     nbtagstcl_++;
+
+	// btag variables: TCHEM -- not supported anymore
+	bool isbtagtcm = ( discrimtche > 3.3 ) ? true: false;
+	if (isbtagtcm)     nbtagstcm_++;
 
 	// in MC apply b-tagging corrections 
 	if ( !isData ) {
@@ -2559,63 +2610,71 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       // store L1FastL2L3Residual pfjets
       // check if jet is b-tagged
-      sort(vpfjets_p4.begin(), vpfjets_p4.end(), sortByPt);
-      if( vpfjets_p4.size() > 0 ) {
-	pfjet1_  = &vpfjets_p4.at(0);
-	bjet1_ = isBTagged( vpfjets_p4.at(0), mediumBJets ) ? 1 : 0;
+      //      sort(vpfjets_p4.begin(), vpfjets_p4.end(), sortByPt);
+      sort(vipfjets_p4.begin(), vipfjets_p4.end(), sortIP4ByPt);
+
+      if( vipfjets_p4.size() > 0 ) {
+	pfjet1_  = &vipfjets_p4.at(0).p4obj;
+	bjet1_  = isCSVTagged(  vipfjets_p4.at(0).p4ind );
 	if (!isData) {
 	  lepjet1_ = getLeptonMatchIndex ( pfjet1_, mclep1_, mclep2_, 0.4 );
-	  qgjet1_ = isGenQGMatched( vpfjets_p4.at(0), 0.4 );
+	  qgjet1_ = isGenQGMatched( vipfjets_p4.at(0).p4obj, 0.4 );
+	  genjetdr1_ = dRGenJet ( vipfjets_p4.at(0).p4obj );
 	}
-      }
-      if( vpfjets_p4.size() > 1 ) {
-	pfjet2_  = &vpfjets_p4.at(1);
-	bjet2_ = isBTagged( vpfjets_p4.at(1), mediumBJets ) ? 1 : 0;
+      } 
+      if( vipfjets_p4.size() > 1 ) {
+	pfjet2_  = &vipfjets_p4.at(1).p4obj;
+	bjet2_ = isCSVTagged(  vipfjets_p4.at(1).p4ind );
 	if (!isData) {
 	  lepjet2_ = getLeptonMatchIndex ( pfjet2_, mclep1_, mclep2_, 0.4 );
-	  qgjet2_ = isGenQGMatched( vpfjets_p4.at(1), 0.4 );
+	  qgjet2_ = isGenQGMatched( vipfjets_p4.at(1).p4obj, 0.4 );
+	  genjetdr2_ = dRGenJet ( vipfjets_p4.at(1).p4obj );
 	}
       }
-      if( vpfjets_p4.size() > 2 ) {
-	pfjet3_  = &vpfjets_p4.at(2);
-	bjet3_ = isBTagged( vpfjets_p4.at(2), mediumBJets ) ? 1 : 0;
+      if( vipfjets_p4.size() > 2 ) {
+	pfjet3_  = &vipfjets_p4.at(2).p4obj;
+	bjet3_ = isCSVTagged(  vipfjets_p4.at(2).p4ind );
 	if (!isData) {
 	  lepjet3_ = getLeptonMatchIndex ( pfjet3_, mclep1_, mclep2_, 0.4 );
-	  qgjet3_ = isGenQGMatched( vpfjets_p4.at(2), 0.4 );
+	  qgjet3_ = isGenQGMatched( vipfjets_p4.at(2).p4obj, 0.4 );
+	  genjetdr3_ = dRGenJet ( vipfjets_p4.at(2).p4obj );
 	}
       }
-      if( vpfjets_p4.size() > 3 ) {
-	pfjet4_  = &vpfjets_p4.at(3);
-	bjet4_ = isBTagged( vpfjets_p4.at(3), mediumBJets ) ? 1 : 0;
+      if( vipfjets_p4.size() > 3 ) {
+	pfjet4_  = &vipfjets_p4.at(3).p4obj;
+	bjet4_ = isCSVTagged(  vipfjets_p4.at(3).p4ind );
 	if (!isData) {
 	  lepjet4_ = getLeptonMatchIndex ( pfjet4_, mclep1_, mclep2_, 0.4 );
-	  qgjet4_ = isGenQGMatched( vpfjets_p4.at(3), 0.4 );
+	  qgjet4_ = isGenQGMatched( vipfjets_p4.at(3).p4obj, 0.4 );
+	  genjetdr4_ = dRGenJet ( vipfjets_p4.at(3).p4obj );
 	}
       }
-      if( vpfjets_p4.size() > 4 ) {
-	pfjet5_  = &vpfjets_p4.at(4);
-	bjet5_ = isBTagged( vpfjets_p4.at(4), mediumBJets ) ? 1 : 0;
+      if( vipfjets_p4.size() > 4 ) {
+	pfjet5_  = &vipfjets_p4.at(4).p4obj;
+	bjet5_ = isCSVTagged(  vipfjets_p4.at(4).p4ind );
 	if (!isData) {
 	  lepjet5_ = getLeptonMatchIndex ( pfjet5_, mclep1_, mclep2_, 0.4 );
-	  qgjet5_ = isGenQGMatched( vpfjets_p4.at(4), 0.4 );
+	  qgjet5_ = isGenQGMatched( vipfjets_p4.at(4).p4obj, 0.4 );
+	  genjetdr5_ = dRGenJet ( vipfjets_p4.at(4).p4obj );
 	}
       }
-      if( vpfjets_p4.size() > 5 ) {
-	pfjet6_  = &vpfjets_p4.at(5);
-	bjet6_ = isBTagged( vpfjets_p4.at(5), mediumBJets ) ? 1 : 0;
+      if( vipfjets_p4.size() > 5 ) {
+	pfjet6_  = &vipfjets_p4.at(5).p4obj;
+	bjet6_ = isCSVTagged(  vipfjets_p4.at(5).p4ind );
 	if (!isData) {
 	  lepjet6_ = getLeptonMatchIndex ( pfjet6_, mclep1_, mclep2_, 0.4 );
-	  qgjet6_ = isGenQGMatched( vpfjets_p4.at(5), 0.4 );
+	  qgjet6_ = isGenQGMatched( vipfjets_p4.at(5).p4obj, 0.4 );
+	  genjetdr6_ = dRGenJet ( vipfjets_p4.at(5).p4obj );
 	}
       }
 
       //store distance to closest jet for pfcand
       if ( nleps_ == 2 ) {
-	pflepmindrj_  = getminjdr( vpfjets_p4, pflep_ );
-	pftaudmindrj_ = getminjdr( vpfjets_p4, pftaud_ );
+	pflepmindrj_  = getminjdr( vipfjets_p4, pflep_ );
+	pftaudmindrj_ = getminjdr( vipfjets_p4, pftaud_ );
       }
-      pfcandmindrj5_  = getminjdr( vpfjets_p4, pfcand5_ );
-      pfcandmindrj10_ = getminjdr( vpfjets_p4, pfcand10_ );
+      pfcandmindrj5_  = getminjdr( vipfjets_p4, pfcand5_ );
+      pfcandmindrj10_ = getminjdr( vipfjets_p4, pfcand10_ );
 
       // max jet variables
       if( imaxjet > -1 ){ 
@@ -3520,6 +3579,12 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("qgjet4",           &qgjet4_,           "qgjet4/I");
   outTree->Branch("qgjet5",           &qgjet5_,           "qgjet5/I");
   outTree->Branch("qgjet6",           &qgjet6_,           "qgjet6/I");
+  outTree->Branch("genjetdr1",        &genjetdr1_,        "genjetdr1/F");
+  outTree->Branch("genjetdr2",        &genjetdr2_,        "genjetdr2/F");
+  outTree->Branch("genjetdr3",        &genjetdr3_,        "genjetdr3/F");
+  outTree->Branch("genjetdr4",        &genjetdr4_,        "genjetdr4/F");
+  outTree->Branch("genjetdr5",        &genjetdr5_,        "genjetdr5/F");
+  outTree->Branch("genjetdr6",        &genjetdr6_,        "genjetdr6/F");
   outTree->Branch("njetsUp",          &njetsUp_,          "njetsUp/I");
   outTree->Branch("njetsDown",        &njetsDown_,        "njetsDown/I");
   outTree->Branch("htUp",             &htUp_,             "htUp/F");
