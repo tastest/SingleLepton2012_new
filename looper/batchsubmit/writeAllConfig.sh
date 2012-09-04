@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-01-01_2012"
+TAG="V00-01-02_2012"
 
 #
 # DATA
@@ -13,8 +13,7 @@ TAG="V00-01-01_2012"
 ./writeConfig.sh /hadoop/cms/store/user/jaehyeok/CMSSW_5_3_2_patch4_V05-03-13/SingleMu_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_SingleMu2012A_recover06Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/user/jaehyeok/CMSSW_5_3_2_patch4_V05-03-13/SingleMu_Run2012A-13Jul2012-v1_AOD/merged/ ${TAG}_SingleMu2012A_13Jul2012v1V532
 ./writeConfig.sh /hadoop/cms/store/user/jaehyeok/CMSSW_5_3_2_patch4_V05-03-13/SingleMu_Run2012B-13Jul2012-v1_AOD/merged/ ${TAG}_SingleMu2012B_13Jul2012v1V532
-# PromptRecov1 is missing - according to the twiki should be in:
-#./writeConfig.sh /hadoop/cms/store/user/jaehyeok/CMSSW_5_3_2_patch4_V05-03-13/SingleMu_Run2012C-PromptReco-v1_AOD/merged/ ${TAG}_SingleMu2012C_PromptRecov1V532
+./writeConfig.sh /hadoop/cms/store/user/jaehyeok/CMSSW_5_3_2_patch4_V05-03-13/SingleMu_Run2012C-PromptReco-v1_AOD/merged/ ${TAG}_SingleMu2012C_PromptRecov1V532
 ./writeConfig.sh /hadoop/cms/store/user/jaehyeok/CMSSW_5_3_2_patch4_V05-03-13/SingleMu_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_SingleMu2012C_PromptRecov2V532
 
 # --- SINGLE ELECTRON ---
@@ -46,7 +45,7 @@ TAG="V00-01-01_2012"
 #
 # TTBAR
 #
-.//hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets
 
 #
 # W+JETS
