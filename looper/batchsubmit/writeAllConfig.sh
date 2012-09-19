@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-01-02_2012"
+TAG="V00-01-03_2012"
 
 #
 # DATA
@@ -20,8 +20,7 @@ TAG="V00-01-02_2012"
 ./writeConfig.sh /hadoop/cms/store/user/cwelke/CMSSW_5_3_2_patch4_V05-03-13/SingleElectron_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_SingleElectron2012A_recover06Aug2012V532
 ./writeConfig.sh /hadoop/cms/store/user/cwelke/CMSSW_5_3_2_patch4_V05-03-13/SingleElectron_Run2012A-13Jul2012-v1_AOD/merged/ ${TAG}_SingleElectron2012A_13Jul2012v1V532
 ./writeConfig.sh /hadoop/cms/store/user/cwelke/CMSSW_5_3_2_patch4_V05-03-13/SingleElectron_Run2012B-13Jul2012-v1_AOD/merged/ ${TAG}_SingleElectron2012B_13Jul2012v1V532
-# PromptRecov1 is missing - according to the twiki should be in:
-#./writeConfig.sh /hadoop/cms/store/user/cwelke/CMSSW_5_3_2_patch4_V05-03-13/SingleElectron_Run2012C-PromptReco-v1_AOD/merged/ ${TAG}_SingleElectron2012C_PromptRecov1V532
+./writeConfig.sh /hadoop/cms/store/user/cwelke/CMSSW_5_3_2_patch4_V05-03-13/SingleElectron_Run2012C-PromptReco-v1_AOD/merged/ ${TAG}_SingleElectron2012C_PromptRecov1V532
 ./writeConfig.sh /hadoop/cms/store/user/cwelke/CMSSW_5_3_2_patch4_V05-03-13/SingleElectron_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_SingleElectron2012C_PromptRecov2V532
 
 # --- DOUBLE MU ---
@@ -55,29 +54,30 @@ TAG="V00-01-02_2012"
 #
 # SINGLE TOP
 #
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_T-tWchannel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_Tbar-tWchannel
 # to be processed in 53
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_T-schannel
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/Tbar_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_Tbar-schannel
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_T-tchannel
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_Tbar-tchannel
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_T-tWchannel
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_Tbar-tWchannel
 
 #
 # DY+JETS
 #
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/SingleOrDiLepton/ ${TAG}_DYJetsToLL
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY4JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_DY4JetsToLL
 
 #
 # DIBOSON
 #
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZJetsTo4L_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/  ${TAG}_ZZJetsTo4L
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WZJetsTo3LNu_TuneZ2_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WZJetsTo3LNu
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WWJetsTo2L2Nu
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v3/V05-03-13/ ${TAG}_ZZJetsTo2L2Nu
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_ZZJetsTo2L2Q
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WZJetsTo2L2Q
 #to be updated in 53
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/WWJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_WWJetsTo2L2Nu
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/ZZJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v3/V05-02-27/New/ ${TAG}_ZZJetsTo2L2Nu
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/ZZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v3/V05-02-27/ ${TAG}_ZZJetsTo2L2Q
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/WZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/Complete/ ${TAG}_WZJetsTo2L2Q
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/WGstarToLNu2E_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_WGstarToLNu2E
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/WGstarToLNu2Mu_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_WGstarToLNu2Mu
 #./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/WGstarToLNu2Tau_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V9-v1/V05-02-27/ ${TAG}_WGstarToLNu2Tau
@@ -87,9 +87,8 @@ TAG="V00-01-02_2012"
 #
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZZNoGstarJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_ZZZNoGstarJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWWJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WWWJets
-#to be updated in 53
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/WZZNoGstarJets_8TeV-madgraph_Summer12-PU_S7_START52_V9-v1/V05-02-28/ ${TAG}_WZZNoGstarJets
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12MC/8TeV_WWZNoGstarJets_FastSim_525_Summer12-v3_StoreResults-InTimePU_START52_V9-v3/V05-02-28/ ${TAG}_WWZNoGstarJets
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWZNoGstarJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WWZNoGstarJets
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WZZNoGstarJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WZZNoGstarJets
 
 #
 # TTV
@@ -97,6 +96,17 @@ TAG="V00-01-02_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTZJets_8TeV-madgraph_v2_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTZJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTWJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTWJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTGJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTGJets
+
+#
+# ALTERNATIVE TTBAR
+#
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_mass178_5_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_MassUp
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_matchingup_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_MatchUp
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_mass166_5_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_MassDown
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaleup_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_ScaleUp
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaledown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_ScaleDown
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_matchingdown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_MatchDown
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets_Powheg
 
 #
 # QCD
