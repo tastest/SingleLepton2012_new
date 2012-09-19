@@ -255,6 +255,7 @@ class singleLeptonLooper
 
 	// MC truth vars
 	Int_t   npartons_;
+	Int_t   nwzpartons_;
 	Float_t maxpartonpt_;
 	Float_t ptt_;
 	Float_t pttbar_;

@@ -1457,6 +1457,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ttbar_    = 0;
 
       npartons_    =  0;
+      nwzpartons_  = -9;
       maxpartonpt_ = -1;
 
       mgcor_ = 1.0;
@@ -1464,6 +1465,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       if( !isData ){
 
+	bool foundwz = false;
 	w1_     = leptonOrTauIsFromW( index1 , id1_ , isLM );
 	pthat_  = genps_pthat();
 	qscale_ = genps_qScale();
@@ -1482,11 +1484,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	nleps_ = nleps;
 
 	// this is a weight which corrects for the wrong MG W->lnu BF
-	if( TString(prefix).Contains("ttall") ){
+	if( TString(prefix).Contains("ttall") ||
+	    TString(prefix).Contains("tt_") ){
 	  if( nleps == 0 ) mgcor_ = 1.028;
 	  if( nleps == 1 ) mgcor_ = 0.986;
 	  if( nleps == 2 ) mgcor_ = 0.945;
 	}
+	if( TString(prefix).Contains("powheg") ||
+	    TString(prefix).Contains("sherpa") ) 
+	  mgcor_ = 1.0;
 
 	if( strcmp(prefix,"ttem")  == 0 && ( nels + nmus ) != 2 ) continue;
 	if( strcmp(prefix,"ttdil") == 0 && nleps != 2           ) continue;
@@ -1501,6 +1507,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  if ( abs( cms2.genps_id().at(igen) ) == 13) vdilepton += genps_p4().at(igen); 
 
 	  int id = cms2.genps_id().at(igen);
+	  int pid = abs( genps_id().at(igen) );
 
 	  if( id == 6 ){
 	    t_         = &(genps_p4().at(igen));
@@ -1511,22 +1518,30 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  if( id == -6 ){
 	    tbar_      = &(genps_p4().at(igen));
 	    pttbar_    = genps_p4().at(igen).pt();
-	    vttbar    += genps_p4().at(igen);
+	    vttbar    += genps_p4().at(igen); 
 	    ntops++;
 	  }
 
 	  // store W or Z pT 
 	  // ignoring cases where have more than 1 boson for now
-	  if ( abs(id) == 24 )
+	  if ( pid == 24 ) {
 	    ptwgen_ = genps_p4().at(igen).pt();
-	  if ( abs(id) == 23 )
+	    foundwz = true;
+	    nwzpartons_  = 0;
+	  }
+	  if ( pid == 23 ) {
 	    ptzgen_ = genps_p4().at(igen).pt();
+	    foundwz = true;
+	    nwzpartons_  = 0;
+	  }
+
+	  if (foundwz && ( pid == 1 || pid == 2 || pid == 3 || pid == 4 || pid == 5 || pid == 6 || pid == 21 ) )   
+	    nwzpartons_++;
 
 	  // skip lines up to t and tbar
 	  if( igen < 8 ) continue;
 
 	  // require particle is a quark or a gluon
-	  int pid = abs( genps_id().at(igen) );
 	  if( !( pid==1 || pid==2 || pid==3 || pid==4 || pid==5 || pid==6 || pid == 21 ) ) continue;
 
 	  // require mother is not a top or W
@@ -3430,6 +3445,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("ptttbar",         &ptttbar_,          "ptttbar/F");
   outTree->Branch("mttbar",          &mttbar_,           "mttbar/F");
   outTree->Branch("npartons",        &npartons_,         "npartons/I");
+  outTree->Branch("nwzpartons",      &nwzpartons_,       "nwzpartons/I");
   outTree->Branch("hyptype",         &hyptype_,          "hyptype/I");
   outTree->Branch("maxpartonpt",     &maxpartonpt_,      "maxpartonpt/F");
   outTree->Branch("etattbar",        &etattbar_,         "etatbar/F");
