@@ -560,6 +560,7 @@ class singleLeptonLooper
 	Float_t pfisoch_;
 	Float_t pfisoem_;
 	Float_t pfisonh_;
+	Float_t eSC_;
 	Float_t emjet10_;
 	Float_t emjet20_;
 
