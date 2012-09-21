@@ -10,6 +10,7 @@
 //#include "../CORE/topmass/ttdilepsolve.h" REPLACETOPMASS
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
 typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
 typedef map<unsigned int, unsigned int> m_uiui;
 
@@ -75,7 +76,7 @@ class singleLeptonLooper
 	std::vector<float> totalIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	//pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV = false);
 	pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool isA = false);
-
+	pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true );
 	bool initialized;
 	TH1D*   stop_xsec_hist;
 	TFile*  stop_xsec_file;
@@ -434,6 +435,8 @@ class singleLeptonLooper
         Int_t   njetsUp_;
         Int_t   npfjets25_;
         Int_t   njetsDown_;
+	Float_t trkmet_nolepcorr_;
+	Float_t trkmetphi_nolepcorr_;
 	Float_t trkmet_;
 	Float_t trkmetphi_;
 	Float_t trkmetproj_;

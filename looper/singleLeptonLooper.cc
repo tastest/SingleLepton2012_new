@@ -482,6 +482,12 @@ void singleLeptonLooper::InitBaby(){
   lepmetpt_	=-999.;
   lept1met10pt_	=-999.;
   
+  //trkmet
+  trkmet_              =-999.;
+  trkmetphi_           =-999.;
+  trkmet_nolepcorr_    =-999.;
+  trkmetphi_nolepcorr_ =-999.;
+
   //phi corrected type1 mets
   t1metphicorr_	      =-999.;
   t1metphicorrphi_    =-999.;
@@ -2931,6 +2937,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       m_events.insert(pair<int,int>(evt_event(), 1));
 
+      // track met
+      pair<float, float> trkMET = getTrackerMET(lep1_); 
+      trkmet_=trkMET.first;
+      trkmetphi_=trkMET.second;
+
+      pair<float, float> trkMET_nolepcorr = getTrackerMET(lep1_, 0.1, false); 
+      trkmet_nolepcorr_=trkMET_nolepcorr.first;
+      trkmetphi_nolepcorr_=trkMET_nolepcorr.second;
+
       //---------------------------
       // set event weight
       //---------------------------
@@ -3499,6 +3514,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("genmet",          &genmet_,           "genmet/F");
   outTree->Branch("gensumet",        &gensumet_,         "gensumet/F");
   outTree->Branch("genmetphi",       &genmetphi_,        "genmetphi/F");
+  outTree->Branch("trkmet",          &trkmet_,           "trkmet/F");
+  outTree->Branch("trkmetphi",       &trkmetphi_,        "trkmetphi/F");
+  outTree->Branch("trkmet_nolepcorr",    &trkmet_nolepcorr_,    "trkmet_nolepcorr/F");
+  outTree->Branch("trkmetphi_nolepcorr", &trkmetphi_nolepcorr_, "trkmetphi_nolepcorr/F");
   outTree->Branch("pfmet",           &pfmet_,            "pfmet/F");
   outTree->Branch("pfmetveto",       &pfmetveto_,        "pfmetveto/F");
   outTree->Branch("pfmetsig",        &pfmetsig_,         "pfmetsig/F");
@@ -4137,4 +4156,37 @@ pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, fl
 
   pair<float, float> phicorrmet = make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
   return phicorrmet;
+}
+
+pair<float,float> singleLeptonLooper::getTrackerMET( P4 *lep, double deltaZCut, bool dolepcorr )
+{
+
+  if ( cms2.vtxs_sumpt().empty() ) return make_pair(-999.,-999.);
+
+  float pX = 0.;
+  float pY = 0.;
+
+  if (dolepcorr ) {
+    pX -= lep->px();
+    pY -= lep->py();
+  }
+  
+  for (unsigned int i=0; i<cms2.pfcands_particleId().size(); ++i){
+        if ( cms2.pfcands_charge().at(i)==0 ) continue;
+
+	if ( dolepcorr && dRbetweenVectors( cms2.pfcands_p4().at(i) , *lep ) < 0.1 ) continue;
+
+        int trkIndex = cms2.pfcands_trkidx().at(i);
+        if (trkIndex<0) continue;
+        double dzpv = dzPV(cms2.trks_vertex_p4()[trkIndex], cms2.trks_trk_p4()[trkIndex], cms2.vtxs_position().front());
+
+        if ( fabs(dzpv) > deltaZCut) continue;
+
+        pX -= cms2.pfcands_p4().at(i).px();
+        pY -= cms2.pfcands_p4().at(i).py();
+    }
+
+  pair<float, float> trkmet = make_pair( sqrt( pX*pX + pY*pY ), atan2( pY , pX ) );
+  return trkmet;
+  
 }
