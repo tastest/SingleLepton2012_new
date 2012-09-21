@@ -3152,6 +3152,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfisoem_ = cms2.els_iso03_pf2012ext_em().at(index1);
 	pfisonh_ = cms2.els_iso03_pf2012ext_nh().at(index1);
 	eSC_ = cms2.els_eSC()[index1];
+	phiSC_ = cms2.els_phiSC()[index1];
+	eSCRaw_ = cms2.els_eSCRaw()[index1];
+	eSCPresh_ = cms2.els_eSCPresh()[index1];
       }
       else if( leptype_ == 1 ){
 	iso1_   = muonIsoValue( index1 , true  ); //truncated 
@@ -3174,6 +3177,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfisoem_ = -999;
 	pfisonh_ = -999;
 	eSC_ = -999;
+	phiSC_ = -999;
+	eSCRaw_ = -999;
+	eSCPresh_ = -999;
 	
 	ecalveto1_ = mus_iso_ecalvetoDep().at(index1);
 	hcalveto1_ = mus_iso_hcalvetoDep().at(index1);
@@ -3708,6 +3714,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfisoem", &pfisoem_, "pfisoem/F");
   outTree->Branch("pfisonh", &pfisonh_, "pfisonh/F");
   outTree->Branch("eSC", & eSC_, "eSC/F");
+  outTree->Branch("phiSC", & phiSC_, "phiSC/F");
+  outTree->Branch("eSCRaw", & eSCRaw_, "eSCRaw/F");
+  outTree->Branch("eSCPresh", & eSCPresh_, "eSCPresh/F");
   outTree->Branch("iso2",             &iso2_,             "iso2/F");
   outTree->Branch("ecalveto1",        &ecalveto1_,        "ecalveto1/F");
   outTree->Branch("ecalveto2",        &ecalveto2_,        "ecalveto2/F");
