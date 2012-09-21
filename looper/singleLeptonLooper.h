@@ -510,6 +510,7 @@ class singleLeptonLooper
 	Float_t iso1_;
 	Float_t isont1_;
 	Float_t isopf1_;
+	Float_t isopfold1_;
 	Float_t iso2_;
 	Float_t isont2_;
 	Float_t isopf2_;
@@ -555,6 +556,10 @@ class singleLeptonLooper
 	Float_t d0vtx_;
 	Float_t dzvtx_;
 	Float_t expinnerlayers_;
+	Float_t fbrem_;
+	Float_t pfisoch_;
+	Float_t pfisoem_;
+	Float_t pfisonh_;
 	Float_t emjet10_;
 	Float_t emjet20_;
 

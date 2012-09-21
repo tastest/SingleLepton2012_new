@@ -3134,7 +3134,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       if( leptype_ == 0 ){
 	iso1_   = electronIsolation_rel   ( index1 , true ); //truncated
 	isont1_ = electronIsolation_rel_v1( index1 , true ); //non-truncated
-	isopf1_ = electronIsoValuePF2012_FastJetEffArea( index1 , 0.3 , 0 );
+	isopfold1_ = electronIsoValuePF2012_FastJetEffArea( index1 , 0.3 , 0 );
+	isopf1_ = electronIsoValuePF2012_FastJetEffArea_v2( index1 , 0.3 , 0 , false);
 	etasc1_ = els_etaSC()[index1];
 	eoverpin_  = els_eOverPIn ()[index1];
 	eoverpout_ = els_eOverPOut()[index1];
@@ -3146,10 +3147,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	d0vtx_ = electron_d0PV_smurfV3(index1);
 	dzvtx_ = electron_dzPV_smurfV3(index1);
 	expinnerlayers_ = cms2.els_exp_innerlayers()[index1];
+	fbrem_ = cms2.els_fbrem()[index1];
+	pfisoch_ = cms2.els_iso03_pf2012ext_ch().at(index1);
+	pfisoem_ = cms2.els_iso03_pf2012ext_em().at(index1);
+	pfisonh_ = cms2.els_iso03_pf2012ext_nh().at(index1);
       }
       else if( leptype_ == 1 ){
 	iso1_   = muonIsoValue( index1 , true  ); //truncated 
 	isont1_ = muonIsoValue( index1 , false ); //non-truncated
+	isopfold1_ = -999;
 	isopf1_ = muonIsoValuePF2012_deltaBeta( index1 );
 	etasc1_ = -999;
 	eoverpin_  = -999;
@@ -3162,6 +3168,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	d0vtx_ = -999;
 	dzvtx_ = -999;
 	expinnerlayers_ = -999;
+	fbrem_ = -999;
+	pfisoch_ = -999;
+	pfisoem_ = -999;
+	pfisonh_ = -999;
 	
 	ecalveto1_ = mus_iso_ecalvetoDep().at(index1);
 	hcalveto1_ = mus_iso_hcalvetoDep().at(index1);
@@ -3677,6 +3687,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("w2",               &w2_,               "w2/I");
   outTree->Branch("iso1",             &iso1_,             "iso1/F");
   outTree->Branch("isont1",           &isont1_,           "isont1/F");
+  outTree->Branch("isopfold1",    &isopfold1_,     "isopfold1/F");
   outTree->Branch("isopf1",           &isopf1_,           "isopf1/F");
   outTree->Branch("etasc1",           &etasc1_,           "etasc1/F");
   outTree->Branch("etasc2",           &etasc2_,           "etasc2/F");
@@ -3690,6 +3701,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("d0vtx", &d0vtx_, "d0vtx/F");
   outTree->Branch("dzvtx", &dzvtx_, "dzvtx/F");
   outTree->Branch("expinnerlayers", &expinnerlayers_, "expinnerlayers/F");
+  outTree->Branch("fbrem", &fbrem_, "fbrem/F");
+  outTree->Branch("pfisoch", &pfisoch_, "pfisoch/F");
+  outTree->Branch("pfisoem", &pfisoem_, "pfisoem/F");
+  outTree->Branch("pfisonh", &pfisonh_, "pfisonh/F");
   outTree->Branch("iso2",             &iso2_,             "iso2/F");
   outTree->Branch("ecalveto1",        &ecalveto1_,        "ecalveto1/F");
   outTree->Branch("ecalveto2",        &ecalveto2_,        "ecalveto2/F");
