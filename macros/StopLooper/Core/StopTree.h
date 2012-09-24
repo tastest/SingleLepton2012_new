@@ -71,7 +71,41 @@ class StopTree {
 	int           nbtagscsvmcorr_;
 	float         pfcandpt10_;
 	float         pfcandiso10_;
-	int           nleps_;         
+	int           nleps_;
+	
+	Int_t         nwzpartons_;
+	Int_t         nbtagscsvl_;
+	Float_t         trkmet_nolepcorr_;
+	Float_t         trkmetphi_nolepcorr_;
+	Float_t         trkmet_;
+	Float_t         trkmetphi_;
+	Float_t         isopf1_;
+	Float_t         isopfold1_;
+	Float_t         isopf2_;
+	Float_t         eoverpin_;
+	Float_t         eoverpout_;
+	Float_t         dEtaIn_;
+	Float_t         dPhiIn_;
+	Float_t         sigmaIEtaIEta_;
+	Float_t         hOverE_;
+	Float_t         ooemoop_;
+	Float_t         d0vtx_;
+	Float_t         dzvtx_;
+	Float_t         expinnerlayers_;
+	Float_t         fbrem_;
+	Float_t         pfisoch_;
+	Float_t         pfisoem_;
+	Float_t         pfisonh_;
+	Float_t         eSC_;
+	Float_t         phiSC_;
+	Float_t         eSCRaw_;
+	Float_t         eSCPresh_;
+	Float_t         etasc1_;
+	Float_t         iso1_;
+	Float_t         isont1_;
+	Float_t         iso2_;
+	Float_t         isont2_;
+	         
 	LorentzVector lep1_;
 	LorentzVector lep2_;
 	LorentzVector pfcand10_;
@@ -81,6 +115,8 @@ class StopTree {
 	LorentzVector pfjet4_;
 	LorentzVector pfjet5_;
 	LorentzVector pfjet6_;
+	LorentzVector pflep1_;
+	LorentzVector pflep2_;
 
     public:
         /// this is the main element
@@ -91,7 +127,8 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
- StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
+ StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
+ //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
 	  cout << "~StopTree()" << endl;
@@ -164,7 +201,41 @@ class StopTree {
 	    tree_->Branch("t1metphicorrlepphi", &t1metphicorrlepphi_, 	"t1metphicorrlepphi/F");        
 	    tree_->Branch("pfcandpt10", 	&pfcandpt10_, 		"pfcandpt10/F");        
 	    tree_->Branch("pfcandiso10", 	&pfcandiso10_, 		"pfcandiso10/F");      
-	    tree_->Branch("nleps", 		&nleps_, 		"nleps/I");     
+	    tree_->Branch("nleps", 		&nleps_, 		"nleps/I");
+	    
+	    tree_->Branch("nwzpartons", &nwzpartons_, "nwzpartons/F");
+	    tree_->Branch("nbtagscsvl", &nbtagscsvl_, "nbtagscsvl/F");
+	    tree_->Branch("trkmet_nolepcorr", &trkmet_nolepcorr_, "trkmet_nolepcorr/F");
+	    tree_->Branch("trkmetphi_nolepcorr", &trkmetphi_nolepcorr_, "trkmetphi_nolepcorr/F");
+	    tree_->Branch("trkmet", &trkmet_, "trkmet/F");
+	    tree_->Branch("trkmetphi", &trkmetphi_, "trkmetphi/F");
+	    tree_->Branch("isopf1", &isopf1_, "isopf1/F");
+	    tree_->Branch("isopfold1", &isopfold1_, "isopfold1/F");
+	    tree_->Branch("isopf2", &isopf2_, "isopf2/F");
+	    tree_->Branch("eoverpin", &eoverpin_, "eoverpin/F");
+	    tree_->Branch("eoverpout", &eoverpout_, "eoverpout/F");
+	    tree_->Branch("dEtaIn", &dEtaIn_, "dEtaIn/F");
+	    tree_->Branch("dPhiIn", &dPhiIn_, "dPhiIn/F");
+	    tree_->Branch("sigmaIEtaIEta", &sigmaIEtaIEta_, "sigmaIEtaIEta/F");
+	    tree_->Branch("hOverE", &hOverE_, "hOverE/F");
+	    tree_->Branch("ooemoop", &ooemoop_, "ooemoop/F");
+	    tree_->Branch("d0vtx", &d0vtx_, "d0vtx/F");
+	    tree_->Branch("dzvtx", &dzvtx_, "dzvtx/F");
+	    tree_->Branch("expinnerlayers", &expinnerlayers_, "expinnerlayers/F");
+	    tree_->Branch("fbrem", &fbrem_, "fbrem/F");
+	    tree_->Branch("pfisoch", &pfisoch_, "pfisoch/F");
+	    tree_->Branch("pfisoem", &pfisoem_, "pfisoem/F");
+	    tree_->Branch("pfisonh", &pfisonh_, "pfisonh/F");
+	    tree_->Branch("eSC", &eSC_, "eSC/F");
+	    tree_->Branch("phiSC", &phiSC_, "phiSC/F");
+	    tree_->Branch("eSCRaw", &eSCRaw_, "eSCRaw/F");
+	    tree_->Branch("eSCPresh", &eSCPresh_, "eSCPresh/F");
+	    tree_->Branch("etasc1", &etasc1_, "etasc1/F");
+	    tree_->Branch("iso1", &iso1_, "iso1/F");
+	    tree_->Branch("isont1", &isont1_, "isont1/F");
+	    tree_->Branch("iso2", &iso2_, "iso2/F");
+	    tree_->Branch("isont2", &isont2_, "isont2/F");
+	    
             tree_->Branch("lep1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep1Ptr_);
             tree_->Branch("lep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep2Ptr_);
             tree_->Branch("pfcand10","ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pfcand10Ptr_);
@@ -174,6 +245,8 @@ class StopTree {
             tree_->Branch("pfjet4",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet4Ptr_);
             tree_->Branch("pfjet5",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet5Ptr_);
             tree_->Branch("pfjet6",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet6Ptr_);
+            tree_->Branch("pflep1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep1Ptr_);
+            tree_->Branch("pflep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep2Ptr_);
              
         }
 
@@ -235,6 +308,40 @@ class StopTree {
 	    tree_->SetBranchAddress("pfcandpt10", 	  &pfcandpt10_);        
 	    tree_->SetBranchAddress("pfcandiso10", 	  &pfcandiso10_);      
 	    tree_->SetBranchAddress("nleps", 		  &nleps_);     
+	    
+	    tree_->SetBranchAddress("nwzpartons",   &nwzpartons_);
+	    tree_->SetBranchAddress("nbtagscsvl",   &nbtagscsvl_);
+	    tree_->SetBranchAddress("trkmet_nolepcorr",   &trkmet_nolepcorr_);
+	    tree_->SetBranchAddress("trkmetphi_nolepcorr",   &trkmetphi_nolepcorr_);
+	    tree_->SetBranchAddress("trkmet",   &trkmet_);
+	    tree_->SetBranchAddress("trkmetphi",   &trkmetphi_);
+	    tree_->SetBranchAddress("isopf1",   &isopf1_);
+	    tree_->SetBranchAddress("isopfold1",   &isopfold1_);
+	    tree_->SetBranchAddress("isopf2",   &isopf2_);
+	    tree_->SetBranchAddress("eoverpin",   &eoverpin_);
+	    tree_->SetBranchAddress("eoverpout",   &eoverpout_);
+	    tree_->SetBranchAddress("dEtaIn",   &dEtaIn_);
+	    tree_->SetBranchAddress("dPhiIn",   &dPhiIn_);
+	    tree_->SetBranchAddress("sigmaIEtaIEta",   &sigmaIEtaIEta_);
+	    tree_->SetBranchAddress("hOverE",   &hOverE_);
+	    tree_->SetBranchAddress("ooemoop",   &ooemoop_);
+	    tree_->SetBranchAddress("d0vtx",   &d0vtx_);
+	    tree_->SetBranchAddress("dzvtx",   &dzvtx_);
+	    tree_->SetBranchAddress("expinnerlayers",   &expinnerlayers_);
+	    tree_->SetBranchAddress("fbrem",   &fbrem_);
+	    tree_->SetBranchAddress("pfisoch",   &pfisoch_);
+	    tree_->SetBranchAddress("pfisoem",   &pfisoem_);
+	    tree_->SetBranchAddress("pfisonh",   &pfisonh_);
+	    tree_->SetBranchAddress("eSC",   &eSC_);
+	    tree_->SetBranchAddress("phiSC",   &phiSC_);
+	    tree_->SetBranchAddress("eSCRaw",   &eSCRaw_);
+	    tree_->SetBranchAddress("eSCPresh",   &eSCPresh_);
+	    tree_->SetBranchAddress("etasc1",   &etasc1_);
+	    tree_->SetBranchAddress("iso1",   &iso1_);
+	    tree_->SetBranchAddress("isont1",   &isont1_);
+	    tree_->SetBranchAddress("iso2",   &iso2_);
+	    tree_->SetBranchAddress("isont2",   &isont2_);
+
             tree_->SetBranchAddress("lep1",   		  &lep1Ptr_);
             tree_->SetBranchAddress("lep2",   		  &lep2Ptr_);
             tree_->SetBranchAddress("pfcand10",   	  &pfcand10Ptr_);
@@ -244,6 +351,8 @@ class StopTree {
             tree_->SetBranchAddress("pfjet4", 		  &jet4Ptr_);
             tree_->SetBranchAddress("pfjet5", 		  &jet5Ptr_);
             tree_->SetBranchAddress("pfjet6", 		  &jet6Ptr_);
+            tree_->SetBranchAddress("pflep1",   		  &pflep1Ptr_);
+            tree_->SetBranchAddress("pflep2",   		  &pflep2Ptr_);
 
             gErrorIgnoreLevel = currentState;
         }
@@ -265,6 +374,8 @@ class StopTree {
         LorentzVector *jet4Ptr_;
         LorentzVector *jet5Ptr_;
         LorentzVector *jet6Ptr_;
+        LorentzVector *pflep1Ptr_;
+        LorentzVector *pflep2Ptr_;
 
 }; 
 
@@ -321,6 +432,40 @@ StopTree::InitVariables(){
 	variables_.push_back(string("pfcandpt10"	));
 	variables_.push_back(string("pfcandiso10"	));
 	variables_.push_back(string("nleps"		));         
+	
+	variables_.push_back(string("nwzpartons"));
+	variables_.push_back(string("nbtagscsvl"));
+	variables_.push_back(string("trkmet_nolepcorr"));
+	variables_.push_back(string("trkmetphi_nolepcorr"));
+	variables_.push_back(string("trkmet"));
+	variables_.push_back(string("trkmetphi"));
+	variables_.push_back(string("isopf1"));
+	variables_.push_back(string("isopfold1"));
+	variables_.push_back(string("isopf2"));
+	variables_.push_back(string("eoverpin"));
+	variables_.push_back(string("eoverpout"));
+	variables_.push_back(string("dEtaIn"));
+	variables_.push_back(string("dPhiIn"));
+	variables_.push_back(string("sigmaIEtaIEta"));
+	variables_.push_back(string("hOverE"));
+	variables_.push_back(string("ooemoop"));
+	variables_.push_back(string("d0vtx"));
+	variables_.push_back(string("dzvtx"));
+	variables_.push_back(string("expinnerlayers"));
+	variables_.push_back(string("fbrem"));
+	variables_.push_back(string("pfisoch"));
+	variables_.push_back(string("pfisoem"));
+	variables_.push_back(string("pfisonh"));
+	variables_.push_back(string("eSC"));
+	variables_.push_back(string("phiSC"));
+	variables_.push_back(string("eSCRaw"));
+	variables_.push_back(string("eSCPresh"));
+	variables_.push_back(string("etasc1"));
+	variables_.push_back(string("iso1"));
+	variables_.push_back(string("isont1"));
+	variables_.push_back(string("iso2"));
+	variables_.push_back(string("isont2"));
+
 	variables_.push_back(string("lep1"		));
 	variables_.push_back(string("lep2"		));
 	variables_.push_back(string("pfcand10"		));
@@ -330,6 +475,8 @@ StopTree::InitVariables(){
 	variables_.push_back(string("pfjet4"		));
 	variables_.push_back(string("pfjet5"		));
 	variables_.push_back(string("pfjet6"		));
+	variables_.push_back(string("pflep1"		));
+	variables_.push_back(string("pflep2"		));
     }
 
     // inizialize variables
@@ -380,7 +527,41 @@ StopTree::InitVariables(){
     nbtagscsvmcorr_	= 999;
     pfcandpt10_		= -999.;
     pfcandiso10_	= -999.;
-    nleps_		= 999;         
+    nleps_		= 999;
+    
+    nwzpartons_= -999.;
+    nbtagscsvl_= -999.;
+    trkmet_nolepcorr_= -999.;
+    trkmetphi_nolepcorr_= -999.;
+    trkmet_= -999.;
+    trkmetphi_= -999.;
+    isopf1_= -999.;
+    isopfold1_= -999.;
+    isopf2_= -999.;
+    eoverpin_= -999.;
+    eoverpout_= -999.;
+    dEtaIn_= -999.;
+    dPhiIn_= -999.;
+    sigmaIEtaIEta_= -999.;
+    hOverE_= -999.;
+    ooemoop_= -999.;
+    d0vtx_= -999.;
+    dzvtx_= -999.;
+    expinnerlayers_= -999.;
+    fbrem_= -999.;
+    pfisoch_= -999.;
+    pfisoem_= -999.;
+    pfisonh_= -999.;
+    eSC_= -999.;
+    phiSC_= -999.;
+    eSCRaw_= -999.;
+    eSCPresh_= -999.;
+    etasc1_= -999.;
+    iso1_= -999.;
+    isont1_= -999.;
+    iso2_= -999.;
+    isont2_= -999.;
+
     lep1_		= LorentzVector();
     lep2_		= LorentzVector();
     pfcand10_		= LorentzVector();
@@ -390,6 +571,8 @@ StopTree::InitVariables(){
     pfjet4_		= LorentzVector();
     pfjet5_		= LorentzVector();
     pfjet6_		= LorentzVector();
+    pflep1_		= LorentzVector();
+    pflep2_		= LorentzVector();
     
 }
 
@@ -445,6 +628,40 @@ StopTree::Get(string value)
   if(value=="pfcandpt10" 	) { return this->pfcandpt10_;		}        
   if(value=="pfcandiso10" 	) { return this->pfcandiso10_;		}      
   if(value=="nleps" 		) { return this->nleps_;		}     
+  
+  if(value=="nwzpartons" ) { return this->nwzpartons_; }
+  if(value=="nbtagscsvl" ) { return this->nbtagscsvl_; }
+  if(value=="trkmet_nolepcorr" ) { return this->trkmet_nolepcorr_; }
+  if(value=="trkmetphi_nolepcorr" ) { return this->trkmetphi_nolepcorr_; }
+  if(value=="trkmet" ) { return this->trkmet_; }
+  if(value=="trkmetphi" ) { return this->trkmetphi_; }
+  if(value=="isopf1" ) { return this->isopf1_; }
+  if(value=="isopfold1" ) { return this->isopfold1_; }
+  if(value=="isopf2" ) { return this->isopf2_; }
+  if(value=="eoverpin" ) { return this->eoverpin_; }
+  if(value=="eoverpout" ) { return this->eoverpout_; }
+  if(value=="dEtaIn" ) { return this->dEtaIn_; }
+  if(value=="dPhiIn" ) { return this->dPhiIn_; }
+  if(value=="sigmaIEtaIEta" ) { return this->sigmaIEtaIEta_; }
+  if(value=="hOverE" ) { return this->hOverE_; }
+  if(value=="ooemoop" ) { return this->ooemoop_; }
+  if(value=="d0vtx" ) { return this->d0vtx_; }
+  if(value=="dzvtx" ) { return this->dzvtx_; }
+  if(value=="expinnerlayers" ) { return this->expinnerlayers_; }
+  if(value=="fbrem" ) { return this->fbrem_; }
+  if(value=="pfisoch" ) { return this->pfisoch_; }
+  if(value=="pfisoem" ) { return this->pfisoem_; }
+  if(value=="pfisonh" ) { return this->pfisonh_; }
+  if(value=="eSC" ) { return this->eSC_; }
+  if(value=="phiSC" ) { return this->phiSC_; }
+  if(value=="eSCRaw" ) { return this->eSCRaw_; }
+  if(value=="eSCPresh" ) { return this->eSCPresh_; }
+  if(value=="etasc1" ) { return this->etasc1_; }
+  if(value=="iso1" ) { return this->iso1_; }
+  if(value=="isont1" ) { return this->isont1_; }
+  if(value=="iso2" ) { return this->iso2_; }
+  if(value=="isont2" ) { return this->isont2_; }
+    
   /* if(value=="lep1"   		) { return this->lep1_;		} */
   /* if(value=="lep2"   		) { return this->lep2_;		} */
   /* if(value=="pfcand10"   		) { return this->pfcand10_;	} */
