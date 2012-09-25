@@ -1002,13 +1002,13 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   
    //phi between pf lepton and lepton
   float dphi_leppflep = getdphi( sTree->pflep1_.Phi() , sTree->lep1_.Phi());
-  plot1D("h_cr1_dphi_leppflep"+tag_selection          +flav_tag, min(dphi_leppflep,float(TMath::Pi()/8 - 0.0001)), evtweight, h_1d, 200, 0., TMath::Pi()/8);
-  plot1D("h_cr1_dphi_leppflep"+tag_selection+tag_njets+flav_tag, min(dphi_leppflep,float(TMath::Pi()/8 - 0.0001)), evtweight, h_1d, 200, 0., TMath::Pi()/8);
+  plot1D("h_cr1_dphi_leppflep"+tag_selection          +flav_tag, min(dphi_leppflep,float(TMath::Pi()/100 - 0.0001)), evtweight, h_1d, 200, 0., TMath::Pi()/100);
+  plot1D("h_cr1_dphi_leppflep"+tag_selection+tag_njets+flav_tag, min(dphi_leppflep,float(TMath::Pi()/100 - 0.0001)), evtweight, h_1d, 200, 0., TMath::Pi()/100);
   
   //ratio of pT between pf lepton and lepton
   //plot1D("h_cr1_pTrat_leppflep"+tag_selection          +flav_tag, sTree->pflep1_.Pt() / sTree->lep1_.Pt(), evtweight, h_1d, 200, 0.5, 1.5);
   //plot1D("h_cr1_pTrat_leppflep"+tag_selection+tag_njets+flav_tag, sTree->pflep1_.Pt() / sTree->lep1_.Pt(), evtweight, h_1d, 200, 0.5, 1.5);
-  x_ovflw2 = 1.5;
+  x_ovflw2 = 1.1;
   plot1D("h_cr1_pTrat_leppflep"+tag_selection          +flav_tag, ((sTree->pflep1_.Pt() / sTree->lep1_.Pt())>1) ? min((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), x_ovflw2) : max((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), 2-x_ovflw2), evtweight, h_1d, 200, 2-x_ovflw2, x_ovflw2);
   plot1D("h_cr1_pTrat_leppflep"+tag_selection+tag_njets+flav_tag, ((sTree->pflep1_.Pt() / sTree->lep1_.Pt())>1) ? min((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), x_ovflw2) : max((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), 2-x_ovflw2), evtweight, h_1d, 200, 2-x_ovflw2, x_ovflw2);
 
@@ -1021,7 +1021,7 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
 
   
   h_xmin = 0;
-  h_xmax = 10;
+  h_xmax = 8;
   plot1D("h_cr1_nwzpartons"+tag_selection          +flav_tag, (sTree->nwzpartons_>0) ? min(sTree->nwzpartons_, 10) : max(sTree->nwzpartons_, 0), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_nwzpartons"+tag_selection+tag_njets+flav_tag, (sTree->nwzpartons_>0) ? min(sTree->nwzpartons_, 10) : max(sTree->nwzpartons_, 0), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
@@ -1046,62 +1046,62 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_trkmetphi"+tag_selection+tag_njets+flav_tag, (sTree->trkmetphi_>0) ? min(sTree->trkmetphi_, float(h_xmax-0.0001)) : max(sTree->trkmetphi_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.5;
+  h_xmax = 0.2;
   plot1D("h_cr1_isopf1"+tag_selection          +flav_tag, (sTree->isopf1_>0) ? min(sTree->isopf1_, float(h_xmax-0.0001)) : max(sTree->isopf1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_isopf1"+tag_selection+tag_njets+flav_tag, (sTree->isopf1_>0) ? min(sTree->isopf1_, float(h_xmax-0.0001)) : max(sTree->isopf1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.5;
+  h_xmax = 0.2;
   plot1D("h_cr1_isopfold1"+tag_selection          +flav_tag, (sTree->isopfold1_>0) ? min(sTree->isopfold1_, float(h_xmax-0.0001)) : max(sTree->isopfold1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_isopfold1"+tag_selection+tag_njets+flav_tag, (sTree->isopfold1_>0) ? min(sTree->isopfold1_, float(h_xmax-0.0001)) : max(sTree->isopfold1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 80.;
+  h_xmax = 25.;
   plot1D("h_cr1_eoverpin"+tag_selection          +flav_tag, (sTree->eoverpin_>0) ? min(sTree->eoverpin_, float(h_xmax-0.0001)) : max(sTree->eoverpin_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_eoverpin"+tag_selection+tag_njets+flav_tag, (sTree->eoverpin_>0) ? min(sTree->eoverpin_, float(h_xmax-0.0001)) : max(sTree->eoverpin_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 80.;
+  h_xmax = 50.;
   plot1D("h_cr1_eoverpout"+tag_selection          +flav_tag, (sTree->eoverpout_>0) ? min(sTree->eoverpout_, float(h_xmax-0.0001)) : max(sTree->eoverpout_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_eoverpout"+tag_selection+tag_njets+flav_tag, (sTree->eoverpout_>0) ? min(sTree->eoverpout_, float(h_xmax-0.0001)) : max(sTree->eoverpout_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
-  h_xmin = -0.02;
-  h_xmax = 0.02;
+  h_xmin = -0.005;
+  h_xmax = 0.005;
   plot1D("h_cr1_dEtaIn"+tag_selection          +flav_tag, (sTree->dEtaIn_>0) ? min(sTree->dEtaIn_, float(h_xmax-0.0001)) : max(sTree->dEtaIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_dEtaIn"+tag_selection+tag_njets+flav_tag, (sTree->dEtaIn_>0) ? min(sTree->dEtaIn_, float(h_xmax-0.0001)) : max(sTree->dEtaIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
-  h_xmin = -0.1;
-  h_xmax = 0.1;
+  h_xmin = -0.05;
+  h_xmax = 0.05;
   plot1D("h_cr1_dPhiIn"+tag_selection          +flav_tag, (sTree->dPhiIn_>0) ? min(sTree->dPhiIn_, float(h_xmax-0.0001)) : max(sTree->dPhiIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_dPhiIn"+tag_selection+tag_njets+flav_tag, (sTree->dPhiIn_>0) ? min(sTree->dPhiIn_, float(h_xmax-0.0001)) : max(sTree->dPhiIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.1;
+  h_xmax = 0.02;
   plot1D("h_cr1_sigmaIEtaIEta"+tag_selection          +flav_tag, (sTree->sigmaIEtaIEta_>0) ? min(sTree->sigmaIEtaIEta_, float(h_xmax-0.0001)) : max(sTree->sigmaIEtaIEta_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_sigmaIEtaIEta"+tag_selection+tag_njets+flav_tag, (sTree->sigmaIEtaIEta_>0) ? min(sTree->sigmaIEtaIEta_, float(h_xmax-0.0001)) : max(sTree->sigmaIEtaIEta_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.2;
+  h_xmax = 0.08;
   plot1D("h_cr1_hOverE"+tag_selection          +flav_tag, (sTree->hOverE_>0) ? min(sTree->hOverE_, float(h_xmax-0.0001)) : max(sTree->hOverE_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_hOverE"+tag_selection+tag_njets+flav_tag, (sTree->hOverE_>0) ? min(sTree->hOverE_, float(h_xmax-0.0001)) : max(sTree->hOverE_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.1;
+  h_xmax = 0.05;
   plot1D("h_cr1_ooemoop"+tag_selection          +flav_tag, (sTree->ooemoop_>0) ? min(sTree->ooemoop_, float(h_xmax-0.0001)) : max(sTree->ooemoop_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_ooemoop"+tag_selection+tag_njets+flav_tag, (sTree->ooemoop_>0) ? min(sTree->ooemoop_, float(h_xmax-0.0001)) : max(sTree->ooemoop_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
-  h_xmin = -0.1;
-  h_xmax = 0.1;
+  h_xmin = -0.02;
+  h_xmax = 0.02;
   plot1D("h_cr1_d0vtx"+tag_selection          +flav_tag, (sTree->d0vtx_>0) ? min(sTree->d0vtx_, float(h_xmax-0.0001)) : max(sTree->d0vtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_d0vtx"+tag_selection+tag_njets+flav_tag, (sTree->d0vtx_>0) ? min(sTree->d0vtx_, float(h_xmax-0.0001)) : max(sTree->d0vtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
-  h_xmin = -0.20;
-  h_xmax = 0.20;
+  h_xmin = -0.05;
+  h_xmax = 0.05;
   plot1D("h_cr1_dzvtx"+tag_selection          +flav_tag, (sTree->dzvtx_>0) ? min(sTree->dzvtx_, float(h_xmax-0.0001)) : max(sTree->dzvtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_dzvtx"+tag_selection+tag_njets+flav_tag, (sTree->dzvtx_>0) ? min(sTree->dzvtx_, float(h_xmax-0.0001)) : max(sTree->dzvtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0;
-  h_xmax = 4;
+  h_xmax = 2;
   plot1D("h_cr1_expinnerlayers"+tag_selection          +flav_tag, (sTree->expinnerlayers_>0) ? min(sTree->expinnerlayers_, float(h_xmax-0.0001)) : max(sTree->expinnerlayers_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_expinnerlayers"+tag_selection+tag_njets+flav_tag, (sTree->expinnerlayers_>0) ? min(sTree->expinnerlayers_, float(h_xmax-0.0001)) : max(sTree->expinnerlayers_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
@@ -1111,17 +1111,17 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_fbrem"+tag_selection+tag_njets+flav_tag, (sTree->fbrem_>0) ? min(sTree->fbrem_, float(h_xmax-0.0001)) : max(sTree->fbrem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 50.;
+  h_xmax = 25.;
   plot1D("h_cr1_pfisoch"+tag_selection          +flav_tag, (sTree->pfisoch_>0) ? min(sTree->pfisoch_, float(h_xmax-0.0001)) : max(sTree->pfisoch_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_pfisoch"+tag_selection+tag_njets+flav_tag, (sTree->pfisoch_>0) ? min(sTree->pfisoch_, float(h_xmax-0.0001)) : max(sTree->pfisoch_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 50.;
+  h_xmax = 25.;
   plot1D("h_cr1_pfisoem"+tag_selection          +flav_tag, (sTree->pfisoem_>0) ? min(sTree->pfisoem_, float(h_xmax-0.0001)) : max(sTree->pfisoem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_pfisoem"+tag_selection+tag_njets+flav_tag, (sTree->pfisoem_>0) ? min(sTree->pfisoem_, float(h_xmax-0.0001)) : max(sTree->pfisoem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 50.;
+  h_xmax = 25.;
   plot1D("h_cr1_pfisonh"+tag_selection          +flav_tag, (sTree->pfisonh_>0) ? min(sTree->pfisonh_, float(h_xmax-0.0001)) : max(sTree->pfisonh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_pfisonh"+tag_selection+tag_njets+flav_tag, (sTree->pfisonh_>0) ? min(sTree->pfisonh_, float(h_xmax-0.0001)) : max(sTree->pfisonh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
@@ -1141,7 +1141,7 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_eSCRaw"+tag_selection+tag_njets+flav_tag, (sTree->eSCRaw_>0) ? min(sTree->eSCRaw_, float(h_xmax-0.0001)) : max(sTree->eSCRaw_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 200.;
+  h_xmax = 100.;
   plot1D("h_cr1_eSCPresh"+tag_selection          +flav_tag, (sTree->eSCPresh_>0) ? min(sTree->eSCPresh_, float(h_xmax-0.0001)) : max(sTree->eSCPresh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_eSCPresh"+tag_selection+tag_njets+flav_tag, (sTree->eSCPresh_>0) ? min(sTree->eSCPresh_, float(h_xmax-0.0001)) : max(sTree->eSCPresh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
@@ -1151,12 +1151,12 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_etasc1"+tag_selection+tag_njets+flav_tag, (sTree->etasc1_>0) ? min(sTree->etasc1_, float(h_xmax-0.0001)) : max(sTree->etasc1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.5;
+  h_xmax = 0.2;
   plot1D("h_cr1_iso1"+tag_selection          +flav_tag, (sTree->iso1_>0) ? min(sTree->iso1_, float(h_xmax-0.0001)) : max(sTree->iso1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_iso1"+tag_selection+tag_njets+flav_tag, (sTree->iso1_>0) ? min(sTree->iso1_, float(h_xmax-0.0001)) : max(sTree->iso1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
 
   h_xmin = 0.;
-  h_xmax = 0.5;
+  h_xmax = 0.2;
   plot1D("h_cr1_isont1"+tag_selection          +flav_tag, (sTree->isont1_>0) ? min(sTree->isont1_, float(h_xmax-0.0001)) : max(sTree->isont1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
   plot1D("h_cr1_isont1"+tag_selection+tag_njets+flav_tag, (sTree->isont1_>0) ? min(sTree->isont1_, float(h_xmax-0.0001)) : max(sTree->isont1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
       
