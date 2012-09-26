@@ -10,6 +10,8 @@ namespace tas {
 	vector<TString> &evt_errCategory() { return cms2.evt_errCategory(); }
 	vector<TString> &evt_errModule() { return cms2.evt_errModule(); }
 	vector<TString> &evt_errSeverity() { return cms2.evt_errSeverity(); }
+	vector<TString> &sparm_comment() { return cms2.sparm_comment(); }
+	vector<TString> &sparm_names() { return cms2.sparm_names(); }
 	bool &evt_eventHasHalo() { return cms2.evt_eventHasHalo(); }
 	bool &hcalnoise_HasBadRBXTS4TS5() { return cms2.hcalnoise_HasBadRBXTS4TS5(); }
 	bool &ls_isValid() { return cms2.ls_isValid(); }
@@ -188,6 +190,12 @@ namespace tas {
 	float &evt_pfmetSignificance() { return cms2.evt_pfmetSignificance(); }
 	float &evt_pfmet_type1cor() { return cms2.evt_pfmet_type1cor(); }
 	float &evt_pfsumet() { return cms2.evt_pfsumet(); }
+	float &sparm_filterEfficiency() { return cms2.sparm_filterEfficiency(); }
+	float &sparm_pdfScale() { return cms2.sparm_pdfScale(); }
+	float &sparm_pdfWeight1() { return cms2.sparm_pdfWeight1(); }
+	float &sparm_pdfWeight2() { return cms2.sparm_pdfWeight2(); }
+	float &sparm_weight() { return cms2.sparm_weight(); }
+	float &sparm_xsec() { return cms2.sparm_xsec(); }
 	float &evt_pf_tcmet() { return cms2.evt_pf_tcmet(); }
 	float &evt_pf_tcmetPhi() { return cms2.evt_pf_tcmetPhi(); }
 	float &evt_pf_tcmetSig() { return cms2.evt_pf_tcmetSig(); }

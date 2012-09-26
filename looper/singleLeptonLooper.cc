@@ -1177,6 +1177,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ngoodel_  = 0;
       ngoodmu_  = 0;
             
+      if( TString(prefix).Contains("T2") ) useOldIsolation = true;
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
 	if( els_p4().at(iel).pt() < 10 )                                                                continue;
         if( !passElectronSelection_Stop2012_v2( iel , vetoTransition,vetoTransition,useOldIsolation) )  continue;
@@ -2954,10 +2955,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       if( TString(prefix).Contains("T2") ){
 	mG_ = -999; //sparm_mG();
-	mL_ = -999; //sparm_mL();
-	x_  = -999; //sparm_mf();
+        mL_ = -999; //sparm_mL();
+        x_  = -999; //sparm_mf();
 
-	weight_ = -999; //lumi * stopPairCrossSection(mG_) * (1000./50000.);
+        for (int i=0; i<(int)sparm_values().size(); ++i) {
+	  if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
+	  if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	}
+        xsecsusy_  = mG_ > 0. ? stopPairCrossSection(mG_) : -999;
+        weight_ = xsecsusy_ > 0. ? lumi * xsecsusy_ * (1000./50000.) : -999.;
 
 	if( doTenPercent )	  weight_ *= 10;
       }

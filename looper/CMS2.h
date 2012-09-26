@@ -46,6 +46,12 @@ protected:
 	vector<TString> evt_errSeverity_;
 	TBranch *evt_errSeverity_branch;
 	bool evt_errSeverity_isLoaded;
+	vector<TString> sparm_comment_;
+	TBranch *sparm_comment_branch;
+	bool sparm_comment_isLoaded;
+	vector<TString> sparm_names_;
+	TBranch *sparm_names_branch;
+	bool sparm_names_isLoaded;
 	bool evt_eventHasHalo_;
 	TBranch *evt_eventHasHalo_branch;
 	bool evt_eventHasHalo_isLoaded;
@@ -580,6 +586,24 @@ protected:
 	float evt_pfsumet_;
 	TBranch *evt_pfsumet_branch;
 	bool evt_pfsumet_isLoaded;
+	float sparm_filterEfficiency_;
+	TBranch *sparm_filterEfficiency_branch;
+	bool sparm_filterEfficiency_isLoaded;
+	float sparm_pdfScale_;
+	TBranch *sparm_pdfScale_branch;
+	bool sparm_pdfScale_isLoaded;
+	float sparm_pdfWeight1_;
+	TBranch *sparm_pdfWeight1_branch;
+	bool sparm_pdfWeight1_isLoaded;
+	float sparm_pdfWeight2_;
+	TBranch *sparm_pdfWeight2_branch;
+	bool sparm_pdfWeight2_isLoaded;
+	float sparm_weight_;
+	TBranch *sparm_weight_branch;
+	bool sparm_weight_isLoaded;
+	float sparm_xsec_;
+	TBranch *sparm_xsec_branch;
+	bool sparm_xsec_isLoaded;
 	float evt_pf_tcmet_;
 	TBranch *evt_pf_tcmet_branch;
 	bool evt_pf_tcmet_isLoaded;
@@ -4349,6 +4373,16 @@ void Init(TTree *tree) {
 		evt_errSeverity_branch = tree->GetBranch(tree->GetAlias("evt_errSeverity"));
 		evt_errSeverity_branch->SetAddress(&evt_errSeverity_);
 	}
+	sparm_comment_branch = 0;
+	if (tree->GetAlias("sparm_comment") != 0) {
+		sparm_comment_branch = tree->GetBranch(tree->GetAlias("sparm_comment"));
+		sparm_comment_branch->SetAddress(&sparm_comment_);
+	}
+	sparm_names_branch = 0;
+	if (tree->GetAlias("sparm_names") != 0) {
+		sparm_names_branch = tree->GetBranch(tree->GetAlias("sparm_names"));
+		sparm_names_branch->SetAddress(&sparm_names_);
+	}
 	evt_eventHasHalo_branch = 0;
 	if (tree->GetAlias("evt_eventHasHalo") != 0) {
 		evt_eventHasHalo_branch = tree->GetBranch(tree->GetAlias("evt_eventHasHalo"));
@@ -5238,6 +5272,36 @@ void Init(TTree *tree) {
 	if (tree->GetAlias("evt_pfsumet") != 0) {
 		evt_pfsumet_branch = tree->GetBranch(tree->GetAlias("evt_pfsumet"));
 		evt_pfsumet_branch->SetAddress(&evt_pfsumet_);
+	}
+	sparm_filterEfficiency_branch = 0;
+	if (tree->GetAlias("sparm_filterEfficiency") != 0) {
+		sparm_filterEfficiency_branch = tree->GetBranch(tree->GetAlias("sparm_filterEfficiency"));
+		sparm_filterEfficiency_branch->SetAddress(&sparm_filterEfficiency_);
+	}
+	sparm_pdfScale_branch = 0;
+	if (tree->GetAlias("sparm_pdfScale") != 0) {
+		sparm_pdfScale_branch = tree->GetBranch(tree->GetAlias("sparm_pdfScale"));
+		sparm_pdfScale_branch->SetAddress(&sparm_pdfScale_);
+	}
+	sparm_pdfWeight1_branch = 0;
+	if (tree->GetAlias("sparm_pdfWeight1") != 0) {
+		sparm_pdfWeight1_branch = tree->GetBranch(tree->GetAlias("sparm_pdfWeight1"));
+		sparm_pdfWeight1_branch->SetAddress(&sparm_pdfWeight1_);
+	}
+	sparm_pdfWeight2_branch = 0;
+	if (tree->GetAlias("sparm_pdfWeight2") != 0) {
+		sparm_pdfWeight2_branch = tree->GetBranch(tree->GetAlias("sparm_pdfWeight2"));
+		sparm_pdfWeight2_branch->SetAddress(&sparm_pdfWeight2_);
+	}
+	sparm_weight_branch = 0;
+	if (tree->GetAlias("sparm_weight") != 0) {
+		sparm_weight_branch = tree->GetBranch(tree->GetAlias("sparm_weight"));
+		sparm_weight_branch->SetAddress(&sparm_weight_);
+	}
+	sparm_xsec_branch = 0;
+	if (tree->GetAlias("sparm_xsec") != 0) {
+		sparm_xsec_branch = tree->GetBranch(tree->GetAlias("sparm_xsec"));
+		sparm_xsec_branch->SetAddress(&sparm_xsec_);
 	}
 	evt_pf_tcmet_branch = 0;
 	if (tree->GetAlias("evt_pf_tcmet") != 0) {
@@ -10269,6 +10333,8 @@ void GetEntry(unsigned int idx)
 		evt_errCategory_isLoaded = false;
 		evt_errModule_isLoaded = false;
 		evt_errSeverity_isLoaded = false;
+		sparm_comment_isLoaded = false;
+		sparm_names_isLoaded = false;
 		evt_eventHasHalo_isLoaded = false;
 		hcalnoise_HasBadRBXTS4TS5_isLoaded = false;
 		ls_isValid_isLoaded = false;
@@ -10447,6 +10513,12 @@ void GetEntry(unsigned int idx)
 		evt_pfmetSignificance_isLoaded = false;
 		evt_pfmet_type1cor_isLoaded = false;
 		evt_pfsumet_isLoaded = false;
+		sparm_filterEfficiency_isLoaded = false;
+		sparm_pdfScale_isLoaded = false;
+		sparm_pdfWeight1_isLoaded = false;
+		sparm_pdfWeight2_isLoaded = false;
+		sparm_weight_isLoaded = false;
+		sparm_xsec_isLoaded = false;
 		evt_pf_tcmet_isLoaded = false;
 		evt_pf_tcmetPhi_isLoaded = false;
 		evt_pf_tcmetSig_isLoaded = false;
@@ -11553,6 +11625,8 @@ void LoadAllBranches()
 	if (evt_errCategory_branch != 0) evt_errCategory();
 	if (evt_errModule_branch != 0) evt_errModule();
 	if (evt_errSeverity_branch != 0) evt_errSeverity();
+	if (sparm_comment_branch != 0) sparm_comment();
+	if (sparm_names_branch != 0) sparm_names();
 	if (evt_eventHasHalo_branch != 0) evt_eventHasHalo();
 	if (hcalnoise_HasBadRBXTS4TS5_branch != 0) hcalnoise_HasBadRBXTS4TS5();
 	if (ls_isValid_branch != 0) ls_isValid();
@@ -11731,6 +11805,12 @@ void LoadAllBranches()
 	if (evt_pfmetSignificance_branch != 0) evt_pfmetSignificance();
 	if (evt_pfmet_type1cor_branch != 0) evt_pfmet_type1cor();
 	if (evt_pfsumet_branch != 0) evt_pfsumet();
+	if (sparm_filterEfficiency_branch != 0) sparm_filterEfficiency();
+	if (sparm_pdfScale_branch != 0) sparm_pdfScale();
+	if (sparm_pdfWeight1_branch != 0) sparm_pdfWeight1();
+	if (sparm_pdfWeight2_branch != 0) sparm_pdfWeight2();
+	if (sparm_weight_branch != 0) sparm_weight();
+	if (sparm_xsec_branch != 0) sparm_xsec();
 	if (evt_pf_tcmet_branch != 0) evt_pf_tcmet();
 	if (evt_pf_tcmetPhi_branch != 0) evt_pf_tcmetPhi();
 	if (evt_pf_tcmetSig_branch != 0) evt_pf_tcmetSig();
@@ -12959,6 +13039,36 @@ void LoadAllBranches()
 			evt_errSeverity_isLoaded = true;
 		}
 		return evt_errSeverity_;
+	}
+	vector<TString> &sparm_comment()
+	{
+		if (not sparm_comment_isLoaded) {
+			if (sparm_comment_branch != 0) {
+				sparm_comment_branch->GetEntry(index);
+				#ifdef PARANOIA
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_comment_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_comment_isLoaded = true;
+		}
+		return sparm_comment_;
+	}
+	vector<TString> &sparm_names()
+	{
+		if (not sparm_names_isLoaded) {
+			if (sparm_names_branch != 0) {
+				sparm_names_branch->GetEntry(index);
+				#ifdef PARANOIA
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_names_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_names_isLoaded = true;
+		}
+		return sparm_names_;
 	}
 	bool &evt_eventHasHalo()
 	{
@@ -16229,6 +16339,120 @@ void LoadAllBranches()
 			evt_pfsumet_isLoaded = true;
 		}
 		return evt_pfsumet_;
+	}
+	float &sparm_filterEfficiency()
+	{
+		if (not sparm_filterEfficiency_isLoaded) {
+			if (sparm_filterEfficiency_branch != 0) {
+				sparm_filterEfficiency_branch->GetEntry(index);
+				#ifdef PARANOIA
+				if (not isfinite(sparm_filterEfficiency_)) {
+					printf("branch sparm_filterEfficiency_branch contains a bad float: %f\n", sparm_filterEfficiency_);
+					exit(1);
+				}
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_filterEfficiency_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_filterEfficiency_isLoaded = true;
+		}
+		return sparm_filterEfficiency_;
+	}
+	float &sparm_pdfScale()
+	{
+		if (not sparm_pdfScale_isLoaded) {
+			if (sparm_pdfScale_branch != 0) {
+				sparm_pdfScale_branch->GetEntry(index);
+				#ifdef PARANOIA
+				if (not isfinite(sparm_pdfScale_)) {
+					printf("branch sparm_pdfScale_branch contains a bad float: %f\n", sparm_pdfScale_);
+					exit(1);
+				}
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_pdfScale_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_pdfScale_isLoaded = true;
+		}
+		return sparm_pdfScale_;
+	}
+	float &sparm_pdfWeight1()
+	{
+		if (not sparm_pdfWeight1_isLoaded) {
+			if (sparm_pdfWeight1_branch != 0) {
+				sparm_pdfWeight1_branch->GetEntry(index);
+				#ifdef PARANOIA
+				if (not isfinite(sparm_pdfWeight1_)) {
+					printf("branch sparm_pdfWeight1_branch contains a bad float: %f\n", sparm_pdfWeight1_);
+					exit(1);
+				}
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_pdfWeight1_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_pdfWeight1_isLoaded = true;
+		}
+		return sparm_pdfWeight1_;
+	}
+	float &sparm_pdfWeight2()
+	{
+		if (not sparm_pdfWeight2_isLoaded) {
+			if (sparm_pdfWeight2_branch != 0) {
+				sparm_pdfWeight2_branch->GetEntry(index);
+				#ifdef PARANOIA
+				if (not isfinite(sparm_pdfWeight2_)) {
+					printf("branch sparm_pdfWeight2_branch contains a bad float: %f\n", sparm_pdfWeight2_);
+					exit(1);
+				}
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_pdfWeight2_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_pdfWeight2_isLoaded = true;
+		}
+		return sparm_pdfWeight2_;
+	}
+	float &sparm_weight()
+	{
+		if (not sparm_weight_isLoaded) {
+			if (sparm_weight_branch != 0) {
+				sparm_weight_branch->GetEntry(index);
+				#ifdef PARANOIA
+				if (not isfinite(sparm_weight_)) {
+					printf("branch sparm_weight_branch contains a bad float: %f\n", sparm_weight_);
+					exit(1);
+				}
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_weight_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_weight_isLoaded = true;
+		}
+		return sparm_weight_;
+	}
+	float &sparm_xsec()
+	{
+		if (not sparm_xsec_isLoaded) {
+			if (sparm_xsec_branch != 0) {
+				sparm_xsec_branch->GetEntry(index);
+				#ifdef PARANOIA
+				if (not isfinite(sparm_xsec_)) {
+					printf("branch sparm_xsec_branch contains a bad float: %f\n", sparm_xsec_);
+					exit(1);
+				}
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch sparm_xsec_branch does not exist!\n");
+				exit(1);
+			}
+			sparm_xsec_isLoaded = true;
+		}
+		return sparm_xsec_;
 	}
 	float &evt_pf_tcmet()
 	{
@@ -37037,6 +37261,8 @@ namespace tas {
 	vector<TString> &evt_errCategory();
 	vector<TString> &evt_errModule();
 	vector<TString> &evt_errSeverity();
+	vector<TString> &sparm_comment();
+	vector<TString> &sparm_names();
 	bool &evt_eventHasHalo();
 	bool &hcalnoise_HasBadRBXTS4TS5();
 	bool &ls_isValid();
@@ -37215,6 +37441,12 @@ namespace tas {
 	float &evt_pfmetSignificance();
 	float &evt_pfmet_type1cor();
 	float &evt_pfsumet();
+	float &sparm_filterEfficiency();
+	float &sparm_pdfScale();
+	float &sparm_pdfWeight1();
+	float &sparm_pdfWeight2();
+	float &sparm_weight();
+	float &sparm_xsec();
 	float &evt_pf_tcmet();
 	float &evt_pf_tcmetPhi();
 	float &evt_pf_tcmetSig();
