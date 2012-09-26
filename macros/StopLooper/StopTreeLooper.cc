@@ -1,3 +1,5 @@
+#include <map>
+#include <set>
 
 #include "StopTreeLooper.h"
 #include "Core/StopTree.h"
@@ -74,6 +76,53 @@ void StopTreeLooper::setOutFileName(string filename)
   m_outfilename_ = filename;
 
 }
+
+
+
+//--------------------------------------------------------------------
+
+struct DorkyEventIdentifier {
+  // this is a workaround for not having unique event id's in MC
+  unsigned long int run, event,lumi;
+  bool operator < (const DorkyEventIdentifier &) const;
+  bool operator == (const DorkyEventIdentifier &) const;
+};
+
+//--------------------------------------------------------------------
+
+bool DorkyEventIdentifier::operator < (const DorkyEventIdentifier &other) const
+{
+  if (run != other.run)
+    return run < other.run;
+  if (event != other.event)
+    return event < other.event;
+  if(lumi != other.lumi)
+    return lumi < other.lumi;
+  return false;
+}
+
+//--------------------------------------------------------------------
+
+bool DorkyEventIdentifier::operator == (const DorkyEventIdentifier &other) const
+{
+  if (run != other.run)
+    return false;
+  if (event != other.event)
+    return false;
+  return true;
+}
+
+//--------------------------------------------------------------------
+
+std::set<DorkyEventIdentifier> already_seen;
+bool is_duplicate (const DorkyEventIdentifier &id) {
+  std::pair<std::set<DorkyEventIdentifier>::const_iterator, bool> ret =
+    already_seen.insert(id);
+  return !ret.second;
+}
+
+//--------------------------------------------------------------------
+
 
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
@@ -166,6 +215,18 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	i_permille_old = i_permille;
       }
 
+
+      //---------------------
+      // skip duplicates
+      //---------------------
+
+      if( isData ) {
+        DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
+        if (is_duplicate(id) ){
+          continue;
+        }
+      }
+
       // 
       // event weight
       // 
@@ -245,7 +306,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	     // if ( tree->t1met10mt_>250 ) 
 		//cout<<"MT: "<<tree->t1met10mt_<<" dPhi(lep,MET): "<<getdphi( tree->lep1_.Phi() , tree->t1met10phi_ )<<" pT(lep): "<<tree->lep1_.Pt() <<" MET: "<<tree->t1met10_ <<" * dataset: "<<tree->dataset_
 		  //  <<" run: "<<tree->run_<<" lumi: "<<tree->lumi_<<" event: "<<tree->event_<<endl;
-
 
 	    //default 
 	    makeCR1Plots( tree, evtweight, h_1d_cr1, "", tag_njets, flav_tag_sl, 150. );
@@ -565,6 +625,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   outfile_z.Write();
   outfile_z.Close();
+  
+  already_seen.clear();
 
   gROOT->cd();
 
