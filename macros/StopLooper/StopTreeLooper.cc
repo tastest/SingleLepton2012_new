@@ -834,6 +834,9 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isDat
 
   //lepton flavor - trigger, pt and eta requirements
   if ( sTree->lep1_.Pt() < 30 )          return false;
+  if ( fabs( sTree->pflep1_.Pt() - sTree->lep1_.Pt() ) > 10. )  return false;
+  if ( ( sTree->isopf1_ * sTree->lep1_.Pt() ) > 5. )  return false; 
+  
   if ( sTree->leptype_ == 0 ) {
 
     //pass trigger if data - single electron
@@ -842,6 +845,9 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isDat
     //    if ( isData && sTree->trgel1_ != 1 )  return false;
     
     if ( fabs(sTree->lep1_.Eta() ) > 2.1)  return false;
+    //barrel only if ( fabs(sTree->lep1_.Eta() ) > 1.4442) return false;
+    if ( sTree->eoverpin_ > 4. ) return false;
+    
 
   } else if ( sTree->leptype_ == 1 ) {
 
