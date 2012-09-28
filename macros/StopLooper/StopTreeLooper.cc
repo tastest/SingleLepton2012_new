@@ -1,5 +1,3 @@
-#include <map>
-#include <set>
 
 #include "StopTreeLooper.h"
 #include "Core/StopTree.h"
@@ -16,6 +14,7 @@
 #include <algorithm>
 #include <utility>
 #include <map>
+#include <set>
 
 float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData ) 
 {
@@ -76,9 +75,6 @@ void StopTreeLooper::setOutFileName(string filename)
   m_outfilename_ = filename;
 
 }
-
-
-
 //--------------------------------------------------------------------
 
 struct DorkyEventIdentifier {
@@ -114,7 +110,7 @@ bool DorkyEventIdentifier::operator == (const DorkyEventIdentifier &other) const
 
 //--------------------------------------------------------------------
 
-std::set<DorkyEventIdentifier> already_seen;
+std::set<DorkyEventIdentifier> already_seen; 
 bool is_duplicate (const DorkyEventIdentifier &id) {
   std::pair<std::set<DorkyEventIdentifier>::const_iterator, bool> ret =
     already_seen.insert(id);
@@ -122,7 +118,6 @@ bool is_duplicate (const DorkyEventIdentifier &id) {
 }
 
 //--------------------------------------------------------------------
-
 
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
@@ -152,6 +147,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   std::map<std::string, TH1F*> h_1d;
   //also for control regions
   std::map<std::string, TH1F*> h_1d_cr1, h_1d_cr2, h_1d_cr4, h_1d_cr5;
+  //for signal region 
+  std::map<std::string, TH1F*> h_1d_sig;
   //for ttbar dilepton njets distribution
   std::map<std::string, TH1F*> h_1d_nj;
   //z sample for yields etc
@@ -215,7 +212,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	i_permille_old = i_permille;
       }
 
-
       //---------------------
       // skip duplicates
       //---------------------
@@ -242,21 +238,47 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // selection criteria
       // 
 
-	//cout<<"got to line "<<__LINE__<<endl;
       //preselection
-      if ( !passEvtSelection(tree) ) continue;
-	//cout<<"got to line "<<__LINE__<<endl;
+      if ( !passEvtSelection(tree, name) ) continue;
 
       // histogram tags
       //jet multiplicity
       string tag_njets = Form("_nj%i", (tree->npfjets30_<4) ? tree->npfjets30_ : 4);
       //b-tagging
-      string tag_btag = (tree->nbtagscsvm_<1) ? "_bveto" : "_btag";
+      string tag_btag = (tree->nbtagscsvm_<1) ? "_bveto" : "";
+      //iso-trk-veto
+      string tag_isotrk = passIsoTrkVeto(tree) ? "" : "_wisotrk";
       //z-peak/veto
       string tag_zcut;
       if ( fabs( tree->dilmass_ - 91.) > 15. ) tag_zcut = "_zveto";
       else if  ( fabs( tree->dilmass_ - 91.) < 10. ) tag_zcut = "_zpeak";
       else tag_zcut = "_ignore";
+      //Corrected jet counting with simple overlap removal
+      //Check if each jet is matched to a lepton
+      int njets_corr = tree->npfjets30_;
+      if ( tree->mclep2_.Pt() > 30. ) {
+	if ( tree->pfjet1_.Pt()>30. && dRbetweenVectors(tree->mclep2_, tree->pfjet1_) < 0.4 ) njets_corr--;
+	if ( tree->pfjet2_.Pt()>30. && dRbetweenVectors(tree->mclep2_, tree->pfjet2_) < 0.4 ) njets_corr--;
+	if ( tree->pfjet3_.Pt()>30. && dRbetweenVectors(tree->mclep2_, tree->pfjet3_) < 0.4 ) njets_corr--;
+	if ( tree->pfjet4_.Pt()>30. && dRbetweenVectors(tree->mclep2_, tree->pfjet4_) < 0.4 ) njets_corr--;
+      } 
+     //to make plots for the two Kfactor bins
+     //note this is to be used for the case where njets>=4
+     string tag_kbin = (njets_corr<4) ? "_K3" : "_K4";
+
+     //event with true truth-level track
+     bool hastruetrk = false;
+     if (tree->nleps_==2 && abs(tree->mclep2_.Eta())<2.5)  {
+       //check if second lepton is e/mu pT>10GeV
+       if (abs(tree->mcid2_)<14 && tree->mclep2_.Pt()>10.) hastruetrk = true;
+       //if second lepton is tau 
+       //check if daughter lepton or single track has pT>10GeV
+       if (abs(tree->mcid2_)>14 && tree->mctaudpt2_>10.) {  
+         if (tree->mcdecay2_==2) hastruetrk = true;
+         if (tree->mcdecay2_==1 && tree->mcndec2_==1) hastruetrk = true;
+       }
+     }
+     string tag_truetrk = hastruetrk ? "_wtruetrk" : "_notruetrk";
 
       //flavor types
       string flav_tag_sl;
@@ -272,58 +294,102 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       string basic_flav_tag_dl = flav_tag_dl;
       if ( abs(tree->id1_) != abs(tree->id2_) ) basic_flav_tag_dl = "_mueg";
 
+
+      //
+      // SIGNAL REGION - single lepton + b-tag
+      //
+
+      // selection - 1 lepton 
+      // Add iso track veto
+      // Add b-tag
+      if ( passSingleLeptonSelection(tree, isData) && tree->npfjets30_>=4 )
+	{
+	  //tag_kbin tag_truetrk 
+
+	  //default 
+	  makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+"_prebtag", 	    tag_kbin, flav_tag_sl, 150. );
+	  makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag,   	    tag_kbin, flav_tag_sl, 150. );
+	  makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+
+	  //met > 50 GeV requirement 
+	  if ( tree->t1met10_ > 50. ) {
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+"_prebtag_met50",  	       tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met50", 	       tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+	  }
+	  //met > 100 GeV requirement 
+	  if ( tree->t1met10_ > 100. ) {
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+"_prebtag_met100",  		tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met100", 		tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+	  }
+	  //met > 150 GeV requirement 
+	  if ( tree->t1met10_ > 150. ) { 
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+"_prebtag_met150",  		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met150", 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	  }
+	  //met > 200 GeV requirement 
+	  if ( tree->t1met10_ > 200. ) {
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+"_prebtag_met200",  		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met200", 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	  }
+	  //met > 250 GeV requirement 
+	  if ( tree->t1met10_ > 250. ) {
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+"_prebtag_met250",  		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met250", 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	  }
+
+	}
+
       //
       // CR1 - single lepton + b-veto
       //
 
       // selection - 1 lepton + iso track veto
       // Add b-tag veto
-      if ( passOneLeptonSelection(tree) )
+      if ( passOneLeptonSelection(tree, isData) )
 	{
-	//cout<<"got to line "<<__LINE__<<endl;
 
 	  //default 
-	  makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto", tag_njets, flav_tag_sl, 150. );
+	  makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto", tag_njets, tag_kbin, flav_tag_sl, 150. );
 	  //met > 50 GeV requirement 
 	  if ( tree->t1met10_ > 50. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met50", tag_njets, flav_tag_sl, 150. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met50", tag_njets, tag_kbin, flav_tag_sl, 150. );
 	  //met > 100 GeV requirement 
 	  if ( tree->t1met10_ > 100. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met100", tag_njets, flav_tag_sl, 150. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met100", tag_njets, tag_kbin, flav_tag_sl, 150. );
 	  //met > 150 GeV requirement 
 	  if ( tree->t1met10_ > 150. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met150", tag_njets, flav_tag_sl, 120. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met150", tag_njets, tag_kbin, flav_tag_sl, 120. );
 	  //met > 200 GeV requirement 
 	  if ( tree->t1met10_ > 200. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met200", tag_njets, flav_tag_sl, 120. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met200", tag_njets, tag_kbin, flav_tag_sl, 120. );
 	  //met > 250 GeV requirement 
 	  if ( tree->t1met10_ > 250. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met250", tag_njets, flav_tag_sl, 120. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr1, "_prebveto_met250", tag_njets, tag_kbin, flav_tag_sl, 120. );
 	  
 	  if ( tree->nbtagscsvm_==0 ) {
-	//cout<<"got to line "<<__LINE__<<endl;
-
-	     // if ( tree->t1met10mt_>250 ) 
-		//cout<<"MT: "<<tree->t1met10mt_<<" dPhi(lep,MET): "<<getdphi( tree->lep1_.Phi() , tree->t1met10phi_ )<<" pT(lep): "<<tree->lep1_.Pt() <<" MET: "<<tree->t1met10_ <<" * dataset: "<<tree->dataset_
-		  //  <<" run: "<<tree->run_<<" lumi: "<<tree->lumi_<<" event: "<<tree->event_<<endl;
 
 	    //default 
-	    makeCR1Plots( tree, evtweight, h_1d_cr1, "", tag_njets, flav_tag_sl, 150. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr1, "", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	    //met > 50 GeV requirement 
 	    if ( tree->t1met10_ > 50. ) 
-	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met50", tag_njets, flav_tag_sl, 150. );
+	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	    //met > 100 GeV requirement 
 	    if ( tree->t1met10_ > 100. ) 
-	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met100", tag_njets, flav_tag_sl, 150. );
+	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	    //met > 150 GeV requirement 
 	    if ( tree->t1met10_ > 150. ) 
-	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met150", tag_njets, flav_tag_sl, 120. );
+	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	    //met > 200 GeV requirement 
 	    if ( tree->t1met10_ > 200. ) 
-	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met200", tag_njets, flav_tag_sl, 120. );
+	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	    //met > 250 GeV requirement 
 	    if ( tree->t1met10_ > 250. ) 
-	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met250", tag_njets, flav_tag_sl, 120. );
+	      makeCR1Plots( tree, evtweight, h_1d_cr1, "_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	    
 	  }
 	}
@@ -342,9 +408,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  if ( fabs( tree->dilmass_ - 91.) < 10. ) 
 	    {
 
-	      //if (tree->npfjets30_>8) 
-		//cout<<"NJETS: "<<tree->npfjets30_<<" * dataset: "<<tree->dataset_
-		 //   <<" run: "<<tree->run_<<" lumi: "<<tree->lumi_<<" event: "<<tree->event_<<endl;
+	      // if (tree->npfjets30_>8) 
+	      // 	cout<<"NJETS: "<<tree->npfjets30_<<" * dataset: "<<tree->dataset_
+	      // 	    <<" run: "<<tree->run_<<" lumi: "<<tree->lumi_<<" event: "<<tree->event_<<endl;
 	      
 	      //z peak plots
 	      plot1D("h_z_njets"    +flav_tag_dl, min(tree->npfjets30_,4),  evtweight, h_1d_z, 5,0,5);
@@ -369,22 +435,22 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		float t1metphicorr_lep    = sqrt(metx*metx + mety*mety);
 		
 		//default 
-		makeCR2Plots( tree, evtweight, h_1d_cr2, "", tag_njets, flav_tag_dl, 150. );
+		makeCR2Plots( tree, evtweight, h_1d_cr2, "", tag_njets,  tag_kbin, flav_tag_dl, 150. );
 		//pseudomet > 50 GeV requirement 
 		if ( t1metphicorr_lep > 50. ) 
-		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met50", tag_njets, flav_tag_dl, 150. );
+		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met50", tag_njets,  tag_kbin, flav_tag_dl, 150. );
 		//pseudomet > 100 GeV requirement 
 		if ( t1metphicorr_lep > 100. ) 
-		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met100", tag_njets, flav_tag_dl, 150. );
+		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met100", tag_njets,  tag_kbin, flav_tag_dl, 150. );
 		//pseudomet > 150 GeV requirement 
 		if ( t1metphicorr_lep > 150. ) 
-		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met150", tag_njets, flav_tag_dl, 120. );
+		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met150", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 		//pseudomet > 200 GeV requirement 
 		if ( t1metphicorr_lep > 200. ) 
-		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met200", tag_njets, flav_tag_dl, 120. );
+		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met200", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 		//pseudomet > 250 GeV requirement 
 		if ( t1metphicorr_lep > 250. ) 
-		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met250", tag_njets, flav_tag_dl, 120. );
+		  makeCR2Plots( tree, evtweight, h_1d_cr2, "_met250", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 	      }
 	    }
 	}
@@ -422,22 +488,22 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  if ( tree->npfjets30_ < 2 ) continue; 
 	  
 	  //default 
-	  makeCR4Plots( tree, evtweight, h_1d_cr4, "", tag_njets, flav_tag_dl, 150. );
+	  makeCR4Plots( tree, evtweight, h_1d_cr4, "", tag_njets,  tag_kbin, flav_tag_dl, 150. );
 	  //met > 50 GeV requirement 
 	  if ( tree->t1met10_ > 50. ) 
-	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met50", tag_njets, flav_tag_dl, 150. );
+	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met50", tag_njets,  tag_kbin, flav_tag_dl, 150. );
 	  //met > 100 GeV requirement 
 	  if ( tree->t1met10_ > 100. ) 
-	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met100", tag_njets, flav_tag_dl, 150. );
+	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met100", tag_njets,  tag_kbin, flav_tag_dl, 150. );
 	  //met > 150 GeV requirement 
 	  if ( tree->t1met10_ > 150. ) 
-	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met150", tag_njets, flav_tag_dl, 120. );
+	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met150", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 	  //met > 200 GeV requirement 
 	  if ( tree->t1met10_ > 200. ) 
-	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met200", tag_njets, flav_tag_dl, 120. );
+	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met200", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 	  //met > 250 GeV requirement 
 	  if ( tree->t1met10_ > 250. ) 
-	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met250", tag_njets, flav_tag_dl, 120. );
+	    makeCR4Plots( tree, evtweight, h_1d_cr4, "_met250", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 	  
 	}
 
@@ -452,28 +518,28 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       // selection - at least 1 lepton
       // Add b-tag requirement
-      if ( passSingleLeptonSelection(tree) 
+      if ( passSingleLeptonSelection(tree, isData) 
 	   && tree->nbtagscsvm_>0 ) 
 	{
 	  
 	  //inclusive sample
 	  //default 
-	  makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto", tag_njets, flav_tag_sl, 150. );
+	  makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	  //met > 50 GeV requirement 
 	  if ( tree->t1met10_ > 50. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met50", tag_njets, flav_tag_sl, 150. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	  //met > 100 GeV requirement 
 	  if ( tree->t1met10_ > 100. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met100", tag_njets, flav_tag_sl, 150. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	  //met > 150 GeV requirement 
 	  if ( tree->t1met10_ > 150. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met150", tag_njets, flav_tag_sl, 120. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	  //met > 200 GeV requirement 
 	  if ( tree->t1met10_ > 200. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met200", tag_njets, flav_tag_sl, 120. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	  //met > 250 GeV requirement 
 	  if ( tree->t1met10_ > 250. ) 
-	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met250", tag_njets, flav_tag_sl, 120. );
+	    makeCR1Plots( tree, evtweight, h_1d_cr5, "_preveto_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	}
       
       //
@@ -482,49 +548,49 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       // selection - lepton + isolated track
       // Add b-tag requirement
-      if ( passLepPlusIsoTrkSelection(tree) 
+      if ( passLepPlusIsoTrkSelection(tree, isData) 
 	   && tree->nbtagscsvm_>0 ) 
 	{
 
 	  //inclusive sample
 	  //default 
-	  makeCR5Plots( tree, evtweight, h_1d_cr5, "_all", tag_njets, flav_tag_sl, 150. );
+	  makeCR5Plots( tree, evtweight, h_1d_cr5, "_all", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	  //met > 50 GeV requirement 
 	  if ( tree->t1met10_ > 50. ) 
-	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met50", tag_njets, flav_tag_sl, 150. );
+	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	  //met > 100 GeV requirement 
 	  if ( tree->t1met10_ > 100. ) 
-	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met100", tag_njets, flav_tag_sl, 150. );
+	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	  //met > 150 GeV requirement 
 	  if ( tree->t1met10_ > 150. ) 
-	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met150", tag_njets, flav_tag_sl, 120. );
+	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	  //met > 200 GeV requirement 
 	  if ( tree->t1met10_ > 200. ) 
-	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met200", tag_njets, flav_tag_sl, 120. );
+	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	  //met > 250 GeV requirement 
 	  if ( tree->t1met10_ > 250. ) 
-	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met250", tag_njets, flav_tag_sl, 120. );
+	    makeCR5Plots( tree, evtweight, h_1d_cr5, "_all_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 
 	  // sample with only 1 lepton - this is the true CR5
 	  if ( tree->ngoodlep_ == 1 ) {
 
 	    //default 
-	    makeCR5Plots( tree, evtweight, h_1d_cr5, "", tag_njets, flav_tag_sl, 150. );
+	    makeCR5Plots( tree, evtweight, h_1d_cr5, "", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	    //met > 50 GeV requirement 
 	    if ( tree->t1met10_ > 50. ) 
-	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met50", tag_njets, flav_tag_sl, 150. );
+	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	    //met > 100 GeV requirement 
 	    if ( tree->t1met10_ > 100. ) 
-	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met100", tag_njets, flav_tag_sl, 150. );
+	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
 	    //met > 150 GeV requirement 
 	    if ( tree->t1met10_ > 150. ) 
-	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met150", tag_njets, flav_tag_sl, 120. );
+	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	    //met > 200 GeV requirement 
 	    if ( tree->t1met10_ > 200. ) 
-	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met200", tag_njets, flav_tag_sl, 120. );
+	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	    //met > 250 GeV requirement 
 	    if ( tree->t1met10_ > 250. ) 
-	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met250", tag_njets, flav_tag_sl, 120. );
+	      makeCR5Plots( tree, evtweight, h_1d_cr5, "_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 
 	  }
 	}
@@ -539,18 +605,33 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     // finish
     //
 
-  TFile outfile(m_outfilename_.c_str(),"RECREATE") ; 
-  printf("[StopTreeLooper::loop] Saving histograms to %s\n", m_outfilename_.c_str());
+  // TFile outfile(m_outfilename_.c_str(),"RECREATE") ; 
+  // printf("[StopTreeLooper::loop] Saving histograms to %s\n", m_outfilename_.c_str());
 
-  std::map<std::string, TH1F*>::iterator it1d;
-  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
-    it1d->second->Write(); 
-    delete it1d->second;
+  // std::map<std::string, TH1F*>::iterator it1d;
+  // for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
+  //   it1d->second->Write(); 
+  //   delete it1d->second;
+  // }
+
+  // outfile.Write();
+  // outfile.Close();
+    
+  //signal region
+  //h_1d_sig
+
+  TFile outfile_sig(Form("SIG%s",m_outfilename_.c_str()),"RECREATE") ; 
+  printf("[StopTreeLooper::loop] Saving SIG histograms to %s\n", m_outfilename_.c_str());
+
+  std::map<std::string, TH1F*>::iterator it1d_sig;
+  for(it1d_sig=h_1d_sig.begin(); it1d_sig!=h_1d_sig.end(); it1d_sig++) {
+    it1d_sig->second->Write(); 
+    delete it1d_sig->second;
   }
 
-  outfile.Write();
-  outfile.Close();
-    
+  outfile_sig.Write();
+  outfile_sig.Close();
+
   //control regions
   //h_1d_cr1, h_1d_cr2, h_1d_cr4, h_1d_cr5
 
@@ -625,14 +706,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   outfile_z.Write();
   outfile_z.Close();
-  
+
   already_seen.clear();
 
   gROOT->cd();
 
 }
 
-bool StopTreeLooper::passEvtSelection(const StopTree *sTree) 
+bool StopTreeLooper::passEvtSelection(const StopTree *sTree, TString name) 
 {
   //lepton + 2j selection
 
@@ -640,6 +721,8 @@ bool StopTreeLooper::passEvtSelection(const StopTree *sTree)
   if ( sTree->rhovor_<0. || sTree->rhovor_>=40. ) return false;
 
   //met filters
+  if ( !name.Contains("tWsl") &&  !name.Contains("tWdl") ) {
+
   if ( sTree->csc_      != 0 ) return false;
   if ( sTree->hbhe_     != 1 ) return false;
   if ( sTree->hcallaser_!= 1 ) return false;
@@ -647,6 +730,8 @@ bool StopTreeLooper::passEvtSelection(const StopTree *sTree)
   if ( sTree->trkfail_  != 1 ) return false;
   if ( sTree->eebadsc_  != 1 ) return false;
   if ( sTree->hbhenew_  != 1 ) return false;
+
+  }
 
   //2-jet requirement
   //  if ( sTree->npfjets30_<2) return false;
@@ -662,7 +747,7 @@ bool StopTreeLooper::passEvtSelection(const StopTree *sTree)
 
 }
 
-bool StopTreeLooper::passSingleMuonSelection(const StopTree *sTree) 
+bool StopTreeLooper::passSingleMuonSelection(const StopTree *sTree, bool isData) 
 {
   //single lepton muon selection for 8 TeV 53 analysis
   
@@ -673,8 +758,9 @@ bool StopTreeLooper::passSingleMuonSelection(const StopTree *sTree)
   if ( sTree->leptype_ != 1 ) return false;
 
   //pass trigger if data - single muon
-  if ( sTree->isomu24_ != 1 ) return false;
-  if ( sTree->trgmu1_ != 1 )  return false;
+  //  if ( sTree->isomu24_ != 1 ) return false;
+  if ( isData && sTree->isomu24_ != 1 ) return false;
+  //  if ( isData && sTree->trgmu1_ != 1 )  return false;
 
   //passes pt and eta requirements
   if ( sTree->lep1_.Pt() < 30 )          return false;
@@ -688,7 +774,7 @@ bool StopTreeLooper::passSingleMuonSelection(const StopTree *sTree)
 
 }
 
-bool StopTreeLooper::passSingleElecSelection(const StopTree *sTree) 
+bool StopTreeLooper::passSingleElecSelection(const StopTree *sTree, bool isData) 
 {
   //single lepton electron selection for 8 TeV 53 analysis
 
@@ -699,8 +785,9 @@ bool StopTreeLooper::passSingleElecSelection(const StopTree *sTree)
   if ( sTree->leptype_ != 0 ) return false;
 
   //pass trigger if data - single electron
-  if ( sTree->ele27wp80_ != 1 ) return false;
-  if ( sTree->trgel1_ != 1 )  return false;
+  //  if ( sTree->ele27wp80_ != 1 ) return false;
+  if ( isData && sTree->ele27wp80_ != 1 ) return false;
+  //  if ( isData && sTree->trgel1_ != 1 )  return false;
 
   //passes pt and eta requirements
   if ( sTree->lep1_.Pt() < 30 )          return false;
@@ -714,10 +801,10 @@ bool StopTreeLooper::passSingleElecSelection(const StopTree *sTree)
 
 }
 
-bool StopTreeLooper::passOneLeptonSelection(const StopTree *sTree) 
+bool StopTreeLooper::passOneLeptonSelection(const StopTree *sTree, bool isData) 
 {
   //single lepton selection for 8 TeV 53 analysis
-  if ( !passSingleLeptonSelection(sTree) ) return false;
+  if ( !passSingleLeptonSelection(sTree, isData) ) return false;
 
   //pass isolated track veto
   //unfortunately changed default value to 9999.
@@ -727,7 +814,18 @@ bool StopTreeLooper::passOneLeptonSelection(const StopTree *sTree)
 
 }
 
-bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree) 
+bool StopTreeLooper::passIsoTrkVeto(const StopTree *sTree) 
+{
+
+  //pass isolated track veto
+  //unfortunately changed default value to 9999.
+  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
+
+  return true;
+
+}
+
+bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isData) 
 {
   //single lepton selection for 8 TeV 53 analysis
 
@@ -739,8 +837,9 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree)
   if ( sTree->leptype_ == 0 ) {
 
     //pass trigger if data - single electron
-    if ( sTree->ele27wp80_ != 1 ) return false;
-    //    if ( sTree->trgel1_ != 1 )  return false;
+    //    if ( sTree->ele27wp80_ != 1 ) return false;
+    if ( isData && sTree->ele27wp80_ != 1 ) return false;
+    //    if ( isData && sTree->trgel1_ != 1 )  return false;
     
     if ( fabs(sTree->lep1_.Eta() ) > 2.1)  return false;
 
@@ -748,6 +847,7 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree)
 
     //pass trigger if data - single muon
     if ( sTree->isomu24_ != 1 ) return false;
+    //    if ( isData && sTree->isomu24_ != 1 ) return false;
     //    if ( sTree->trgmu1_ != 1 )  return false;
     
     if ( fabs(sTree->lep1_.Eta() ) > 2.1)  return false;
@@ -783,12 +883,12 @@ bool StopTreeLooper::passDileptonSelection(const StopTree *sTree)
 
 }
 
-bool StopTreeLooper::passLepPlusIsoTrkSelection(const StopTree *sTree) 
+bool StopTreeLooper::passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData) 
 {
   //single lepton plus iso trk selection for 8 TeV 53 analysis
 
   //at least one lepton
-  if ( !passSingleLeptonSelection(sTree) ) return false;
+  if ( !passSingleLeptonSelection(sTree, isData) ) return false;
 
   //pass isolated track requirement
   //unfortunately changed default value to 9999.
@@ -799,7 +899,7 @@ bool StopTreeLooper::passLepPlusIsoTrkSelection(const StopTree *sTree)
 }
 
 void StopTreeLooper::makeCR2Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-				   string tag_selection, string tag_njets, string flav_tag_dl, float mtcut ) 
+				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut ) 
 {
 
   //find positive lepton - this is the one that is combined with the pseudomet to form the mT
@@ -835,30 +935,35 @@ void StopTreeLooper::makeCR2Plots( const StopTree *sTree, float evtweight, std::
   //default met
   plot1D("h_cr2_met"+tag_selection          +flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_met"+tag_selection+tag_njets+flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_met"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //pseudo-met
   plot1D("h_cr2_pseudomet"+tag_selection	  +flav_tag_dl, min(t1met10_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_pseudomet"+tag_selection+tag_njets+flav_tag_dl, min(t1met10_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomet"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1met10_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //positive lepton pt - enters mT calculation
   float leppt = isfirstp ? sTree->lep1_.Pt() : sTree->lep2_.Pt();
   plot1D("h_cr2_leppt"+tag_selection          +flav_tag_dl, min(leppt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_leppt"+tag_selection+tag_njets+flav_tag_dl, min(leppt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_leppt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(leppt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //angle between pos-lep and pseudopseudomet
   float dphi_pseudometlep = isfirstp ?
     getdphi( sTree->lep2_.Phi() , t1met10phi_lep ) :
     getdphi( sTree->lep1_.Phi() , t1met10phi_lep );
   plot1D("h_cr2_dphi_pseudometlep"+tag_selection          +flav_tag_dl, dphi_pseudometlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr2_dphi_pseudometlep"+tag_selection+tag_njets+flav_tag_dl, dphi_pseudometlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr2_dphi_pseudometlep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_pseudometlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //pseudo-mt
   plot1D("h_cr2_pseudomt"      +tag_selection          +flav_tag_dl, min(t1met10mt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_pseudomt"      +tag_selection+tag_njets+flav_tag_dl, min(t1met10mt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomt"      +tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1met10mt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_pseudomt_count"+tag_selection          +flav_tag_dl, pseudomt_count, evtweight, h_1d, 2, 0, 2);
   plot1D("h_cr2_pseudomt_count"+tag_selection+tag_njets+flav_tag_dl, pseudomt_count, evtweight, h_1d, 2, 0, 2);
-
+  plot1D("h_cr2_pseudomt_count"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, pseudomt_count, evtweight, h_1d, 2, 0, 2);
 
 }
 
 void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-				   string tag_selection, string tag_njets, string flav_tag_dl, float mtcut ) 
+				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut ) 
 {
 
   //binning for mT plots
@@ -873,38 +978,46 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   else if ( sTree->t1met10mt_ > mtcut ) mt_count = 1.5;
   
   //default met
-  plot1D("h_cr4_met"+tag_selection          +flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_met"+tag_selection+tag_njets+flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_met"+tag_selection                   +flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_met"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_met"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //leading lepton pt - enters mT calculation
-  plot1D("h_cr4_leppt"+tag_selection          +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_leppt"+tag_selection+tag_njets+flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_leppt"+tag_selection                   +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_leppt"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_leppt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //subleading lepton pt
-  plot1D("h_cr4_subleadleppt"+tag_selection          +flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_subleadleppt"+tag_selection+tag_njets+flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_subleadleppt"+tag_selection                   +flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_subleadleppt"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_subleadleppt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //angle between lead-lep and met
   float dphi_metlep = getdphi( sTree->lep1_.Phi() , sTree->t1met10phi_ );
-  plot1D("h_cr4_dphi_metlep"+tag_selection          +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets+flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dphi_metlep"+tag_selection                   +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets         +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
-  plot1D("h_cr4_mt"+tag_selection          +flav_tag_dl, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_mt"+tag_selection+tag_njets+flav_tag_dl, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_mt_count"+tag_selection          +flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
-  plot1D("h_cr4_mt_count"+tag_selection+tag_njets+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr4_mt"+tag_selection                   +flav_tag_dl, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_mt"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_mt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_mt_count"+tag_selection                   +flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr4_mt_count"+tag_selection+tag_njets         +flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr4_mt_count"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
 
   //Plot more angles between various objects
   //angle between 2 leptons
   float dphi_dilep = getdphi( sTree->lep1_.Phi() ,  sTree->lep2_.Phi() );
-  plot1D("h_cr4_dphi_dilep"+tag_selection          +flav_tag_dl, dphi_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr4_dphi_dilep"+tag_selection+tag_njets+flav_tag_dl, dphi_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dphi_dilep"+tag_selection                   +flav_tag_dl, dphi_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dphi_dilep"+tag_selection+tag_njets         +flav_tag_dl, dphi_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dphi_dilep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
   //dR between 2 leptons
   float dR_dilep = dRbetweenVectors( sTree->lep1_ ,  sTree->lep2_ );
-  plot1D("h_cr4_dR_dilep"+tag_selection          +flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets+flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dR_dilep"+tag_selection                   +flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets         +flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
 
 }
 
 void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-				   string tag_selection, string tag_njets, string flav_tag, float mtcut ) 
+				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ) 
 {
 
   //binning for mT plots
@@ -919,45 +1032,52 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
   else if ( sTree->t1met10mt_ > mtcut ) mt_count = 1.5;
   
   //default met
-  plot1D("h_cr5_met"+tag_selection          +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_met"+tag_selection+tag_njets+flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_met"+tag_selection                   +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_met"+tag_selection+tag_njets         +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_met"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //leading lepton pt - enters mT calculation
-  plot1D("h_cr5_leppt"+tag_selection          +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_leppt"+tag_selection+tag_njets+flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_leppt"+tag_selection                   +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_leppt"+tag_selection+tag_njets         +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_leppt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //isolated track pt
-  plot1D("h_cr5_isotrkpt"+tag_selection          +flav_tag, min(sTree->pfcand10_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_isotrkpt"+tag_selection+tag_njets+flav_tag, min(sTree->pfcand10_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_isotrkpt"+tag_selection                   +flav_tag, min(sTree->pfcand10_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_isotrkpt"+tag_selection+tag_njets         +flav_tag, min(sTree->pfcand10_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_isotrkpt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->pfcand10_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //angle between lead-lep and met
   float dphi_metlep = getdphi( sTree->lep1_.Phi() , sTree->t1met10phi_ );
-  plot1D("h_cr5_dphi_metlep"+tag_selection          +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dphi_metlep"+tag_selection                   +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
-  plot1D("h_cr5_mt"+tag_selection          +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_mt"+tag_selection+tag_njets+flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_mt_count"+tag_selection          +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
-  plot1D("h_cr5_mt_count"+tag_selection+tag_njets+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr5_mt"+tag_selection                   +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_mt"+tag_selection+tag_njets         +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_mt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_mt_count"+tag_selection                   +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr5_mt_count"+tag_selection+tag_njets         +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr5_mt_count"+tag_selection+tag_njets+tag_kbin+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
 
   //Plot more angles between various objects
   //angle between lepton and isolated track
   float dphi_leptrk = getdphi( sTree->lep1_.Phi() ,  sTree->pfcand10_.Phi() );
-  plot1D("h_cr5_dphi_leptrk"+tag_selection          +flav_tag, dphi_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr5_dphi_leptrk"+tag_selection+tag_njets+flav_tag, dphi_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dphi_leptrk"+tag_selection                   +flav_tag, dphi_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dphi_leptrk"+tag_selection+tag_njets         +flav_tag, dphi_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dphi_leptrk"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
   //dR between lepton and isolated track
   float dR_leptrk = dRbetweenVectors( sTree->lep1_ ,  sTree->pfcand10_ );
-  plot1D("h_cr5_dR_leptrk"+tag_selection          +flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets+flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dR_leptrk"+tag_selection                   +flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets         +flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets+tag_kbin+flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
 
 }
 
-void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-				   string tag_selection, string tag_njets, string flav_tag, float mtcut ) 
+void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
+				   string tag_selection, string tag_kbin, string flav_tag, float mtcut ) 
 {
 
  //binning for mT plots
-  int nbins = 150;
-  int nbins2 = 200;
+  int nbins = 50;
   float h_xmin = 0.;
-  float h_xmax = 1500.;
+  float h_xmax = 500.;
   float x_ovflw = h_xmax-0.001;
   
   float mt_count = -1.;
@@ -965,268 +1085,61 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
        && sTree->t1met10mt_ < 100. )    mt_count = 0.5;
   else if ( sTree->t1met10mt_ > mtcut ) mt_count = 1.5;
   
+  //default met
+  plot1D("h_sig_met"+tag_selection         +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_sig_met"+tag_selection+tag_kbin+flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  //lepton pt - enters mT calculation
+  plot1D("h_sig_leppt"+tag_selection         +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_sig_leppt"+tag_selection+tag_kbin+flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  //angle between lepton and met
   float dphi_metlep = getdphi( sTree->lep1_.Phi() , sTree->t1met10phi_ );
+  plot1D("h_sig_dphi_metlep"+tag_selection         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_sig_dphi_metlep"+tag_selection+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  //MT
+  plot1D("h_sig_mt"+tag_selection         +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_sig_mt"+tag_selection+tag_kbin+flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_sig_mt_count"+tag_selection         +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_sig_mt_count"+tag_selection+tag_kbin+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+
+}
+
+void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
+				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ) 
+{
+
+ //binning for mT plots
+  int nbins = 50;
+  float h_xmin = 0.;
+  float h_xmax = 500.;
+  float x_ovflw = h_xmax-0.001;
   
-  //if(sTree->t1met10mt_>250 && sTree->t1met10mt_<450) {
-  //if(sTree->t1met10mt_>450 ) {
-  //if(sTree->t1met10mt_>250 ) {
-  //if(sTree->t1met10mt_>250 && fabs(sTree->pflep1_.Pt() -sTree->lep1_.Pt() )<10) {
-  //if(sTree->t1met10mt_>250 && dphi_metlep<3. && fabs(sTree->pflep1_.Pt() -sTree->lep1_.Pt() )<10 && fabs(sTree->lep1_.Eta())<1.4442 ) {
-  if(sTree->t1met10mt_>250 && dphi_metlep<(TMath::Pi()*19./20.) && fabs(sTree->pflep1_.Pt() -sTree->lep1_.Pt() )<10 && fabs(sTree->lep1_.Eta())<1.4442 ) {
-  //if(sTree->t1met10mt_>0) {
+  float mt_count = -1.;
+  if ( sTree->t1met10mt_ > 60. 
+       && sTree->t1met10mt_ < 100. )    mt_count = 0.5;
+  else if ( sTree->t1met10mt_ > mtcut ) mt_count = 1.5;
   
   plot1D("h_cr1_njets"    +tag_selection+flav_tag, min(sTree->npfjets30_,4),  evtweight, h_1d, 5,0,5);
   plot1D("h_cr1_njets_all"+tag_selection+flav_tag, min(sTree->npfjets30_,9),  evtweight, h_1d, 10, 0, 10);
-  
   //default met
-  plot1D("h_cr1_met"+tag_selection          +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins2, 0., 1000.);
-  plot1D("h_cr1_met"+tag_selection+tag_njets+flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins2, 0., 1000.);
-  
+  plot1D("h_cr1_met"+tag_selection                   +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_met"+tag_selection+tag_njets         +flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_met"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->t1met10_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //lepton pt - enters mT calculation
-  plot1D("h_cr1_leppt"+tag_selection          +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr1_leppt"+tag_selection+tag_njets+flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  
+  plot1D("h_cr1_leppt"+tag_selection                   +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_leppt"+tag_selection+tag_njets         +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_leppt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //angle between lepton and met
-  //float dphi_metlep = getdphi( sTree->lep1_.Phi() , sTree->t1met10phi_ );
-  plot1D("h_cr1_dphi_metlep"+tag_selection          +flav_tag, dphi_metlep, evtweight, h_1d, 200, 0., TMath::Pi());
-  plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets+flav_tag, dphi_metlep, evtweight, h_1d, 200, 0., TMath::Pi());
-  
+  float dphi_metlep = getdphi( sTree->lep1_.Phi() , sTree->t1met10phi_ );
+  plot1D("h_cr1_dphi_metlep"+tag_selection                   +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
-  plot1D("h_cr1_mt"+tag_selection          +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr1_mt"+tag_selection+tag_njets+flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  
-  //lepton eta
-  float x_ovflw2 = 3-0.001;
-  plot1D("h_cr1_lepeta"+tag_selection          +flav_tag, (sTree->lep1_.Eta()>0) ? min(sTree->lep1_.Eta(), x_ovflw2) : max(sTree->lep1_.Eta(), -x_ovflw2), evtweight, h_1d, nbins, -3, 3);
-  plot1D("h_cr1_lepeta"+tag_selection+tag_njets+flav_tag, (sTree->lep1_.Eta()>0) ? min(sTree->lep1_.Eta(), x_ovflw2) : max(sTree->lep1_.Eta(), -x_ovflw2), evtweight, h_1d, nbins, -3, 3);
-  
-  //lepton phi
-  plot1D("h_cr1_lepphi"+tag_selection          +flav_tag, sTree->lep1_.Phi(), evtweight, h_1d, nbins, -TMath::Pi(),TMath::Pi());
-  plot1D("h_cr1_lepphi"+tag_selection+tag_njets+flav_tag, sTree->lep1_.Phi(), evtweight, h_1d, nbins, -TMath::Pi(),TMath::Pi()) ;
-  
-  //angle between met and high pT jet
-  float dphi_metjet1 = getdphi( sTree->pfjet1_.Phi() , sTree->t1met10phi_ );
-  plot1D("h_cr1_dphi_metjet1"+tag_selection          +flav_tag, dphi_metjet1, evtweight, h_1d, 200, 0., TMath::Pi());
-  plot1D("h_cr1_dphi_metjet1"+tag_selection+tag_njets+flav_tag, dphi_metjet1, evtweight, h_1d, 200, 0., TMath::Pi());
-  
-  //angle between met and closest jet
-  float dphi_metjet[] = {getdphi( sTree->pfjet1_.Phi() , sTree->t1met10phi_ ), getdphi( sTree->pfjet2_.Phi() , sTree->t1met10phi_ ), getdphi( sTree->pfjet3_.Phi() , sTree->t1met10phi_ ), getdphi( sTree->pfjet4_.Phi() , sTree->t1met10phi_ ) };
-  //cout<<sizeof(dphi_metjet)/sizeof(dphi_metjet[0])<<endl;
-  std::sort(dphi_metjet, dphi_metjet + sizeof(dphi_metjet)/sizeof(dphi_metjet[0]) );
-  //cout<<dphi_metjet[0]<<" "<<dphi_metjet[1]<<" "<<dphi_metjet[2]<<" "<<dphi_metjet[3]<<endl;
-  float dphi_metclosestjet = ( ( (TMath::Pi() - dphi_metjet[3]) < dphi_metjet[0] ) ? dphi_metjet[3] : dphi_metjet[0] );
-  //cout<<dphi_metclosestjet <<endl;
-  plot1D("h_cr1_dphi_metclosestjet"+tag_selection          +flav_tag, dphi_metclosestjet, evtweight, h_1d, 200, 0., TMath::Pi());
-  plot1D("h_cr1_dphi_metclosestjet"+tag_selection+tag_njets+flav_tag, dphi_metclosestjet, evtweight, h_1d, 200, 0., TMath::Pi());
-  
-  //nvtx
-  plot1D("h_cr1_nvtx"    +tag_selection          +flav_tag, sTree->nvtx_,  evtweight, h_1d, 40,0,40);
-  plot1D("h_cr1_nvtx"    +tag_selection+tag_njets+flav_tag, sTree->nvtx_,  evtweight, h_1d, 40,0,40);
-  
-  //vtxw
-  plot1D("h_cr1_nvtxw"    +tag_selection          +flav_tag, sTree-> nvtxweight_,  evtweight, h_1d, 41, -4., 4.);
-  plot1D("h_cr1_nvtxw"    +tag_selection+tag_njets+flav_tag, sTree-> nvtxweight_,  evtweight, h_1d, 41, -4., 4.);
-
-  //rho
-  plot1D("h_cr1_rho"    +tag_selection          +flav_tag, sTree-> rhovor_,  evtweight, h_1d, 80,0,40);
-  plot1D("h_cr1_rho"    +tag_selection+tag_njets+flav_tag, sTree-> rhovor_,  evtweight, h_1d, 80,0,40);
-
-  
-  //nbtagscsvl
-  plot1D("h_cr1_nbtagscsvl"    +tag_selection          +flav_tag, sTree-> nbtagscsvl_,  evtweight, h_1d, 6,0,6);
-  plot1D("h_cr1_nbtagscsvl"    +tag_selection+tag_njets+flav_tag, sTree-> nbtagscsvl_,  evtweight, h_1d, 6,0,6);
-  
-  //nbtagscsvm
-  plot1D("h_cr1_nbtagscsvm"    +tag_selection          +flav_tag, sTree-> nbtagscsvm_,  evtweight, h_1d, 6,0,6);
-  plot1D("h_cr1_nbtagscsvm"    +tag_selection+tag_njets+flav_tag, sTree-> nbtagscsvm_,  evtweight, h_1d, 6,0,6);
-  
-  float t1met10mtPFlep_     = getMT( sTree->pflep1_.Pt() , sTree->pflep1_.Phi() , sTree->t1met10_     , sTree->t1met10phi_ );
-  //MT with pflep
-  plot1D("h_cr1_mtpflep"+tag_selection          +flav_tag, min(t1met10mtPFlep_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr1_mtpflep"+tag_selection+tag_njets+flav_tag, min(t1met10mtPFlep_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  
-  //pf lepton pt - enters mT calculation
-  plot1D("h_cr1_pfleppt"+tag_selection          +flav_tag, min(sTree->pflep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr1_pfleppt"+tag_selection+tag_njets+flav_tag, min(sTree->pflep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  
-  //angle between pf lepton and met
-  float dphi_metpflep = getdphi( sTree->pflep1_.Phi() , sTree->t1met10phi_ );
-  plot1D("h_cr1_dphi_metpflep"+tag_selection          +flav_tag, dphi_metpflep, evtweight, h_1d, 200, 0., TMath::Pi());
-  plot1D("h_cr1_dphi_metpflep"+tag_selection+tag_njets+flav_tag, dphi_metpflep, evtweight, h_1d, 200, 0., TMath::Pi());
-  
-  //pf lepton eta
-  plot1D("h_cr1_pflepeta"+tag_selection          +flav_tag, (sTree->pflep1_.Eta()>0) ? min(sTree->pflep1_.Eta(), x_ovflw2) : max(sTree->pflep1_.Eta(), -x_ovflw2), evtweight, h_1d, nbins, -3, 3);
-  plot1D("h_cr1_pflepeta"+tag_selection+tag_njets+flav_tag, (sTree->pflep1_.Eta()>0) ? min(sTree->pflep1_.Eta(), x_ovflw2) : max(sTree->pflep1_.Eta(), -x_ovflw2), evtweight, h_1d, nbins, -3, 3);
-  
-  //pf lepton phi
-  plot1D("h_cr1_pflepphi"+tag_selection          +flav_tag, sTree->pflep1_.Phi(), evtweight, h_1d, nbins, -TMath::Pi(),TMath::Pi());
-  plot1D("h_cr1_pflepphi"+tag_selection+tag_njets+flav_tag, sTree->pflep1_.Phi(), evtweight, h_1d, nbins, -TMath::Pi(),TMath::Pi()) ;
-  
-   //phi between pf lepton and lepton
-  float dphi_leppflep = getdphi( sTree->pflep1_.Phi() , sTree->lep1_.Phi());
-  plot1D("h_cr1_dphi_leppflep"+tag_selection          +flav_tag, min(dphi_leppflep,float(TMath::Pi()/100 - 0.0001)), evtweight, h_1d, 200, 0., TMath::Pi()/100);
-  plot1D("h_cr1_dphi_leppflep"+tag_selection+tag_njets+flav_tag, min(dphi_leppflep,float(TMath::Pi()/100 - 0.0001)), evtweight, h_1d, 200, 0., TMath::Pi()/100);
-  
-  //ratio of pT between pf lepton and lepton
-  //plot1D("h_cr1_pTrat_leppflep"+tag_selection          +flav_tag, sTree->pflep1_.Pt() / sTree->lep1_.Pt(), evtweight, h_1d, 200, 0.5, 1.5);
-  //plot1D("h_cr1_pTrat_leppflep"+tag_selection+tag_njets+flav_tag, sTree->pflep1_.Pt() / sTree->lep1_.Pt(), evtweight, h_1d, 200, 0.5, 1.5);
-  x_ovflw2 = 1.1;
-  plot1D("h_cr1_pTrat_leppflep"+tag_selection          +flav_tag, ((sTree->pflep1_.Pt() / sTree->lep1_.Pt())>1) ? min((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), x_ovflw2) : max((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), 2-x_ovflw2), evtweight, h_1d, 200, 2-x_ovflw2, x_ovflw2);
-  plot1D("h_cr1_pTrat_leppflep"+tag_selection+tag_njets+flav_tag, ((sTree->pflep1_.Pt() / sTree->lep1_.Pt())>1) ? min((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), x_ovflw2) : max((sTree->pflep1_.Pt() / sTree->lep1_.Pt()), 2-x_ovflw2), evtweight, h_1d, 200, 2-x_ovflw2, x_ovflw2);
-
-  //difference of pT between pf lepton and lepton
-  //plot1D("h_cr1_pTdiff_leppflep"+tag_selection          +flav_tag, sTree->pflep1_.Pt() - sTree->lep1_.Pt(), evtweight, h_1d, 200, -10, 10);
-  //plot1D("h_cr1_pTdiff_leppflep"+tag_selection+tag_njets+flav_tag, sTree->pflep1_.Pt() - sTree->lep1_.Pt(), evtweight, h_1d, 200, -10, 10);
-  x_ovflw2 = 40.;
-  plot1D("h_cr1_pTdiff_leppflep"+tag_selection          +flav_tag, ((sTree->pflep1_.Pt() - sTree->lep1_.Pt())>0) ? min((sTree->pflep1_.Pt() - sTree->lep1_.Pt()), x_ovflw2) : max((sTree->pflep1_.Pt() - sTree->lep1_.Pt()), -x_ovflw2), evtweight, h_1d, 200, -x_ovflw2, x_ovflw2);
-  plot1D("h_cr1_pTdiff_leppflep"+tag_selection+tag_njets+flav_tag, ((sTree->pflep1_.Pt() - sTree->lep1_.Pt())>0) ? min((sTree->pflep1_.Pt() - sTree->lep1_.Pt()), x_ovflw2) : max((sTree->pflep1_.Pt() - sTree->lep1_.Pt()), -x_ovflw2), evtweight, h_1d, 200, -x_ovflw2, x_ovflw2);
-
-  
-  h_xmin = 0;
-  h_xmax = 8;
-  plot1D("h_cr1_nwzpartons"+tag_selection          +flav_tag, (sTree->nwzpartons_>0) ? min(sTree->nwzpartons_, 10) : max(sTree->nwzpartons_, 0), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_nwzpartons"+tag_selection+tag_njets+flav_tag, (sTree->nwzpartons_>0) ? min(sTree->nwzpartons_, 10) : max(sTree->nwzpartons_, 0), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 1000.;
-  plot1D("h_cr1_trkmet_nolepcorr"+tag_selection          +flav_tag, (sTree->trkmet_nolepcorr_>0) ? min(sTree->trkmet_nolepcorr_, float(h_xmax-0.0001)) : max(sTree->trkmet_nolepcorr_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_trkmet_nolepcorr"+tag_selection+tag_njets+flav_tag, (sTree->trkmet_nolepcorr_>0) ? min(sTree->trkmet_nolepcorr_, float(h_xmax-0.0001)) : max(sTree->trkmet_nolepcorr_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -TMath::Pi();
-  h_xmax = TMath::Pi();
-  plot1D("h_cr1_trkmetphi_nolepcorr"+tag_selection          +flav_tag, (sTree->trkmetphi_nolepcorr_>0) ? min(sTree->trkmetphi_nolepcorr_, float(h_xmax-0.0001)) : max(sTree->trkmetphi_nolepcorr_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_trkmetphi_nolepcorr"+tag_selection+tag_njets+flav_tag, (sTree->trkmetphi_nolepcorr_>0) ? min(sTree->trkmetphi_nolepcorr_, float(h_xmax-0.0001)) : max(sTree->trkmetphi_nolepcorr_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 1000.;
-  plot1D("h_cr1_trkmet"+tag_selection          +flav_tag, (sTree->trkmet_>0) ? min(sTree->trkmet_, float(h_xmax-0.0001)) : max(sTree->trkmet_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_trkmet"+tag_selection+tag_njets+flav_tag, (sTree->trkmet_>0) ? min(sTree->trkmet_, float(h_xmax-0.0001)) : max(sTree->trkmet_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -TMath::Pi();
-  h_xmax = TMath::Pi();
-  plot1D("h_cr1_trkmetphi"+tag_selection          +flav_tag, (sTree->trkmetphi_>0) ? min(sTree->trkmetphi_, float(h_xmax-0.0001)) : max(sTree->trkmetphi_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_trkmetphi"+tag_selection+tag_njets+flav_tag, (sTree->trkmetphi_>0) ? min(sTree->trkmetphi_, float(h_xmax-0.0001)) : max(sTree->trkmetphi_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.2;
-  plot1D("h_cr1_isopf1"+tag_selection          +flav_tag, (sTree->isopf1_>0) ? min(sTree->isopf1_, float(h_xmax-0.0001)) : max(sTree->isopf1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_isopf1"+tag_selection+tag_njets+flav_tag, (sTree->isopf1_>0) ? min(sTree->isopf1_, float(h_xmax-0.0001)) : max(sTree->isopf1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.2;
-  plot1D("h_cr1_isopfold1"+tag_selection          +flav_tag, (sTree->isopfold1_>0) ? min(sTree->isopfold1_, float(h_xmax-0.0001)) : max(sTree->isopfold1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_isopfold1"+tag_selection+tag_njets+flav_tag, (sTree->isopfold1_>0) ? min(sTree->isopfold1_, float(h_xmax-0.0001)) : max(sTree->isopfold1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 25.;
-  plot1D("h_cr1_eoverpin"+tag_selection          +flav_tag, (sTree->eoverpin_>0) ? min(sTree->eoverpin_, float(h_xmax-0.0001)) : max(sTree->eoverpin_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_eoverpin"+tag_selection+tag_njets+flav_tag, (sTree->eoverpin_>0) ? min(sTree->eoverpin_, float(h_xmax-0.0001)) : max(sTree->eoverpin_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 50.;
-  plot1D("h_cr1_eoverpout"+tag_selection          +flav_tag, (sTree->eoverpout_>0) ? min(sTree->eoverpout_, float(h_xmax-0.0001)) : max(sTree->eoverpout_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_eoverpout"+tag_selection+tag_njets+flav_tag, (sTree->eoverpout_>0) ? min(sTree->eoverpout_, float(h_xmax-0.0001)) : max(sTree->eoverpout_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -0.005;
-  h_xmax = 0.005;
-  plot1D("h_cr1_dEtaIn"+tag_selection          +flav_tag, (sTree->dEtaIn_>0) ? min(sTree->dEtaIn_, float(h_xmax-0.0001)) : max(sTree->dEtaIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_dEtaIn"+tag_selection+tag_njets+flav_tag, (sTree->dEtaIn_>0) ? min(sTree->dEtaIn_, float(h_xmax-0.0001)) : max(sTree->dEtaIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -0.05;
-  h_xmax = 0.05;
-  plot1D("h_cr1_dPhiIn"+tag_selection          +flav_tag, (sTree->dPhiIn_>0) ? min(sTree->dPhiIn_, float(h_xmax-0.0001)) : max(sTree->dPhiIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_dPhiIn"+tag_selection+tag_njets+flav_tag, (sTree->dPhiIn_>0) ? min(sTree->dPhiIn_, float(h_xmax-0.0001)) : max(sTree->dPhiIn_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.02;
-  plot1D("h_cr1_sigmaIEtaIEta"+tag_selection          +flav_tag, (sTree->sigmaIEtaIEta_>0) ? min(sTree->sigmaIEtaIEta_, float(h_xmax-0.0001)) : max(sTree->sigmaIEtaIEta_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_sigmaIEtaIEta"+tag_selection+tag_njets+flav_tag, (sTree->sigmaIEtaIEta_>0) ? min(sTree->sigmaIEtaIEta_, float(h_xmax-0.0001)) : max(sTree->sigmaIEtaIEta_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.08;
-  plot1D("h_cr1_hOverE"+tag_selection          +flav_tag, (sTree->hOverE_>0) ? min(sTree->hOverE_, float(h_xmax-0.0001)) : max(sTree->hOverE_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_hOverE"+tag_selection+tag_njets+flav_tag, (sTree->hOverE_>0) ? min(sTree->hOverE_, float(h_xmax-0.0001)) : max(sTree->hOverE_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.05;
-  plot1D("h_cr1_ooemoop"+tag_selection          +flav_tag, (sTree->ooemoop_>0) ? min(sTree->ooemoop_, float(h_xmax-0.0001)) : max(sTree->ooemoop_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_ooemoop"+tag_selection+tag_njets+flav_tag, (sTree->ooemoop_>0) ? min(sTree->ooemoop_, float(h_xmax-0.0001)) : max(sTree->ooemoop_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -0.02;
-  h_xmax = 0.02;
-  plot1D("h_cr1_d0vtx"+tag_selection          +flav_tag, (sTree->d0vtx_>0) ? min(sTree->d0vtx_, float(h_xmax-0.0001)) : max(sTree->d0vtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_d0vtx"+tag_selection+tag_njets+flav_tag, (sTree->d0vtx_>0) ? min(sTree->d0vtx_, float(h_xmax-0.0001)) : max(sTree->d0vtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -0.05;
-  h_xmax = 0.05;
-  plot1D("h_cr1_dzvtx"+tag_selection          +flav_tag, (sTree->dzvtx_>0) ? min(sTree->dzvtx_, float(h_xmax-0.0001)) : max(sTree->dzvtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_dzvtx"+tag_selection+tag_njets+flav_tag, (sTree->dzvtx_>0) ? min(sTree->dzvtx_, float(h_xmax-0.0001)) : max(sTree->dzvtx_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0;
-  h_xmax = 2;
-  plot1D("h_cr1_expinnerlayers"+tag_selection          +flav_tag, (sTree->expinnerlayers_>0) ? min(sTree->expinnerlayers_, float(h_xmax-0.0001)) : max(sTree->expinnerlayers_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_expinnerlayers"+tag_selection+tag_njets+flav_tag, (sTree->expinnerlayers_>0) ? min(sTree->expinnerlayers_, float(h_xmax-0.0001)) : max(sTree->expinnerlayers_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -1.;
-  h_xmax = 1.;
-  plot1D("h_cr1_fbrem"+tag_selection          +flav_tag, (sTree->fbrem_>0) ? min(sTree->fbrem_, float(h_xmax-0.0001)) : max(sTree->fbrem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_fbrem"+tag_selection+tag_njets+flav_tag, (sTree->fbrem_>0) ? min(sTree->fbrem_, float(h_xmax-0.0001)) : max(sTree->fbrem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 25.;
-  plot1D("h_cr1_pfisoch"+tag_selection          +flav_tag, (sTree->pfisoch_>0) ? min(sTree->pfisoch_, float(h_xmax-0.0001)) : max(sTree->pfisoch_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_pfisoch"+tag_selection+tag_njets+flav_tag, (sTree->pfisoch_>0) ? min(sTree->pfisoch_, float(h_xmax-0.0001)) : max(sTree->pfisoch_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 25.;
-  plot1D("h_cr1_pfisoem"+tag_selection          +flav_tag, (sTree->pfisoem_>0) ? min(sTree->pfisoem_, float(h_xmax-0.0001)) : max(sTree->pfisoem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_pfisoem"+tag_selection+tag_njets+flav_tag, (sTree->pfisoem_>0) ? min(sTree->pfisoem_, float(h_xmax-0.0001)) : max(sTree->pfisoem_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 25.;
-  plot1D("h_cr1_pfisonh"+tag_selection          +flav_tag, (sTree->pfisonh_>0) ? min(sTree->pfisonh_, float(h_xmax-0.0001)) : max(sTree->pfisonh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_pfisonh"+tag_selection+tag_njets+flav_tag, (sTree->pfisonh_>0) ? min(sTree->pfisonh_, float(h_xmax-0.0001)) : max(sTree->pfisonh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 1500.;
-  plot1D("h_cr1_eSC"+tag_selection          +flav_tag, (sTree->eSC_>0) ? min(sTree->eSC_, float(h_xmax-0.0001)) : max(sTree->eSC_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_eSC"+tag_selection+tag_njets+flav_tag, (sTree->eSC_>0) ? min(sTree->eSC_, float(h_xmax-0.0001)) : max(sTree->eSC_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -TMath::Pi();
-  h_xmax = TMath::Pi();
-  plot1D("h_cr1_phiSC"+tag_selection          +flav_tag, (sTree->phiSC_>0) ? min(sTree->phiSC_, float(h_xmax-0.0001)) : max(sTree->phiSC_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_phiSC"+tag_selection+tag_njets+flav_tag, (sTree->phiSC_>0) ? min(sTree->phiSC_, float(h_xmax-0.0001)) : max(sTree->phiSC_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 1500.;
-  plot1D("h_cr1_eSCRaw"+tag_selection          +flav_tag, (sTree->eSCRaw_>0) ? min(sTree->eSCRaw_, float(h_xmax-0.0001)) : max(sTree->eSCRaw_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_eSCRaw"+tag_selection+tag_njets+flav_tag, (sTree->eSCRaw_>0) ? min(sTree->eSCRaw_, float(h_xmax-0.0001)) : max(sTree->eSCRaw_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 100.;
-  plot1D("h_cr1_eSCPresh"+tag_selection          +flav_tag, (sTree->eSCPresh_>0) ? min(sTree->eSCPresh_, float(h_xmax-0.0001)) : max(sTree->eSCPresh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_eSCPresh"+tag_selection+tag_njets+flav_tag, (sTree->eSCPresh_>0) ? min(sTree->eSCPresh_, float(h_xmax-0.0001)) : max(sTree->eSCPresh_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = -3.;
-  h_xmax = 3.;
-  plot1D("h_cr1_etasc1"+tag_selection          +flav_tag, (sTree->etasc1_>0) ? min(sTree->etasc1_, float(h_xmax-0.0001)) : max(sTree->etasc1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_etasc1"+tag_selection+tag_njets+flav_tag, (sTree->etasc1_>0) ? min(sTree->etasc1_, float(h_xmax-0.0001)) : max(sTree->etasc1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.2;
-  plot1D("h_cr1_iso1"+tag_selection          +flav_tag, (sTree->iso1_>0) ? min(sTree->iso1_, float(h_xmax-0.0001)) : max(sTree->iso1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_iso1"+tag_selection+tag_njets+flav_tag, (sTree->iso1_>0) ? min(sTree->iso1_, float(h_xmax-0.0001)) : max(sTree->iso1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-
-  h_xmin = 0.;
-  h_xmax = 0.2;
-  plot1D("h_cr1_isont1"+tag_selection          +flav_tag, (sTree->isont1_>0) ? min(sTree->isont1_, float(h_xmax-0.0001)) : max(sTree->isont1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-  plot1D("h_cr1_isont1"+tag_selection+tag_njets+flav_tag, (sTree->isont1_>0) ? min(sTree->isont1_, float(h_xmax-0.0001)) : max(sTree->isont1_, float(h_xmin+0.0001)), evtweight, h_1d, nbins2, h_xmin, h_xmax);
-      
-  }
- // else cout<<"*****PROBLEM WITH MT******** "<<sTree->t1met10mt_<<endl;
-  
-  plot1D("h_cr1_mt_count"+tag_selection          +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
-  plot1D("h_cr1_mt_count"+tag_selection+tag_njets+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr1_mt"+tag_selection                   +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_mt"+tag_selection+tag_njets         +flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_mt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(sTree->t1met10mt_, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_mt_count"+tag_selection                   +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr1_mt_count"+tag_selection+tag_njets         +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  plot1D("h_cr1_mt_count"+tag_selection+tag_njets+tag_kbin+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
 
 }
 

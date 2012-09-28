@@ -53,8 +53,13 @@ class StopTree {
 	int           leptype_;
 	int           id1_;
 	int           id2_;
+	int           mcid1_;
+	int           mcid2_;
+	int           mcdecay2_;
+	int           mcndec2_;
 	int           npfjets30_;
 	int           npfjets40_;
+	float 	      mctaudpt2_;	
 	float 	      lep1chi2ndf_;	
 	float 	      lep1dpt_;	
 	float         dilmass_;
@@ -108,6 +113,7 @@ class StopTree {
 	         
 	LorentzVector lep1_;
 	LorentzVector lep2_;
+	LorentzVector mclep2_;
 	LorentzVector pfcand10_;
 	LorentzVector pfjet1_;
 	LorentzVector pfjet2_;
@@ -183,8 +189,13 @@ class StopTree {
 	    tree_->Branch("leptype", 		&leptype_, 		"leptype/I");	      	      
 	    tree_->Branch("id1", 		&id1_, 			"id1/I");	      	      
 	    tree_->Branch("id2", 		&id2_, 			"id2/I");	      	      
+	    tree_->Branch("mcid1", 		&mcid1_, 		"mcid1/I");	      	      
+	    tree_->Branch("mcid2", 		&mcid2_, 		"mcid2/I");	      	      
+	    tree_->Branch("mcdecay2", 		&mcdecay2_, 		"mcdecay2/I");	      	      
+	    tree_->Branch("mcndec2", 		&mcndec2_, 		"mcndec2/I");	      	      
 	    tree_->Branch("npfjets30", 		&npfjets30_, 		"npfjets30/I");        
 	    tree_->Branch("npfjets40", 		&npfjets40_, 		"npfjets40/I");            
+	    tree_->Branch("mctaudpt2", 		&mctaudpt2_, 		"mctaudpt2/F");	      	      
 	    tree_->Branch("lep1chi2ndf", 	&lep1chi2ndf_, 		"lep1chi2ndf/F");	      	      
 	    tree_->Branch("lep1dpt", 		&lep1dpt_, 		"lep1dpt/F");
 	    tree_->Branch("dilmmas", 		&dilmass_, 		"dilmass/F");	      	      
@@ -238,6 +249,7 @@ class StopTree {
 	    
             tree_->Branch("lep1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep1Ptr_);
             tree_->Branch("lep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep2Ptr_);
+            tree_->Branch("mclep2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &mclep2Ptr_);
             tree_->Branch("pfcand10","ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pfcand10Ptr_);
             tree_->Branch("pfjet1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet1Ptr_);
             tree_->Branch("pfjet2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet2Ptr_);
@@ -289,8 +301,13 @@ class StopTree {
 	    tree_->SetBranchAddress("leptype", 		  &leptype_);	      	      
 	    tree_->SetBranchAddress("id1", 		  &id1_);	      	      
 	    tree_->SetBranchAddress("id2", 		  &id2_);	      	      
+	    tree_->SetBranchAddress("mcid1", 		  &mcid1_);	      	      
+	    tree_->SetBranchAddress("mcid2", 		  &mcid2_);	      	      
+	    tree_->SetBranchAddress("mcdecay2", 	  &mcdecay2_);	      	      
+	    tree_->SetBranchAddress("mcndec2", 		  &mcndec2_);	      	      
 	    tree_->SetBranchAddress("npfjets30", 	  &npfjets30_);          
 	    tree_->SetBranchAddress("npfjets40", 	  &npfjets40_);          
+	    tree_->SetBranchAddress("mctaudpt2", 	  &mctaudpt2_);	      	      
 	    tree_->SetBranchAddress("lep1chi2ndf", 	  &lep1chi2ndf_);	      	      
 	    tree_->SetBranchAddress("lep1dpt", 		  &lep1dpt_);	      	      
 	    tree_->SetBranchAddress("dilmass", 		  &dilmass_);	      	      
@@ -367,6 +384,7 @@ class StopTree {
 
         LorentzVector *lep1Ptr_;
         LorentzVector *lep2Ptr_;
+        LorentzVector *mclep2Ptr_;
         LorentzVector *pfcand10Ptr_;
         LorentzVector *jet1Ptr_;
         LorentzVector *jet2Ptr_;
@@ -413,8 +431,13 @@ StopTree::InitVariables(){
 	variables_.push_back(string("leptype"		));
 	variables_.push_back(string("id1"		));
 	variables_.push_back(string("id2"		));
+	variables_.push_back(string("mcid1"		));
+	variables_.push_back(string("mcid2"		));
+	variables_.push_back(string("mcdecay2"		));
+	variables_.push_back(string("mcndec2"		));
 	variables_.push_back(string("npfjets30"		));
 	variables_.push_back(string("npfjets40"		));
+	variables_.push_back(string("mctaudpt2"		));
 	variables_.push_back(string("lep1chi2ndf"	));
 	variables_.push_back(string("lep1dpt"		));
 	variables_.push_back(string("dilmass"		));
@@ -468,6 +491,7 @@ StopTree::InitVariables(){
 
 	variables_.push_back(string("lep1"		));
 	variables_.push_back(string("lep2"		));
+	variables_.push_back(string("mclep2"		));
 	variables_.push_back(string("pfcand10"		));
 	variables_.push_back(string("pfjet1"		));
 	variables_.push_back(string("pfjet2"		));
@@ -509,8 +533,13 @@ StopTree::InitVariables(){
     leptype_		= 999;
     id1_		= 999;
     id2_		= 999;
+    mcid1_		= 999;
+    mcid2_		= 999;
+    mcdecay2_		= 999;
+    mcndec2_		= 999;
     npfjets30_		= 999;
     npfjets40_		= 999;
+    mctaudpt2_		= -999.;
     lep1chi2ndf_	= -999.;
     lep1dpt_		= -999.;
     dilmass_		= -999.;
@@ -529,8 +558,8 @@ StopTree::InitVariables(){
     pfcandiso10_	= -999.;
     nleps_		= 999;
     
-    nwzpartons_= -999.;
-    nbtagscsvl_= -999.;
+    nwzpartons_= -999;
+    nbtagscsvl_= -999;
     trkmet_nolepcorr_= -999.;
     trkmetphi_nolepcorr_= -999.;
     trkmet_= -999.;
@@ -564,6 +593,7 @@ StopTree::InitVariables(){
 
     lep1_		= LorentzVector();
     lep2_		= LorentzVector();
+    mclep2_		= LorentzVector();
     pfcand10_		= LorentzVector();
     pfjet1_		= LorentzVector();
     pfjet2_		= LorentzVector();
@@ -609,8 +639,13 @@ StopTree::Get(string value)
   if(value=="leptype" 		) { return this->leptype_;		}	      	      
   if(value=="id1" 		) { return this->id1_;			}	      	      
   if(value=="id2" 		) { return this->id2_;			}	      	      
+  if(value=="mcid1" 		) { return this->mcid1_;		}	      	      
+  if(value=="mcid2" 		) { return this->mcid2_;		}	      	      
+  if(value=="mcdecay2" 		) { return this->mcdecay2_;		}	      	      
+  if(value=="mcndec2" 		) { return this->mcndec2_;		}	      	      
   if(value=="npfjets30" 	) { return this->npfjets30_;		}          
   if(value=="npfjets40" 	) { return this->npfjets40_;		}          
+  if(value=="mctaudpt2" 	) { return this->mctaudpt2_;		}	      	      
   if(value=="lep1chi2ndf" 	) { return this->lep1chi2ndf_;		}	      	      
   if(value=="lep1dpt" 		) { return this->lep1dpt_;		}	      	      
   if(value=="dilmass" 		) { return this->dilmass_;		}	      	      
@@ -664,6 +699,7 @@ StopTree::Get(string value)
     
   /* if(value=="lep1"   		) { return this->lep1_;		} */
   /* if(value=="lep2"   		) { return this->lep2_;		} */
+  /* if(value=="mclep2"   		) { return this->mclep2_;	} */
   /* if(value=="pfcand10"   		) { return this->pfcand10_;	} */
   /* if(value=="pfjet1" 		) { return this->pfjet1_;	} */
   /* if(value=="pfjet2" 		) { return this->pfjet2_;	} */

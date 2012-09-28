@@ -28,23 +28,26 @@ class StopTreeLooper {
         void loop(TChain *chain, TString name);
 
 	//selection
-	bool passEvtSelection(const StopTree *sTree);
-	bool passOneLeptonSelection(const StopTree *sTree);
-	bool passSingleLeptonSelection(const StopTree *sTree);
-	bool passSingleMuonSelection(const StopTree *sTree);
-	bool passSingleElecSelection(const StopTree *sTree);
+	bool passEvtSelection(const StopTree *sTree, TString name);
+	bool passOneLeptonSelection(const StopTree *sTree, bool isData);
+	bool passSingleLeptonSelection(const StopTree *sTree, bool isData);
+	bool passSingleMuonSelection(const StopTree *sTree, bool isData);
+	bool passSingleElecSelection(const StopTree *sTree, bool isData);
 	bool passDileptonSelection(const StopTree *sTree);
-	bool passLepPlusIsoTrkSelection(const StopTree *sTree);
+	bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);
+	bool passIsoTrkVeto(const StopTree *sTree);
 
 	//plotting
+	void makeSIGPlots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
+			   string tag_selection, string tag_kbin, string flav_tag, float mtcut ); 
 	void makeCR1Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string flav_tag, float mtcut ); 
+			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ); 
 	void makeCR2Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string flav_tag_dl, float mtcut );
+			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
 	void makeCR4Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string flav_tag_dl, float mtcut );
+			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
 	void makeCR5Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string flav_tag_dl, float mtcut );
+			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
 	void makeNJPlots(  const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
 			   string tag_selection, string flav_tag ); 
 	void makeZPlots(   const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
