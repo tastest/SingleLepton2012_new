@@ -133,7 +133,7 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
- StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
+ StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
  //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
@@ -361,6 +361,7 @@ class StopTree {
 
             tree_->SetBranchAddress("lep1",   		  &lep1Ptr_);
             tree_->SetBranchAddress("lep2",   		  &lep2Ptr_);
+            tree_->SetBranchAddress("mclep2",   	  &mclep2Ptr_);
             tree_->SetBranchAddress("pfcand10",   	  &pfcand10Ptr_);
             tree_->SetBranchAddress("pfjet1", 		  &jet1Ptr_);
             tree_->SetBranchAddress("pfjet2", 		  &jet2Ptr_);
@@ -368,8 +369,8 @@ class StopTree {
             tree_->SetBranchAddress("pfjet4", 		  &jet4Ptr_);
             tree_->SetBranchAddress("pfjet5", 		  &jet5Ptr_);
             tree_->SetBranchAddress("pfjet6", 		  &jet6Ptr_);
-            tree_->SetBranchAddress("pflep1",   		  &pflep1Ptr_);
-            tree_->SetBranchAddress("pflep2",   		  &pflep2Ptr_);
+            tree_->SetBranchAddress("pflep1",   	  &pflep1Ptr_);
+            tree_->SetBranchAddress("pflep2",   	  &pflep2Ptr_);
 
             gErrorIgnoreLevel = currentState;
         }
