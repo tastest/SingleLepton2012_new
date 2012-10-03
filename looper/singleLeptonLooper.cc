@@ -1878,7 +1878,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	      mlep_         = &els_p4().at(imatch);
 	      mleppassid_   = passElectronSelection_Stop2012_v2_NoIso( imatch , vetoTransition,vetoTransition,useOldIsolation) ? 1 : 0;
 	      mleppassiso_  = passElectronSelection_Stop2012_v2_Iso  ( imatch , vetoTransition,vetoTransition,useOldIsolation) ? 1 : 0;
-	      mlepiso_      = electronIsoValuePF2012_FastJetEffArea( imatch , 0.3 , 0 );
+	      mlepiso_      = electronIsoValuePF2012_FastJetEffArea_v2( imatch , 0.3 , 0 );
 	    }
 
 	    // found matched muon
