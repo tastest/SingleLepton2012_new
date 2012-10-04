@@ -261,7 +261,7 @@ TCut selection_TCut(){
   TCut rho("rhovor>0 && rhovor<40");
   TCut goodlep("ngoodlep > 0 && leptype==1 && lep1->Pt()>30 && abs(lep1->Eta())<2.1");
   TCut njets4("npfjets30 >= 4");
-  TCut btag1("nbtagsssvcorr>=1");
+  TCut btag1("nbtagscsvmcorr>=1");
   TCut isotrk("pfcandpt10 > 9998. || pfcandiso10 > 0.1");
   TCut met50("t1metphicorr > 50");
   TCut met100("t1metphicorr > 100");
