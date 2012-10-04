@@ -1179,6 +1179,24 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
             
       if( TString(prefix).Contains("T2") ) useOldIsolation = true;
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
+
+	//-------------------------------------------
+	// FASTSIM BUG: check for duplicate electrons
+	//-------------------------------------------
+
+	bool foundDuplicate = false;
+
+	for( unsigned int i2 = 0 ; i2 < goodLeptons.size() ; ++i2 ){
+	  if( fabs( els_p4().at(iel).pt()  - goodLeptons.at(i2).pt()  ) < 0.001 &&
+	      fabs( els_p4().at(iel).eta() - goodLeptons.at(i2).eta() ) < 0.001 &&
+	      fabs( els_p4().at(iel).phi() - goodLeptons.at(i2).phi() ) < 0.001 ){
+	    eldup_ = 1;
+	    //cout << "WARNING! FOUND DUPLICATE ELECTRON " << evt_run() << " " << evt_lumiBlock() << " " << evt_event() << endl;
+	    foundDuplicate = true;
+	  }
+	}
+	if( foundDuplicate ) continue;
+
 	if( els_p4().at(iel).pt() < 10 )                                                                continue;
         if( !passElectronSelection_Stop2012_v2( iel , vetoTransition,vetoTransition,useOldIsolation) )  continue;
 
@@ -3465,6 +3483,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("acc_highmet",     &acc_highmet_,      "acc_highmet/I");
   outTree->Branch("acc_highht",      &acc_highht_,       "acc_highht/I");
 
+  outTree->Branch("eldup"     ,  &eldup_     ,  "eldup/I");  
   outTree->Branch("csc"       ,  &csc_       ,  "csc/I");  
   outTree->Branch("hbhe"      ,  &hbhe_      ,  "hbhe/I");  
   outTree->Branch("hbhenew"   ,  &hbhenew_   ,  "hbhenew/I");  

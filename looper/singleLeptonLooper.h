@@ -101,6 +101,8 @@ class singleLeptonLooper
         Int_t pdfid1_; 
 	Int_t pdfid2_;
 
+	Int_t   eldup_;    
+
 	// MC truth lepton info
 	Int_t   mcid1_;    
 	Int_t   mcid2_;    
