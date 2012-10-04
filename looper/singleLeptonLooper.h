@@ -568,6 +568,26 @@ class singleLeptonLooper
 	Float_t eSCPresh_;
 	Float_t emjet10_;
 	Float_t emjet20_;
+	Float_t eoverpin2_;
+	Float_t eoverpout2_;
+	Float_t dEtaIn2_;
+	Float_t dPhiIn2_;
+	Float_t sigmaIEtaIEta2_;
+	Float_t hOverE2_;
+	Float_t ooemoop2_;
+	Float_t d0vtx2_;
+	Float_t dzvtx2_;
+	Float_t expinnerlayers2_;
+	Float_t fbrem2_;
+	Float_t pfisoch2_;
+	Float_t pfisoem2_;
+	Float_t pfisonh2_;
+	Float_t eSC2_;
+	Float_t phiSC2_;
+	Float_t eSCRaw2_;
+	Float_t eSCPresh2_;
+
+
 
 	//recoil
 	Float_t dilrecoil_;

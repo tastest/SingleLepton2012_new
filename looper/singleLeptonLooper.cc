@@ -690,6 +690,57 @@ void singleLeptonLooper::InitBaby(){
   pfcandpt10pt1p0_  = 9999.;
   pfcandiso10pt1p0_ = 9999.;
 
+  //lepton variables
+  iso1_   = -9999; 
+  isont1_ = -9999;
+  isopfold1_ = -9999;
+  isopf1_ = -9999;
+  etasc1_ = -9999;
+  eoverpin_  = -9999;
+  eoverpout_ = -9999;
+  dEtaIn_ = -9999;
+  dPhiIn_ = -9999;
+  sigmaIEtaIEta_ = -9999;
+  hOverE_ = -9999;
+  ooemoop_ = -9999;
+  d0vtx_ = -9999;
+  dzvtx_ = -9999;
+  expinnerlayers_ = -9999;
+  fbrem_ = -9999;
+  pfisoch_ = -9999;
+  pfisoem_ = -9999;
+  pfisonh_ = -9999;
+  eSC_ = -9999;
+  phiSC_ = -9999;
+  eSCRaw_ = -9999;
+  eSCPresh_ = -9999;  
+  ecalveto1_ = -9999;
+  hcalveto1_ = -9999;
+
+  iso2_   = -9999;
+  isont2_ = -9999;
+  isopf2_ = -9999;
+  etasc2_ = -9999;
+  eoverpin2_  = -9999;
+  eoverpout2_ = -9999;
+  dEtaIn2_ = -9999;
+  dPhiIn2_ = -9999;
+  sigmaIEtaIEta2_ = -9999;
+  hOverE2_ = -9999;
+  ooemoop2_ = -9999;
+  d0vtx2_ = -9999;
+  dzvtx2_ = -9999;
+  expinnerlayers2_ = -9999;
+  fbrem2_ = -9999;
+  pfisoch2_ = -9999;
+  pfisoem2_ = -9999;
+  pfisonh2_ = -9999;
+  eSC2_ = -9999;
+  phiSC2_ = -9999;
+  eSCRaw2_ = -9999;
+  eSCPresh2_ = -9999;  
+  ecalveto2_ = -9999;
+  hcalveto2_ = -9999;
 }
 
 //--------------------------------------------------------------------
@@ -3183,31 +3234,45 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       else if( leptype_ == 1 ){
 	iso1_   = muonIsoValue( index1 , true  ); //truncated 
 	isont1_ = muonIsoValue( index1 , false ); //non-truncated
-	isopfold1_ = -999;
 	isopf1_ = muonIsoValuePF2012_deltaBeta( index1 );
-	etasc1_ = -999;
-	eoverpin_  = -999;
-	eoverpout_ = -999;
-	dEtaIn_ = -999;
-	dPhiIn_ = -999;
-	sigmaIEtaIEta_ = -999;
-	hOverE_ = -999;
-	ooemoop_ = -999;
-	d0vtx_ = -999;
-	dzvtx_ = -999;
-	expinnerlayers_ = -999;
-	fbrem_ = -999;
-	pfisoch_ = -999;
-	pfisoem_ = -999;
-	pfisonh_ = -999;
-	eSC_ = -999;
-	phiSC_ = -999;
-	eSCRaw_ = -999;
-	eSCPresh_ = -999;
-	
 	ecalveto1_ = mus_iso_ecalvetoDep().at(index1);
 	hcalveto1_ = mus_iso_hcalvetoDep().at(index1);
       }
+      
+      //fill variables for second lepton if it exists
+      if(abs(id2_) == 11) {
+	iso2_   = electronIsolation_rel   ( index2 , true ); //truncated
+	isont2_ = electronIsolation_rel_v1( index2 , true ); //non-truncated
+	isopf2_ = electronIsoValuePF2012_FastJetEffArea_v2( index2 , 0.3 , 0 , false);
+	etasc2_ = els_etaSC()[index2];
+	eoverpin2_  = els_eOverPIn ()[index2];
+	eoverpout2_ = els_eOverPOut()[index2];
+	dEtaIn2_ = cms2.els_dEtaIn()[index2];
+	dPhiIn2_ = cms2.els_dPhiIn()[index2];
+	sigmaIEtaIEta2_ = cms2.els_sigmaIEtaIEta()[index2];
+	hOverE2_ = cms2.els_hOverE()[index2];
+	ooemoop2_ = fabs( (1.0/cms2.els_ecalEnergy()[index2]) - (cms2.els_eOverPIn()[index2]/cms2.els_ecalEnergy()[index2]) );
+	d0vtx2_ = electron_d0PV_smurfV3(index2);
+	dzvtx2_ = electron_dzPV_smurfV3(index2);
+	expinnerlayers2_ = cms2.els_exp_innerlayers()[index2];
+	fbrem2_ = cms2.els_fbrem()[index2];
+	pfisoch2_ = cms2.els_iso03_pf2012ext_ch().at(index2);
+	pfisoem2_ = cms2.els_iso03_pf2012ext_em().at(index2);
+	pfisonh2_ = cms2.els_iso03_pf2012ext_nh().at(index2);
+	eSC2_ = cms2.els_eSC()[index2];
+	phiSC2_ = cms2.els_phiSC()[index2];
+	eSCRaw2_ = cms2.els_eSCRaw()[index2];
+	eSCPresh2_ = cms2.els_eSCPresh()[index2];
+      }
+      else if(abs(id2_) == 13) {
+	iso2_   = muonIsoValue( index2 , true  ); //truncated 
+	isont2_ = muonIsoValue( index2 , false ); //non-truncated
+	isopf2_ = muonIsoValuePF2012_deltaBeta( index2 );
+	
+	ecalveto2_ = mus_iso_ecalvetoDep().at(index2);
+	hcalveto2_ = mus_iso_hcalvetoDep().at(index2);
+      }
+      
             
       if     ( leptype_ == 0 ) netot += weight_;
       else if( leptype_ == 1 ) nmtot += weight_;
@@ -3742,6 +3807,26 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("phiSC", & phiSC_, "phiSC/F");
   outTree->Branch("eSCRaw", & eSCRaw_, "eSCRaw/F");
   outTree->Branch("eSCPresh", & eSCPresh_, "eSCPresh/F");
+  
+  outTree->Branch("eoverpin2",         &eoverpin2_,         "eoverpin2/F");
+  outTree->Branch("eoverpout2",        &eoverpout2_,        "eoverpout2/F");
+  outTree->Branch("dEtaIn2", &dEtaIn2_, "dEtaIn2/F");
+  outTree->Branch("dPhiIn2", &dPhiIn2_, "dPhiIn2/F");
+  outTree->Branch("sigmaIEtaIEta2", &sigmaIEtaIEta2_, "sigmaIEtaIEta2/F");
+  outTree->Branch("hOverE2", &hOverE2_, "hOverE2/F");
+  outTree->Branch("ooemoop2", &ooemoop2_, "ooemoop2/F");
+  outTree->Branch("d0vtx2", &d0vtx2_, "d0vtx2/F");
+  outTree->Branch("dzvtx2", &dzvtx2_, "dzvtx2/F");
+  outTree->Branch("expinnerlayers2", &expinnerlayers2_, "expinnerlayers2/F");
+  outTree->Branch("fbrem2", &fbrem2_, "fbrem2/F");
+  outTree->Branch("pfisoch2", &pfisoch2_, "pfisoch2/F");
+  outTree->Branch("pfisoem2", &pfisoem2_, "pfisoem2/F");
+  outTree->Branch("pfisonh2", &pfisonh2_, "pfisonh2/F");
+  outTree->Branch("eSC2", & eSC2_, "eSC2/F");
+  outTree->Branch("phiSC2", & phiSC2_, "phiSC2/F");
+  outTree->Branch("eSCRaw2", & eSCRaw2_, "eSCRaw2/F");
+  outTree->Branch("eSCPresh2", & eSCPresh2_, "eSCPresh2/F");
+  
   outTree->Branch("iso2",             &iso2_,             "iso2/F");
   outTree->Branch("ecalveto1",        &ecalveto1_,        "ecalveto1/F");
   outTree->Branch("ecalveto2",        &ecalveto2_,        "ecalveto2/F");
