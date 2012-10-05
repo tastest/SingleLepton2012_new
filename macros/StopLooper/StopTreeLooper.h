@@ -53,6 +53,7 @@ class StopTreeLooper {
 
 	//helper
 	float getdltrigweight(int id1, int id2);
+	float getsltrigweight(int id1, float pt, float eta);
 	float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
 	float dRbetweenVectors(LorentzVector vec1, LorentzVector vec2 );
 	float getdphi( float phi1 , float phi2 );
