@@ -2639,7 +2639,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       //phi-corrected type1 met
       pair<float, float> p_t1metphicorr = 
-	getPhiCorrMET( t1met10_, t1met10phi_, evt_pfsumet(), !isData, true);
+	getPhiCorrMET( t1met10_, t1met10phi_, nvtx_, !isData);
       t1metphicorr_    = p_t1metphicorr.first;
       t1metphicorrphi_ = p_t1metphicorr.second;
 
@@ -4217,55 +4217,21 @@ std::vector<float> singleLeptonLooper::totalIso( int thisPf , float coneR , floa
   return isos;
 }
 
-/*
-pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool isA)
-{
-  float metx = met * cos( metphi );
-  float mety = met * sin( metphi );
+pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) {
+
+  //using met phi corrections from C. Veelken (emails from Oct. 4th)
+  //previous versions are available here:
+  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py
+
+  // Data
+  // ------
+  // x :  "+2.87340e-01 + 3.29813e-01*Nvtx" 
+  // y : "-2.27938e-01 - 1.71272e-01*Nvtx"
+  // MC
+  // ------            
+  // x : "+8.72683e-02 - 1.66671e-02*Nvtx"
+  // y :  "+1.86650e-01 - 1.21946e-01*Nvtx"
   
-  //Values for 2011A
-  float cx0A = ismc ? -0.09389 : -0.3365;
-  float cx1A = ismc ? 0.0001815 : 0.004801;
-  float cy0A = ismc ? 0.1571 :  0.2578; 
-  float cy1A = ismc ? -0.00371 : -0.006124;
-  //Values for 2011B
-  float cx0B = ismc ? -0.1070 : -0.3265;
-  float cx1B = ismc ? 0.00009587 : 0.005162;
-  float cy0B = ismc ? 0.01517 : -0.1956; 
-  float cy1B = ismc ? -0.003357 : -0.006299;
-
-  float cx0 = 0.;
-  float cx1 = 0.;
-  float cy0 = 0.;
-  float cy1 = 0.;
-  if (ismc) {
-    //For MC Use lumi weighted av
-    float lumiA = 2.1;
-    float lumiB = 2.6;
-    cx0 = (cx0A*lumiA + cx0B*lumiB)/(lumiA+lumiB);
-    cx1 = (cx1A*lumiA + cx1B*lumiB)/(lumiA+lumiB);
-    cy0 = (cy0A*lumiA + cy0B*lumiB)/(lumiA+lumiB);
-    cy1 = (cy1A*lumiA + cy1B*lumiB)/(lumiA+lumiB);
-  } else {
-    cx0 = isA ? cx0A : cx0B;    
-    cx1 = isA ? cx1A : cx1B;
-    cy0 = isA ? cy0A : cy0B;
-    cy1 = isA ? cy1A : cy1B;
-  }
-
-  metx -= cx0 + cx1 * sumet;
-  mety -= cy0 + cy1 * sumet;
-
-  pair<float, float> phicorrmet = make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
-  return phicorrmet;
-}
-*/
-
-//VERSION FOR RUNNING ON 8 TEV AND COMBINED 7 TEV
-pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV ){
-
-  //using met phi correction values from location
-  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py?revision=1.3&view=markup
 
   float metx = met * cos( metphi );
   float mety = met * sin( metphi );
@@ -4273,21 +4239,12 @@ pair<float,float> singleLeptonLooper::getPhiCorrMET( float met, float metphi, fl
   float shiftx = 0.;
   float shifty = 0.;
 
-  //use correction for data vs. mc and 7 TeV vs. 8 TeV
-  if (is8TeV) {
-    // cout<<"RUNNING WITH 8 TEV SETTINGS! This is a check that you are paying attention! Comment out line "
-    // 	<<__LINE__<<" and rerun"<<endl;
-    shiftx = ismc ? (+1.77344e-01 - 1.34333e-03*sumet)
-      : (-7.67892e-01 + 5.76983e-03*sumet);
-    shifty = ismc ? (+8.08402e-01 - 2.84264e-03*sumet)
-      : (+5.54005e-01 - 2.94046e-03*sumet);
-  } else {
-    shiftx = ismc ? (-4.53909e-02 - 2.55863e-05*sumet)
-      : (-5.65217e-01 + 5.42436e-03*sumet);
-    shifty = ismc ? (+1.27947e-01 - 3.62604e-03*sumet)
-      : (+4.54054e-01 - 6.73607e-03*sumet);
-  }
-
+  //use correction for data vs. mc 
+  shiftx = ismc ? (+8.72683e-02 - 1.66671e-02*nvtx)
+    : (+2.87340e-01 + 3.29813e-01*nvtx);
+  shifty = ismc ? (+1.86650e-01 - 1.21946e-01*nvtx)
+    : (-2.27938e-01 - 1.71272e-01*nvtx);
+  
   metx -= shiftx;
   mety -= shifty;
 

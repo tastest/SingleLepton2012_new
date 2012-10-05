@@ -75,7 +75,7 @@ class singleLeptonLooper
 	std::vector<float> trackIsoPtRanges( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	std::vector<float> totalIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	//pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV = false);
-	pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool isA = false);
+	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 	pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true );
 	bool initialized;
 	TH1D*   stop_xsec_hist;

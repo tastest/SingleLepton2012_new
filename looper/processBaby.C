@@ -34,8 +34,8 @@ void pickSkimIfExists( TChain *ch, const std::string& base, const std::string& s
   return;
 }
 
-//void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_157.root" )
-void processBaby( TString outfileid = "dy4j_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY4JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_150.root" )
+void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_157.root" )
+//void processBaby( TString outfileid = "dy4j_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY4JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_150.root" )
 //void processBaby( TString outfileid = "dyj_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/SingleOrDiLepton/merged_ntuple_951.root" )
 {
 
@@ -85,6 +85,8 @@ void processBaby( TString outfileid = "dy4j_test", TString infile = "/hadoop/cms
   //MC
   if (infile.Contains("TTJets_MassiveBinDECAY_TuneZ2star_8TeV"))   sample = Form("ttall_%s",  	       outfileid.Data());
   else if (infile.Contains("WJetsToLNu"))                          sample = Form("wjets_%s",           outfileid.Data());
+  else if (infile.Contains("W3JetsToLNu"))                         sample = Form("w3jets_%s",          outfileid.Data());
+  else if (infile.Contains("W4JetsToLNu"))                         sample = Form("w4jets_%s",          outfileid.Data());
   else if (infile.Contains("DY4JetsToLL"))                         sample = Form("DY4Jtot_%s",         outfileid.Data());
   else if (infile.Contains("DYJetsToLL"))                          sample = Form("DYtot_%s",           outfileid.Data());
   else if (infile.Contains("T_s-channel"))                         sample = Form("tschan_%s",          outfileid.Data());
