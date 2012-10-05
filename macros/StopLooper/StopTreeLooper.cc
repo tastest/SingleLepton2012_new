@@ -259,7 +259,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
           continue;
         }
 	if (is_badLaserEvent(id) ){
-	  std::cout<<"Removed event:" <<tree->run_<<"   "<<tree->event_<<"\n";
+	  std::cout<<"Removed bad laser calibration event:" <<tree->run_<<"   "<<tree->event_<<"\n";
 	  continue;
 	}
       }
