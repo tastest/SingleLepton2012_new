@@ -14,37 +14,45 @@
     // samples to run over
     //
  
-    char* path = "/home/users/vimartin/output/output_V00-01-02_2012_4jskim";
+   char* path = "/home/users/vimartin/output/output_V00-01_05_2012";
 
-    const int NSAMPLES = 2;//13;//11;
-    char* sampletag[NSAMPLES] = { 
-      "tW",
-      "data_ele"};
+   const int NSAMPLES = 15;//17;
+   char* sampletag[NSAMPLES] = {
+     "ttlpsl",
+     "ttlpdl",
+     "triboson",
+     "diboson",
+     "ttV",
+     "data_mueg",
+     "data_dimu",
+     "data_diel",
+     "DYStitchtot",
+     "tWall",
+     "tWsl",
+     "tWdl",
+     "wstitchjets",
+//      "ttsl",
+//      "ttdl",
+     "data_ele",
+     "data_muo"};
 
-      // "data_dimu",
-      // "data_diel",
-      // "data_mueg",
-      // "wjets",
-      // "DYtot",
-      // //      "ttall",
-      // "triboson",
-      // "ttV",
-      // "diboson",
-      // "ttfake",
-      // "ttsl",
-      // "ttdl",
-      // "data_muo",
-      // "data_ele"};
+//     char* path = "/home/users/vimartin/output/output_V00-01_05_2012/altttbar";
 
-    // char* path = "/home/users/vimartin/output/output_V00-00-03_2012";
+//     const int NSAMPLES = 12;
+//     char* sampletag[NSAMPLES] = {
+//       "ttsl_massup",
+//       "ttsl_matchup",
+//       "ttsl_massdw",
+//       "ttsl_scaleup",
+//       "ttsl_scaledw",
+//       "ttsl_matchdw",
+//       "ttdl_massup",
+//       "ttdl_matchup",
+//       "ttdl_massdw",
+//       "ttdl_scaleup",
+//       "ttdl_scaledw",
+//       "ttdl_matchdw"};
 
-    // const int NSAMPLES = 4;
-    // char* sampletag[NSAMPLES] = { 
-    //   "tW",
-    //   "tWfake",
-    //   "tWsl",
-    //   "tWdl"};
-    
 
     TChain *ch[NSAMPLES];
     

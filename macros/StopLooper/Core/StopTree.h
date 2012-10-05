@@ -63,6 +63,9 @@ class StopTree {
 	float 	      lep1chi2ndf_;	
 	float 	      lep1dpt_;	
 	float         dilmass_;
+	float         pfmet_;
+	float         mt_;
+	float         pfmetphi_;
 	float         t1met10_;
 	float         t1met10mt_;
 	float         t1met10phi_;
@@ -199,6 +202,9 @@ class StopTree {
 	    tree_->Branch("lep1chi2ndf", 	&lep1chi2ndf_, 		"lep1chi2ndf/F");	      	      
 	    tree_->Branch("lep1dpt", 		&lep1dpt_, 		"lep1dpt/F");
 	    tree_->Branch("dilmmas", 		&dilmass_, 		"dilmass/F");	      	      
+	    tree_->Branch("pfmet", 		&pfmet_, 		"pfmet/F");	      	      
+	    tree_->Branch("mt", 		&mt_, 			"mt/F");          
+	    tree_->Branch("pfmetphi", 		&pfmetphi_, 		"pfmetphi/F");        	      	      
 	    tree_->Branch("t1met10", 		&t1met10_, 		"t1met10/F");	      	      
 	    tree_->Branch("t1met10mt", 		&t1met10mt_, 		"t1met10mt/F");          
 	    tree_->Branch("t1met10phi", 	&t1met10phi_, 		"t1met10phi/F");        	      	      
@@ -311,6 +317,9 @@ class StopTree {
 	    tree_->SetBranchAddress("lep1chi2ndf", 	  &lep1chi2ndf_);	      	      
 	    tree_->SetBranchAddress("lep1dpt", 		  &lep1dpt_);	      	      
 	    tree_->SetBranchAddress("dilmass", 		  &dilmass_);	      	      
+	    tree_->SetBranchAddress("pfmet", 		  &pfmet_);	      	      
+	    tree_->SetBranchAddress("mt", 	          &mt_);          
+	    tree_->SetBranchAddress("pfmetphi", 	  &pfmetphi_);        
 	    tree_->SetBranchAddress("t1met10", 		  &t1met10_);	      	      
 	    tree_->SetBranchAddress("t1met10mt", 	  &t1met10mt_);          
 	    tree_->SetBranchAddress("t1met10phi", 	  &t1met10phi_);        
@@ -442,6 +451,9 @@ StopTree::InitVariables(){
 	variables_.push_back(string("lep1chi2ndf"	));
 	variables_.push_back(string("lep1dpt"		));
 	variables_.push_back(string("dilmass"		));
+	variables_.push_back(string("pfmet"		));
+	variables_.push_back(string("pfmt"		));
+	variables_.push_back(string("pfmetphi"		));
 	variables_.push_back(string("t1met10"		));
 	variables_.push_back(string("t1met10mt"		));
 	variables_.push_back(string("t1met10phi"	));
@@ -544,6 +556,9 @@ StopTree::InitVariables(){
     lep1chi2ndf_	= -999.;
     lep1dpt_		= -999.;
     dilmass_		= -999.;
+    pfmet_		= -999.;
+    mt_			= -999.;
+    pfmetphi_		= -999.;
     t1met10_		= -999.;
     t1met10mt_		= -999.;
     t1met10phi_		= -999.;
@@ -650,6 +665,9 @@ StopTree::Get(string value)
   if(value=="lep1chi2ndf" 	) { return this->lep1chi2ndf_;		}	      	      
   if(value=="lep1dpt" 		) { return this->lep1dpt_;		}	      	      
   if(value=="dilmass" 		) { return this->dilmass_;		}	      	      
+  if(value=="pfmet" 		) { return this->pfmet_;		}	      	      
+  if(value=="mt" 		) { return this->mt_;			}          
+  if(value=="pfmetphi" 		) { return this->pfmetphi_;		}        
   if(value=="t1met10" 		) { return this->t1met10_;		}	      	      
   if(value=="t1met10mt" 	) { return this->t1met10mt_;		}          
   if(value=="t1met10phi" 	) { return this->t1met10phi_;		}        
