@@ -833,14 +833,16 @@ bool StopTreeLooper::passEvtSelection(const StopTree *sTree, TString name)
   //rho requirement
   if ( sTree->rhovor_<0. || sTree->rhovor_>=40. ) return false;
 
-  //met filters
-  if ( sTree->csc_      != 0 ) return false;
-  if ( sTree->hbhe_     != 1 ) return false;
-  if ( sTree->hcallaser_!= 1 ) return false;
-  if ( sTree->ecaltp_   != 1 ) return false;
-  if ( sTree->trkfail_  != 1 ) return false;
-  if ( sTree->eebadsc_  != 1 ) return false;
-  if ( sTree->hbhenew_  != 1 ) return false;
+  if (!name.Contains("T2")) {
+      //met filters
+      if ( sTree->csc_      != 0 ) return false;
+      if ( sTree->hbhe_     != 1 ) return false;
+      if ( sTree->hcallaser_!= 1 ) return false;
+      if ( sTree->ecaltp_   != 1 ) return false;
+      if ( sTree->trkfail_  != 1 ) return false;
+      if ( sTree->eebadsc_  != 1 ) return false;
+      if ( sTree->hbhenew_  != 1 ) return false;
+    }
 
   //at least 1 lepton
   if ( sTree->ngoodlep_ < 1 ) return false;
