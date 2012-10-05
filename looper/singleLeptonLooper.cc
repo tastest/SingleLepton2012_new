@@ -93,7 +93,8 @@ void fillOverFlow(TH2F *h2, float xvalue, float yvalue, float weight = 1.);
 void fillHistos(TH1F *h1[4][4],float value, float weight, int myType, int nJetsIdx);
 void fillHistos(TH2F *h2[4][4],float xvalue, float yvalue, float weight, int myType, int nJetsIdx);
 void fillHistos(TProfile *h2[4][4],float xvalue, float yvalue,  int myType, int nJetsIdx);
-
+float getdltrigweight(int id1, int id2);
+float getsltrigweight(int id1, float pt, float eta);
 //--------------------------------------------------------------------
 
 void singleLeptonLooper::weight3D_init( std::string WeightFileName ) { 
@@ -444,6 +445,8 @@ void singleLeptonLooper::InitBaby(){
   pdfx2_  = -99999.;
 
   mutrigweight_ = 1.;
+  sltrigweight_ = 1.;
+  dltrigweight_ = 1.;
 
   jetid_	= 1;
   jetid30_	= 1;
@@ -3350,6 +3353,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       //set trigger weight
       mutrigweight_  = getMuTriggerWeight   ( lep1_->pt() , lep1_->eta() );
       mutrigweight2_ = getMuTriggerWeightNew( lep1_->pt() , lep1_->eta() );
+      sltrigweight_ = isData ? 1. : getsltrigweight( id1_, lep1_->pt() , lep1_->eta() );
+      dltrigweight_ = (!isData && ngoodlep_>1) ? getdltrigweight( id1_, id2_ ) : 1.;
       
       outTree->Fill();
     
@@ -3578,6 +3583,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("weight",          &weight_,           "weight/F");
   outTree->Branch("mutrigweight",    &mutrigweight_,     "mutrigweight/F");
   outTree->Branch("mutrigweight2",   &mutrigweight2_,    "mutrigweight2/F");
+  outTree->Branch("sltrigweight",    &sltrigweight_,     "sltrigweight/F");
+  outTree->Branch("dltrigweight",    &dltrigweight_,     "dltrigweight/F");
   outTree->Branch("trgeff",          &trgeff_,           "trgeff/F");
   outTree->Branch("pthat",           &pthat_,            "pthat/F");
   outTree->Branch("qscale",          &qscale_,           "qscale/F");
@@ -4283,4 +4290,118 @@ pair<float,float> singleLeptonLooper::getTrackerMET( P4 *lep, double deltaZCut, 
   pair<float, float> trkmet = make_pair( sqrt( pX*pX + pY*pY ), atan2( pY , pX ) );
   return trkmet;
   
+}
+
+float getdltrigweight(int id1, int id2)
+{ 
+  if (abs(id1)==11 && abs(id2)==11) return 0.95;
+  if (abs(id1)==13 && abs(id2)==13) return 0.88;
+  if (abs(id1)!=abs(id2)) return 0.92;
+  return -999.;
+
+}
+
+float getsltrigweight(int id1, float pt, float eta) 
+{
+
+  //electron efficiencies
+  if ( abs(id1)==11 ) {
+    if ( fabs(eta)<1.5) {
+      if ( pt>=20 && pt<22 ) return 0.00;
+      if ( pt>=22 && pt<24 ) return 0.00;
+      if ( pt>=24 && pt<26 ) return 0.00;
+      if ( pt>=26 && pt<28 ) return 0.08;
+      if ( pt>=28 && pt<30 ) return 0.61;
+      if ( pt>=30 && pt<32 ) return 0.86;
+      if ( pt>=32 && pt<34 ) return 0.88;
+      if ( pt>=34 && pt<36 ) return 0.90;
+      if ( pt>=36 && pt<38 ) return 0.91;
+      if ( pt>=38 && pt<40 ) return 0.92;
+      if ( pt>=40 && pt<50 ) return 0.94;
+      if ( pt>=50 && pt<60 ) return 0.95;
+      if ( pt>=60 && pt<80 ) return 0.96;
+      if ( pt>=80 && pt<100 ) return 0.96;
+      if ( pt>=100 && pt<150 ) return 0.96;
+      if ( pt>=150 && pt<200 ) return 0.97;
+      if ( pt>=200 ) return 0.97;
+    } else if ( fabs(eta)>=1.5 && fabs(eta)<2.1) {
+      if ( pt>=20 && pt<22 ) return 0.00;
+      if ( pt>=22 && pt<24 ) return 0.00;
+      if ( pt>=24 && pt<26 ) return 0.02;
+      if ( pt>=26 && pt<28 ) return 0.18;
+      if ( pt>=28 && pt<30 ) return 0.50;
+      if ( pt>=30 && pt<32 ) return 0.63;
+      if ( pt>=32 && pt<34 ) return 0.68;
+      if ( pt>=34 && pt<36 ) return 0.70;
+      if ( pt>=36 && pt<38 ) return 0.72;
+      if ( pt>=38 && pt<40 ) return 0.74;
+      if ( pt>=40 && pt<50 ) return 0.76;
+      if ( pt>=50 && pt<60 ) return 0.77;
+      if ( pt>=60 && pt<80 ) return 0.78;
+      if ( pt>=80 && pt<100 ) return 0.80;
+      if ( pt>=100 && pt<150 ) return 0.79;
+      if ( pt>=150 && pt<200 ) return 0.76;
+      if ( pt>=200 ) return 0.81;
+    }
+  } else if ( abs(id1)==13 ) {//muon efficiencies
+
+    if ( fabs(eta)<0.8 ) {
+      if (pt>=20 && pt<22)  return  0.00;	 
+      if (pt>=22 && pt<24)  return  0.03; 	 
+      if (pt>=24 && pt<26)  return  0.87; 
+      if (pt>=26 && pt<28)  return  0.90; 
+      if (pt>=28 && pt<30)  return  0.91; 
+      if (pt>=30 && pt<32)  return  0.91; 
+      if (pt>=32 && pt<34)  return  0.92; 
+      if (pt>=34 && pt<36)  return  0.93; 
+      if (pt>=36 && pt<38)  return  0.93; 
+      if (pt>=38 && pt<40)  return  0.93; 
+      if (pt>=40 && pt<50)  return  0.94; 
+      if (pt>=50 && pt<60)  return  0.95; 
+      if (pt>=60 && pt<80)  return  0.95; 
+      if (pt>=80 && pt<100) return 0.94; 
+      if (pt>=100 && pt<150) return 0.94; 
+      if (pt>=150 && pt<200) return 0.93; 
+      if (pt>=200) return 0.92; 
+    } else if ( fabs(eta)>=0.8 && fabs(eta)<1.5 ) {
+      if (pt>=20 && pt<22)  return  0.00;
+      if (pt>=22 && pt<24)  return  0.05;
+      if (pt>=24 && pt<26)  return  0.78;
+      if (pt>=26 && pt<28)  return  0.81;
+      if (pt>=28 && pt<30)  return  0.81;
+      if (pt>=30 && pt<32)  return  0.81;
+      if (pt>=32 && pt<34)  return  0.82;
+      if (pt>=34 && pt<36)  return  0.82;
+      if (pt>=36 && pt<38)  return  0.83;
+      if (pt>=38 && pt<40)  return  0.83;
+      if (pt>=40 && pt<50)  return  0.84;
+      if (pt>=50 && pt<60)  return  0.84;
+      if (pt>=60 && pt<80)  return  0.84;
+      if (pt>=80 && pt<100) return 0.84; 
+      if (pt>=100 && pt<150) return 0.84;
+      if (pt>=150 && pt<200) return 0.84;
+      if (pt>=200) return 0.82;
+    } else if ( fabs(eta)>=1.5 && fabs(eta)<2.1 ) {
+      if (pt>=20 && pt<22)  return  0.00;
+      if (pt>=22 && pt<24)  return  0.11;
+      if (pt>=24 && pt<26)  return  0.76;
+      if (pt>=26 && pt<28)  return  0.78;
+      if (pt>=28 && pt<30)  return  0.79;
+      if (pt>=30 && pt<32)  return  0.80;
+      if (pt>=32 && pt<34)  return  0.80;
+      if (pt>=34 && pt<36)  return  0.81;
+      if (pt>=36 && pt<38)  return  0.81;
+      if (pt>=38 && pt<40)  return  0.82;
+      if (pt>=40 && pt<50)  return  0.82;
+      if (pt>=50 && pt<60)  return  0.83;
+      if (pt>=60 && pt<80)  return  0.83;
+      if (pt>=80 && pt<100) return 0.83;
+      if (pt>=100 && pt<150) return 0.83;
+      if (pt>=150 && pt<200) return 0.82;
+      if (pt>=200) return 0.82;
+    }
+  }//end check for muons
+
+  return 1.;
+
 }
