@@ -10,6 +10,7 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "TChain.h"
+#include "Riostream.h"
 
 #include <algorithm>
 #include <utility>
@@ -119,10 +120,45 @@ bool is_duplicate (const DorkyEventIdentifier &id) {
 
 //--------------------------------------------------------------------
 
+std::set<DorkyEventIdentifier> events_lasercalib; 
+int load_badlaserevents  () {
+
+  ifstream in;
+  in.open("badlaser_events.txt");
+
+   int run, event, lumi;
+   int nlines = 0;
+
+   while (1) {
+      in >> run >> event >> lumi;
+      if (!in.good()) break;
+      nlines++;
+      DorkyEventIdentifier id = {run, event, lumi };
+      events_lasercalib.insert(id);
+   }
+   printf(" found %d bad events \n",nlines);
+
+   in.close();
+
+   return 0;
+
+}
+
+bool is_badLaserEvent (const DorkyEventIdentifier &id) {
+  if (events_lasercalib.find(id) != events_lasercalib.end()) return true;
+  return false;
+}
+
+
+
+//--------------------------------------------------------------------
+
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
   printf("[StopTreeLooper::loop] %s\n", name.Data());
+
+  load_badlaserevents  ();
 
   //
   // check for valid chain
@@ -193,6 +229,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     ULong64_t nEvents = tree->tree_->GetEntries();
     for(ULong64_t event = 0; event < nEvents; ++event) {
+
       tree->tree_->GetEntry(event);
 
       //
@@ -221,6 +258,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         if (is_duplicate(id) ){
           continue;
         }
+	if (is_badLaserEvent(id) ){
+	  std::cout<<"Removed event:" <<tree->run_<<"   "<<tree->event_<<"\n";
+	  continue;
+	}
       }
 
       // 
