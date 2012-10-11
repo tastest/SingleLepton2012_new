@@ -31,6 +31,7 @@ class StopTree {
 	int           nvtx_;
 	float         nvtxweight_;
 	float         weight_;
+	float         xsecsusy_;
 	float         mutrigweight_;
 	float         rhovor_;
 	float         mgcor_;
@@ -170,6 +171,7 @@ class StopTree {
 	    tree_->Branch("nvtx", 		&nvtx_, 		"nvtx/I");
 	    tree_->Branch("nvtxweight", 	&nvtxweight_, 		"nvtxweight/F");    
 	    tree_->Branch("weight", 		&weight_, 		"weight/F");	      	      
+	    tree_->Branch("xsecsusy", 		&xsecsusy_, 		"xsecsusy/F");	      	      
 	    tree_->Branch("mutrigweight", 	&mutrigweight_, 	"mutrigweight/F");    
 	    tree_->Branch("rhovor", 		&rhovor_, 		"rhovor/F");	      	      
 	    tree_->Branch("mgcor", 		&mgcor_, 		"mgcor/F");	 
@@ -285,6 +287,7 @@ class StopTree {
 	    tree_->SetBranchAddress("nvtx", 		  &nvtx_);	      	      
 	    tree_->SetBranchAddress("nvtxweight", 	  &nvtxweight_);    
 	    tree_->SetBranchAddress("weight", 		  &weight_);	      	      
+	    tree_->SetBranchAddress("xsecsusy",		  &xsecsusy_);	      	      
 	    tree_->SetBranchAddress("mutrigweight", 	  &mutrigweight_);    
 	    tree_->SetBranchAddress("rhovor", 		  &rhovor_);	      	      
 	    tree_->SetBranchAddress("mgcor", 		  &mgcor_);	      
@@ -419,6 +422,7 @@ StopTree::InitVariables(){
 	variables_.push_back(string("nvtx"		));
 	variables_.push_back(string("nvtxweight"	));
 	variables_.push_back(string("weight"		));
+	variables_.push_back(string("xsecsusy"		));
 	variables_.push_back(string("mutrigweight"	));
 	variables_.push_back(string("rhovor"		));
 	variables_.push_back(string("mgcor"		));
@@ -524,6 +528,7 @@ StopTree::InitVariables(){
     nvtx_		= 9999;
     nvtxweight_		= -999.;
     weight_		= -999.;
+    xsecsusy_		= -999.;
     mutrigweight_	= -999.;
     rhovor_		= -999.;
     mgcor_		= -999.;
@@ -633,6 +638,7 @@ StopTree::Get(string value)
   if(value=="nvtx" 		) { return this->nvtx_;			}	      	      
   if(value=="nvtxweight" 	) { return this->nvtxweight_;		}    
   if(value=="weight" 		) { return this->weight_;		}	      	      
+  if(value=="xsecsusy" 		) { return this->xsecsusy_;		}	      	      
   if(value=="mutrigweight" 	) { return this->mutrigweight_;		}    
   if(value=="rhovor" 		) { return this->rhovor_;		}	      	      
   if(value=="mgcor" 		) { return this->mgcor_;		}
