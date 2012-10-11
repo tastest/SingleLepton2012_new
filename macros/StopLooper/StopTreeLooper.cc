@@ -69,6 +69,8 @@ StopTreeLooper::StopTreeLooper()
   t1metphicorr = -9999.;
   t1metphicorrphi = -9999.;
   t1metphicorrmt = -9999.;
+  min_mtpeak = -9999.;
+  max_mtpeak = -9999.; 
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -214,6 +216,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   int i_permille_old = 0;
 
   bool isData = name.Contains("data") ? true : false;
+
+  //Define peak region 
+  min_mtpeak = 50.; 
+  max_mtpeak = 80.; 
+  printf("[StopTreeLooper::loop] MT PEAK definition %.0f - %.0f GeV \n", min_mtpeak, max_mtpeak);
 
   cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
 
@@ -396,6 +403,18 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
 	  }
+	  //met > 350 GeV requirement 
+	  if ( t1metphicorr > 350. ) {
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met350",  		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350", 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	  }
+	  //met > 400 GeV requirement 
+	  if ( t1metphicorr > 400. ) {
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met400",  		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400", 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	  }
 
 	}
 
@@ -429,6 +448,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  //met > 300 GeV requirement 
 	  if ( t1metphicorr > 300. ) 
 	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met300", tag_njets, tag_kbin, flav_tag_sl, 120. );
+	  //met > 350 GeV requirement 
+	  if ( t1metphicorr > 350. ) 
+	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met350", tag_njets, tag_kbin, flav_tag_sl, 120. );
+	  //met > 400 GeV requirement 
+	  if ( t1metphicorr > 400. ) 
+	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met400", tag_njets, tag_kbin, flav_tag_sl, 120. );
 	  
 	  if ( tree->nbtagscsvm_==0 ) {
 
@@ -452,6 +477,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    //met > 300 GeV requirement 
 	    if ( t1metphicorr > 300. ) 
 	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	    //met > 350 GeV requirement 
+	    if ( t1metphicorr > 350. ) 
+	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	    //met > 400 GeV requirement 
+	    if ( t1metphicorr > 400. ) 
+	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 
 	  }
 	}
@@ -518,6 +549,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		//pseudomet > 300 GeV requirement 
 		if ( t1metphicorr_lep > 300. ) 
 		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met300", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
+		//pseudomet > 350 GeV requirement 
+		if ( t1metphicorr_lep > 350. ) 
+		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met350", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
+		//pseudomet > 400 GeV requirement 
+		if ( t1metphicorr_lep > 400. ) 
+		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met400", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
 
 		if ( tree->nbtagscsvm_==0) {
 		  //default 
@@ -540,6 +577,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		  //pseudomet > 300 GeV requirement 
 		  if ( t1metphicorr_lep > 300. ) 
 		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2,"_met300", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
+		  //pseudomet > 350 GeV requirement 
+		  if ( t1metphicorr_lep > 350. ) 
+		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2,"_met350", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
+		  //pseudomet > 400 GeV requirement 
+		  if ( t1metphicorr_lep > 400. ) 
+		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2,"_met400", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
 		}
 	      }
 	    }
@@ -578,6 +621,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  //met > 300 GeV requirement 
 	  if ( t1metphicorr > 300. ) 
 	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met300", basic_flav_tag_dl);	    
+	  //met > 350 GeV requirement 
+	  if ( t1metphicorr > 350. ) 
+	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met350", basic_flav_tag_dl);	    
+	  //met > 400 GeV requirement 
+	  if ( t1metphicorr > 400. ) 
+	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met400", basic_flav_tag_dl);	    
 
 	  if ( tree->npfjets30_ < 2 ) continue; 
 	  
@@ -601,6 +650,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  //met > 300 GeV requirement 
 	  if ( t1metphicorr > 300. ) 
 	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met300", tag_njets,  tag_kbin, flav_tag_dl, 120. );
+	  //met > 350 GeV requirement 
+	  if ( t1metphicorr > 350. ) 
+	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met350", tag_njets,  tag_kbin, flav_tag_dl, 120. );
+	  //met > 400 GeV requirement 
+	  if ( t1metphicorr > 400. ) 
+	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met400", tag_njets,  tag_kbin, flav_tag_dl, 120. );
 	  
 	}
 
@@ -640,6 +695,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  //met > 300 GeV requirement 
 	  if ( t1metphicorr > 300. ) 
 	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	  //met > 350 GeV requirement 
+	  if ( t1metphicorr > 350. ) 
+	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	  //met > 400 GeV requirement 
+	  if ( t1metphicorr > 400. ) 
+	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 	}
       
       //
@@ -673,6 +734,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  //met > 300 GeV requirement 
 	  if ( t1metphicorr > 300. ) 
 	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	  //met > 350 GeV requirement 
+	  if ( t1metphicorr > 350. ) 
+	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	  //met > 400 GeV requirement 
+	  if ( t1metphicorr > 400. ) 
+	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 
 	  // sample with only 1 lepton - this is the true CR5
 	  if ( tree->ngoodlep_ == 1 ) {
@@ -697,6 +764,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    //met > 300 GeV requirement 
 	    if ( t1metphicorr > 300. ) 
 	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	    //met > 350 GeV requirement 
+	    if ( t1metphicorr > 350. ) 
+	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
+	    //met > 400 GeV requirement 
+	    if ( t1metphicorr > 400. ) 
+	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
 
 	  }
 	}
@@ -990,8 +1063,8 @@ void StopTreeLooper::makeCR2Plots( const StopTree *sTree, float evtweight, std::
   float x_ovflw = h_xmax-0.001;
   
   float pseudomt_count = -1.;
-  if ( t1met10mt_lep > 60. 
-       && t1met10mt_lep < 100. )    pseudomt_count = 0.5;
+  if ( t1met10mt_lep > min_mtpeak
+       && t1met10mt_lep < max_mtpeak )    pseudomt_count = 0.5;
   else if ( t1met10mt_lep > mtcut ) pseudomt_count = 1.5;
   
   //default met
@@ -1035,8 +1108,8 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   float x_ovflw = h_xmax-0.001;
   
   float mt_count = -1.;
-  if ( t1metphicorrmt > 60. 
-       && t1metphicorrmt < 100. )    mt_count = 0.5;
+  if ( t1metphicorrmt > min_mtpeak 
+       && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   //default met
@@ -1089,8 +1162,8 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
   float x_ovflw = h_xmax-0.001;
   
   float mt_count = -1.;
-  if ( t1metphicorrmt > 60. 
-       && t1metphicorrmt < 100. )    mt_count = 0.5;
+  if ( t1metphicorrmt > min_mtpeak 
+       && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   //default met
@@ -1143,8 +1216,8 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
   float x_ovflw = h_xmax-0.001;
   
   float mt_count = -1.;
-  if ( t1metphicorrmt > 60. 
-       && t1metphicorrmt < 100. )    mt_count = 0.5;
+  if ( t1metphicorrmt > min_mtpeak 
+       && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   //default met
@@ -1176,8 +1249,8 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   float x_ovflw = h_xmax-0.001;
   
   float mt_count = -1.;
-  if ( t1metphicorrmt > 60. 
-       && t1metphicorrmt < 100. )    mt_count = 0.5;
+  if ( t1metphicorrmt > min_mtpeak 
+       && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   plot1D("h_cr1_njets"    +tag_selection+flav_tag, min(sTree->npfjets30_,4),  evtweight, h_1d, 5,0,5);

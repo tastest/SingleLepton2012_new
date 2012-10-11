@@ -68,6 +68,9 @@ class StopTreeLooper {
 	float t1metphicorr;
 	float t1metphicorrphi;
 	float t1metphicorrmt;
+	//for mt peak definition
+	float min_mtpeak;
+	float max_mtpeak; 
 
 };
 
