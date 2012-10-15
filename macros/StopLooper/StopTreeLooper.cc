@@ -1120,6 +1120,10 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr4_leppt"+tag_selection                   +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_leppt"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_leppt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  //leading lepton eta
+  plot1D("h_cr4_lepeta"+tag_selection                   +flav_tag_dl, sTree->lep1_.Eta(), evtweight, h_1d, 21, -2.1, 2.1);
+  plot1D("h_cr4_lepeta"+tag_selection+tag_njets         +flav_tag_dl, sTree->lep1_.Eta(), evtweight, h_1d, 21, -2.1, 2.1);
+  plot1D("h_cr4_lepeta"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, sTree->lep1_.Eta(), evtweight, h_1d, 21, -2.1, 2.1);
   //subleading lepton pt
   plot1D("h_cr4_subleadleppt"+tag_selection                   +flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_subleadleppt"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->lep2_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1145,9 +1149,9 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr4_dphi_dilep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
   //dR between 2 leptons
   float dR_dilep = dRbetweenVectors( sTree->lep1_ ,  sTree->lep2_ );
-  plot1D("h_cr4_dR_dilep"+tag_selection                   +flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets         +flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dR_dilep, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr4_dR_dilep"+tag_selection                   +flav_tag_dl, min(dR_dilep, (float)4.999), evtweight, h_1d, 15, 0., 5.);
+  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets         +flav_tag_dl, min(dR_dilep, (float)4.999), evtweight, h_1d, 15, 0., 5.);
+  plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(dR_dilep, (float)4.999), evtweight, h_1d, 15, 0., 5.);
 
 }
 
@@ -1199,9 +1203,9 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr5_dphi_leptrk"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
   //dR between lepton and isolated track
   float dR_leptrk = dRbetweenVectors( sTree->lep1_ ,  sTree->pfcand10_ );
-  plot1D("h_cr5_dR_leptrk"+tag_selection                   +flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets         +flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets+tag_kbin+flav_tag, dR_leptrk, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_cr5_dR_leptrk"+tag_selection                   +flav_tag, min(dR_leptrk, (float)4.999), evtweight, h_1d, 15, 0., 5.);
+  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets         +flav_tag, min(dR_leptrk, (float)4.999), evtweight, h_1d, 15, 0., 5.);
+  plot1D("h_cr5_dR_leptrk"+tag_selection+tag_njets+tag_kbin+flav_tag, min(dR_leptrk, (float)4.999), evtweight, h_1d, 15, 0., 5.);
 
 }
 
