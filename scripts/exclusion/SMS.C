@@ -1,4 +1,4 @@
-//#include "Utils/SMS_utils.C"
+#include "Utils/SMS_utils.C"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -24,6 +24,7 @@
 #include "TMath.h"
 #include <sstream>
 #include <iomanip>
+#include "upperLimits.C"
 
 //-------------------------------------------
 // THING TO ADD
@@ -155,8 +156,8 @@ TGraph* getGraph(char* sample, char* type, string SR){
 }
 
 
-float getObservedLimit( float seff , string SR );
-float getExpectedLimit( float seff , string SR );
+//float getObservedLimit( float seff , string SR );
+//float getExpectedLimit( float seff , string SR );
 
 using namespace std;
 
@@ -168,16 +169,16 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   // input parameters
   //--------------------------------------------------
   
-  const float denom    = 50000;
+  //const float denom    = 50000;
   const float lumi     = 9200;
-  const char* filename = Form(Form("/tas/benhoob/testFiles/T2tt_8TeV/merged_1.root",sample));
-  const float btagerr  = 0.06;
+  const char* filename = Form(Form("/tas/benhoob/testFiles/T2tt_8TeV/merged*njets4.root",sample));
+  const float btagerr  = 0.02;
 
   TFile* fdenom = TFile::Open("/tas/benhoob/testFiles/T2tt_8TeV/myMassDB.root");
   TH2F*  hdenom = (TH2F*) fdenom->Get("masses");
 
   cout << "Using file        " << filename << endl;
-  cout << "Using denominator " << denom    << " events" << endl;
+  //cout << "Using denominator " << denom    << " events" << endl;
   cout << "Using lumi        " << lumi     << " pb-1" << endl;
 
   char* label = (char*)"";
@@ -241,8 +242,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCut btag1  ("nbtagscsvm>=1");
   TCut isotrk ("pfcandpt10 > 9998. || pfcandiso10 > 0.1");
 
-  //TCut weight("xsecsusy * (1000./50000.) * 9.708");
-  TCut weight("xsecsusy * (1000./50000.) * 9.708 * sltrigweight");
+  TCut weight("sltrigweight * 0.98"); // trigger efficiency X btagging SF
 
   TCut presel;
   presel += rho;
@@ -300,8 +300,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TH2F* heffdn[nsig];
   TH2F* hxsec[nsig];
   TH2F* hxsec_exp[nsig];
+  TH2F* hxsec_expp1[nsig];
+  TH2F* hxsec_expm1[nsig];
   TH2F* hexcl[nsig];
   TH2F* hexcl_exp[nsig];
+  TH2F* hexcl_expp1[nsig];
+  TH2F* hexcl_expm1[nsig];
   TH2F* hjes[nsig];
   
   TCanvas *ctemp = new TCanvas();
@@ -328,12 +332,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << "Selection up  : " << jesupcut      << endl;
     cout << "Selection dn  : " << jesdncut      << endl;
 
-    int   nbinsx  =    61;
-    float xmin    = 195.0;
-    float xmax    = 805.0;
-    int   nbinsy  =    81;
-    float ymin    =  -5.0;
-    float ymax    = 805.0;
+    int   nbinsx  =   120;
+    float xmin    =     0;
+    float xmax    =  1200;
+    int   nbinsy  =   120;
+    float ymin    =     0;
+    float ymax    =  1200;
 
     if( TString(sample).Contains("T2bw") ){
       nbinsx =   9;
@@ -344,15 +348,20 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
       ymax   = 325;
     }
 
-    heff[i]      = new TH2F(Form("heff_%i",i)        , Form("heff_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    heffup[i]    = new TH2F(Form("heffup_%i",i)      , Form("heffup_%i",i)     , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    heffdn[i]    = new TH2F(Form("heffdn_%i",i)      , Form("heffdn_%i",i)     , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hxsec[i]     = new TH2F(Form("hxsec_%i",i)       , Form("hxsec_%i",i)      , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hxsec_exp[i] = new TH2F(Form("hxsec_exp_%i",i)   , Form("hxsec_exp_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hexcl[i]     = new TH2F(Form("hexcl_%i",i)       , Form("hexcl_%i",i)      , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hexcl_exp[i] = new TH2F(Form("hexcl_exp_%i",i)   , Form("hexcl_exp_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hjes[i]      = new TH2F(Form("hjes_%i",i)        , Form("hjes_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    heff[i]        = new TH2F(Form("heff_%i",i)          , Form("heff_%i",i)         , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    heffup[i]      = new TH2F(Form("heffup_%i",i)        , Form("heffup_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    heffdn[i]      = new TH2F(Form("heffdn_%i",i)        , Form("heffdn_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hxsec[i]       = new TH2F(Form("hxsec_%i",i)         , Form("hxsec_%i",i)        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hxsec_exp[i]   = new TH2F(Form("hxsec_exp_%i",i)     , Form("hxsec_exp_%i",i)    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hxsec_expp1[i] = new TH2F(Form("hxsec_expp1_%i",i)   , Form("hxsec_expp1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hxsec_expm1[i] = new TH2F(Form("hxsec_expm1_%i",i)   , Form("hxsec_expm1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+ 
+    hexcl[i]       = new TH2F(Form("hexcl_%i",i)         , Form("hexcl_%i",i)        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hexcl_exp[i]   = new TH2F(Form("hexcl_exp_%i",i)     , Form("hexcl_exp_%i",i)    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hexcl_expp1[i] = new TH2F(Form("hexcl_expp1_%i",i)   , Form("hexcl_expp1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hexcl_expm1[i] = new TH2F(Form("hexcl_expm1_%i",i)   , Form("hexcl_expm1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
 
+    hjes[i]      = new TH2F(Form("hjes_%i",i)        , Form("hjes_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
 
     ch->Draw(Form("ml:mg>>heff_%i",i),sigcuts.at(i)*weight);
     //heff[i]->Scale(1.0/denom);
@@ -390,15 +399,72 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
 	float toterr  = sqrt( 0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr + djes*djes );
 
-	float this_ul = getObservedLimit( toterr , labels.at(i) );
-	float xsecul  = this_ul / ( lumi * eff );
+	// float this_ul     = getObservedLimit( toterr , labels.at(i) );
+	// float this_ul_exp = getExpectedLimit( toterr , labels.at(i) );
 
-	float this_ul_exp = getExpectedLimit( toterr , labels.at(i) );
-	float xsecul_exp  = this_ul_exp / ( lumi * eff );
+	// float xsecul      = this_ul / ( lumi * eff );
+	// float xsecul_exp  = this_ul_exp / ( lumi * eff );
+
+	float this_ul;
+	float this_ul_exp;
+	float this_ul_expp1;
+	float this_ul_expm1;
+
+	if( TString(labels.at(i)).Contains("SRA") ){
+	  this_ul       = getUpperLimit_SRA( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRA( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRA( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRA( toterr );
+	}
+
+	else if( TString(labels.at(i)).Contains("SRB") ){
+	  this_ul       = getUpperLimit_SRB( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRB( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRB( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRB( toterr );
+	}
+
+	else if( TString(labels.at(i)).Contains("SRC") ){
+	  this_ul       = getUpperLimit_SRC( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRC( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRC( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRC( toterr );
+	}
+	else if( TString(labels.at(i)).Contains("SRD") ){
+	  this_ul       = getUpperLimit_SRD( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRD( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRD( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRD( toterr );
+	}
+	else if( TString(labels.at(i)).Contains("SRE") ){
+	  this_ul       = getUpperLimit_SRE( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRE( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRE( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRE( toterr );
+	}
+	else if( TString(labels.at(i)).Contains("SRF") ){
+	  this_ul       = getUpperLimit_SRF( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRF( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRF( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRF( toterr );
+	}
+	else if( TString(labels.at(i)).Contains("SRG") ){
+	  this_ul       = getUpperLimit_SRG( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_SRG( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_SRG( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_SRG( toterr );
+	}
+
+	float xsecul        = this_ul       / ( lumi * eff );
+	float xsecul_exp    = this_ul_exp   / ( lumi * eff );
+	float xsecul_expp1  = this_ul_expp1 / ( lumi * eff );
+	float xsecul_expm1  = this_ul_expm1 / ( lumi * eff );
 
 	if( eff > 0 ){
 	  hxsec[i]->SetBinContent(ibin,jbin, xsecul );
 	  hxsec_exp[i]->SetBinContent(ibin,jbin, xsecul_exp );
+	  hxsec_expp1[i]->SetBinContent(ibin,jbin, xsecul_expp1 );
+	  hxsec_expm1[i]->SetBinContent(ibin,jbin, xsecul_expm1 );
 	}
 
 	int   bin = refxsec->FindBin(mg);
@@ -409,6 +475,13 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
 	hexcl_exp[i]->SetBinContent(ibin,jbin,0);
 	if( xsec > xsecul_exp )   hexcl_exp[i]->SetBinContent(ibin,jbin,1);
+
+	hexcl_expp1[i]->SetBinContent(ibin,jbin,0);
+	if( xsec > xsecul_expp1 )   hexcl_expp1[i]->SetBinContent(ibin,jbin,1);
+
+	hexcl_expm1[i]->SetBinContent(ibin,jbin,0);
+	if( xsec > xsecul_expm1 )   hexcl_expm1[i]->SetBinContent(ibin,jbin,1);
+
 	//cout << "ibin jbin mg xsec " << ibin << " " << jbin << " " << mg << " " << xsec << endl;
       }
     }
@@ -431,8 +504,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
   for( unsigned int i = 0 ; i < nsig ; ++i ){
 
-    TGraph *gr     = getGraph( sample , "observed" , signames.at(i) );
-    TGraph *gr_exp = getGraph( sample , "expected" , signames.at(i) );
+    //TGraph *gr     = getGraph( sample , "observed" , signames.at(i) );
+    //TGraph *gr_exp = getGraph( sample , "expected" , signames.at(i) );
+
+    TGraph* gr      = getRefXsecGraph(hxsec[i]     , "T2tt", 1.0);
+    TGraph* gr_exp  = getRefXsecGraph(hxsec_exp[i] , "T2tt", 1.0);
 
     gr->SetLineWidth(4);
     gr_exp->SetLineWidth(4);
@@ -455,17 +531,20 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     gPad->SetRightMargin(0.2);
     heff[i]->Scale(100);
     heff[i]->GetXaxis()->SetLabelSize(0.035);
+    heff[i]->GetYaxis()->SetLabelSize(0.035);
     heff[i]->GetYaxis()->SetTitle("#chi^{0}_{1} mass (GeV)");
     heff[i]->GetXaxis()->SetTitle("stop mass (GeV)");
     heff[i]->GetZaxis()->SetTitle("efficiency (%)");
     heff[i]->GetZaxis()->SetTitleOffset(1.2);
+    heff[i]->GetXaxis()->SetRangeUser(200,700);
+    heff[i]->GetYaxis()->SetRangeUser(0,600);
     heff[i]->Draw("colz");
-    heff[i]->Draw("sametext");
+    //heff[i]->Draw("sametext");
 
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.78,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 7 TeV, #scale[0.6]{#int}Ldt = 4.98 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
 
     //-------------------------------
     // cross section
@@ -477,14 +556,17 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     gPad->SetLogz();
   
     hxsec[i]->GetXaxis()->SetLabelSize(0.035);
+    hxsec[i]->GetYaxis()->SetLabelSize(0.035);
     hxsec[i]->GetYaxis()->SetTitle("#chi^{0}_{1} mass (GeV)");
     hxsec[i]->GetXaxis()->SetTitle("stop mass (GeV)");
     hxsec[i]->GetZaxis()->SetTitle("#sigma upper limit");
     hxsec[i]->GetZaxis()->SetTitleOffset(1.2);
     hxsec[i]->Draw("colz");
-    hxsec[i]->Draw("sametext");
+    //hxsec[i]->Draw("sametext");
     hxsec[i]->SetMinimum(0.01);
     hxsec[i]->SetMaximum(100);
+    hxsec[i]->GetXaxis()->SetRangeUser(200,700);
+    hxsec[i]->GetYaxis()->SetRangeUser(0,600);
 
     gr->Draw("same");
     gr_exp->Draw("same");
@@ -514,7 +596,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.78,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 7 TeV, #scale[0.6]{#int}Ldt = 4.98 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
 
     //-------------------------------
     // excluded points
@@ -533,12 +615,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hexcl[i]->GetZaxis()->SetTitle("observed excluded points");
     hexcl[i]->Draw("colz");
     gr->Draw("l");
-    //gr_excl->Draw("same");
 
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.71,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 7 TeV, #scale[0.6]{#int}Ldt = 4.98 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
 
     //-------------------------------
     // JES uncertainty
@@ -558,7 +639,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.71,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary   #sqrt{s} = 7 TeV, #scale[0.6]{#int}Ldt = 4.98 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary   #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
 
     
     /*
@@ -581,14 +662,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
     int bin = heff[i]->FindBin(300,50);
 
-    float toterr = sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.022*0.022 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
+    float toterr = sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
     cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
     cout << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
     cout << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
     cout << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
     cout << "tot err              " << toterr << endl;
-    cout << "obs limit            " << getObservedLimit(toterr,labels.at(i)) << endl;
-    cout << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
+    //cout << "obs limit            " << getObservedLimit(toterr,labels.at(i)) << endl;
+    //cout << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
     cout << endl << endl;
   }
   
@@ -596,16 +677,21 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
     hxsec[i]->Write();
-    heff[i]->Write();
     hxsec_exp[i]->Write();
-    hexcl_exp[i]->Write();
+    hxsec_expp1[i]->Write();
+    hxsec_expm1[i]->Write();
     hexcl[i]->Write();
+    hexcl_exp[i]->Write();
+    hexcl_expp1[i]->Write();
+    hexcl_expm1[i]->Write();
+    heff[i]->Write();
+    hjes[i]->Write();
   }
   outfile->Close();
 
 }
 
-
+/*
 //-----------------------------------------
 // the following UL's correspdond to:
 // SRA: observed 116, predicted 112.7 8.3% uncertainty
@@ -617,19 +703,19 @@ float getObservedLimit( float seff , string SR ){
   float ul = 9999.;
 
   if( TString(SR).Contains("SRA") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 30.3;
-    if(seff >= 0.05 && seff < 0.10) ul = 30.7;
-    if(seff >= 0.10 && seff < 0.15) ul = 31.6;
-    if(seff >= 0.15 && seff < 0.20) ul = 32.3;
-    if(seff >= 0.20 && seff < 0.25) ul = 36.0;
+    if(seff >= 0.00 && seff < 0.05) ul = 130.0;
+    if(seff >= 0.05 && seff < 0.10) ul = 130.0;
+    if(seff >= 0.10 && seff < 0.15) ul = 130.0;
+    if(seff >= 0.15 && seff < 0.20) ul = 130.0;
+    if(seff >= 0.20 && seff < 0.25) ul = 130.0;
   }
 
   else if( TString(SR).Contains("SRB") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 38.3;
-    if(seff >= 0.05 && seff < 0.10) ul = 39.3;
-    if(seff >= 0.10 && seff < 0.15) ul = 40.4;
-    if(seff >= 0.15 && seff < 0.20) ul = 42.1;
-    if(seff >= 0.20 && seff < 0.25) ul = 47.7;
+    if(seff >= 0.00 && seff < 0.05) ul = 83.0;
+    if(seff >= 0.05 && seff < 0.10) ul = 83.0;
+    if(seff >= 0.10 && seff < 0.15) ul = 83.0;
+    if(seff >= 0.15 && seff < 0.20) ul = 83.0;
+    if(seff >= 0.20 && seff < 0.25) ul = 83.0;
   }
 
   else{
@@ -649,19 +735,19 @@ float getExpectedLimit( float seff , string SR ){
   float ul = 9999.;
 
   if( TString(SR).Contains("SRA") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 27.9;
-    if(seff >= 0.05 && seff < 0.10) ul = 28.2;
-    if(seff >= 0.10 && seff < 0.15) ul = 28.8;
-    if(seff >= 0.15 && seff < 0.20) ul = 29.5;
-    if(seff >= 0.20 && seff < 0.25) ul = 32.4;
+    if(seff >= 0.00 && seff < 0.05) ul = 130.0;
+    if(seff >= 0.05 && seff < 0.10) ul = 130.0;
+    if(seff >= 0.10 && seff < 0.15) ul = 130.0;
+    if(seff >= 0.15 && seff < 0.20) ul = 130.0;
+    if(seff >= 0.20 && seff < 0.25) ul = 130.0;
   }
 
   else if( TString(SR).Contains("SRB") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 20.1;
-    if(seff >= 0.05 && seff < 0.10) ul = 22.2;
-    if(seff >= 0.10 && seff < 0.15) ul = 20.8;
-    if(seff >= 0.15 && seff < 0.20) ul = 21.4;
-    if(seff >= 0.20 && seff < 0.25) ul = 24.0;
+    if(seff >= 0.00 && seff < 0.05) ul = 83.0;
+    if(seff >= 0.05 && seff < 0.10) ul = 83.0;
+    if(seff >= 0.10 && seff < 0.15) ul = 83.0;
+    if(seff >= 0.15 && seff < 0.20) ul = 83.0;
+    if(seff >= 0.20 && seff < 0.25) ul = 83.0;
   }
 
   else{
@@ -699,3 +785,4 @@ float getExpectedLimit( float seff , string SR ){
 //   if(seff >= 0.25 && seff < 0.30) ul = 23.6;
 //   return ul;
 // }
+*/
