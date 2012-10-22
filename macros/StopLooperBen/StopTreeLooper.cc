@@ -359,420 +359,76 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // selection - 1 lepton 
       // Add iso track veto
       // Add b-tag
-      if ( passSingleLeptonSelection(tree, isData) && tree->npfjets30_>=4 )
+      if ( passSingleLeptonSelection(tree, isData) && tree->npfjets30_>=4 
+	   && passIsoTrkVeto(tree) 
+	   && tree->nbtagscsvm_>0 )
 	{
-	  float trigweight = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
-	  //default 
-	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag", 	    tag_kbin, flav_tag_sl, 150. );
-	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag,   	    tag_kbin, flav_tag_sl, 150. );
-	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+	  //this is the event weight including the trigger SFs
+	  evtweight *= isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
 
 	  //met > 50 GeV requirement 
 	  if ( t1metphicorr > 50. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met50",  	       tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50", 	       tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met100",  		tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100", 		tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) { 
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met150",  		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150", 		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met200",  		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200", 		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met250",  		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250", 		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met300",  		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300", 		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met350",  		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350", 		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) {
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met400",  		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400", 		tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	  }
 
-	}
+	    //this is where the code for selected events goes
 
-      //
-      // CR1 - single lepton + b-veto
-      //
+	    //horrible code to attempt to reconstruct the hadronic top following the ATLAS procedure
 
-      // selection - 1 lepton + iso track veto
-      // Add b-tag veto
-      if ( passOneLeptonSelection(tree, isData) )
-	{
+	    LorentzVector jets[6];
+	    jets[0] = tree->pfjet1_;
+	    jets[1] = tree->pfjet2_;
+	    jets[2] = tree->pfjet3_;
+	    jets[3] = tree->pfjet4_;
+	    jets[4] = tree->pfjet5_;
+	    jets[5] = tree->pfjet6_;
+	    
+	    //loop over all jet pairs and find the one with the smallest dR with inv mass > 60 GeV
 
-	  float trigweight = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
-	  //default 
-	  makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met50", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met100", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met150", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met200", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met250", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met300", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met350", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_prebveto_met400", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  
-	  if ( tree->nbtagscsvm_==0 ) {
-
-	    //default 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 50 GeV requirement 
-	    if ( t1metphicorr > 50. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 100 GeV requirement 
-	    if ( t1metphicorr > 100. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 150 GeV requirement 
-	    if ( t1metphicorr > 150. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 200 GeV requirement 
-	    if ( t1metphicorr > 200. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 250 GeV requirement 
-	    if ( t1metphicorr > 250. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 300 GeV requirement 
-	    if ( t1metphicorr > 300. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 350 GeV requirement 
-	    if ( t1metphicorr > 350. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 400 GeV requirement 
-	    if ( t1metphicorr > 400. ) 
-	      makeCR1Plots( tree, evtweight*trigweight, h_1d_cr1, "_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-
-	  }
-	}
-
-      //
-      // CR2 - Z-peak for yields and mT resolution studies
-      // 
-
-      // selection - SF dilepton, veto on isolated track in addition to 2 leptons, in z-peak
-      //      if ( passDileptonSelection(tree) && abs(tree->id1_) == abs(tree->id2_) )
-      if ( passTwoLeptonSelection(tree, isData) )
-	{
-	  float trigweight = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
-	  //invariant mass
-	  plot1D("h_z_dilmass"          +flav_tag_dl, tree->dilmass_, evtweight*trigweight, h_1d_z,  30 , 76 , 106);
-	  plot1D("h_z_dilmass"+tag_njets+flav_tag_dl, tree->dilmass_, evtweight*trigweight, h_1d_z,  30 , 76 , 106);
-	  
-	  if ( fabs( tree->dilmass_ - 91.) < 10. ) 
-	    {
-
-	      // if (tree->npfjets30_>8) 
-	      // 	cout<<"NJETS: "<<tree->npfjets30_<<" * dataset: "<<tree->dataset_
-	      // 	    <<" run: "<<tree->run_<<" lumi: "<<tree->lumi_<<" event: "<<tree->event_<<endl;
-	      
-	      //z peak plots
-	      plot1D("h_z_njets"    +flav_tag_dl, min(tree->npfjets30_,4),  evtweight*trigweight, h_1d_z, 5,0,5);
-	      plot1D("h_z_njets_all"+flav_tag_dl, min(tree->npfjets30_,9),  evtweight*trigweight, h_1d_z, 10, 0, 10);
-	      plot1D("h_z_nbjets"   +flav_tag_dl, min(tree->nbtagscsvm_,3), evtweight*trigweight, h_1d_z, 4, 0, 4);
-	      makeZPlots( tree, evtweight*trigweight, h_1d_z, "", tag_njets, flav_tag_dl );
-
-	      // Add b-tag veto 
-	      if ( tree->npfjets30_ >= 2 ) {
-
-		//find positive lepton
-		bool isfirstp = (tree->id1_ > 0) ? true : false;
-		
-		//recalculate met
-		float metx = t1metphicorr * cos( t1metphicorrphi );
-		float mety = t1metphicorr * sin( t1metphicorrphi );
-		
-		//recalculate the MET with the positive lepton
-		metx += isfirstp ? tree->lep1_.px() : tree->lep2_.px();
-		mety += isfirstp ? tree->lep1_.py() : tree->lep2_.py();
-		
-		float t1metphicorr_lep    = sqrt(metx*metx + mety*mety);
-		
-		//default 
-		makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		//pseudomet > 50 GeV requirement 
-		if ( t1metphicorr_lep > 50. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met50", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		//pseudomet > 100 GeV requirement 
-		if ( t1metphicorr_lep > 100. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met100", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		//pseudomet > 150 GeV requirement 
-		if ( t1metphicorr_lep > 150. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met150", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 200 GeV requirement 
-		if ( t1metphicorr_lep > 200. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met200", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 250 GeV requirement 
-		if ( t1metphicorr_lep > 250. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met250", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 300 GeV requirement 
-		if ( t1metphicorr_lep > 300. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met300", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 350 GeV requirement 
-		if ( t1metphicorr_lep > 350. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met350", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 400 GeV requirement 
-		if ( t1metphicorr_lep > 400. ) 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_prebveto_met400", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-
-		if ( tree->nbtagscsvm_==0) {
-		  //default 
-		  makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		  //pseudomet > 50 GeV requirement 
-		  if ( t1metphicorr_lep > 50. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_met50", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		  //pseudomet > 100 GeV requirement 
-		  if ( t1metphicorr_lep > 100. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_met100", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		  //pseudomet > 150 GeV requirement 
-		  if ( t1metphicorr_lep > 150. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_met150", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 200 GeV requirement 
-		  if ( t1metphicorr_lep > 200. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_met200", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 250 GeV requirement 
-		  if ( t1metphicorr_lep > 250. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2, "_met250", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 300 GeV requirement 
-		  if ( t1metphicorr_lep > 300. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2,"_met300", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 350 GeV requirement 
-		  if ( t1metphicorr_lep > 350. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2,"_met350", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 400 GeV requirement 
-		  if ( t1metphicorr_lep > 400. ) 
-		    makeCR2Plots( tree, evtweight*trigweight, h_1d_cr2,"_met400", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
+	    float mhadtop = 0.;
+	    int i_j1 = -9;
+	    int i_j2 = -9;
+	    LorentzVector hadW = LorentzVector();
+	    float mindRjj = 9999.;
+	    for ( int i_jet=0; i_jet<6; ++i_jet ) {
+	      if ( jets[i_jet].Pt()<20. ) continue;
+	      for ( int j_jet=i_jet+1; j_jet<6; ++j_jet ) {
+		if ( jets[j_jet].Pt()<20. ) continue;
+		float jjmass = (jets[i_jet]+jets[j_jet]).mass();
+		if (jjmass<60.) continue;
+		float dRjj = dRbetweenVectors(jets[i_jet],jets[j_jet]);
+		if (dRjj<mindRjj) {
+		  hadW = jets[i_jet]+jets[j_jet];
+		  mindRjj = dRjj;
+		  i_j1 = i_jet;
+		  i_j2 = j_jet;
 		}
 	      }
 	    }
-	}
 
-      //
-      // CR4 - ttbar dilepton sample with 2 good leptons
-      //
-      
-      // selection - all dilepton, z-veto for SF dilepton
-      // Add b-tag requirement
-      if ( passDileptonSelection(tree, isData) 
-	   && (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) 
-	   && tree->nbtagscsvm_>0 ) 
-	{
-	  float trigweight = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
+	    //look for third jet closest to hadronic W, with m(jjj) < 130 GeV
 
-	  //jet multiplicity distributions 
-	  //store in separate file since this is used for njet reweighting
-	  makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "", basic_flav_tag_dl);
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met50", basic_flav_tag_dl);
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met100", basic_flav_tag_dl);
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met150", basic_flav_tag_dl);	    
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met200", basic_flav_tag_dl);	    
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met250", basic_flav_tag_dl);	    
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met300", basic_flav_tag_dl);	    
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met350", basic_flav_tag_dl);	    
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) 
-	    makeNJPlots( tree, evtweight*trigweight, h_1d_nj, "_met400", basic_flav_tag_dl);	    
+	    if (mindRjj<9998.) {
+	      LorentzVector hadtop = LorentzVector();
+	      float mindRWj = 9999.;
+	      for ( int i_jet=0; i_jet<6; ++i_jet ) {
+	    	if ( jets[i_jet].Pt()<20. ) continue;
+	    	if (i_jet==i_j1 || i_jet==i_j2) continue;
+	    	float Wjmass = (jets[i_jet]+hadW).mass();
+	    	if (Wjmass<130.) continue;
+	    	float dRWj = dRbetweenVectors(hadW, jets[i_jet]);
+	    	if (dRWj<mindRWj) {
+	    	  hadtop = jets[i_jet]+hadW;
+	    	  mindRWj = dRWj;
+	    	  mhadtop = hadtop.mass();
+	    	}
+	      }
+	    } 
 
-	  if ( tree->npfjets30_ < 2 ) continue; 
-	  
-	  //default 
-	  makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "", tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met50", tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met100", tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met150", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met200", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met250", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met300", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met350", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) 
-	    makeCR4Plots( tree, evtweight*trigweight, h_1d_cr4, "_met400", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  
-	}
-
-      ////////////////////////////////////////////////////////////////////////////////////////////////////
-      // Ask for at least 2 jets from now on
-      if ( tree->npfjets30_ < 2 ) continue;
+	    //store
+	    plot1D("h_mhadtop",min(mhadtop, (float)499.99), evtweight, h_1d_sig, 50, 0, 500.);
 
 
-      //
-      // Sample before isolated track requirement - for fake rate of requirement
-      //
-
-      // selection - at least 1 lepton
-      // Add b-tag requirement
-      if ( passSingleLeptonSelection(tree, isData) 
-	   && tree->nbtagscsvm_>0 ) 
-	{
-	  float trigweight = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
-	  //inclusive sample
-	  //default 
-	  makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) 
-	    makeCR1Plots( tree, evtweight*trigweight, h_1d_cr5, "_preveto_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	}
-      
-      //
-      // CR5 - lepton + isolated track
-      //
-
-      // selection - lepton + isolated track
-      // Add b-tag requirement
-      if ( passLepPlusIsoTrkSelection(tree, isData) 
-	   && tree->nbtagscsvm_>0 ) 
-	{
-	  float trigweight = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
-	  //inclusive sample
-	  //default 
-	  makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_all_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-
-	  // sample with only 1 lepton - this is the true CR5
-	  if ( tree->ngoodlep_ == 1 ) {
-
-	    //default 
-	    makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 50 GeV requirement 
-	    if ( t1metphicorr > 50. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 100 GeV requirement 
-	    if ( t1metphicorr > 100. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 150 GeV requirement 
-	    if ( t1metphicorr > 150. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 200 GeV requirement 
-	    if ( t1metphicorr > 200. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 250 GeV requirement 
-	    if ( t1metphicorr > 250. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 300 GeV requirement 
-	    if ( t1metphicorr > 300. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 350 GeV requirement 
-	    if ( t1metphicorr > 350. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    //met > 400 GeV requirement 
-	    if ( t1metphicorr > 400. ) 
-	      makeCR5Plots( tree, evtweight*trigweight, h_1d_cr5, "_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-
-	  }
-	}
+	  } // end met cut
+	} // end signal sample selection
 
     } // end event loop
 
