@@ -35,6 +35,8 @@ class StopTreeLooper {
 	bool passDileptonSelection(const StopTree *sTree, bool isData);
 	bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);
 	bool passIsoTrkVeto(const StopTree *sTree);
+	float getHadronicTopMass(const StopTree *sTree);
+	bool passATLASSelection(const StopTree *sTree, bool isData);
 
 	//plotting
 	void makeSIGPlots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
@@ -72,7 +74,8 @@ class StopTreeLooper {
 	//for mt peak definition
 	float min_mtpeak;
 	float max_mtpeak; 
-
+	
+	TH1F* hyield;
 };
 
 #endif

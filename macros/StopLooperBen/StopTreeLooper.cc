@@ -18,6 +18,85 @@
 #include <set>
 
 
+float StopTreeLooper::getHadronicTopMass(const StopTree *tree){ 
+
+  LorentzVector jets[6];
+  jets[0] = tree->pfjet1_;
+  jets[1] = tree->pfjet2_;
+  jets[2] = tree->pfjet3_;
+  jets[3] = tree->pfjet4_;
+  jets[4] = tree->pfjet5_;
+  jets[5] = tree->pfjet6_;
+
+  //loop over all jet pairs and find the one with the smallest dR with inv mass > 60 GeV
+
+  float mhadtop = 0.;
+  int i_j1 = -9;
+  int i_j2 = -9;
+  LorentzVector hadW = LorentzVector();
+  float mindRjj = 9999.;
+  for ( int i_jet=0; i_jet<6; ++i_jet ) {
+    if ( jets[i_jet].Pt()<20. ) continue;
+    for ( int j_jet=i_jet+1; j_jet<6; ++j_jet ) {
+      if ( jets[j_jet].Pt()<20. ) continue;
+      float jjmass = (jets[i_jet]+jets[j_jet]).mass();
+      if (jjmass<60.) continue;
+      float dRjj = dRbetweenVectors(jets[i_jet],jets[j_jet]);
+      if (dRjj<mindRjj) {
+	hadW = jets[i_jet]+jets[j_jet];
+	mindRjj = dRjj;
+	i_j1 = i_jet;
+	i_j2 = j_jet;
+      }
+    }
+  }
+
+  //look for third jet closest to hadronic W, with m(jjj) < 130 GeV
+
+  if (mindRjj<9998.) {
+    LorentzVector hadtop = LorentzVector();
+    float mindRWj = 9999.;
+    for ( int i_jet=0; i_jet<6; ++i_jet ) {
+      if ( jets[i_jet].Pt()<20. ) continue;
+      if (i_jet==i_j1 || i_jet==i_j2) continue;
+      float Wjmass = (jets[i_jet]+hadW).mass();
+      if (Wjmass<130.) continue;
+      float dRWj = dRbetweenVectors(hadW, jets[i_jet]);
+      if (dRWj<mindRWj) {
+	hadtop = jets[i_jet]+hadW;
+	mindRWj = dRWj;
+	mhadtop = hadtop.mass();
+      }
+    }
+  } 
+
+  return mhadtop;
+
+}
+
+
+void makeYieldHistos( char* name , float mt , float met , float evtweight , std::map<string, TH1F*> & h_1d_sig ){
+
+  if( mt > 150 && met > 100 )  plot1D(Form("%s_SRA",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 150 )  plot1D(Form("%s_SRB",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 200 )  plot1D(Form("%s_SRC",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 250 )  plot1D(Form("%s_SRD",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 300 )  plot1D(Form("%s_SRE",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 350 )  plot1D(Form("%s_SRF",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 400 )  plot1D(Form("%s_SRG",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  
+}
+
+void makeATLASYieldHistos( char* name , float mt , float met , float y, float evtweight , std::map<string, TH1F*> & h_1d_sig ){
+
+  if( mt > 120 && met > 150 && y >  7.0 )  plot1D(Form("%s_ATLAS_SRA",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 150 && y >  9.0 )  plot1D(Form("%s_ATLAS_SRB",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 150 && y > 11.0 )  plot1D(Form("%s_ATLAS_SRC",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 130 && met > 225 && y > 11.0 )  plot1D(Form("%s_ATLAS_SRD",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 140 && met > 275 && y > 11.0 )  plot1D(Form("%s_ATLAS_SRE",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  
+}
+
 float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData ) 
 {
 
@@ -279,6 +358,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // 
 
       float evtweight = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
+
+      if (name.Contains("T2")) evtweight = tree->xsecsusy_ * (1000./50000.) * 9.708;
+
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( tree->nvtx_, h_vtx_wgt, isData );
 
@@ -313,6 +395,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	if ( tree->pfjet3_.Pt()>30. && dRbetweenVectors(tree->mclep2_, tree->pfjet3_) < 0.4 ) njets_corr--;
 	if ( tree->pfjet4_.Pt()>30. && dRbetweenVectors(tree->mclep2_, tree->pfjet4_) < 0.4 ) njets_corr--;
       } 
+
      //to make plots for the two Kfactor bins
      //note this is to be used for the case where njets>=4
      string tag_kbin = (njets_corr<4) ? "_K3" : "_K4";
@@ -348,13 +431,24 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //Apply the MET phi corrections to the type1 met ---- this will eventually be updated in the babies
       pair<float, float> p_t1metphicorr = 
 	getPhiCorrMET( tree->t1met10_, tree->t1met10phi_, tree->nvtx_, !isData);
-      t1metphicorr    = p_t1metphicorr.first;
-      t1metphicorrphi = p_t1metphicorr.second;
-      t1metphicorrmt  = getMT( tree->lep1_.Pt() , tree->lep1_.Phi() , t1metphicorr , t1metphicorrphi );  
+      t1metphicorr    = p_t1metphicorr.first;   // MET VARIABLE
+      t1metphicorrphi = p_t1metphicorr.second;  // MET PHI VARIABLE
+      t1metphicorrmt  = getMT( tree->lep1_.Pt() , tree->lep1_.Phi() , t1metphicorr , t1metphicorrphi ); // MT VARIABLE
 
       //
       // SIGNAL REGION - single lepton + b-tag
       //
+
+      if( passATLASSelection(tree,isData) ){
+	    
+	float met = t1metphicorr;
+	float mt  = t1metphicorrmt;
+	float ht  = tree->pfjet1_.pt() + tree->pfjet2_.pt() + tree->pfjet3_.pt() + tree->pfjet4_.pt();
+	float y   = met/sqrt(ht);
+
+	makeATLASYieldHistos("hyield",mt,met,y,evtweight,h_1d_sig);
+
+      }
 
       // selection - 1 lepton 
       // Add iso track veto
@@ -380,9 +474,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    jets[3] = tree->pfjet4_;
 	    jets[4] = tree->pfjet5_;
 	    jets[5] = tree->pfjet6_;
-	    
-	    //loop over all jet pairs and find the one with the smallest dR with inv mass > 60 GeV
 
+
+	    //loop over all jet pairs and find the one with the smallest dR with inv mass > 60 GeV
+	    /*
 	    float mhadtop = 0.;
 	    int i_j1 = -9;
 	    int i_j2 = -9;
@@ -422,9 +517,34 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    	}
 	      }
 	    } 
+	    */
+
+	    float mhadtop = getHadronicTopMass(tree);
+
+	    // hadronic top mass = mhadtop
 
 	    //store
 	    plot1D("h_mhadtop",min(mhadtop, (float)499.99), evtweight, h_1d_sig, 50, 0, 500.);
+	    
+	    float met = t1metphicorr;
+	    float mt  = t1metphicorrmt;
+
+	    //cout << "met " << met << " mt " << mt << endl;
+
+	    float dphi1 = getdphi( t1metphicorrphi , jets[0].phi() );
+	    float dphi2 = getdphi( t1metphicorrphi , jets[1].phi() );
+	    
+	    makeYieldHistos("hyield",mt,met,evtweight,h_1d_sig);
+
+	    if( dphi1 > 0.8 && dphi2 > 0.8 ){
+	      makeYieldHistos("hyield_dphi",mt,met,evtweight,h_1d_sig);
+	    }
+
+	    if( mhadtop > 130.0 && mhadtop < 205.0 ){
+	      makeYieldHistos("hyield_hadtop",mt,met,evtweight,h_1d_sig);
+	    }
+
+
 
 
 	  } // end met cut
@@ -645,6 +765,62 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isDat
     if ( fabs(sTree->lep1_.Eta() ) > 2.1)  return false;
 
   }
+
+  return true;
+
+}
+
+
+bool StopTreeLooper::passATLASSelection(const StopTree *sTree, bool isData) 
+{
+  //single lepton selection for 8 TeV 53 analysis
+
+  //exactly one lepton
+  if ( sTree->ngoodlep_ != 1 ) return false;
+  
+  //e-channel
+  if ( sTree->leptype_ == 0 ) {
+
+    //pass trigger if data - single electron
+    if ( isData && sTree->ele27wp80_ != 1 ) return false;
+    
+    // pt > 25 GeV, |eta| < 2.47
+    if ( sTree->lep1_.Pt() < 25 )          return false;
+    if ( fabs(sTree->lep1_.Eta() ) > 2.47) return false;
+    
+
+  }
+
+  //mu-channel
+  else if ( sTree->leptype_ == 1 ) {
+
+    //pass trigger if data - single muon
+    if ( isData && sTree->isomu24_ != 1 ) return false;
+
+    // pt > 20 GeV, |eta| < 2.4
+    if ( sTree->lep1_.Pt() < 20 )          return false;
+    if ( fabs(sTree->lep1_.Eta() ) > 2.4 ) return false;
+
+  }
+
+  // hadronic top mass reconstruction
+  float mhadtop = getHadronicTopMass(sTree);
+  if( mhadtop < 130.0 || mhadtop > 205.0 ) return false;
+  
+  // jet pt's
+  if( sTree->pfjet1_.pt() < 80.0 ) return false;
+  if( sTree->pfjet2_.pt() < 60.0 ) return false;
+  if( sTree->pfjet3_.pt() < 40.0 ) return false;
+  if( sTree->pfjet4_.pt() < 25.0 ) return false;
+
+  // >=1 b-tag
+  if( sTree->nbtagscsvm_ == 0 ) return false;
+
+  // dphi(jet,met)
+  float dphi1 = getdphi( t1metphicorrphi , sTree->pfjet1_.phi() );
+  float dphi2 = getdphi( t1metphicorrphi , sTree->pfjet1_.phi() );
+  if( dphi1 < 0.8 || dphi2 < 0.8 ) return false;
+
 
   return true;
 
