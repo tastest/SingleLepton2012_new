@@ -14,7 +14,7 @@
     // samples to run over
     //
  
-   char* path = "/home/users/vimartin/output/output_V00-01_05_2012";
+   char* path = "/home/users/vimartin/output/output_V00-01_05_2012_4jskim";
 
    const int NSAMPLES = 15;//17;
    char* sampletag[NSAMPLES] = {

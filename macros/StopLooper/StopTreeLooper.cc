@@ -491,9 +491,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // CR2 - Z-peak for yields and mT resolution studies
       // 
 
-      // selection - SF dilepton, in z-peak
+      // selection - SF dilepton, veto on isolated track in addition to 2 leptons, in z-peak
       //      if ( passDileptonSelection(tree) && abs(tree->id1_) == abs(tree->id2_) )
-      if ( passDileptonSelection(tree, isData) )
+      if ( passTwoLeptonSelection(tree, isData) )
 	{
 	  float trigweight = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
 	  //invariant mass
@@ -517,7 +517,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	      if ( tree->npfjets30_ >= 2 ) {
 
 		//find positive lepton
-		bool isfirstp = (tree->id1_ < 0) ? true : false;
+		bool isfirstp = (tree->id1_ > 0) ? true : false;
 		
 		//recalculate met
 		float metx = t1metphicorr * cos( t1metphicorrphi );
@@ -933,6 +933,19 @@ bool StopTreeLooper::passOneLeptonSelection(const StopTree *sTree, bool isData)
 
 }
 
+bool StopTreeLooper::passTwoLeptonSelection(const StopTree *sTree, bool isData) 
+{
+  //single lepton selection for 8 TeV 53 analysis
+  if ( !passDileptonSelection(sTree, isData) ) return false;
+
+  //apply isolated track veto in addition to 2 leptons
+  //default value for this one is -999
+  if ( sTree->trkpt10loose_ >0. && sTree->trkreliso10loose_ < 0.1 ) return false;
+
+  return true;
+
+}
+
 bool StopTreeLooper::passIsoTrkVeto(const StopTree *sTree) 
 {
 
@@ -1100,8 +1113,6 @@ void StopTreeLooper::makeCR2Plots( const StopTree *sTree, float evtweight, std::
 void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
 				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut ) 
 {
-
-  //binning for mT plots
   int nbins = 50;
   float h_xmin = 0.;
   float h_xmax = 500.;
@@ -1113,9 +1124,9 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   //default met
-  plot1D("h_cr4_met"+tag_selection                   +flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_met"+tag_selection+tag_njets         +flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr4_met"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr4_met"+tag_selection                   +flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
+  plot1D("h_cr4_met"+tag_selection+tag_njets         +flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
+  plot1D("h_cr4_met"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
   //leading lepton pt - enters mT calculation
   plot1D("h_cr4_leppt"+tag_selection                   +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_leppt"+tag_selection+tag_njets         +flav_tag_dl, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1134,6 +1145,11 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets         +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
+  //binning for mT plots
+  nbins = 30;
+  h_xmin = 0.;
+  h_xmax = 300.;
+  x_ovflw = h_xmax-0.001;
   plot1D("h_cr4_mt"+tag_selection                   +flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_mt"+tag_selection+tag_njets         +flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_mt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1159,7 +1175,6 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
 				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ) 
 {
 
-  //binning for mT plots
   int nbins = 50;
   float h_xmin = 0.;
   float h_xmax = 500.;
@@ -1171,9 +1186,9 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   //default met
-  plot1D("h_cr5_met"+tag_selection                   +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_met"+tag_selection+tag_njets         +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr5_met"+tag_selection+tag_njets+tag_kbin+flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr5_met"+tag_selection                   +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
+  plot1D("h_cr5_met"+tag_selection+tag_njets         +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
+  plot1D("h_cr5_met"+tag_selection+tag_njets+tag_kbin+flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
   //leading lepton pt - enters mT calculation
   plot1D("h_cr5_leppt"+tag_selection                   +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr5_leppt"+tag_selection+tag_njets         +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1188,6 +1203,11 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
+  //binning for mT plots
+  nbins = 30;
+  h_xmin = 0.;
+  h_xmax = 300.;
+  x_ovflw = h_xmax-0.001;
   plot1D("h_cr5_mt"+tag_selection                   +flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr5_mt"+tag_selection+tag_njets         +flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr5_mt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1213,7 +1233,6 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
 				   string tag_selection, string tag_kbin, string flav_tag, float mtcut ) 
 {
 
- //binning for mT plots
   int nbins = 50;
   float h_xmin = 0.;
   float h_xmax = 500.;
@@ -1225,8 +1244,8 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   
   //default met
-  plot1D("h_sig_met"+tag_selection         +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_sig_met"+tag_selection+tag_kbin+flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_sig_met"+tag_selection         +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50, h_xmax);
+  plot1D("h_sig_met"+tag_selection+tag_kbin+flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50, h_xmax);
   //lepton pt - enters mT calculation
   plot1D("h_sig_leppt"+tag_selection         +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_leppt"+tag_selection+tag_kbin+flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1235,6 +1254,11 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
   plot1D("h_sig_dphi_metlep"+tag_selection         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_sig_dphi_metlep"+tag_selection+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
+  //binning for mT plots
+  nbins = 30;
+  h_xmin = 0.;
+  h_xmax = 300.;
+  x_ovflw = h_xmax-0.001;
   plot1D("h_sig_mt"+tag_selection         +flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_mt"+tag_selection+tag_kbin+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_mt_count"+tag_selection         +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
@@ -1246,12 +1270,11 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
 				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ) 
 {
 
- //binning for mT plots
   int nbins = 50;
   float h_xmin = 0.;
   float h_xmax = 500.;
   float x_ovflw = h_xmax-0.001;
-  
+
   float mt_count = -1.;
   if ( t1metphicorrmt > min_mtpeak 
        && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
@@ -1260,9 +1283,9 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_njets"    +tag_selection+flav_tag, min(sTree->npfjets30_,4),  evtweight, h_1d, 5,0,5);
   plot1D("h_cr1_njets_all"+tag_selection+flav_tag, min(sTree->npfjets30_,9),  evtweight, h_1d, 10, 0, 10);
   //default met
-  plot1D("h_cr1_met"+tag_selection                   +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr1_met"+tag_selection+tag_njets         +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr1_met"+tag_selection+tag_njets+tag_kbin+flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr1_met"+tag_selection                   +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
+  plot1D("h_cr1_met"+tag_selection+tag_njets         +flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
+  plot1D("h_cr1_met"+tag_selection+tag_njets+tag_kbin+flav_tag, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins-5, 50., h_xmax);
   //lepton pt - enters mT calculation
   plot1D("h_cr1_leppt"+tag_selection                   +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr1_leppt"+tag_selection+tag_njets         +flav_tag, min(sTree->lep1_.Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1281,6 +1304,11 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //MT
+  //binning for mT plots
+  nbins = 30;
+  h_xmin = 0.;
+  h_xmax = 300.;
+  x_ovflw = h_xmax-0.001;
   plot1D("h_cr1_mt"+tag_selection                   +flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr1_mt"+tag_selection+tag_njets         +flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr1_mt"+tag_selection+tag_njets+tag_kbin+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
@@ -1305,9 +1333,9 @@ void StopTreeLooper::makeZPlots( const StopTree *sTree, float evtweight, std::ma
 				  string tag_selection, string tag_njets, string flav_tag ) 
 {
 
-  int nbins = 40;
+  int nbins = 30;
   float h_xmin = 0.;
-  float h_xmax = 400.;
+  float h_xmax = 300.;
   float x_ovflw = h_xmax-0.001;
 
   plot1D("h_z_met"+tag_selection+flav_tag, min(t1metphicorr,x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
