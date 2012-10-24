@@ -17,19 +17,25 @@
     //char* path = "/home/users/vimartin/output/output_V00-01_05_2012_4jskim";
     char* path = "/nfs-4/userdata/benhoob/StopBabies/output/output_V00-01_05_2012_4jskim_pt25";
 
-    const int NSAMPLES = 1; 
+    const int NSAMPLES = 15; 
     char* sampletag[NSAMPLES] = {
 
-     "singleleptontop"         // powheg tt->l+jets sample
-     //"ttlpdl"                // powheg tt->ll sample
-     //"wstitchjets",          // W+jets
-     //"rare",                 // rare
+      "T2tt_fullscan_400_0",
+      "T2tt_fullscan_250_0",
+      "T2tt_fullscan_300_100",
+      "T2tt_fullscan_500_0",
+      "T2tt_fullscan_400_100",
+      "T2tt_fullscan_450_0",
+      "T2tt_300_100",
+      "T2tt_300_50",
+      "T2tt_450_0",
+      "T2tt_350_0",
+      "T2tt_250_0",
+      "singleleptontop",         // powheg tt->l+jets sample
+      "ttlpdl",                  // powheg tt->ll sample
+      "wstitchjets",             // W+jets
+      "rare"                     // rare
 
-     // "T2tt_300_100",
-     // "T2tt_300_50",
-     // "T2tt_450_0",
-     // "T2tt_350_0",
-     // "T2tt_250_0"
 
      //      "ttlpsl",       // powheg tt->l+jets sample
      //      "triboson", 

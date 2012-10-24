@@ -97,6 +97,16 @@ void makeATLASYieldHistos( char* name , float mt , float met , float y, float ev
   
 }
 
+void makeATLASYieldHistos_NoMetSignificance( char* name , float mt , float met , float evtweight , std::map<string, TH1F*> & h_1d_sig ){
+
+  if( mt > 120 && met > 150 )  plot1D(Form("%s_ATLAS_SRA",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 150 )  plot1D(Form("%s_ATLAS_SRB",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 120 && met > 150 )  plot1D(Form("%s_ATLAS_SRC",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 130 && met > 225 )  plot1D(Form("%s_ATLAS_SRD",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  if( mt > 140 && met > 275 )  plot1D(Form("%s_ATLAS_SRE",name),0.5, evtweight, h_1d_sig, 1, 0, 1);
+  
+}
+
 float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData ) 
 {
 
@@ -439,21 +449,24 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // SIGNAL REGION - single lepton + b-tag
       //
 
-      if( passATLASSelection(tree,isData) ){
-	    
-	float met = t1metphicorr;
-	float mt  = t1metphicorrmt;
-	float ht  = tree->pfjet1_.pt() + tree->pfjet2_.pt() + tree->pfjet3_.pt() + tree->pfjet4_.pt();
-	float y   = met/sqrt(ht);
+      float met = t1metphicorr;
+      float mt  = t1metphicorrmt;
+      float ht  = tree->pfjet1_.pt() + tree->pfjet2_.pt() + tree->pfjet3_.pt() + tree->pfjet4_.pt();
+      float y   = met/sqrt(ht);
 
-	makeATLASYieldHistos("hyield",mt,met,y,evtweight,h_1d_sig);
-
+      if( passATLASSelection(tree,isData,true ,true ,true)  ){
+	makeATLASYieldHistos                  ("hyield"             ,mt,met,y,evtweight,h_1d_sig);
+	makeATLASYieldHistos_NoMetSignificance("hyield_noMetSig"    ,mt,met,  evtweight,h_1d_sig);
       }
+      if( passATLASSelection(tree,isData,false,true ,true)  )  makeATLASYieldHistos("hyield_nohadtop"    ,mt,met,y,evtweight,h_1d_sig);
+      if( passATLASSelection(tree,isData,true ,false,true)  )  makeATLASYieldHistos("hyield_nodphi"      ,mt,met,y,evtweight,h_1d_sig);
+      if( passATLASSelection(tree,isData,true ,true ,false) )  makeATLASYieldHistos("hyield_noisotrk"    ,mt,met,y,evtweight,h_1d_sig);
 
       // selection - 1 lepton 
       // Add iso track veto
       // Add b-tag
-      if ( passSingleLeptonSelection(tree, isData) && tree->npfjets30_>=4 
+      if ( passSingleLeptonSelection(tree, isData) 
+	   && tree->npfjets30_>=3 
 	   && passIsoTrkVeto(tree) 
 	   && tree->nbtagscsvm_>0 )
 	{
@@ -528,24 +541,33 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    
 	    float met = t1metphicorr;
 	    float mt  = t1metphicorrmt;
+	    float ht  = tree->pfjet1_.pt() + tree->pfjet2_.pt() + tree->pfjet3_.pt() + tree->pfjet4_.pt();
+	    float y   = met/sqrt(ht);
 
 	    //cout << "met " << met << " mt " << mt << endl;
 
 	    float dphi1 = getdphi( t1metphicorrphi , jets[0].phi() );
 	    float dphi2 = getdphi( t1metphicorrphi , jets[1].phi() );
 	    
-	    makeYieldHistos("hyield",mt,met,evtweight,h_1d_sig);
+	    if( tree->npfjets30_>=4 ){
 
-	    if( dphi1 > 0.8 && dphi2 > 0.8 ){
-	      makeYieldHistos("hyield_dphi",mt,met,evtweight,h_1d_sig);
+	      makeYieldHistos("hyield",mt,met,evtweight,h_1d_sig);
+
+	      makeATLASYieldHistos("hyieldCMS",mt,met,y,evtweight,h_1d_sig);
+	      
+	      if( dphi1 > 0.8 && dphi2 > 0.8 ){
+		makeYieldHistos("hyield_dphi",mt,met,evtweight,h_1d_sig);
+	      }
+	      
+	      if( mhadtop > 130.0 && mhadtop < 205.0 ){
+		makeYieldHistos("hyield_hadtop",mt,met,evtweight,h_1d_sig);
+	      }
+
 	    }
 
-	    if( mhadtop > 130.0 && mhadtop < 205.0 ){
-	      makeYieldHistos("hyield_hadtop",mt,met,evtweight,h_1d_sig);
+	    if( tree->pfjet1_.pt() > 80.0 && tree->pfjet2_.pt() > 60.0 && tree->pfjet3_.pt() > 40.0 && tree->pfjet4_.pt() > 25.0 ){
+	      makeYieldHistos("hyield_jets",mt,met,evtweight,h_1d_sig);
 	    }
-
-
-
 
 	  } // end met cut
 	} // end signal sample selection
@@ -771,13 +793,15 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isDat
 }
 
 
-bool StopTreeLooper::passATLASSelection(const StopTree *sTree, bool isData) 
+bool StopTreeLooper::passATLASSelection(const StopTree *sTree, bool isData, bool hadtopcut, bool dphicut, bool isotrkcut) 
 {
   //single lepton selection for 8 TeV 53 analysis
 
   //exactly one lepton
   if ( sTree->ngoodlep_ != 1 ) return false;
   
+  if( isotrkcut && !passIsoTrkVeto(sTree) ) return false;
+
   //e-channel
   if ( sTree->leptype_ == 0 ) {
 
@@ -805,7 +829,7 @@ bool StopTreeLooper::passATLASSelection(const StopTree *sTree, bool isData)
 
   // hadronic top mass reconstruction
   float mhadtop = getHadronicTopMass(sTree);
-  if( mhadtop < 130.0 || mhadtop > 205.0 ) return false;
+  if( hadtopcut && (mhadtop < 130.0 || mhadtop > 205.0) ) return false;
   
   // jet pt's
   if( sTree->pfjet1_.pt() < 80.0 ) return false;
@@ -818,8 +842,8 @@ bool StopTreeLooper::passATLASSelection(const StopTree *sTree, bool isData)
 
   // dphi(jet,met)
   float dphi1 = getdphi( t1metphicorrphi , sTree->pfjet1_.phi() );
-  float dphi2 = getdphi( t1metphicorrphi , sTree->pfjet1_.phi() );
-  if( dphi1 < 0.8 || dphi2 < 0.8 ) return false;
+  float dphi2 = getdphi( t1metphicorrphi , sTree->pfjet2_.phi() );
+  if( dphicut && (dphi1 < 0.8 || dphi2 < 0.8 ) ) return false;
 
 
   return true;

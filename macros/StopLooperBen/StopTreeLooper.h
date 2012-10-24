@@ -36,7 +36,7 @@ class StopTreeLooper {
 	bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);
 	bool passIsoTrkVeto(const StopTree *sTree);
 	float getHadronicTopMass(const StopTree *sTree);
-	bool passATLASSelection(const StopTree *sTree, bool isData);
+	bool passATLASSelection(const StopTree *sTree, bool isData,bool hadtopcut, bool dphicut, bool isotrkcut);
 
 	//plotting
 	void makeSIGPlots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
