@@ -1161,6 +1161,8 @@ int genLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescal
       t_        = 0;
       tbar_     = 0;
       ttbar_    = 0;
+      mcStop1_ = 0;   
+      mcStop2_ = 0;   
       b_     = 0;
       bbar_    = 0;
       mcid1_      = -1;
@@ -1233,6 +1235,12 @@ int genLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescal
 	    vttbar    += genps_p4().at(igen); 
 	    ntops++;
 	  }
+
+	  //store stop
+	  if ( id == 1000006)
+	    mcStop1_ = &(genps_p4().at(igen));   
+	  else if ( id == -1000006 )
+	    mcStop2_ = &(genps_p4().at(igen));   
 
 	  //store b
 	  if( id == 5 ){
@@ -2046,6 +2054,8 @@ void genLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t"         , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &t_   	);
   outTree->Branch("tbar"      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &tbar_   	);
   outTree->Branch("ttbar"     , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &ttbar_   	);
+  outTree->Branch("mcStop1"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &mcStop1_   );
+  outTree->Branch("mcStop2"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &mcStop2_   );
 
   outTree->Branch("b"         , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &b_   	);
   outTree->Branch("bbar"      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &bbar_   	);
