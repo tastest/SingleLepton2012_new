@@ -16,7 +16,7 @@ LIB = libgenLooper.so
 
 CORESOURCES = ../CORE/CMS2.cc ../CORE/utilities.cc ../CORE/ssSelections.cc ../CORE/electronSelections.cc ../CORE/electronSelectionsParameters.cc ../CORE/MITConversionUtilities.cc ../CORE/muonSelections.cc ../CORE/eventSelections.cc ../CORE/trackSelections.cc ../CORE/metSelections.cc ../CORE/jetSelections.cc ../CORE/photonSelections.cc ../CORE/triggerUtils.cc ../CORE/triggerSuperModel.cc ../CORE/mcSelections.cc ../CORE/susySelections.cc ../CORE/mcSUSYkfactor.cc ../CORE/SimpleFakeRate.cc ../Tools/goodrun.cc ../Tools/vtxreweight.cc ../Tools/msugraCrossSection.cc
 COREOBJECTS = $(CORESOURCES:.cc=.o) 
-CORELIB = libsingleLeptonCORE.so
+CORELIB = libgenCORE.so
 
 #FWLIB = libMiniFWLite.so
 FWLIB = ../Tools/MiniFWLite/libMiniFWLite.so
