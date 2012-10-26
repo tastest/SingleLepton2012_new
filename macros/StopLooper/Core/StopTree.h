@@ -54,6 +54,8 @@ class StopTree {
 	int           leptype_;
 	int           id1_;
 	int           id2_;
+	int           lep_t_id_;
+	int           lep_tbar_id_;
 	int           mcid1_;
 	int           mcid2_;
 	int           mcdecay2_;
@@ -119,7 +121,14 @@ class StopTree {
 	         
 	LorentzVector lep1_;
 	LorentzVector lep2_;
+	LorentzVector t_;
+	LorentzVector tbar_;
+	LorentzVector lep_t_;
+	LorentzVector lep_tbar_;
+	LorentzVector mclep1_;
 	LorentzVector mclep2_;
+	LorentzVector stop_t_;
+	LorentzVector stop_tbar_;
 	LorentzVector pfcand10_;
 	LorentzVector pfjet1_;
 	LorentzVector pfjet2_;
@@ -139,7 +148,7 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
- StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
+ StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
  //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
@@ -196,6 +205,8 @@ class StopTree {
 	    tree_->Branch("leptype", 		&leptype_, 		"leptype/I");	      	      
 	    tree_->Branch("id1", 		&id1_, 			"id1/I");	      	      
 	    tree_->Branch("id2", 		&id2_, 			"id2/I");	      	      
+	    tree_->Branch("lep_t_id", 		&lep_t_id_, 		"lep_t_id/I");	      	      
+	    tree_->Branch("lep_tbar_id", 		&lep_tbar_id_, 		"lep_tbar_id/I");	      	      
 	    tree_->Branch("mcid1", 		&mcid1_, 		"mcid1/I");	      	      
 	    tree_->Branch("mcid2", 		&mcid2_, 		"mcid2/I");	      	      
 	    tree_->Branch("mcdecay2", 		&mcdecay2_, 		"mcdecay2/I");	      	      
@@ -261,6 +272,13 @@ class StopTree {
 	    
             tree_->Branch("lep1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep1Ptr_);
             tree_->Branch("lep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep2Ptr_);
+            tree_->Branch("t",       "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &tPtr_);
+            tree_->Branch("tbar",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &tbarPtr_);
+            tree_->Branch("stop_t",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &stop_tPtr_);
+            tree_->Branch("stop_tbar",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &stop_tbarPtr_);
+            tree_->Branch("lep_t",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep_tPtr_);
+            tree_->Branch("lep_tbar",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep_tbarPtr_);
+            tree_->Branch("mclep1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &mclep1Ptr_);
             tree_->Branch("mclep2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &mclep2Ptr_);
             tree_->Branch("pfcand10","ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pfcand10Ptr_);
             tree_->Branch("pfjet1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet1Ptr_);
@@ -269,8 +287,8 @@ class StopTree {
             tree_->Branch("pfjet4",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet4Ptr_);
             tree_->Branch("pfjet5",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet5Ptr_);
             tree_->Branch("pfjet6",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet6Ptr_);
-            tree_->Branch("pflep1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep1Ptr_);
-            tree_->Branch("pflep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep2Ptr_);
+            tree_->Branch("pflep1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep1Ptr_);
+            tree_->Branch("pflep2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep2Ptr_);
              
         }
 
@@ -314,6 +332,8 @@ class StopTree {
 	    tree_->SetBranchAddress("leptype", 		  &leptype_);	      	      
 	    tree_->SetBranchAddress("id1", 		  &id1_);	      	      
 	    tree_->SetBranchAddress("id2", 		  &id2_);	      	      
+	    tree_->SetBranchAddress("lep_t_id", 		  &lep_t_id_);	      	      
+	    tree_->SetBranchAddress("lep_tbar_id", 		  &lep_tbar_id_);	      	      
 	    tree_->SetBranchAddress("mcid1", 		  &mcid1_);	      	      
 	    tree_->SetBranchAddress("mcid2", 		  &mcid2_);	      	      
 	    tree_->SetBranchAddress("mcdecay2", 	  &mcdecay2_);	      	      
@@ -379,6 +399,13 @@ class StopTree {
 
             tree_->SetBranchAddress("lep1",   		  &lep1Ptr_);
             tree_->SetBranchAddress("lep2",   		  &lep2Ptr_);
+            tree_->SetBranchAddress("t",   		  &tPtr_);
+            tree_->SetBranchAddress("tbar",   		  &tbarPtr_);
+            tree_->SetBranchAddress("stop_t",   	  &stop_tPtr_);
+            tree_->SetBranchAddress("stop_tbar",   	  &stop_tbarPtr_);
+            tree_->SetBranchAddress("lep_t",   	  &lep_tPtr_);
+            tree_->SetBranchAddress("lep_tbar",   	  &lep_tbarPtr_);
+            tree_->SetBranchAddress("mclep1",   	  &mclep1Ptr_);
             tree_->SetBranchAddress("mclep2",   	  &mclep2Ptr_);
             tree_->SetBranchAddress("pfcand10",   	  &pfcand10Ptr_);
             tree_->SetBranchAddress("pfjet1", 		  &jet1Ptr_);
@@ -403,6 +430,13 @@ class StopTree {
 
         LorentzVector *lep1Ptr_;
         LorentzVector *lep2Ptr_;
+        LorentzVector *tPtr_;
+        LorentzVector *tbarPtr_;
+        LorentzVector *stop_tPtr_;
+        LorentzVector *stop_tbarPtr_;
+        LorentzVector *lep_tPtr_;
+        LorentzVector *lep_tbarPtr_;
+        LorentzVector *mclep1Ptr_;
         LorentzVector *mclep2Ptr_;
         LorentzVector *pfcand10Ptr_;
         LorentzVector *jet1Ptr_;
@@ -451,6 +485,8 @@ StopTree::InitVariables(){
 	variables_.push_back(string("leptype"		));
 	variables_.push_back(string("id1"		));
 	variables_.push_back(string("id2"		));
+	variables_.push_back(string("lep_t_id"		));
+	variables_.push_back(string("lep_tbar_id"		));
 	variables_.push_back(string("mcid1"		));
 	variables_.push_back(string("mcid2"		));
 	variables_.push_back(string("mcdecay2"		));
@@ -516,6 +552,13 @@ StopTree::InitVariables(){
 
 	variables_.push_back(string("lep1"		));
 	variables_.push_back(string("lep2"		));
+	variables_.push_back(string("t"			));
+	variables_.push_back(string("tbar"		));
+	variables_.push_back(string("stop_t"		));
+	variables_.push_back(string("stop_tbar"		));
+	variables_.push_back(string("lep_t"		));
+	variables_.push_back(string("lep_tbar"		));
+	variables_.push_back(string("mclep1"		));
 	variables_.push_back(string("mclep2"		));
 	variables_.push_back(string("pfcand10"		));
 	variables_.push_back(string("pfjet1"		));
@@ -559,6 +602,8 @@ StopTree::InitVariables(){
     leptype_		= 999;
     id1_		= 999;
     id2_		= 999;
+    lep_t_id_		= 999;
+    lep_tbar_id_		= 999;
     mcid1_		= 999;
     mcid2_		= 999;
     mcdecay2_		= 999;
@@ -624,6 +669,13 @@ StopTree::InitVariables(){
 
     lep1_		= LorentzVector();
     lep2_		= LorentzVector();
+    t_			= LorentzVector();
+    tbar_		= LorentzVector();
+    stop_t_		= LorentzVector();
+    stop_tbar_		= LorentzVector();
+    lep_t_		= LorentzVector();
+    lep_tbar_		= LorentzVector();
+    mclep1_		= LorentzVector();
     mclep2_		= LorentzVector();
     pfcand10_		= LorentzVector();
     pfjet1_		= LorentzVector();
@@ -671,6 +723,8 @@ StopTree::Get(string value)
   if(value=="leptype" 		) { return this->leptype_;		}	      	      
   if(value=="id1" 		) { return this->id1_;			}	      	      
   if(value=="id2" 		) { return this->id2_;			}	      	      
+  if(value=="lep_t_id" 		) { return this->lep_t_id_;		}	      	      
+  if(value=="lep_tbar_id" 	) { return this->lep_tbar_id_;		}	      	      
   if(value=="mcid1" 		) { return this->mcid1_;		}	      	      
   if(value=="mcid2" 		) { return this->mcid2_;		}	      	      
   if(value=="mcdecay2" 		) { return this->mcdecay2_;		}	      	      
@@ -736,7 +790,7 @@ StopTree::Get(string value)
     
   /* if(value=="lep1"   		) { return this->lep1_;		} */
   /* if(value=="lep2"   		) { return this->lep2_;		} */
-  /* if(value=="mclep2"   		) { return this->mclep2_;	} */
+  /* if(value=="lep_tbar"   		) { return this->mclep2_;	} */
   /* if(value=="pfcand10"   		) { return this->pfcand10_;	} */
   /* if(value=="pfjet1" 		) { return this->pfjet1_;	} */
   /* if(value=="pfjet2" 		) { return this->pfjet2_;	} */
