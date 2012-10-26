@@ -531,6 +531,8 @@ void singleLeptonLooper::InitBaby(){
   // MC truth info
   mcid1_	= -1;
   mcid2_	= -1;
+  lep_t_id_	= -1;
+  lep_tbar_id_  = -1;
   mclep1_	=  0;
   mclep2_	=  0;
   mctaud1_      =  0;
@@ -1534,6 +1536,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       t_        = 0;
       tbar_     = 0;
       ttbar_    = 0;
+      lep_t_	= 0;   
+      lep_tbar_	= 0;   
+      stop_t_	= 0;   
+      stop_tbar_ = 0;   
 
       npartons_    =  0;
       nwzpartons_  = -9;
@@ -1587,6 +1593,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	  int id = cms2.genps_id().at(igen);
 	  int pid = abs( genps_id().at(igen) );
+	  int mothid = abs(genps_id_mother().at(igen));
 
 	  if( id == 6 ){
 	    t_         = &(genps_p4().at(igen));
@@ -1599,6 +1606,27 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    pttbar_    = genps_p4().at(igen).pt();
 	    vttbar    += genps_p4().at(igen); 
 	    ntops++;
+	  }
+
+	  //store stop
+	  if ( id == 1000006)
+	    stop_t_ = &(genps_p4().at(igen));   
+	  else if ( id == -1000006 )
+	    stop_tbar_ = &(genps_p4().at(igen));   
+
+
+	  //store daughter lepton
+	  if ( abs(mothid) == 24 && (abs(id) == 11 || abs(id) == 13 || abs(id) ==15)) {
+
+	    if (genps_id_mother().at(igen)>0) {
+	      // lept 1 is the particle 
+	      lep_t_id_ = genps_id().at(igen);
+	      lep_t_ = &(genps_p4().at(igen));
+	    } else {
+	      // lept 2 is the anti-particle
+	      lep_tbar_id_ = genps_id().at(igen);
+	      lep_tbar_ = &(genps_p4().at(igen));
+	    }
 	  }
 
 	  // store W or Z pT 
@@ -1624,7 +1652,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  if( !( pid==1 || pid==2 || pid==3 || pid==4 || pid==5 || pid==6 || pid == 21 ) ) continue;
 
 	  // require mother is not a top or W
-	  int mothid = abs(genps_id_mother().at(igen));
 	  if( mothid == 6 || mothid == 24) continue;
 
 	  // found additional parton
@@ -4004,7 +4031,12 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t"         , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &t_   	);
   outTree->Branch("tbar"      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &tbar_   	);
   outTree->Branch("ttbar"     , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &ttbar_   	);
-
+  outTree->Branch("lep_t"     , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &lep_t_   	);
+  outTree->Branch("lep_tbar"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &lep_tbar_  );
+  outTree->Branch("stop_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_t_   	);
+  outTree->Branch("stop_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_tbar_ );
+  outTree->Branch("lep_t_id",            &lep_t_id_,            "lep_t_id/I");  
+  outTree->Branch("lep_tbar_id",         &lep_tbar_id_,         "lep_tbar_id/I");  
 
 }
 

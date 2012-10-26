@@ -106,6 +106,8 @@ class singleLeptonLooper
 	// MC truth lepton info
 	Int_t   mcid1_;    
 	Int_t   mcid2_;    
+	Int_t   lep_t_id_;
+	Int_t   lep_tbar_id_;
 	Int_t	mcdecay1_; 
 	Int_t   mcdecay2_; 
 	Int_t	mcndec1_; 
@@ -298,6 +300,10 @@ class singleLeptonLooper
 	// assorted p4's
 	LorentzVector*  t_;   
 	LorentzVector*  tbar_;   
+	LorentzVector*  lep_t_;   
+	LorentzVector*  lep_tbar_;   
+	LorentzVector*  stop_t_;   
+	LorentzVector*  stop_tbar_;   
 	LorentzVector*  ttbar_;   
 	LorentzVector*  mlep_;   
 	LorentzVector*  mclep1_;   
