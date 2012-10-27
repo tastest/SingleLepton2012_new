@@ -26,139 +26,6 @@
 #include <iomanip>
 #include "upperLimits.C"
 
-//-------------------------------------------
-// THING TO ADD
-//-------------------------------------------
-/*
-
-2) b-tagging uncertanties
-
-*/
-
-TGraph* getGraph(char* sample, char* type, string SR){
-
-  float x[20];
-  float y[20];
-  int   npoints = -1;
-
-  if( TString(sample).Contains("T2tt") ){
-
-    if( TString(SR).Contains("SRA") ){
-
-      // T2tt, SRA, observed
-      if( TString(type).Contains("observed") ){
-	x[0] =  337.5;  y[0] = 37.5;
-	x[1] =  337.5;  y[1] = 62.5;
-	x[2] =  312.5;  y[2] = 87.5;
-	x[3] =  287.5;  y[3] = 87.5;
-	x[4] =  262.5;  y[4] = 62.5;
-	x[5] =  262.5;  y[5] = 37.5;
-	npoints = 6;
-      }
-
-      // T2tt, SRA, expected
-      else if( TString(type).Contains("expected") ){
-	x[0] =  337.5;  y[0] = 37.5;
-	x[1] =  337.5;  y[1] = 75.0;
-	x[2] =  325.0;  y[2] = 87.5;
-	x[3] =  287.5;  y[3] = 87.5;
-	x[4] =  237.5;  y[4] = 62.5;
-	x[5] =  237.5;  y[5] = 37.5;
-	npoints = 6;
-      }
-    }
-     
-    else if( TString(SR).Contains("SRB") ){
-
-      // T2tt, SRB, observed
-      if( TString(type).Contains("observed") ){
-	x[0] =  0.0;  y[0] = 0.0;
-	npoints = 1;
-      }
-
-      // T2tt, SRB, expected
-      else if( TString(type).Contains("expected") ){
-	x[0] =  337.5;  y[0] = 37.5;
-	x[1] =  337.5;  y[1] = 75.0;
-	x[2] =  325.0;  y[2] = 87.5;
-	x[3] =  287.5;  y[3] = 87.5;
-	x[4] =  262.5;  y[4] = 62.5;
-	x[5] =  262.5;  y[5] = 37.5;
-	npoints = 6;
-      }
-
-    }
-
-    else{
-      cout << "ERROR! unrecognized SR " << SR << endl;
-      exit(0);
-    }
-
-  }
-
-  if( TString(sample).Contains("T2bw") ){
-
-    if( TString(SR).Contains("SRA") ){
-
-      // T2bw, SRA, observed
-      if( TString(type).Contains("observed") ){
-	x[0] =  375;  y[0] =  25;
-	x[1] =  375;  y[1] =  75;
-	x[2] =  275;  y[2] = 125;
-	x[3] =  225;  y[3] = 125;
-	x[4] =  175;  y[4] =  75;
-	x[5] =  175;  y[5] =  25;
-	npoints = 6;
-      }
-
-      // T2bw, SRA, expected
-      else if( TString(type).Contains("expected") ){
-	x[0] =  375;  y[0] =  25;
-	x[1] =  375;  y[1] =  75;
-	x[2] =  325;  y[2] = 125;
-	x[3] =  225;  y[3] = 125;
-	x[4] =  175;  y[4] =  75;
-	x[5] =  175;  y[5] =  25;
-	npoints = 6;
-      }
-    }
-     
-    else if( TString(SR).Contains("SRB") ){
-
-      // T2bw, SRB, observed
-      if( TString(type).Contains("observed") ){
-	x[0] =  0.0;  y[0] = 0.0;
-	npoints = 1;
-      }
-
-      // T2bw, SRB, expected
-      else if( TString(type).Contains("expected") ){
-	x[0] =  375;  y[0] =  25;
-	x[1] =  375;  y[1] =  75;
-	x[2] =  275;  y[2] = 125;
-	x[3] =  250;  y[3] = 125;
-	x[4] =  225;  y[4] = 100;
-	x[5] =  225;  y[5] =  25;
-	npoints = 6;
-      }
-
-    }
-
-    else{
-      cout << "ERROR! unrecognized SR " << SR << endl;
-      exit(0);
-    }
-
-  }
-
-  TGraph *gr = new TGraph(npoints,x,y);
-  return gr;
-}
-
-
-//float getObservedLimit( float seff , string SR );
-//float getExpectedLimit( float seff , string SR );
-
 using namespace std;
 
 void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
@@ -242,7 +109,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCut btag1  ("nbtagscsvm>=1");
   TCut isotrk ("pfcandpt10 > 9998. || pfcandiso10 > 0.1");
 
-  TCut weight("sltrigweight * 0.98"); // trigger efficiency X btagging SF
+  TCut weight("sltrigweight * 0.98 * 1.45"); // trigger efficiency X btagging SF
+  //TCut weight("sltrigweight * 0.98"); // trigger efficiency X btagging SF
+  //TCut weight("1"); // no per-event weights (for Maria comparison)
 
   TCut presel;
   presel += rho;
@@ -282,12 +151,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   vector<int>     cuts;
 
   sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  cuts.push_back(1);
-  // sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  cuts.push_back(1);
-  // sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  cuts.push_back(1);
-  // sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  cuts.push_back(1);
-  // sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  cuts.push_back(1);
-  // sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  cuts.push_back(1);
-  // sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  cuts.push_back(1);
 
   const unsigned int nsig = sigcuts.size();
 
@@ -502,18 +371,29 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCanvas* can[nsig];
   TCanvas* can_exclusion[nsig];
 
+  TGraph* gr[nsig];
+  TGraph* gr_exp[nsig];
+  TGraph* gr_expp1[nsig];
+  TGraph* gr_expm1[nsig];
+
+
   for( unsigned int i = 0 ; i < nsig ; ++i ){
 
     //TGraph *gr     = getGraph( sample , "observed" , signames.at(i) );
     //TGraph *gr_exp = getGraph( sample , "expected" , signames.at(i) );
 
-    TGraph* gr      = getRefXsecGraph(hxsec[i]     , "T2tt", 1.0);
-    TGraph* gr_exp  = getRefXsecGraph(hxsec_exp[i] , "T2tt", 1.0);
+    gr[i]      = getRefXsecGraph(hxsec[i]     , "T2tt", 1.0);
+    gr_exp[i]  = getRefXsecGraph(hxsec_exp[i] , "T2tt", 1.0);
 
-    gr->SetLineWidth(4);
-    gr_exp->SetLineWidth(4);
-    gr_exp->SetLineStyle(2);
-  
+    gr[i]->SetLineWidth(3);
+    gr_exp[i]->SetLineWidth(3);
+    gr_exp[i]->SetLineStyle(2);
+
+    gr[i]->SetName(Form("gr_%i",i));
+    gr_exp[i]->SetName(Form("gr_exp_%i",i));
+    gr[i]->SetTitle(Form("gr_%i",i));
+    gr_exp[i]->SetTitle(Form("gr_exp_%i",i));
+
     //can[i] = new TCanvas(Form("can_%i",i),Form("can_%i",i),1200,600);
     //can[i]->Divide(2,1);
     //can[i] = new TCanvas(Form("can_%i",i),Form("can_%i",i),1800,600);
@@ -568,12 +448,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hxsec[i]->GetXaxis()->SetRangeUser(200,700);
     hxsec[i]->GetYaxis()->SetRangeUser(0,600);
 
-    gr->Draw("same");
-    gr_exp->Draw("same");
+    gr[i]->Draw("same");
+    gr_exp[i]->Draw("same");
 
     TLegend *leg = new TLegend(0.2,0.6,0.4,0.75);
-    leg->AddEntry(gr,    "observed" ,"l");
-    leg->AddEntry(gr_exp,"expected" ,"l");
+    leg->AddEntry(gr[i],    "observed" ,"l");
+    leg->AddEntry(gr_exp[i],"expected" ,"l");
     leg->SetFillColor(0);
     leg->SetBorderSize(0);
     leg->Draw();
@@ -614,7 +494,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hexcl[i]->GetXaxis()->SetTitle("#tilde{t} mass (GeV)");
     hexcl[i]->GetZaxis()->SetTitle("observed excluded points");
     hexcl[i]->Draw("colz");
-    gr->Draw("l");
+    gr[i]->Draw("l");
 
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
@@ -634,7 +514,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hexcl_exp[i]->GetXaxis()->SetTitle("#tilde{t} mass (GeV)");
     hexcl_exp[i]->GetZaxis()->SetTitle("expected excluded points");
     hexcl_exp[i]->Draw("colz");
-    gr_exp->Draw("l");
+    gr_exp[i]->Draw("l");
 
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
@@ -655,9 +535,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     */
 
     if( print ){
-      can[i]->Print(Form("../../plots/%s_%s.pdf",sample,labels.at(i).c_str()));
-      //can[i]->Print(Form("../plots/%s.eps",labels.at(i).c_str()));
-      //gROOT->ProcessLine(Form(".! ps2pdf ../plots/%s.eps  ../plots/%s.pdf",labels.at(i).c_str(),labels.at(i).c_str()));
+      can[i]->          Print(Form("../../plots/%s_%s.pdf"       ,sample,labels.at(i).c_str()));
+      can_exclusion[i]->Print(Form("../../plots/%s_%s_points.pdf",sample,labels.at(i).c_str()));
     }
 
     int bin = heff[i]->FindBin(300,50);
@@ -686,103 +565,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hexcl_expm1[i]->Write();
     heff[i]->Write();
     hjes[i]->Write();
+    gr[i]->Write();
+    gr_exp[i]->Write();
   }
   outfile->Close();
 
 }
-
-/*
-//-----------------------------------------
-// the following UL's correspdond to:
-// SRA: observed 116, predicted 112.7 8.3% uncertainty
-// SRB: observed  79, predicted 58.75 9.1% uncertainty
-// predicted bkg  = 116, 10% uncertainty
-//-----------------------------------------
-
-float getObservedLimit( float seff , string SR ){
-  float ul = 9999.;
-
-  if( TString(SR).Contains("SRA") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 130.0;
-    if(seff >= 0.05 && seff < 0.10) ul = 130.0;
-    if(seff >= 0.10 && seff < 0.15) ul = 130.0;
-    if(seff >= 0.15 && seff < 0.20) ul = 130.0;
-    if(seff >= 0.20 && seff < 0.25) ul = 130.0;
-  }
-
-  else if( TString(SR).Contains("SRB") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 83.0;
-    if(seff >= 0.05 && seff < 0.10) ul = 83.0;
-    if(seff >= 0.10 && seff < 0.15) ul = 83.0;
-    if(seff >= 0.15 && seff < 0.20) ul = 83.0;
-    if(seff >= 0.20 && seff < 0.25) ul = 83.0;
-  }
-
-  else{
-    cout << "ERROR! unrecognized SR name " << SR << endl;
-    exit(0);
-  }
-
-  if( ul > 1000 ){
-    cout << "WARNING: signal efficiency uncertainty " << seff << ", returning ul 9999" << endl;
-  }
-
-  return ul;
-}
-
-
-float getExpectedLimit( float seff , string SR ){
-  float ul = 9999.;
-
-  if( TString(SR).Contains("SRA") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 130.0;
-    if(seff >= 0.05 && seff < 0.10) ul = 130.0;
-    if(seff >= 0.10 && seff < 0.15) ul = 130.0;
-    if(seff >= 0.15 && seff < 0.20) ul = 130.0;
-    if(seff >= 0.20 && seff < 0.25) ul = 130.0;
-  }
-
-  else if( TString(SR).Contains("SRB") ){
-    if(seff >= 0.00 && seff < 0.05) ul = 83.0;
-    if(seff >= 0.05 && seff < 0.10) ul = 83.0;
-    if(seff >= 0.10 && seff < 0.15) ul = 83.0;
-    if(seff >= 0.15 && seff < 0.20) ul = 83.0;
-    if(seff >= 0.20 && seff < 0.25) ul = 83.0;
-  }
-
-  else{
-    cout << "ERROR! unrecognized SR name " << SR << endl;
-    exit(0);
-  }
-
-  if( ul > 1000 ){
-    cout << "WARNING: signal efficiency uncertainty " << seff << ", returning ul 9999" << endl;
-  }
-
-  return ul;
-}
-
-
-// float getExpectedP1UpperLimit( float seff ){
-//   float ul = 9999.;
-//   if(seff >= 0.00 && seff < 0.05) ul = 41.5;
-//   if(seff >= 0.05 && seff < 0.10) ul = 42.7;
-//   if(seff >= 0.10 && seff < 0.15) ul = 44.3;
-//   if(seff >= 0.15 && seff < 0.20) ul = 46.2;
-//   if(seff >= 0.20 && seff < 0.25) ul = 54.3;
-//   if(seff >= 0.25 && seff < 0.30) ul = 51.3;
-//   return ul;
-// }
-
-
-// float getExpectedM1UpperLimit( float seff ){
-//   float ul = 9999.;
-//   if(seff >= 0.00 && seff < 0.05) ul = 21.6;
-//   if(seff >= 0.05 && seff < 0.10) ul = 21.9;
-//   if(seff >= 0.10 && seff < 0.15) ul = 22.4;
-//   if(seff >= 0.15 && seff < 0.20) ul = 22.7;
-//   if(seff >= 0.20 && seff < 0.25) ul = 24.1;
-//   if(seff >= 0.25 && seff < 0.30) ul = 23.6;
-//   return ul;
-// }
-*/
