@@ -92,6 +92,8 @@ void smoothHist(TH2F* h){
   for(int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ ){
     for(int jbin = 1 ; jbin <= h->GetYaxis()->GetNbins() ; jbin++ ){
 
+      if( h->GetXaxis()->GetBinCenter(ibin) > 620.0 ) continue;
+
       float val   = h->GetBinContent(ibin  ,jbin);
       float valup = h->GetBinContent(ibin+1,jbin);
       float valdn = h->GetBinContent(ibin-1,jbin);
@@ -124,7 +126,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   char* outfilename = "";
   char* label       = "";
   float xaxismin    = 0;
-  float yaxismax    = 400;
+  float yaxismax    = 250.0;
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #chi_{1}^{0}";
@@ -295,6 +297,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   // TGraph* gr_obsp1  = getRefXsecGraph(hxsec_best       , "T2tt", 1.15);
   // TGraph* gr_obsm1  = getRefXsecGraph(hxsec_best       , "T2tt", 0.85);
 
+
   TGraph* gr       = new TGraph();
   TGraph* gr_exp   = new TGraph();
   TGraph* gr_expp1 = new TGraph();
@@ -302,12 +305,22 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   TGraph* gr_obsp1 = new TGraph();
   TGraph* gr_obsm1 = new TGraph();
 
-  gr       = T2tt_observed();
-  gr_exp   = T2tt_expected();
-  gr_expp1 = T2tt_expectedP1();
-  gr_expm1 = T2tt_expectedM1();
-  gr_obsp1 = T2tt_observedP1();
-  gr_obsm1 = T2tt_observedM1();
+  if( TString(sample).Contains("T2tt") ){
+    gr       = T2tt_observed();
+    gr_exp   = T2tt_expected();
+    gr_expp1 = T2tt_expectedP1();
+    gr_expm1 = T2tt_expectedM1();
+    gr_obsp1 = T2tt_observedP1();
+    gr_obsm1 = T2tt_observedM1();
+  }
+  else if( TString(sample).Contains("T2bw") && x==75 ){
+    gr       = T2bw_x75_observed();
+    gr_exp   = T2bw_x75_expected();
+    gr_expp1 = T2bw_x75_expectedP1();
+    gr_expm1 = T2bw_x75_expectedM1();
+    gr_obsp1 = T2bw_x75_observedP1();
+    gr_obsm1 = T2bw_x75_observedM1();
+  }
 
   gr->SetLineWidth(6);
 
@@ -366,13 +379,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->DrawLatex(0.19,0.79,"unpolarized top quarks");
   */
   t->SetTextSize(0.035);
-  t->DrawLatex(0.19,0.79,"unpolarized top quarks");
+  t->DrawLatex(0.18,0.79,"unpolarized top quarks");
+  t->DrawLatex(0.18,0.84,label);
   t->SetTextSize(0.04);
-  t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
+  t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
   t->DrawLatex(0.55,0.80,"Observed #pm1#sigma^{theory}");
   t->DrawLatex(0.55,0.75,"Expected #pm1#sigma");
-  t->DrawLatex(0.19,0.84,label);
-
 
 
 
@@ -387,6 +399,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   float yspace1 =     5;
   float yspace2 =    17;
 
+  if( TString(sample).Contains("T2bw") && x==75 ) xoffset -= 30.0;
+  
   // median expected
   //TLine *line22 = new TLine(xaxismin+xoffset+25, 310-yoffset, xaxismin+xoffset+65, 310-yoffset);
   TLine *line22 = new TLine(xoffset,yoffset,xoffset+length,yoffset);
@@ -556,7 +570,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetGridy();
   hexcl->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl->GetXaxis()->SetRangeUser(200,600);
+  hexcl->GetXaxis()->SetRangeUser(xaxismin,600);
   hexcl->GetYaxis()->SetRangeUser(0,200);
   hexcl->Draw("colz");
   gr->Draw("lp");
@@ -567,7 +581,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetGridy();
   hexcl_obsp1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_obsp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_obsp1->GetXaxis()->SetRangeUser(200,600);
+  hexcl_obsp1->GetXaxis()->SetRangeUser(xaxismin,600);
   hexcl_obsp1->GetYaxis()->SetRangeUser(0,200);
   hexcl_obsp1->Draw("colz");
   gr_obsp1->Draw("lp");
@@ -578,7 +592,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetGridy();
   hexcl_obsm1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_obsm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_obsm1->GetXaxis()->SetRangeUser(200,600);
+  hexcl_obsm1->GetXaxis()->SetRangeUser(xaxismin,600);
   hexcl_obsm1->GetYaxis()->SetRangeUser(0,200);
   hexcl_obsm1->Draw("colz");
   gr_obsm1->Draw("lp");
@@ -589,7 +603,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetGridy();
   hexcl_exp->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_exp->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_exp->GetXaxis()->SetRangeUser(200,600);
+  hexcl_exp->GetXaxis()->SetRangeUser(xaxismin,600);
   hexcl_exp->GetYaxis()->SetRangeUser(0,200);
   hexcl_exp->Draw("colz");
   gr_exp->Draw("lp");
@@ -600,7 +614,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetGridy();
   hexcl_expp1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_expp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_expp1->GetXaxis()->SetRangeUser(200,600);
+  hexcl_expp1->GetXaxis()->SetRangeUser(xaxismin,600);
   hexcl_expp1->GetYaxis()->SetRangeUser(0,200);
   hexcl_expp1->Draw("colz");
   gr_expp1->Draw("lp");
@@ -611,7 +625,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetGridy();
   hexcl_expm1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_expm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_expm1->GetXaxis()->SetRangeUser(200,600);
+  hexcl_expm1->GetXaxis()->SetRangeUser(xaxismin,600);
   hexcl_expm1->GetYaxis()->SetRangeUser(0,200);
   hexcl_expm1->Draw("colz");
   gr_expm1->Draw("lp");
