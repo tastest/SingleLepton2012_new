@@ -3,10 +3,10 @@ TGraph* T2tt_observed(){
    float x[25];
    float y[25];
    x[i] = 235; y[i++]=0;
-   x[i] = 235; y[i++]=15;
+   x[i] = 240; y[i++]=15;
    x[i] = 245; y[i++]=35;
    x[i] = 255; y[i++]=50;
-   x[i] = 265; y[i++]=55;
+   x[i] = 265; y[i++]=60;
    x[i] = 275; y[i++]=65;
    x[i] = 285; y[i++]=75;
    x[i] = 295; y[i++]=85;
@@ -442,3 +442,138 @@ TGraph* T2bw_x75_expectedM1(){
    return gr;
 }
 
+
+TGraph* T2bw_x50_observed(){
+   int i = 0;
+   float x[15];
+   float y[15];
+   x[i] = 245; y[i++]=0;
+   x[i] = 245; y[i++]=45;
+   x[i] = 255; y[i++]=50;
+   x[i] = 265; y[i++]=55;
+   x[i] = 275; y[i++]=75;
+   x[i] = 285; y[i++]=80;
+   x[i] = 295; y[i++]=85;
+   x[i] = 305; y[i++]=90;
+   x[i] = 315; y[i++]=95;
+   x[i] = 325; y[i++]=95;
+   x[i] = 335; y[i++]=95;
+   x[i] = 345; y[i++]=90;
+   x[i] = 355; y[i++]=85;
+   x[i] = 365; y[i++]=55;
+   x[i] = 360; y[i++]=0;
+   TGraph *gr = new TGraph(15,x,y);
+   return gr;
+}
+
+
+TGraph* T2bw_x50_observedP1(){
+
+   int i = 0;
+   float x[20];
+   float y[20];
+   x[i] = 235; y[i++]=0;
+   x[i] = 235; y[i++]=25;
+   x[i] = 245; y[i++]=45;
+   x[i] = 255; y[i++]=75;
+   x[i] = 265; y[i++]=85;
+   x[i] = 275; y[i++]=85;
+   x[i] = 285; y[i++]=85;
+   x[i] = 295; y[i++]=95;
+   x[i] = 305; y[i++]=95;
+   x[i] = 315; y[i++]=105;
+   x[i] = 325; y[i++]=105;
+   x[i] = 335; y[i++]=115;
+   x[i] = 345; y[i++]=105;
+   x[i] = 355; y[i++]=105;
+   x[i] = 365; y[i++]=105;
+   x[i] = 375; y[i++]=85;
+   x[i] = 385; y[i++]=85;
+   x[i] = 395; y[i++]=75;
+   x[i] = 405; y[i++]=35;
+   x[i] = 375; y[i++]=0;
+   TGraph *gr = new TGraph(20,x,y);
+   return gr;
+}
+
+
+
+TGraph* T2bw_x50_observedM1(){
+
+   int i = 0;
+   float x[10];
+   float y[10];
+   x[i] = 265; y[i++]=45;
+   x[i] = 275; y[i++]=55;
+   x[i] = 285; y[i++]=65;
+   x[i] = 295; y[i++]=75;
+   x[i] = 305; y[i++]=65;
+   x[i] = 315; y[i++]=85;
+   x[i] = 325; y[i++]=75;
+   x[i] = 335; y[i++]=75;
+   x[i] = 345; y[i++]=65;
+   x[i] = 355; y[i++]=0;
+   TGraph *gr = new TGraph(10,x,y);
+   return gr;
+}
+
+
+
+TGraph* T2bw_x50_expected(){
+
+   int i = 0;
+   float x[7];
+   float y[7];
+   x[i] = 265; y[i++]=25;
+   x[i] = 275; y[i++]=45;
+   x[i] = 285; y[i++]=65;
+   x[i] = 295; y[i++]=65;
+   x[i] = 305; y[i++]=55;
+   x[i] = 315; y[i++]=75;
+   x[i] = 325; y[i++]=0;
+   TGraph *gr = new TGraph(7,x,y);
+   return gr;
+}
+
+
+
+TGraph* T2bw_x50_expectedP1(){
+
+   int i = 0;
+   float x[1];
+   float y[1];
+   x[i] = 265; y[i++]=25;
+   TGraph *gr = new TGraph(1,x,y);
+   return gr;
+}
+
+
+
+TGraph* T2bw_x50_expectedM1(){
+
+   int i = 0;
+   float x[20];
+   float y[20];
+   x[i] = 235; y[i++]=15;
+   x[i] = 245; y[i++]=45;
+   x[i] = 255; y[i++]=65;
+   x[i] = 265; y[i++]=85;
+   x[i] = 275; y[i++]=75;
+   x[i] = 285; y[i++]=75;
+   x[i] = 295; y[i++]=95;
+   x[i] = 305; y[i++]=95;
+   x[i] = 315; y[i++]=105;
+   x[i] = 325; y[i++]=105;
+   x[i] = 335; y[i++]=105;
+   x[i] = 345; y[i++]=105;
+   x[i] = 355; y[i++]=105;
+   x[i] = 365; y[i++]=105;
+   x[i] = 375; y[i++]=95;
+   x[i] = 385; y[i++]=105;
+   x[i] = 395; y[i++]=95;
+   x[i] = 405; y[i++]=85;
+   x[i] = 415; y[i++]=65;
+   x[i] = 425; y[i++]=0;
+   TGraph *gr = new TGraph(20,x,y);
+   return gr;
+}
