@@ -28,6 +28,19 @@
 
 using namespace std;
 
+TH2F* shiftHist(TH2F* hin){
+
+  TH2F* hout = new TH2F(Form("%s_out",hin->GetName()),Form("%s_out",hin->GetName()), 120.0 , 0-5.0 , 1200-5.0 , 120 , 0-5.0 , 1200-5.0 );
+
+  for(int ibin = 1 ; ibin <= 120 ; ibin++ ){
+    for(int jbin = 1 ; jbin <= 120 ; jbin++ ){
+      hout->SetBinContent(ibin,jbin,hin->GetBinContent(ibin,jbin));
+    }
+  }
+
+  return hout;
+}
+
 void blankHist( TH2F* h , float y ){
 
   for(int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ ){
@@ -120,7 +133,8 @@ void smoothHist(TH2F* h){
  
 
 void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
- 
+
+  bool  shift       = true;
   bool  smooth      = false;
   char* filename    = "";
   char* outfilename = "";
@@ -259,6 +273,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   }
 
   blankHist( hxsec_best , 200 );
+  TH2F* hxsec_best_shifted = shiftHist( hxsec_best );
+  TH2F* hdummy = (TH2F*) hxsec_best->Clone("hdummy");
+  hdummy->Reset();
+
+  //hxsec_best->Reset();
+  // if( shift ){
+  //   hxsec_best = shiftHist( hxsec_best );
+  //}
 
   // cout << endl << "observed" << endl;
   // plot1D( hxsec_best );
@@ -276,19 +298,22 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gPad->SetTopMargin(0.1);
   gPad->SetRightMargin(0.2);
   gPad->SetLogz();
-  hxsec_best->GetXaxis()->SetLabelSize(0.035);
-  hxsec_best->GetYaxis()->SetLabelSize(0.035);
-  hxsec_best->GetZaxis()->SetLabelSize(0.035);
-  hxsec_best->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
-  hxsec_best->GetYaxis()->SetTitleOffset(0.9);
-  hxsec_best->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
-  hxsec_best->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
-  hxsec_best->GetZaxis()->SetTitleOffset(0.8);
-  hxsec_best->GetXaxis()->SetRangeUser(xaxismin,590);
-  hxsec_best->GetYaxis()->SetRangeUser(0,yaxismax);
-  hxsec_best->Draw("colz");
-  hxsec_best->SetMinimum(0.01);
-  hxsec_best->SetMaximum(10);
+  hdummy->GetXaxis()->SetLabelSize(0.035);
+  hdummy->GetYaxis()->SetLabelSize(0.035);
+  hdummy->GetZaxis()->SetLabelSize(0.035);
+  hdummy->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
+  hdummy->GetYaxis()->SetTitleOffset(0.9);
+  hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
+  hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
+  hdummy->GetZaxis()->SetTitleOffset(0.8);
+  hdummy->GetXaxis()->SetRangeUser(xaxismin,590);
+  hdummy->GetYaxis()->SetRangeUser(0,yaxismax);
+  //hdummy->Draw("colz");
+  hdummy->Draw();
+  hxsec_best_shifted->Draw("samecolz");
+  hdummy->Draw("axissame");
+  hdummy->SetMinimum(0.01);
+  hdummy->SetMaximum(10);
   
   // TGraph* gr        = getRefXsecGraph(hxsec_best       , "T2tt", 1.0);
   // TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp   , "T2tt", 1.0);
@@ -320,6 +345,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     gr_expm1 = T2bw_x75_expectedM1();
     gr_obsp1 = T2bw_x75_observedP1();
     gr_obsm1 = T2bw_x75_observedM1();
+  }
+  else if( TString(sample).Contains("T2bw") && x==50 ){
+    gr       = T2bw_x50_observed();
+    gr_exp   = T2bw_x50_expected();
+    gr_expp1 = T2bw_x50_expectedP1();
+    gr_expm1 = T2bw_x50_expectedM1();
+    gr_obsp1 = T2bw_x50_observedP1();
+    gr_obsm1 = T2bw_x50_observedM1();
   }
 
   gr->SetLineWidth(6);
@@ -387,7 +420,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->DrawLatex(0.55,0.75,"Expected #pm1#sigma");
 
 
-
+  t->SetTextSize(0.045);
   if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
   if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
   if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
@@ -500,11 +533,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   //-------------------------------
 
   int   nbinsx  =   120;
-  float xmin    =     0;
-  float xmax    =  1200;
+  float xmin    =    -5;
+  float xmax    =  1195;
   int   nbinsy  =   120;
-  float ymin    =     0;
-  float ymax    =  1200;
+  float ymin    =    -5;
+  float ymax    =  1195;
 
   TFile* f = TFile::Open("stop_xsec.root");
   TH1F* refxsec = (TH1F*) f->Get("h_stop_xsec");
@@ -520,9 +553,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   for( unsigned int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
     for( unsigned int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
 
-      float mg      = hxsec_best->GetXaxis()->GetBinCenter(ibin);
+      //float mg      = hxsec_best->GetXaxis()->GetBinCenter(ibin);
+      float mg      = hexcl->GetXaxis()->GetBinCenter(ibin);
       int   bin     = refxsec->FindBin(mg);
       float xsec    = refxsec->GetBinContent(bin);
+
       float xsec_up = refxsec->GetBinContent(bin) + refxsec->GetBinError(bin);
       float xsec_dn = refxsec->GetBinContent(bin) - refxsec->GetBinError(bin);
       
@@ -530,6 +565,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
       float xsecul_exp   = hxsec_best_exp->GetBinContent(ibin,jbin);
       float xsecul_expp1 = hxsec_best_expp1->GetBinContent(ibin,jbin);
       float xsecul_expm1 = hxsec_best_expm1->GetBinContent(ibin,jbin);
+
+      // cout << endl;
+      // cout << "mg xsec " << mg << " " << xsec << endl;
+      // cout << "xsec: obs exp expp1 expm1 " << xsecul << " " << xsecul_exp << " " << xsecul_expp1 << " " << xsecul_expm1 << endl;
 
       if( xsecul < 1.e-10 ) continue;
 
