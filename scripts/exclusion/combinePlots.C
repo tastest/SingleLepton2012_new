@@ -309,11 +309,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   hdummy->GetXaxis()->SetRangeUser(xaxismin,590);
   hdummy->GetYaxis()->SetRangeUser(0,yaxismax);
   //hdummy->Draw("colz");
+  hdummy->SetMinimum(0.01);
+  hdummy->SetMaximum(10);
+  hxsec_best_shifted->SetMinimum(0.01);
+  hxsec_best_shifted->SetMaximum(10);
+  hdummy->SetMaximum(10);
   hdummy->Draw();
   hxsec_best_shifted->Draw("samecolz");
   hdummy->Draw("axissame");
-  hdummy->SetMinimum(0.01);
-  hdummy->SetMaximum(10);
   
   // TGraph* gr        = getRefXsecGraph(hxsec_best       , "T2tt", 1.0);
   // TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp   , "T2tt", 1.0);
@@ -412,7 +415,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->DrawLatex(0.19,0.79,"unpolarized top quarks");
   */
   t->SetTextSize(0.035);
-  t->DrawLatex(0.18,0.79,"unpolarized top quarks");
+  t->DrawLatex(0.18,0.79,"50 / 50 t_{L} / t_{R} mixture");
   t->DrawLatex(0.18,0.84,label);
   t->SetTextSize(0.04);
   t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
@@ -421,9 +424,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
 
   t->SetTextSize(0.045);
-  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
 
   //float offset = 40.0;
   float xoffset = 405.0;
