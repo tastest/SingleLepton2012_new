@@ -10,8 +10,8 @@
   TCut btag1  ("nbtagscsvm>=1");
   TCut isotrk ("pfcandpt10 > 9998. || pfcandiso10 > 0.1");
 
-  //TCut weight("xsecsusy * (1000./50000.) * 9.708");
-  TCut weight("xsecsusy * (1000./50000.) * 9.708 * sltrigweight");
+  TCut weight("xsecsusy * (1000./50000.) * 9.708");
+  //TCut weight("xsecsusy * (1000./50000.) * 9.708 * sltrigweight");
 
   TCut presel;
   presel += rho;
@@ -35,6 +35,7 @@
   SR[6]=TCut("t1metphicorrmt > 120 && t1metphicorr > 400");
 
 
+  TCanvas *ctemp = new TCanvas();
 
   TChain *sig = new TChain("t");
   sig->Add("/tas/vimartin/SingleLepton2012Signal/looper/output/T2tt_300_50.root");
@@ -57,13 +58,26 @@
     cout << SRname[i] << "   " << Form("%.0f +/- %.0f",h->GetBinContent(1),h->GetBinError(1)) << endl;      
   }
 
-  // cout << "SRA:          " << sig->GetEntries(presel+SRA) << endl;
-  // cout << "SRB:          " << sig->GetEntries(presel+SRB) << endl;
-  // cout << "SRC:          " << sig->GetEntries(presel+SRC) << endl;
-  // cout << "SRD:          " << sig->GetEntries(presel+SRD) << endl;
-  // cout << "SRE:          " << sig->GetEntries(presel+SRE) << endl;
-  // cout << "SRF:          " << sig->GetEntries(presel+SRF) << endl;
-  // cout << "SRG:          " << sig->GetEntries(presel+SRG) << endl;
+  TChain *scan = new TChain("t");
+  scan->Add("/tas/benhoob/testFiles/T2tt_8TeV/merged*njets4.root");
+
+  TFile* fdenom = TFile::Open("/tas/benhoob/testFiles/T2tt_8TeV/myMassDB.root");
+  TH2F*  hdenom = (TH2F*) fdenom->Get("masses");
+
+  TH2F* hnum = new TH2F("hnum","",120,0,1200,120,0,1200);
+
+  TCut weight("sltrigweight*0.98");
+
+  scan->Draw("ml:mg>>hnum",(presel+SR[4])*weight);
+
+  delete ctemp;
+
+  TCanvas *c1 = new TCanvas();
+  c1->cd();
+
+  hnum->Divide(hdenom);
+  hnum->Draw("colz");
+
 
 
 
