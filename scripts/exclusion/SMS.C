@@ -35,18 +35,41 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //--------------------------------------------------
   // input parameters
   //--------------------------------------------------
-  
+
+  char* suffix         = "";
+  char* denomhistoname = "masses";
+
+  if( TString(sample).Contains("T2bw") && x==25 ){
+    denomhistoname = "masses25";
+    suffix         = "_x25";
+  }
+  if( TString(sample).Contains("T2bw") && x==50 ){
+    denomhistoname = "masses";
+    suffix         = "_x50";
+  }
+  if( TString(sample).Contains("T2bw") && x==75 ){
+    denomhistoname = "masses75";
+    suffix         = "_x75";
+  }
+
   //const float denom    = 50000;
-  const float lumi     = 9200;
-  const char* filename = Form(Form("/tas/benhoob/testFiles/T2tt_8TeV/merged*njets4.root",sample));
-  const float btagerr  = 0.02;
+  const float lumi      = 9200;
+  const char* filename  = Form("/tas/benhoob/testFiles/%s_8TeV/merged*njets4%s.root",sample,suffix);
+  const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
+  const float btagerr   = 0.02;
 
-  TFile* fdenom = TFile::Open("/tas/benhoob/testFiles/T2tt_8TeV/myMassDB.root");
-  TH2F*  hdenom = (TH2F*) fdenom->Get("masses");
 
-  cout << "Using file        " << filename << endl;
-  //cout << "Using denominator " << denom    << " events" << endl;
-  cout << "Using lumi        " << lumi     << " pb-1" << endl;
+  cout << "----------------------------------------------------" << endl;
+  cout << "Sample            " << sample          << endl;
+  cout << "x                 " << x               << endl;
+  cout << "Using file        " << filename        << endl;
+  cout << "Using denominator " << denomname       << endl;
+  cout << "Denom histo       " << denomhistoname  << endl;
+  cout << "Using lumi        " << lumi            << " pb-1" << endl;
+  cout << "----------------------------------------------------" << endl;
+
+  TFile* fdenom = TFile::Open(denomname);
+  TH2F*  hdenom = (TH2F*) fdenom->Get(denomhistoname);
 
   char* label = (char*)"";
 
@@ -109,8 +132,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCut btag1  ("nbtagscsvm>=1");
   TCut isotrk ("pfcandpt10 > 9998. || pfcandiso10 > 0.1");
 
-  TCut weight("sltrigweight * 0.98 * 1.45"); // trigger efficiency X btagging SF
-  //TCut weight("sltrigweight * 0.98"); // trigger efficiency X btagging SF
+  //TCut weight("sltrigweight * 0.98 * 1.45"); // trigger efficiency X btagging SF
+  TCut weight("sltrigweight * 0.98"); // trigger efficiency X btagging SF
   //TCut weight("1"); // no per-event weights (for Maria comparison)
 
   TCut presel;
@@ -123,9 +146,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   presel += btag1;
   presel += isotrk;
 
-  if( x == 25 ) presel += TCut("x==0.25");
-  if( x == 50 ) presel += TCut("x==0.50");
-  if( x == 75 ) presel += TCut("x==0.75");
+  // if( x == 25 ) presel += TCut("x==0.25");
+  // if( x == 50 ) presel += TCut("x==0.50");
+  // if( x == 75 ) presel += TCut("x==0.75");
 
   cout << "Using pre-selection   " << presel.GetTitle() << endl;
   cout << "Using weight          " << weight.GetTitle() << endl;
@@ -175,6 +198,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TH2F* hexcl_exp[nsig];
   TH2F* hexcl_expp1[nsig];
   TH2F* hexcl_expm1[nsig];
+  TH2F* hexcl_obsp1[nsig];
+  TH2F* hexcl_obsm1[nsig];
   TH2F* hjes[nsig];
   
   TCanvas *ctemp = new TCanvas();
@@ -208,14 +233,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     float ymin    =     0;
     float ymax    =  1200;
 
-    if( TString(sample).Contains("T2bw") ){
-      nbinsx =   9;
-      xmin   = 175;
-      xmax   = 625;
-      nbinsy =   7;
-      ymin   = -25;
-      ymax   = 325;
-    }
+    // if( TString(sample).Contains("T2bw") ){
+    //   nbinsx =   9;
+    //   xmin   = 175;
+    //   xmax   = 625;
+    //   nbinsy =   7;
+    //   ymin   = -25;
+    //   ymax   = 325;
+    // }
 
     heff[i]        = new TH2F(Form("heff_%i",i)          , Form("heff_%i",i)         , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     heffup[i]      = new TH2F(Form("heffup_%i",i)        , Form("heffup_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
@@ -226,6 +251,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hxsec_expm1[i] = new TH2F(Form("hxsec_expm1_%i",i)   , Form("hxsec_expm1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
  
     hexcl[i]       = new TH2F(Form("hexcl_%i",i)         , Form("hexcl_%i",i)        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hexcl_obsp1[i] = new TH2F(Form("hexcl_obsp1_%i",i)   , Form("hexcl_obsp1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hexcl_obsm1[i] = new TH2F(Form("hexcl_obsm1_%i",i)   , Form("hexcl_obsm1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hexcl_exp[i]   = new TH2F(Form("hexcl_exp_%i",i)     , Form("hexcl_exp_%i",i)    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hexcl_expp1[i] = new TH2F(Form("hexcl_expp1_%i",i)   , Form("hexcl_expp1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hexcl_expm1[i] = new TH2F(Form("hexcl_expm1_%i",i)   , Form("hexcl_expm1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
@@ -336,8 +363,10 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	  hxsec_expm1[i]->SetBinContent(ibin,jbin, xsecul_expm1 );
 	}
 
-	int   bin = refxsec->FindBin(mg);
-	float xsec = refxsec->GetBinContent(bin);
+	int   bin     = refxsec->FindBin(mg);
+	float xsec    = refxsec->GetBinContent(bin);
+	float xsec_up = refxsec->GetBinContent(bin) + refxsec->GetBinError(bin);
+	float xsec_dn = refxsec->GetBinContent(bin) - refxsec->GetBinError(bin);
 
 	hexcl[i]->SetBinContent(ibin,jbin,0);
 	if( xsec > xsecul )   hexcl[i]->SetBinContent(ibin,jbin,1);
@@ -350,6 +379,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
 	hexcl_expm1[i]->SetBinContent(ibin,jbin,0);
 	if( xsec > xsecul_expm1 )   hexcl_expm1[i]->SetBinContent(ibin,jbin,1);
+
+	hexcl_obsp1[i]->SetBinContent(ibin,jbin,0);
+	if( xsec_up > xsecul )   hexcl_obsp1[i]->SetBinContent(ibin,jbin,1);
+
+	hexcl_obsm1[i]->SetBinContent(ibin,jbin,0);
+	if( xsec_dn > xsecul )   hexcl_obsm1[i]->SetBinContent(ibin,jbin,1);
 
 	//cout << "ibin jbin mg xsec " << ibin << " " << jbin << " " << mg << " " << xsec << endl;
       }
@@ -535,8 +570,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     */
 
     if( print ){
-      can[i]->          Print(Form("../../plots/%s_%s.pdf"       ,sample,labels.at(i).c_str()));
-      can_exclusion[i]->Print(Form("../../plots/%s_%s_points.pdf",sample,labels.at(i).c_str()));
+      can[i]->          Print(Form("../../plots/%s%s_%s.pdf"       ,sample,suffix,labels.at(i).c_str()));
+      can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points.pdf",sample,suffix,labels.at(i).c_str()));
     }
 
     int bin = heff[i]->FindBin(300,50);
@@ -552,7 +587,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << endl << endl;
   }
   
-  TFile *outfile = TFile::Open(Form("%s_histos.root",sample),"RECREATE");
+  TFile *outfile = TFile::Open(Form("%s%s_histos.root",sample,suffix),"RECREATE");
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
     hxsec[i]->Write();
@@ -560,6 +595,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hxsec_expp1[i]->Write();
     hxsec_expm1[i]->Write();
     hexcl[i]->Write();
+    hexcl_obsp1[i]->Write();
+    hexcl_obsm1[i]->Write();
     hexcl_exp[i]->Write();
     hexcl_expp1[i]->Write();
     hexcl_expm1[i]->Write();
