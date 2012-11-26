@@ -21,6 +21,10 @@
 #include "TTreeCache.h"
 #include "TDatabasePDG.h"
 
+#include "../CORE/MT2/MT2Utility.h"
+#include "mt2w_bisect.h"
+#include "mt2bl_bisect.h"
+
 #include "../CORE/CMS2.h"
 #include "../CORE/utilities.h"
 #include "../CORE/ssSelections.h"
@@ -34,6 +38,7 @@
 #include "../CORE/jetcorr/FactorizedJetCorrector.h"
 #include "../CORE/jetcorr/JetCorrectionUncertainty.h"
 #include "../CORE/jetSelections.h"
+#include "../CORE/jetSmearingTools.h"
 #include "../CORE/photonSelections.h"
 #include "../CORE/triggerUtils.h"
 #include "../CORE/triggerSuperModel.h"
@@ -58,8 +63,8 @@ bool useOldIsolation      = false;
 using namespace std;
 using namespace tas;
 
-typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
-typedef vector< P4 > VofP4;
+//typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
+//typedef vector< P4 > VofP4;
 //typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
 
 struct indP4{
@@ -485,6 +490,10 @@ void singleLeptonLooper::InitBaby(){
   lepmetpt_	=-999.;
   lept1met10pt_	=-999.;
   
+  t1met10s_	=-999.;
+  t1met10sphi_	=-999.;
+  t1met10smt_	=-999.;
+
   //trkmet
   trkmet_              =-999.;
   trkmetphi_           =-999.;
@@ -961,7 +970,344 @@ float getminjdr( VofiP4 jets, LorentzVector *particle ) {
   return mindr;
 }
 
-//--------------------------------------------------------------------
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+float getDataMCRatio(float eta){
+  if (eta >=0.0 && eta < 0.5) return 1.052;
+  if (eta >=0.5 && eta < 1.1) return 1.057;
+  if (eta >=1.1 && eta < 1.7) return 1.096;
+  if (eta >=1.7 && eta < 2.3) return 1.134;
+  if (eta >=2.3 && eta < 5.0) return 1.288;
+  return 1.0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+
+bool compare_candidates( Candidate x, Candidate y ){
+  return x.chi2 < y.chi2;
+}
+
+double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
+{
+    if (verbose) {
+        printf("c1: %4.2f\n", c1);
+        printf("m12: %4.2f\n", m12);
+        printf("m22: %4.2f\n", m22);
+        printf("m02: %4.2f\n", m02);
+    }
+
+    double a = m22;
+    double b = (m02 - m12 - m22) * c1;
+    double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
+
+    if (verbose) {
+        printf("a: %4.2f\n", a);
+        printf("b: %4.2f\n", b);
+        printf("c: %4.2f\n", c);
+    }
+
+    double num = -1. * b + sqrt(b * b - 4 * a * c);
+    double den = 2 * a;
+
+    if (verbose) {
+        printf("num: %4.2f\n", num);
+        printf("den: %4.2f\n", den);
+        printf("num/den: %4.2f\n", num/den);
+    }
+
+    return (num/den);
+}
+
+
+double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
+              double m12, double m22, double m02){
+    double rat1 = pt1 * (1 - c1) / sigma1;
+    double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
+
+    return ( rat1 * rat1 + rat2 * rat2);
+}
+
+//void StopSelector::minuitFunction(int& npar, double *gout, double &result, double par[], int flg)
+void minuitFunction(int&, double* , double &result, double par[], int){
+  result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
+}
+
+
+/* Reconstruct the hadronic top candidates, select the best candidate and
+ * store the chi2 =  (m_jj - m_W)^2/sigma_m_jj + (m_jjj - m_t)^2/sigma_m_jjj
+ * return the number of candidates found.
+ *
+ * n_jets - number of jets.
+ * jets - jets
+ * btag - b-tagging information of the jets
+ * mc - qgjet montecarlo match number for the jets
+ * 
+ * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
+*/ 
+
+list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
+                                 LorentzVector* lep, double met, double metphi,
+                                 VofP4 jets, std::vector<float> btag){
+
+  float metx = met * cos( metphi );
+  float mety = met * sin( metphi );
+
+  int n_jets = jets.size();
+  double sigma_jets[n_jets];
+  for (int i=0; i<n_jets; ++i)
+    sigma_jets[i] = getJetResolution(jets[i], jetSmearer);
+
+  if ( isData )
+    for (int i=0; i<n_jets; ++i)
+      sigma_jets[i] *= getDataMCRatio(jets[i].eta());
+
+  
+  vector<int> mc;
+  for (unsigned int i=0; i<jets.size(); i++)
+    mc.push_back( isGenQGMatched( jets.at(i), 0.4 ) );
+
+  int ibl[5];
+  int iw1[5];
+  int iw2[5];
+  int ib[5];
+
+  if ( !isData ){
+     /*
+     *  Matching MC algoritm search over all conbinations  until the 
+     *  right combination is found. More than one candidate is suported 
+     *  but later only the first is used.
+     */ 
+    int match = 0;
+    for (int jbl=0; jbl<n_jets; ++jbl )
+      for (int jb=0; jb<n_jets; ++jb )
+        for (int jw1=0; jw1<n_jets; ++jw1 )
+          for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
+            if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
+                 (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
+                    ibl[match] = jbl;
+                    iw1[match] = jw1;
+                    iw2[match] = jw2;
+                    ib[match] = jb;
+                    match++;
+            }
+  }
+
+
+   /*
+    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
+   */
+  vector<int> v_i, v_j;
+  vector<double> v_k1, v_k2;
+  for ( int i=0; i<n_jets; ++i )
+    for ( int j=i+1; j<n_jets; ++j ){
+      double pt_w1 = jets[i].Pt();
+      double pt_w2 = jets[j].Pt();
+      if (pt_w1 < PTMIN_J1  || pt_w2 < PTMIN_J2)
+        continue;
+
+      /*
+       *  W
+       */
+      LorentzVector hadW = jets[i] + jets[j];
+
+      /*
+       *  W Mass Constraint.
+       */
+      TFitter *minimizer = new TFitter();
+      double p1 = -1;
+
+      minimizer->ExecuteCommand("SET PRINTOUT", &p1, 1);
+      minimizer->SetFCN(minuitFunction);
+      minimizer->SetParameter(0 , "c1"     , 1.1             , 1 , 0 , 0);
+      minimizer->SetParameter(1 , "pt1"    , 1.0             , 1 , 0 , 0);
+      minimizer->SetParameter(2 , "sigma1" , sigma_jets[i]   , 1 , 0 , 0);
+      minimizer->SetParameter(3 , "pt2"    , 1.0             , 1 , 0 , 0);
+      minimizer->SetParameter(4 , "sigma2" , sigma_jets[j]   , 1 , 0 , 0);
+      minimizer->SetParameter(5 , "m12"    , jets[i].mass2() , 1 , 0 , 0);
+      minimizer->SetParameter(6 , "m22"    , jets[j].mass2() , 1 , 0 , 0);
+      minimizer->SetParameter(7 , "m02"    , hadW.mass2()    , 1 , 0 , 0);
+
+      for (unsigned int k = 1; k < 8; k++)
+        minimizer->FixParameter(k);
+
+      minimizer->ExecuteCommand("SIMPLEX", 0, 0);
+      minimizer->ExecuteCommand("MIGRAD", 0, 0);
+
+      double c1 = minimizer->GetParameter(0);
+      double c2 = fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2());
+                
+      delete minimizer;
+
+      /*
+       * W Mass check :)
+       *  Never trust a computer you can't throw out a window. 
+       *  - Steve Wozniak 
+
+      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
+           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
+       */
+      v_i.push_back(i);
+      v_j.push_back(j);
+      v_k1.push_back(c1);
+      v_k2.push_back(c2);
+    }
+
+
+  list<Candidate> chi2candidates;
+        
+  mt2_bisect::mt2 mt2_event;
+  mt2bl_bisect::mt2bl mt2bl_event;
+  mt2w_bisect::mt2w mt2w_event;
+  
+  for ( int b=0; b<n_jets; ++b )
+    for (int o=0; o<n_jets; ++o){
+      if ( b == o )
+        continue;
+
+      if ( btag[b] < BTAG_MIN && btag[o] < BTAG_MIN )
+        continue;
+
+      double pt_b = jets[b].Pt();
+      if ( btag[b] >= BTAG_MIN && pt_b < PTMIN_BTAG )
+        continue;
+
+      if ( btag[b] < BTAG_MIN && pt_b < PTMIN_B )
+        continue;
+
+      double pt_o = jets[o].Pt();
+      if ( btag[o] >= BTAG_MIN && pt_o < PTMIN_OTAG )
+        continue;
+
+      if ( btag[o] < BTAG_MIN && pt_o < PTMIN_O)
+        continue;
+
+      /*
+       *  MT2 Variables
+       */
+         
+      double pl[4];     // Visible lepton
+      double pb1[4];    // bottom on the same side as the visible lepton
+      double pb2[4];    // other bottom, paired with the invisible W
+      double pmiss[3];  // <unused>, pmx, pmy   missing pT
+      pl[0]= lep->E(); pl[1]= lep->Px(); pl[2]= lep->Py(); pl[3]= lep->Pz();
+      pb1[0] = jets[o].E();  pb1[1] = jets[o].Px(); 
+      pb1[2] = jets[o].Py(); pb1[3] = jets[o].Pz();
+      pb2[0] = jets[b].E();  pb2[1] = jets[b].Px(); 
+      pb2[2] = jets[b].Py(); pb2[3] = jets[b].Pz();
+      pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
+
+      double pmiss_lep[3];
+      pmiss_lep[0] = 0.;
+      pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
+
+      mt2_event.set_momenta( pb1, pb2, pmiss_lep );
+      mt2_event.set_mn( 0.0 );   // Invisible particle mass
+      double c_mt2b = mt2_event.get_mt2();
+         
+      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss); 
+      double c_mt2bl = mt2bl_event.get_mt2bl();
+
+      mt2w_event.set_momenta(pl, pb1, pb2, pmiss); 
+      double c_mt2w = mt2w_event.get_mt2w();
+
+//      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
+
+      for (unsigned int w = 0; w < v_i.size() ; ++w ){
+        int i = v_i[w];
+        int j = v_j[w];
+        if ( i==o || i==b || j==o || j==b )
+            continue;
+
+        double pt_w1 = jets[i].Pt();
+        double pt_w2 = jets[j].Pt();
+
+	/*
+	 *  W Mass.
+	 */
+	LorentzVector hadW = jets[i] + jets[j];
+	double massW = hadW.mass();
+
+	double c1 = v_k1[w];
+	double c2 = v_k2[w];
+
+	/*
+	 * Top Mass.
+	 */
+	LorentzVector c_hadtop = (jets[i] * c1) + (jets[j] * c2) + jets[b];
+	double massT = c_hadtop.mass();
+
+	double pt_w = pt_w1 + pt_w2;
+        double sigma_w = pt_w1*sigma_jets[i] + pt_w2*sigma_jets[j];
+        double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w*sigma_w;
+        double pt_t = c1*pt_w1 + c2*pt_w2 + pt_b;
+        double sigma_t = c1*pt_w1*sigma_jets[i] + c2*pt_w2*sigma_jets[j] 
+                       + pt_b*sigma_jets[b];
+        double smtop2 = (1+2.*pt_t*pt_t/massT/massT)*sigma_t*sigma_t;
+
+        double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2 + 
+                        (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+
+        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o ) ;
+       
+        Candidate c;
+        c.chi2  = c_chi2;
+        c.mt2b  = c_mt2b;
+        c.mt2w  = c_mt2w;
+        c.mt2bl = c_mt2bl;
+        c.j1 = i;
+        c.j2 = j;
+        c.bi = b;
+        c.oi = o;
+        c.k1 = c1;
+        c.k2 = c2;
+        c.k2 = c2;
+        c.match = c_match;
+
+        chi2candidates.push_back(c);
+      }
+    }
+
+
+   if (__SORT) 
+     chi2candidates.sort(compare_candidates);
+
+   return chi2candidates;
+}
+
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+
+pair<float,float> Type1PFMETSmear(JetSmearer* jetSmearer, bool isData,
+                                      VofP4 jets_p4 , float met, float metphi){
+  float metx = met * cos( metphi );
+  float mety = met * sin( metphi );
+
+  if (!isData){
+      UInt_t seed = 0;
+
+      for (unsigned int i=0; i<jets_p4.size(); ++i)
+          seed += jets_p4.at(i).Pt()*1000;
+
+      TRandom3 kicker(seed);
+
+      for (unsigned int i=0; i<jets_p4.size(); ++i){
+          LorentzVector recJet = jets_p4.at(i);
+
+          float c = getDataMCRatio(recJet.eta());
+          double sigma = getJetResolution(recJet, jetSmearer);
+          double alpha = kicker.Gaus(0.0, TMath::Sqrt(c*c-1.0)*sigma);
+
+          metx -= alpha*recJet.px();
+          mety -= alpha*recJet.py();
+      }
+  }
+  
+  return make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
+}
+
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
 
 int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescale, float lumi,
 				  FREnum frmode, bool doFakeApp)
@@ -1032,6 +1378,16 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
 
   JetCorrectionUncertainty *pfUncertainty   = new JetCorrectionUncertainty( pfUncertaintyFile   );
+
+  /*
+   *  Jet Smearer Object to obtain the jet pt uncertainty.
+   */
+
+  std::vector<std::string> list_of_file_names;
+  list_of_file_names.push_back("jetSmearData/Spring10_PtResolution_AK5PF.txt");
+  list_of_file_names.push_back("jetSmearData/Spring10_PhiResolution_AK5PF.txt");
+  list_of_file_names.push_back("jetSmearData/jet_resolutions.txt");
+  JetSmearer *jetSmearer = makeJetSmearer(list_of_file_names);
 
   //------------------------------------------------
   // set stop cross section file
@@ -2673,6 +3029,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       t1metphicorr_    = p_t1metphicorr.first;
       t1metphicorrphi_ = p_t1metphicorr.second;
 
+
+      // MET after Jet PT smearing.
+      pair<float, float> p_t1met10Smear = Type1PFMETSmear(jetSmearer, isData, vpfrawjets_p4 , t1met10_, t1met10phi_);
+      t1met10s_ = p_t1met10Smear.first;
+      t1met10sphi_ = p_t1met10Smear.second;
+      
+
       //---------------------------------------
       // now calculate METup and METdown
       //---------------------------------------
@@ -3127,6 +3490,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       //phi-corrected met
       t1metphicorrmt_   = getMT( lep1_->pt() , lep1_->phi() , t1metphicorr_ , t1metphicorrphi_ );
 
+      t1met10smt_   = getMT( lep1_->pt() , lep1_->phi() , t1met10s_     , t1met10sphi_ );
+
       t1metphicorrmtup_ = getMT( lep1_->pt() , lep1_->phi() , t1metphicorrup_ , t1metphicorrphiup_ );
       t1metphicorrmtdn_ = getMT( lep1_->pt() , lep1_->phi() , t1metphicorrdn_ , t1metphicorrphidn_ );
 
@@ -3382,7 +3747,22 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       mutrigweight2_ = getMuTriggerWeightNew( lep1_->pt() , lep1_->eta() );
       sltrigweight_ = isData ? 1. : getsltrigweight( id1_, lep1_->pt() , lep1_->eta() );
       dltrigweight_ = (!isData && ngoodlep_>1) ? getdltrigweight( id1_, id2_ ) : 1.;
-      
+    
+
+      candidates_.clear(); 
+      list<Candidate> candidates = recoHadronicTop(jetSmearer, isData, lep1_,
+                        t1metphicorr_, t1metphicorrphi_,
+                        vpfrawjets_p4, pfjets_combinedSecondaryVertexBJetTag());
+      for (list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); ++it)
+          candidates_.push_back(*it);
+
+      jets_.clear();
+      btag_.clear();
+      for (unsigned int i = 0; i < vpfrawjets_p4.size(); i++){
+         jets_.push_back(vpfrawjets_p4.at(i));
+         btag_.push_back( pfjets_combinedSecondaryVertexBJetTag().at(i) );
+      }
+
       outTree->Fill();
     
     } // entries
@@ -3728,6 +4108,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("lepmetpt",        &lepmetpt_,         "lepmetpt/F");
   outTree->Branch("lept1met10pt",    &lept1met10pt_,     "lept1met10pt/F");
 
+  outTree->Branch("t1met10s",         &t1met10s_,          "t1met10s/F");
+  outTree->Branch("t1met10sphi",      &t1met10sphi_,       "t1met10sphi/F");
+  outTree->Branch("t1met10smt",       &t1met10smt_,       "t1met10smt/F");
+
   //met variables with phi correction
   outTree->Branch("t1metphicorr"       , &t1metphicorr_       , "t1metphicorr/F");
   outTree->Branch("t1metphicorrup"     , &t1metphicorrup_     , "t1metphicorrup/F");
@@ -4031,12 +4415,17 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t"         , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &t_   	);
   outTree->Branch("tbar"      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &tbar_   	);
   outTree->Branch("ttbar"     , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &ttbar_   	);
+
   outTree->Branch("lep_t"     , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &lep_t_   	);
   outTree->Branch("lep_tbar"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &lep_tbar_  );
   outTree->Branch("stop_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_t_   	);
   outTree->Branch("stop_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_tbar_ );
   outTree->Branch("lep_t_id",            &lep_t_id_,            "lep_t_id/I");  
   outTree->Branch("lep_tbar_id",         &lep_tbar_id_,         "lep_tbar_id/I");  
+
+  outTree->Branch("candidates", "std::vector<Candidate>", &candidates_);
+  outTree->Branch("jets", "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &jets_ );
+  outTree->Branch("btag", "std::vector<float>", &btag_ );
 
 }
 
@@ -4437,3 +4826,4 @@ float getsltrigweight(int id1, float pt, float eta)
   return 1.;
 
 }
+
