@@ -1252,8 +1252,6 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
 
         bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
 
-        cout << "chi2 " << c_chi2  << " " << c1 << " " << c2<< endl;
-       
         Candidate c;
         c.chi2  = c_chi2;
         c.mt2b  = c_mt2b;
