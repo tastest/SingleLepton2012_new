@@ -1,7 +1,11 @@
 #ifndef singleLeptonLooper_h
 #define singleLeptonLooper_h
 
+#include "TFitter.h"
+#include "Candidate.h"
+
 #include <vector>
+#include <list>
 #include <map>
 #include "Math/LorentzVector.h"
 #include "Math/PxPyPzE4D.h"
@@ -20,6 +24,24 @@ class  TH2F;
 class  TRandom3;
 class  TTree;
 struct metStruct;
+
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+const double PTMIN_J1   = 25;
+const double PTMIN_J2   = 25;
+const double PTMIN_BTAG = 30;
+const double PTMIN_OTAG = 30;
+const double PTMIN_B    = 30;  //  This Two should be tigther than the  
+const double PTMIN_O    = 30;  //  b-tagged versions.
+const double PDG_TOP_MASS = 173.5;
+const double PDG_W_MASS = 80.385;
+const double BTAG_MIN = 0.679;
+
+const bool __SORT = true;
+
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+
 
 class singleLeptonLooper
 {
@@ -283,6 +305,10 @@ class singleLeptonLooper
 	Float_t lepmetpt_;
 	Float_t lept1met10pt_;
 
+	Float_t t1met10s_;
+	Float_t t1met10sphi_;
+	Float_t t1met10smt_;
+
 	//phi corrected type1 mets
 	Float_t t1metphicorr_;
 	Float_t t1metphicorrphi_;
@@ -332,6 +358,10 @@ class singleLeptonLooper
         LorentzVector*  jet_; 
 	LorentzVector*  mcnu_;
 	LorentzVector*  mclep_;
+
+        std::vector<Candidate>  candidates_;
+        VofP4 jets_;
+        std::vector<float> btag_;
 
 	// jet p4's
         LorentzVector*  pfjet1_; 

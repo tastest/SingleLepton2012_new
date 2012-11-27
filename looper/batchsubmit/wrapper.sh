@@ -18,10 +18,13 @@ echo "[wrapper] COPYDIR   = " ${COPYDIR}
 
 echo "[wrapper] setting env"
 export CMS_PATH=/code/osgcode/cmssoft/cms
-export SCRAM_ARCH=slc5_amd64_gcc434
+export SCRAM_ARCH=slc5_amd64_gcc462
 source /code/osgcode/cmssoft/cmsset_default.sh
-export ROOTSYS=/code/osgcode/cmssoft/cms/slc5_amd64_gcc434/lcg/root/5.27.06b-cms21/
-export LD_LIBRARY_PATH=$ROOTSYS/lib:/code/osgcode/cmssoft/cms/slc5_amd64_gcc434/external/gcc/4.3.4-cms/lib64:$LD_LIBRARY_PATH
+
+CMSSW_LIBRARY_PATH=/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_3/lib/slc5_amd64_gcc462:/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_3/external/slc5_amd64_gcc462/lib:/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/external/gcc/4.6.2/lib64:/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/external/gcc/4.6.2/lib:/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_3/external/slc5_amd64_gcc462/lib/
+
+export ROOTSYS=/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/root/5.32.00-cms5
+export LD_LIBRARY_PATH=$ROOTSYS/lib:$CMSSW_LIBRARY_PATH:$LD_LIBRARY_PATH
 export PATH=$HOME/bin:$ROOTSYS/bin:$PATH
 export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH
 

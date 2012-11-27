@@ -5,9 +5,9 @@
 for example, from the looper directory
 > cp -r BtagFuncs.h processBaby.C jetCorrections jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
 
-2) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
-PROXY
-COPYDIR to point to the desired output directory in hadoop
+*) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
+PROXY (not nedded anymore unless you have a special location for your proxy file)
+COPYDIR to point to the desired output directory in hadoop ( default to /hadoop/cms/store/user/${USERNAME}/babies/) where $USERNAME is your username
 
 3) now execute scripts!
 to run on only one dataset for example run the writeConfig.sh script 

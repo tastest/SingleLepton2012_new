@@ -1234,21 +1234,25 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
 	/*
 	 * Top Mass.
 	 */
-	LorentzVector c_hadtop = (jets[i] * c1) + (jets[j] * c2) + jets[b];
-	double massT = c_hadtop.mass();
+        LorentzVector hadT = (jets[i] * c1) + (jets[j] * c2) + jets[b];
+        double massT = hadT.mass();
 
-	double pt_w = pt_w1 + pt_w2;
-        double sigma_w = pt_w1*sigma_jets[i] + pt_w2*sigma_jets[j];
-        double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w*sigma_w;
-        double pt_t = c1*pt_w1 + c2*pt_w2 + pt_b;
-        double sigma_t = c1*pt_w1*sigma_jets[i] + c2*pt_w2*sigma_jets[j] 
-                       + pt_b*sigma_jets[b];
-        double smtop2 = (1+2.*pt_t*pt_t/massT/massT)*sigma_t*sigma_t;
+        double pt_w = hadW.Pt();
+        double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
+                        + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
+        double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
+        double pt_t = hadT.Pt();
+        double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
+                        + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
+                        + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
+        double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
 
-        double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2 + 
-                        (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+        double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
+                      + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
 
-        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o ) ;
+        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
+
+        cout << "chi2 " << c_chi2  << " " << c1 << " " << c2<< endl;
        
         Candidate c;
         c.chi2  = c_chi2;
@@ -1261,13 +1265,11 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
         c.oi = o;
         c.k1 = c1;
         c.k2 = c2;
-        c.k2 = c2;
         c.match = c_match;
 
         chi2candidates.push_back(c);
       }
     }
-
 
    if (__SORT) 
      chi2candidates.sort(compare_candidates);

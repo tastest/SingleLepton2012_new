@@ -188,7 +188,8 @@ void doAll(bool skipFWLite = true)
   TChain* chtopall = new TChain("Events");
   if (runttall) {
     //single file for testing
-    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_157.root");
+    //pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_157.root");
+    pickSkimIfExists(chtopall,"/tmp/merged_ntuple_157.root");
     //    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged*.root");
 
   }
@@ -279,7 +280,7 @@ void doAll(bool skipFWLite = true)
   if(runWjets){
 
     //single file for testing
-    pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_455.root");
+    pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_45*.root");
 
     //pickSkimIfExists(chWjets,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged*root");
 
@@ -384,9 +385,9 @@ void doAll(bool skipFWLite = true)
   TChain *chT2tt = new TChain("Events");
   if (runT2tt) {
     cout << "UPDATE 7 TeV T2TT SAMPLE!!!! QUITTING!!!" << endl;
-    exit(0);
+//    exit(0);
 
-    pickSkimIfExists(chT2tt,"/nfs-7/userdata/cms2/SMS-T2tt_Mstop-225to1200_mLSP-50to1025_7TeV-Pythia6Z_Summer11-PU_START42_V11_FastSim-v1/V04-02-20-04/merged*root");
+    pickSkimIfExists(chT2tt,"/hadoop/cms/store/user/magania/stop_mc/merged_ntuple_T2tt_FineBin_Stop450_LSP0.root");
   }
 
   //----------------------------------------

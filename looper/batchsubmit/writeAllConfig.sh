@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-01-07_2012"
+TAG="V00-01-09_2012"
 
 #
 # DATA
@@ -44,14 +44,23 @@ TAG="V00-01-07_2012"
 #
 # TTBAR
 #
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_TTJets
+./writeConfig.sh  /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-13 ${TAG}_TTJets
+
 
 #
 # W+JETS
 #
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WJetsToLNu
-./writeConfig.sh /hadoop/cms/store/user/linacre/CMS2_V05-03-13/W4JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_W4JetsToLNu
-./writeConfig.sh /hadoop/cms/store/user/linacre/CMS2_V05-03-13/W3JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_W3JetsToLNu
+
+##./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_WJetsToLNu
+##./writeConfig.sh /hadoop/cms/store/user/linacre/CMS2_V05-03-13/W4JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_W4JetsToLNu
+##./writeConfig.sh /hadoop/cms/store/user/linacre/CMS2_V05-03-13/W3JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_W3JetsToLNu
+
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/W1JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13 ${TAG}_W1JetsToLNu_v1
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/W2JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13 ${TAG}_W2JetsToLNu_v1
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/W3JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13 ${TAG}_W3JetsToLNu_v1
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/W4JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13 ${TAG}_W4JetsToLNu_v1
+
 
 #
 # SINGLE TOP

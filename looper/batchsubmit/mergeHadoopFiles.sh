@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HADOOPDIR=/hadoop/cms/store/user/vimartin/babies/$1
+HADOOPDIR=/hadoop/cms/store/user/magania/babies/$1
 rm unmerged/*.root
 
 echo "
