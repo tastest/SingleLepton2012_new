@@ -93,7 +93,7 @@ void doAll(bool skipFWLite = true)
  
   // flags for files to run over
   bool rundata     = 0;
-  bool runttall    = 1;
+  bool runttall    = 0;
   bool runWjets    = 0;
   bool runVV       = 0;
   bool runQCD      = 0;
@@ -106,6 +106,7 @@ void doAll(bool skipFWLite = true)
   bool runT2tt_few = 0;
   bool runT2bw     = 0;
   bool runT2bw_few = 0;
+  bool runtttest   = 1;
 
   bool rundata2012a      = 0;
   bool rundata2012b      = 0;
@@ -192,6 +193,20 @@ void doAll(bool skipFWLite = true)
     pickSkimIfExists(chtopall,"/tmp/merged_ntuple_157.root");
     //    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged*.root");
 
+  }
+
+  //----------------------------------------
+  // ttbar: 
+  //----------------------------------------
+
+  TChain* chtttest = new TChain("Events");
+
+  if (runtttest) {
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_1.root");
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_2.root");
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_3.root");
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_4.root");
+    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_5.root");
   }
 
   //----------------------------------------
@@ -614,6 +629,12 @@ void doAll(bool skipFWLite = true)
     cout << "Processing ttbar all.. " << endl;
     looper->ScanChain(chtopall,"ttall", kttall, prettall, lumi);
     cout << "Done processing ttbar all.. " << endl;
+  }
+  //--------------------------------------------------------------------
+  if (runtttest) {
+    cout << "Processing ttbar test.. " << endl;
+    looper->ScanChain(chtttest,"tttest", 1, 1, lumi);
+    cout << "Done processing ttbar test.. " << endl;
   }
   //--------------------------------------------------------------------
   if (runtt_scaleup) {
