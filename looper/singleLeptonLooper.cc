@@ -1384,9 +1384,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
    */
 
   std::vector<std::string> list_of_file_names;
-  list_of_file_names.push_back("jetSmearData/Spring10_PtResolution_AK5PF.txt");
-  list_of_file_names.push_back("jetSmearData/Spring10_PhiResolution_AK5PF.txt");
-  list_of_file_names.push_back("jetSmearData/jet_resolutions.txt");
+  list_of_file_names.push_back("../CORE/jetsmear/data/Spring10_PtResolution_AK5PF.txt");
+  list_of_file_names.push_back("../CORE/jetsmear/data/Spring10_PhiResolution_AK5PF.txt");
+  list_of_file_names.push_back("../CORE/jetsmear/data/jet_resolutions.txt");
   JetSmearer *jetSmearer = makeJetSmearer(list_of_file_names);
 
   //------------------------------------------------
@@ -3184,29 +3184,29 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       // find jet with max EM fraction outside tracker acceptance
       //-------------------------------------------------------------
 
-      for (unsigned int ijet = 0; ijet < jets_p4().size(); ijet++) {
+//       for (unsigned int ijet = 0; ijet < jets_p4().size(); ijet++) {
 	
-	LorentzVector vjet = jets_p4().at(ijet) * jets_corL1FastL2L3().at(ijet);
+// 	LorentzVector vjet = jets_p4().at(ijet) * jets_corL1FastL2L3().at(ijet);
 
-	if( fabs( vjet.eta() ) < 2.5 )         continue;
+// 	if( fabs( vjet.eta() ) < 2.5 )         continue;
 
-	bool rejectJet = false;
-	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( dRbetweenVectors( vjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
-	}
-	if( rejectJet ) continue;
+// 	bool rejectJet = false;
+// 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
+// 	  if( dRbetweenVectors( vjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
+// 	}
+// 	if( rejectJet ) continue;
 
-	float emfrac = jets_emFrac().at(ijet);
+// 	float emfrac = jets_emFrac().at(ijet);
 
-	if( vjet.pt() < 10. ) continue;
+// 	if( vjet.pt() < 10. ) continue;
 
-	if( emfrac > emjet10_ ) emjet10_ = emfrac;
+// 	if( emfrac > emjet10_ ) emjet10_ = emfrac;
 
-	if( vjet.pt() < 20. ) continue;
+// 	if( vjet.pt() < 20. ) continue;
 
-	if( emfrac > emjet20_ ) emjet20_ = emfrac;
+// 	if( emfrac > emjet20_ ) emjet20_ = emfrac;
 
-      }
+//       }
 
       //--------------------------------
       // get non-isolated leptons
@@ -3776,7 +3776,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   cout << endl;
   cout << "Sample: " << prefix << endl;
   cout << endl;
-  cout << "-----------------------" << endl;
+  cout << "-----------------------" << endl; 
   cout << "| Lepton yields       |" << endl;
   cout << "-----------------------" << endl;
   cout << "ne  " << netot       << endl;
@@ -4433,7 +4433,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
 float singleLeptonLooper::dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx ){
   
-  return ((cms2.trks_vertex_p4()[trkidx].z()-cms2.vtxs_position()[vtxidx].z()) - ((cms2.trks_vertex_p4()[trkidx].x()-cms2.vtxs_position()[vtxidx].x()) * cms2.trks_trk_p4()[trkidx].px() + (cms2.trks_vertex_p4()[trkidx].y() - cms2.vtxs_position()[vtxidx].y()) * cms2.trks_trk_p4()[trkidx].py())/cms2.trks_trk_p4()[trkidx].pt() * cms2.trks_trk_p4()[trkidx].pz()/cms2.trks_trk_p4()[trkidx].pt());
+  //  return ((cms2.trks_vertex_p4()[trkidx].z()-cms2.vtxs_position()[vtxidx].z()) - ((cms2.trks_vertex_p4()[trkidx].x()-cms2.vtxs_position()[vtxidx].x()) * cms2.trks_trk_p4()[trkidx].px() + (cms2.trks_vertex_p4()[trkidx].y() - cms2.vtxs_position()[vtxidx].y()) * cms2.trks_trk_p4()[trkidx].py())/cms2.trks_trk_p4()[trkidx].pt() * cms2.trks_trk_p4()[trkidx].pz()/cms2.trks_trk_p4()[trkidx].pt());
+  return trks_dz_pv(trkidx,vtxidx).first;
   
 }
 
@@ -4700,7 +4701,8 @@ pair<float,float> singleLeptonLooper::getTrackerMET( P4 *lep, double deltaZCut, 
 
         int trkIndex = cms2.pfcands_trkidx().at(i);
         if (trkIndex<0) continue;
-        double dzpv = dzPV(cms2.trks_vertex_p4()[trkIndex], cms2.trks_trk_p4()[trkIndex], cms2.vtxs_position().front());
+	//        double dzpv = dzPV(cms2.trks_vertex_p4()[trkIndex], cms2.trks_trk_p4()[trkIndex], cms2.vtxs_position().front());
+	double dzpv = trks_dz_pv(trkIndex,0).first;
 
         if ( fabs(dzpv) > deltaZCut) continue;
 
@@ -4739,7 +4741,7 @@ float getsltrigweight(int id1, float pt, float eta)
       if ( pt>=36 && pt<38 ) return 0.91;
       if ( pt>=38 && pt<40 ) return 0.92;
       if ( pt>=40 && pt<50 ) return 0.94;
-      if ( pt>=50 && pt<60 ) return 0.95;
+      if ( pt>=50 && pt<60 ) return 0.95; 
       if ( pt>=60 && pt<80 ) return 0.96;
       if ( pt>=80 && pt<100 ) return 0.96;
       if ( pt>=100 && pt<150 ) return 0.96;
