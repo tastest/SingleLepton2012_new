@@ -93,7 +93,8 @@ float getMT( float leppt , float lepphi , float met , float metphi );
 float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , float pt_thresh );
 float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool dovtxcut = false , float pt_thresh = 0.0); 
 
-//--------------------------------------------------------------------                                                                                                                                                   
+//--------------------------------------------------------------------   
+                              
 double dRbetweenVectors(const LorentzVector &vec1,
                         const LorentzVector &vec2 );
 
@@ -120,5 +121,20 @@ bool objectPassTrigger(const LorentzVector &obj, const std::vector<LorentzVector
 TString triggerName(TString triggerPattern);
 
 bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax ); 
+
+void weight3D_init( std::string WeightFileName );
+
+double weight3D( int pv1, int pv2, int pv3 );
+
+void fillUnderOverFlow(TH1F *h1, float value, float weight = 1.);
+void fillUnderOverFlow(TH2F *h2, float xvalue, float yvalue, float weight = 1.);
+//void fillUnderOverFlow(TProfile *h2, float xvalue, float yvalue);
+void fillOverFlow(TH1F *h1, float value, float weight = 1.);
+void fillOverFlow(TH2F *h2, float xvalue, float yvalue, float weight = 1.);
+void fillHistos(TH1F *h1[4][4],float value, float weight, int myType, int nJetsIdx);
+void fillHistos(TH2F *h2[4][4],float xvalue, float yvalue, float weight, int myType, int nJetsIdx);
+void fillHistos(TProfile *h2[4][4],float xvalue, float yvalue,  int myType, int nJetsIdx);
+float getdltrigweight(int id1, int id2);
+float getsltrigweight(int id1, float pt, float eta);
 
 #endif

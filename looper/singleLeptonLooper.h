@@ -52,23 +52,23 @@ class singleLeptonLooper
         singleLeptonLooper();
         ~singleLeptonLooper() {}
 
-        enum TrigEnum { e_highpt = 0, e_lowpt };  
-        // e_highpt  :   high pt dilepton triggers, 20,10  
-        // e_lowpt   :   dilepton-HT cross triggers, 10,5            
-        enum JetTypeEnum { e_JPT = 0, e_calo , e_pfjet };
-        // e_JPT     :   jpt jets
-        // e_calo    :   l1 and l2 corrected calo jets
-        // e_pfjet   :   corrected pfjets
-        enum MetTypeEnum { e_tcmet = 0, e_muon, e_muonjes , e_pfmet };
-        // e_tcmet   :   track corrected met
-        // e_muon    :   calo met with muon corrections
-        // e_muonjes :   calo met with muon and jet energy scale corrections
-        // e_pfmet   :   particle-flow met
-        enum ZVetoEnum   { e_standard = 0, e_allzveto, e_nozveto, e_selectz };
-        // e_standard:   apply Z-veto to same-flavor pairs
-        // e_allzveto:   apply Z-veto regardless of lepton flavor
-        // e_nozveto :   no Z-veto
-        // e_selectz :   select Z by requiring SF OS pair in Z mass window
+        /* enum TrigEnum { e_highpt = 0, e_lowpt };   */
+        /* // e_highpt  :   high pt dilepton triggers, 20,10   */
+        /* // e_lowpt   :   dilepton-HT cross triggers, 10,5             */
+        /* enum JetTypeEnum { e_JPT = 0, e_calo , e_pfjet }; */
+        /* // e_JPT     :   jpt jets */
+        /* // e_calo    :   l1 and l2 corrected calo jets */
+        /* // e_pfjet   :   corrected pfjets */
+        /* enum MetTypeEnum { e_tcmet = 0, e_muon, e_muonjes , e_pfmet }; */
+        /* // e_tcmet   :   track corrected met */
+        /* // e_muon    :   calo met with muon corrections */
+        /* // e_muonjes :   calo met with muon and jet energy scale corrections */
+        /* // e_pfmet   :   particle-flow met */
+        /* enum ZVetoEnum   { e_standard = 0, e_allzveto, e_nozveto, e_selectz }; */
+        /* // e_standard:   apply Z-veto to same-flavor pairs */
+        /* // e_allzveto:   apply Z-veto regardless of lepton flavor */
+        /* // e_nozveto :   no Z-veto */
+        /* // e_selectz :   select Z by requiring SF OS pair in Z mass window */
         enum FREnum   { e_qcd = 0, e_wjets };
         // e_qcd     :   derive prediction for 2 fake leptons
         // e_wjets   :   derive prediction for 1 real and one fake lepton
@@ -81,8 +81,6 @@ class singleLeptonLooper
         void BookHistos (char *prefix);
 	void InitBaby();
 	//	float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx = 0 );
-	void weight3D_init( std::string WeightFileName );
-	double weight3D( int pv1, int pv2, int pv3 );
 
         // Set globals
         void set_susybaseline (bool  b)    { g_susybaseline = b; }
@@ -90,7 +88,7 @@ class singleLeptonLooper
         void set_useBitMask   (bool  b)    { g_useBitMask   = b; }
         void set_version      (const char* v)    { g_version      = v; }
 	void set_json         (const char* v)    { g_json         = v; }        
-        void set_trigger      (TrigEnum t) { g_trig         = t; } 
+        //void set_trigger      (TrigEnum t) { g_trig         = t; } 
 
         // Baby ntuple methods
         void makeTree (char *prefix,bool doFakeApp, FREnum frmode );
@@ -116,7 +114,7 @@ class singleLeptonLooper
         bool  g_useBitMask;
         const char* g_version;
 	const char* g_json;      
-	TrigEnum g_trig;
+	//TrigEnum g_trig;
         TRandom3 *random3_;
 
 	//PDF information

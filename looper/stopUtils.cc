@@ -1,5 +1,88 @@
 #include "stopUtils.h"
 
+//--------------------------------------------------------------------
+
+void weight3D_init( std::string WeightFileName ) { 
+
+  TFile *infile = new TFile(WeightFileName.c_str());
+  TH1F *WHist = (TH1F*)infile->Get("WHist");
+
+  
+  // Check if the histogram exists           
+  if (!WHist) {
+    cout << "Error, could not find the histogram WHist in the file "
+	 << WeightFileName << ", quitting" << endl;
+    exit(0);
+  }
+
+  for (int i=0; i<50; i++) 
+    for(int j=0; j<50; j++)
+      for(int k=0; k<50; k++) {
+	Weight3D[i][j][k] = WHist->GetBinContent(i+1,j+1,k+1);
+      }
+
+  cout << " 3D Weight Matrix initialized! " << endl;
+
+  delete infile;
+
+  return;
+
+
+}
+
+//--------------------------------------------------------------------
+
+double weight3D( int pv1, int pv2, int pv3 ) {
+
+  using std::min;
+
+  int npm1 = min(pv1,49);
+  int np0 = min(pv2,49);
+  int npp1 = min(pv3,49);
+
+  return Weight3D[npm1][np0][npp1];
+
+}
+
+//--------------------------------------------------------------------
+
+void checkElectron( int elidx ){
+
+  cout << "Check electron" << endl;
+  cout << "Pass all    " << pass_electronSelection( elidx , electronSelection_ssV5			) << endl;
+  cout << "Pass ID     " << pass_electronSelection( elidx , electronSelection_ssV5_noIso		) << endl;
+  cout << "Pass iso    " << pass_electronSelection( elidx , electronSelection_ssV5_iso	        	) << endl;
+  cout << "VBTF90      " << pass_electronSelection( elidx , 1ll<<ELEID_VBTF_90_HLT_CALOIDT_TRKIDVL	) << endl;
+  cout << "PV          " << pass_electronSelection( elidx , 1ll<<ELEIP_PV_OSV2				) << endl;
+  cout << "nomuon      " << pass_electronSelection( elidx , 1ll<<ELENOMUON_010				) << endl;
+  cout << "hitpattern  " << pass_electronSelection( elidx , 1ll<<ELENOTCONV_HITPATTERN			) << endl;
+  cout << "convrej     " << pass_electronSelection( elidx , 1ll<<ELENOTCONV_DISTDCOT002			) << endl;
+  cout << "pt10        " << pass_electronSelection( elidx , 1ll<<ELEPT_010				) << endl;
+  cout << "eta25       " << pass_electronSelection( elidx , 1ll<<ELEETA_250				) << endl;
+  cout << "transition  " << pass_electronSelection( elidx , 1ll<<ELE_NOT_TRANSITION			) << endl;
+  cout << "HLT iso     " << pass_electronSelection( elidx , 1ll<<ELEISO_ECAL_RELNT020_NPS		) << endl;
+  cout << "offline iso " << pass_electronSelection( elidx , 1ll<<ELEISO_RELNT015			) << endl;
+
+}
+
+void checkMuon( int muidx ){
+
+  cout << "Check muon" << endl;
+  cout << "Pass all  " <<  muonId(muidx , OSGeneric_v3)                                            << endl;
+  cout << "Pass ID   " <<  muonIdNotIsolated(muidx , OSGeneric_v3 )                                << endl;
+  cout << "Pass iso  " <<  ( muonIsoValue(muidx,false) < 0.15 )                                    << endl;
+  cout << "eta24     " <<  ( TMath::Abs(mus_p4()[muidx].eta()) < 2.4)                         << endl;
+  cout << "chi2/ndf  " <<  ( mus_gfit_chi2().at(muidx)/mus_gfit_ndof().at(muidx) < 10)   << endl;
+  cout << "global    " <<  ( ((mus_type().at(muidx)) & (1<<1)) != 0)                          << endl;
+  cout << "tracker   " <<  ( ((mus_type().at(muidx)) & (1<<2)) != 0)                          << endl;
+  cout << "nhits     " <<  ( mus_validHits().at(muidx) > 10)                                  << endl;
+  cout << "stahits   " <<  ( mus_gfit_validSTAHits().at(muidx) != 0)                          << endl;
+  cout << "d0PV      " <<  ( TMath::Abs(mud0PV_smurfV3(muidx)) < 0.02)                             << endl;
+  cout << "dzPV      " <<  ( TMath::Abs(mudzPV_smurfV3(muidx)) < 1  )                              << endl;
+  cout << "dpt/pt    " <<  ( mus_ptErr().at(muidx)/mus_p4().at(muidx).pt()<0.1)          << endl;
+
+}
+
 //--------------------------------------------------------------------                                                                                                                                               
 
 pair<float, float> ScaleMET( pair<float, float> p_met, LorentzVector p4_dilep, double rescale){
@@ -22,22 +105,22 @@ pair<float, float> ScaleMET( pair<float, float> p_met, LorentzVector p4_dilep, d
   return p_met2;
 }
 
-//--------------------------------------------------------------------                                                                                                                                               
+//--------------------------------------------------------------------                                                                                 
 
-pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) {
+pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) {                                                 
 
-  //using met phi corrections from C. Veelken (emails from Oct. 4th)                                                                                                                             
-  //previous versions are available here:                                                                                                                                                        
-  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py                                                                           
+  //using met phi corrections from C. Veelken (emails from Oct. 4th)                                                                                 
+  //previous versions are available here:                                                                                                            
+  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py                               
 
-  // Data                                                                                                                                                                                        
-  // ------                                                                                                                                                                                      
-  // x :  "+2.87340e-01 + 3.29813e-01*Nvtx"                                                                                                                                                      
-  // y : "-2.27938e-01 - 1.71272e-01*Nvtx"                                                                                                                                                       
-  // MC                                                                                                                                                                                          
-  // ------                                                                                                                                                                                      
-  // x : "+8.72683e-02 - 1.66671e-02*Nvtx"                                                                                                                                                       
-  // y :  "+1.86650e-01 - 1.21946e-01*Nvtx"                                                                                                                                                      
+  // Data                                                                                                                                            
+  // ------                                                                                                                                          
+  // x :  "+2.87340e-01 + 3.29813e-01*Nvtx"                                                                                                          
+  // y : "-2.27938e-01 - 1.71272e-01*Nvtx"                                                                                                           
+  // MC                                                                                                                                              
+  // ------                                                                                                                                          
+  // x : "+8.72683e-02 - 1.66671e-02*Nvtx"                                                                                                           
+  // y :  "+1.86650e-01 - 1.21946e-01*Nvtx"                                                                                                                                                
 
 
   float metx = met * cos( metphi );
@@ -46,7 +129,7 @@ pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) 
   float shiftx = 0.;
   float shifty = 0.;
 
-  //use correction for data vs. mc                                                                                                                                                               
+  //use correction for data vs. mc                                                                                                                  
   shiftx = ismc ? (+8.72683e-02 - 1.66671e-02*nvtx)
     : (+2.87340e-01 + 3.29813e-01*nvtx);
   shifty = ismc ? (+1.86650e-01 - 1.21946e-01*nvtx)
@@ -439,3 +522,104 @@ bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax = 0
   return false;
 }
 
+
+//--------------------------------------------------------------------
+
+void fillUnderOverFlow(TH1F *h1, float value, float weight)
+{
+  float min = h1->GetXaxis()->GetXmin();
+  float max = h1->GetXaxis()->GetXmax();
+
+  if (value > max) value = h1->GetBinCenter(h1->GetNbinsX());
+  if (value < min) value = h1->GetBinCenter(1);
+
+  h1->Fill(value, weight);
+}
+
+//--------------------------------------------------------------------
+
+void fillUnderOverFlow(TH2F *h2, float xvalue, float yvalue, float weight)
+{
+  float maxx = h2->GetXaxis()->GetXmax();
+  float minx = h2->GetXaxis()->GetXmin();
+  float maxy = h2->GetYaxis()->GetXmax();
+  float miny = h2->GetYaxis()->GetXmin();
+
+  if (xvalue > maxx) xvalue = h2->GetXaxis()->GetBinCenter(h2->GetNbinsX());
+  if (xvalue < minx) xvalue = h2->GetXaxis()->GetBinCenter(1);
+  if (yvalue > maxy) yvalue = h2->GetYaxis()->GetBinCenter(h2->GetNbinsY());
+  if (yvalue < miny) yvalue = h2->GetYaxis()->GetBinCenter(1);
+
+  h2->Fill(xvalue, yvalue, weight);
+}
+
+//--------------------------------------------------------------------
+
+// void fillUnderOverFlow(TProfile *h2, float xvalue, float yvalue)
+// {
+//   float maxx = h2->GetXaxis()->GetXmax();
+//   float minx = h2->GetXaxis()->GetXmin();
+//   float maxy = h2->GetYaxis()->GetXmax();
+//   float miny = h2->GetYaxis()->GetXmin();
+
+//   if (xvalue > maxx) xvalue = h2->GetXaxis()->GetBinCenter(h2->GetNbinsX());
+//   if (xvalue < minx) xvalue = h2->GetXaxis()->GetBinCenter(1);
+//   if (yvalue > maxy) yvalue = h2->GetYaxis()->GetBinCenter(h2->GetNbinsY());
+//   if (yvalue < miny) yvalue = h2->GetYaxis()->GetBinCenter(1);
+
+//   h2->Fill(xvalue, yvalue);
+// }
+
+//--------------------------------------------------------------------
+
+void fillOverFlow(TH1F *h1, float value, float weight)
+{
+  float max = h1->GetXaxis()->GetXmax();
+  if (value > max) value = h1->GetBinCenter(h1->GetNbinsX());
+  h1->Fill(value, weight);
+}
+
+//--------------------------------------------------------------------
+
+void fillOverFlow(TH2F *h2, float xvalue, float yvalue, float weight)
+{
+  float maxx = h2->GetXaxis()->GetXmax();
+  float maxy = h2->GetYaxis()->GetXmax();
+
+  if (xvalue > maxx) xvalue = h2->GetXaxis()->GetBinCenter(h2->GetNbinsX());
+  if (yvalue > maxy) yvalue = h2->GetYaxis()->GetBinCenter(h2->GetNbinsY());
+
+  h2->Fill(xvalue, yvalue, weight);
+}
+
+//--------------------------------------------------------------------
+
+void fillHistos(TH1F *h1[4][4],float value, float weight, int myType, int nJetsIdx)
+{
+  fillUnderOverFlow(h1[myType][nJetsIdx], value, weight);      
+  fillUnderOverFlow(h1[myType][3],        value, weight);      
+  fillUnderOverFlow(h1[3][nJetsIdx],      value, weight);      
+  fillUnderOverFlow(h1[3][3],             value, weight);      
+}
+
+//--------------------------------------------------------------------
+
+void fillHistos(TH2F *h2[4][4],float xvalue, float yvalue, float weight, int myType, int nJetsIdx)
+{
+  fillUnderOverFlow(h2[myType][nJetsIdx], xvalue, yvalue, weight);      
+  fillUnderOverFlow(h2[myType][3],        xvalue, yvalue, weight);      
+  fillUnderOverFlow(h2[3][nJetsIdx],      xvalue, yvalue, weight);      
+  fillUnderOverFlow(h2[3][3],             xvalue, yvalue, weight);      
+}
+
+//--------------------------------------------------------------------
+
+void fillHistos(TProfile *h2[4][4],float xvalue, float yvalue, int myType, int nJetsIdx)
+{
+  h2[myType][nJetsIdx] -> Fill(xvalue, yvalue);      
+  h2[myType][3]        -> Fill(xvalue, yvalue);      
+  h2[3][nJetsIdx]      -> Fill(xvalue, yvalue);      
+  h2[3][3]             -> Fill(xvalue, yvalue);      
+}
+
+//--------------------------------------------------------------------
