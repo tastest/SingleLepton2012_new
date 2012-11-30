@@ -10,6 +10,8 @@
 #include <cmath>
 #include "assert.h"
 
+#include "../../../looper/Candidate.h"
+
 using namespace std;
 using namespace ROOT::Math;
 
@@ -138,6 +140,9 @@ class StopTree {
 	LorentzVector pfjet6_;
 	LorentzVector pflep1_;
 	LorentzVector pflep2_;
+
+        CANDIDATES* candidates_;
+        vector<LorentzVector>* jets_;
 
     public:
         /// this is the main element
@@ -287,9 +292,12 @@ class StopTree {
             tree_->Branch("pfjet4",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet4Ptr_);
             tree_->Branch("pfjet5",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet5Ptr_);
             tree_->Branch("pfjet6",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet6Ptr_);
+
             tree_->Branch("pflep1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep1Ptr_);
             tree_->Branch("pflep2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep2Ptr_);
-             
+
+            tree_->Branch("candidates", "std::vector<Candidate>", &candidates_);
+            tree_->Branch("jets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &jets_);
         }
 
         // initialze a StopTree
@@ -416,6 +424,9 @@ class StopTree {
             tree_->SetBranchAddress("pfjet6", 		  &jet6Ptr_);
             tree_->SetBranchAddress("pflep1",   	  &pflep1Ptr_);
             tree_->SetBranchAddress("pflep2",   	  &pflep2Ptr_);
+
+            tree_->SetBranchAddress("candidates",  &candidates_);
+            tree_->SetBranchAddress("jets",  &jets_);
 
             gErrorIgnoreLevel = currentState;
         }
@@ -686,7 +697,10 @@ StopTree::InitVariables(){
     pfjet6_		= LorentzVector();
     pflep1_		= LorentzVector();
     pflep2_		= LorentzVector();
-    
+
+    candidates_ = 0;
+    jets_ = 0;
+
 }
 
 inline double
