@@ -6,17 +6,20 @@
 
 #include <vector>
 #include <list>
+#include <string>
 #include <map>
 #include "Math/LorentzVector.h"
 #include "Math/PxPyPzE4D.h"
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
 
+#include "stopUtils.h"
+
 //#include "../CORE/topmass/ttdilepsolve.h" REPLACETOPMASS
 
-typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
-typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
-typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
-typedef map<unsigned int, unsigned int> m_uiui;
+//typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+//typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
+//typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
+//typedef map<unsigned int, unsigned int> m_uiui;
 
 class  TChain;
 class  TH1F;
@@ -77,7 +80,7 @@ class singleLeptonLooper
                        );
         void BookHistos (char *prefix);
 	void InitBaby();
-	float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx = 0 );
+	//	float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx = 0 );
 	void weight3D_init( std::string WeightFileName );
 	double weight3D( int pv1, int pv2, int pv3 );
 
@@ -85,20 +88,20 @@ class singleLeptonLooper
         void set_susybaseline (bool  b)    { g_susybaseline = b; }
         void set_createTree   (bool  b)    { g_createTree   = b; }
         void set_useBitMask   (bool  b)    { g_useBitMask   = b; }
-        void set_version      (char* v)    { g_version      = v; }
-	void set_json         (char* v)    { g_json         = v; }        
+        void set_version      (const char* v)    { g_version      = v; }
+	void set_json         (const char* v)    { g_json         = v; }        
         void set_trigger      (TrigEnum t) { g_trig         = t; } 
 
         // Baby ntuple methods
         void makeTree (char *prefix,bool doFakeApp, FREnum frmode );
 	float stopPairCrossSection( float stopmass );
         void closeTree ();
-	float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool dovtxcut = false , float pt_thresh = 0.0);
+	//	float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool dovtxcut = false , float pt_thresh = 0.0);
 	std::vector<float> trackIsoPtRanges( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	std::vector<float> totalIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	//pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV = false);
-	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
-	pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true );
+	//	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
+	//	pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true );
 	bool initialized;
 	TH1D*   stop_xsec_hist;
 	TFile*  stop_xsec_file;
@@ -111,8 +114,8 @@ class singleLeptonLooper
         bool  g_susybaseline;
         bool  g_createTree;
         bool  g_useBitMask;
-        char* g_version;
-	char* g_json;      
+        const char* g_version;
+	const char* g_json;      
 	TrigEnum g_trig;
         TRandom3 *random3_;
 
