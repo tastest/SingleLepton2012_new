@@ -104,7 +104,7 @@ class singleLeptonLooper
 	TH1D*   stop_xsec_hist;
 	TFile*  stop_xsec_file;
 	//3D Vertex weight
-	double Weight3D[50][50][50];
+	//	double Weight3D[50][50][50];
 
     private:
 

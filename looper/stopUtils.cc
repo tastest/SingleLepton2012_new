@@ -1,6 +1,21 @@
 #include "stopUtils.h"
 
+/*
 //--------------------------------------------------------------------
+
+double weight3D( int pv1, int pv2, int pv3 ) {
+
+  using std::min;
+
+  int npm1 = min(pv1,49);
+  int np0 = min(pv2,49);
+  int npp1 = min(pv3,49);
+
+  return Weight3D[npm1][np0][npp1];
+
+}
+
+//--------------------------------------------------------------------                
 
 void weight3D_init( std::string WeightFileName ) { 
 
@@ -29,21 +44,7 @@ void weight3D_init( std::string WeightFileName ) {
 
 
 }
-
-//--------------------------------------------------------------------
-
-double weight3D( int pv1, int pv2, int pv3 ) {
-
-  using std::min;
-
-  int npm1 = min(pv1,49);
-  int np0 = min(pv2,49);
-  int npp1 = min(pv3,49);
-
-  return Weight3D[npm1][np0][npp1];
-
-}
-
+*/
 //--------------------------------------------------------------------
 
 void checkElectron( int elidx ){

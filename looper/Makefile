@@ -10,7 +10,7 @@ ifeq ($(shell root-config --platform),macosx)
 	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector
 endif
 
-SOURCES = singleLeptonLooper.cc mt2w_bisect.cc mt2bl_bisect.cc ../CORE/MT2/MT2Utility.cc
+SOURCES = singleLeptonLooper.cc mt2w_bisect.cc mt2bl_bisect.cc ../CORE/MT2/MT2Utility.cc stopUtils.cc
 OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libsingleLeptonLooper.so
 
@@ -41,8 +41,8 @@ $(FWLIB):
         $(MAKE) -f Makefile; cd -; \
 	cp $(FWLIB) .;
 
-LinkDef_out.cxx: LinkDef.h singleLeptonLooper.h
-	rootcint -f $@ -c $(INCLUDE) singleLeptonLooper.h $<
+LinkDef_out.cxx: LinkDef.h singleLeptonLooper.h stopUtils.h
+	rootcint -f $@ -c $(INCLUDE) singleLeptonLooper.h stopUtils.h $<
 
 # General rule for making object files
 %.d:	%.cc

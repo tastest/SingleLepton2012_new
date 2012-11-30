@@ -122,9 +122,12 @@ TString triggerName(TString triggerPattern);
 
 bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax ); 
 
-void weight3D_init( std::string WeightFileName );
+//double weight3D( int pv1, int pv2, int pv3 );
 
-double weight3D( int pv1, int pv2, int pv3 );
+//void weight3D_init( std::string WeightFileName );
+
+//3D Vertex weight
+//double Weight3D[50][50][50];
 
 void fillUnderOverFlow(TH1F *h1, float value, float weight = 1.);
 void fillUnderOverFlow(TH2F *h2, float xvalue, float yvalue, float weight = 1.);
