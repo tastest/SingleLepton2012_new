@@ -21,42 +21,37 @@
 #include "TRandom3.h"
 #include "Math/LorentzVector.h"
 
-
-
-#include "../CORE/MT2/MT2Utility.h"                                                                                                                                                                                  
-#include "mt2w_bisect.h"                                                                                                                                                                                             
-#include "mt2bl_bisect.h"  
-
+#include "../CORE/MT2/MT2Utility.h"
+#include "mt2w_bisect.h"
+#include "mt2bl_bisect.h"
 #include "../CORE/CMS2.h"
-
-#include "../CORE/utilities.h"                                                                                                                                                                                       
-#include "../CORE/ssSelections.h"                                                                                                                                                                                    
-#include "../CORE/electronSelections.h"                                                                                                                                                                              
-#include "../CORE/electronSelectionsParameters.h"                                                                                                                                                                    
-#include "../CORE/MITConversionUtilities.h"                                                                                                                                                                          
-#include "../CORE/muonSelections.h"                                                                                                                                                                                  
-#include "../CORE/eventSelections.h"                                                                                                                                                                                 
-#include "../CORE/trackSelections.h"                                                                                                                                                                                 
-#include "../CORE/metSelections.h"                                                                                                                                                                                   
-#include "../CORE/jetcorr/FactorizedJetCorrector.h"                                                                                                                                                                  
-#include "../CORE/jetcorr/JetCorrectionUncertainty.h"                                                                                                                                                                
-#include "../CORE/jetSelections.h"                                                                                                                                                                                   
-#include "../CORE/jetSmearingTools.h"                                                                                                                                                                                
-#include "../CORE/photonSelections.h"                                                                                                                                                                                
-#include "../CORE/triggerUtils.h"                                                                                                                                                                                    
-#include "../CORE/triggerSuperModel.h"                                                                                                                                                                               
-#include "../CORE/mcSelections.h"                                                                                                                                                                                    
-#include "../CORE/susySelections.h"                                                                                                                                                                                  
-#include "../CORE/mcSUSYkfactor.h"                                                                                                                                                                                   
-#include "../CORE/SimpleFakeRate.h"              
+#include "../CORE/utilities.h"
+#include "../CORE/ssSelections.h"
+#include "../CORE/electronSelections.h"
+#include "../CORE/electronSelectionsParameters.h"
+#include "../CORE/MITConversionUtilities.h"
+#include "../CORE/muonSelections.h"
+#include "../CORE/eventSelections.h"
+#include "../CORE/trackSelections.h"
+#include "../CORE/metSelections.h"
+#include "../CORE/jetcorr/FactorizedJetCorrector.h"
+#include "../CORE/jetcorr/JetCorrectionUncertainty.h"
+#include "../CORE/jetSelections.h"
+#include "../CORE/jetSmearingTools.h"
+#include "../CORE/photonSelections.h"
+#include "../CORE/triggerUtils.h"
+#include "../CORE/triggerSuperModel.h"
+#include "../CORE/mcSelections.h"
+#include "../CORE/susySelections.h"
+#include "../CORE/mcSUSYkfactor.h"
+#include "../CORE/SimpleFakeRate.h"
 
 using namespace tas;
 using namespace std;
 
-
-typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+//typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
-typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
+//typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
 typedef map<unsigned int, unsigned int> m_uiui;
 
 struct indP4{

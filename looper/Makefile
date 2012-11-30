@@ -41,8 +41,8 @@ $(FWLIB):
         $(MAKE) -f Makefile; cd -; \
 	cp $(FWLIB) .;
 
-LinkDef_out.cxx: LinkDef.h singleLeptonLooper.h stopUtils.h
-	rootcint -f $@ -c $(INCLUDE) singleLeptonLooper.h stopUtils.h $<
+LinkDef_out.cxx: LinkDef.h singleLeptonLooper.h
+	rootcint -f $@ -c $(INCLUDE) singleLeptonLooper.h $<
 
 # General rule for making object files
 %.d:	%.cc

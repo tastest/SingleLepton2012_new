@@ -12,13 +12,11 @@
 #include "Math/PxPyPzE4D.h"
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
 
-#include "stopUtils.h"
-
 //#include "../CORE/topmass/ttdilepsolve.h" REPLACETOPMASS
 
-//typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 //typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
-//typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
+typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
 //typedef map<unsigned int, unsigned int> m_uiui;
 
 class  TChain;
