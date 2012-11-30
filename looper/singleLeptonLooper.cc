@@ -2271,13 +2271,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float maxjetpt  = -1.;
       float ht_ = 0.;
 
-      //      VofP4 vpfjets_p4;
+      VofP4 vpfjets_p4;
+      vpfjets_p4.clear();
       VofP4 vpfrawjets_p4;
-      //      vpfjets_p4.clear();
       vpfrawjets_p4.clear();
       VofiP4 vipfjets_p4;
       vipfjets_p4.clear();
-
+      
+      vector<float> vpfjets_csv;
       vector<float> fullcors;
       vector<float> l2l3cors;
       vector<float> rescors;
@@ -2286,6 +2287,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       l2l3cors.clear();
       rescors.clear();
       l1cors.clear();
+      vpfjets_csv.clear();
 
       rhovor_ = evt_ww_rho_vor();
 
@@ -2384,9 +2386,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 
 	// store L1FastL2L3Residual jet p4's pt > 15 GeV
-	if( vjet.pt() > 15 && fabs( vjet.eta() ) < 2.5 ){
-	  //	  vpfjets_p4.push_back( vjet );
+	if( vjet.pt() > 20 && fabs( vjet.eta() ) < 4.7 ){
 	  vipfjets_p4.push_back( ivjet );
+	  vpfjets_p4.push_back(vjet);
+	  vpfjets_csv.push_back(pfjets_combinedSecondaryVertexBJetTag().at(ijet));
 	}
 
 	// njets JEC up
@@ -2631,6 +2634,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       // check if jet is b-tagged
       //      sort(vpfjets_p4.begin(), vpfjets_p4.end(), sortByPt);
       sort(vipfjets_p4.begin(), vipfjets_p4.end(), sortIP4ByPt);
+
+      for( int i = 0 ; i < vipfjets_p4.size() ; ++i ){
+	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
+	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
+	//add: beta, beta2, 3 gen branches below (lepjet,qgjet,genjet), q vs. g discrimination
+      }
 
       if( vipfjets_p4.size() > 0 ) {
 	pfjet1_  = &vipfjets_p4.at(0).p4obj;
@@ -3259,12 +3268,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       sltrigweight_ = isData ? 1. : getsltrigweight( id1_, lep1_->pt() , lep1_->eta() );
       dltrigweight_ = (!isData && ngoodlep_>1) ? getdltrigweight( id1_, id2_ ) : 1.;
     
-      /*
-      /// hadronci stop reconstruction
+
+      /// hadronic stop reconstruction
       candidates_.clear(); 
+
+      // OLD: used uncorrected jets
+      // list<Candidate> candidates = recoHadronicTop(jetSmearer, isData, lep1_,
+      //                   t1metphicorr_, t1metphicorrphi_,
+      //                   vpfrawjets_p4, pfjets_combinedSecondaryVertexBJetTag());
+
+      // NEW: use corrected jets and corresponding CSV values
       list<Candidate> candidates = recoHadronicTop(jetSmearer, isData, lep1_,
                         t1metphicorr_, t1metphicorrphi_,
-                        vpfrawjets_p4, pfjets_combinedSecondaryVertexBJetTag());
+                        vpfjets_p4, vpfjets_csv);
+
       for (list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); ++it)
           candidates_.push_back(*it);
 
@@ -3274,7 +3291,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
          jets_.push_back(vpfrawjets_p4.at(i));
          btag_.push_back( pfjets_combinedSecondaryVertexBJetTag().at(i) );
       }
-      */
+
 
       outTree->Fill();
     
@@ -3839,6 +3856,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("candidates", "std::vector<Candidate>", &candidates_);
   outTree->Branch("jets", "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &jets_ );
   outTree->Branch("btag", "std::vector<float>", &btag_ );
+
+  outTree->Branch("pfjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_ );
+  outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
 
 }
 

@@ -364,6 +364,9 @@ class singleLeptonLooper
         VofP4 jets_;
         std::vector<float> btag_;
 
+        VofP4 pfjets_;
+        std::vector<float> pfjets_csv_;
+
 	// jet p4's
         LorentzVector*  pfjet1_; 
         LorentzVector*  pfjet2_; 
