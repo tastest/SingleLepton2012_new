@@ -613,6 +613,8 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
                                  LorentzVector* lep, double met, double metphi,
                                  VofP4 jets, std::vector<float> btag){
 
+  assert( jets.size() == btag.size() );
+
   float metx = met * cos( metphi );
   float mety = met * sin( metphi );
 
@@ -2638,7 +2640,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( int i = 0 ; i < vipfjets_p4.size() ; ++i ){
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
-	//add: beta, beta2, 3 gen branches below (lepjet,qgjet,genjet), q vs. g discrimination
+	// VARIABLES TO ADD
+	//beta, beta2, 3 gen branches below (lepjet,qgjet,genjet), q vs. g discrimination
       }
 
       if( vipfjets_p4.size() > 0 ) {
