@@ -1900,7 +1900,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
  	int itrk = pfcands_trkidx().at(ipf);
 	
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( dz_trk_vtx(itrk,0) ) > 0.2 ){
+ 	  if( fabs( trks_dz_pv(itrk,0).first ) > 0.2 ){
  	    fillOverFlow( h_PU_trkpt , pfcands_p4().at(ipf).pt() );
  	  }
  	}
@@ -1937,7 +1937,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  int itrk = pfcands_trkidx().at(ipf);
 	  
 	  if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
-	    if( fabs( dz_trk_vtx(itrk,0) ) > 0.2 ) continue;
+	    if( fabs( trks_dz_pv(itrk,0).first ) > 0.2 ) continue;
 	  }
 	  //Only remove leading lepton to see what happens to the sub-leading lepton
 	  // bool isGoodLepton = false;
@@ -2031,7 +2031,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	float iso = trackIso(ipf, 0.3, dz_cut_loose, true) / pfcands_p4().at(ipf).pt();
 
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( dz_trk_vtx(itrk,0) ) > dz_cut_loose ) continue;
+ 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut_loose ) continue;
  	}
 
 	if( iso < trkreliso10loose_ && !isGoodLepton ){
@@ -2041,7 +2041,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	//tighten dz cut
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( dz_trk_vtx(itrk,0) ) > dz_cut ) continue;
+ 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut ) continue;
  	}
 
 	//recalculated definition of the isolation
@@ -2192,7 +2192,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	bool isLeadLepton = ( dRbetweenVectors( pfcands_p4().at(ipf) , goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
 
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( dz_trk_vtx(itrk,0) ) > dz_cut_loose ) continue;
+ 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut_loose ) continue;
  	}
 
 	float iso = trackIso(ipf, 0.3, dz_cut_loose, true) / pfcands_p4().at(ipf).pt();
@@ -2204,7 +2204,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	//tighten dz cut
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( dz_trk_vtx(itrk,0) ) > dz_cut ) continue;
+ 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut ) continue;
  	}
  
 	iso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
@@ -4040,7 +4040,7 @@ std::vector<float> singleLeptonLooper::totalIso( int thisPf , float coneR , floa
       //----------------------------------------------------------------------------
     
       // if ( vtxi != 0               )     continue;
-      float mindz = dz_trk_vtx(itrk,0);
+      float mindz = trks_dz_pv(itrk,0).first;
       if ( fabs(mindz) > dz_thresh )     continue;
 
       //---------------------------------------

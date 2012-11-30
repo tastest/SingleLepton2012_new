@@ -252,16 +252,6 @@ float getMT( float leppt , float lepphi , float met , float metphi ) {
   return sqrt( 2 * ( leppt * met * (1 - cos( dphi ) ) ) );
 }
 
-//--------------------------------------------------------------------                                                                                                                                               
-float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx ){
-
-  //  return ((trks_vertex_p4()[trkidx].z()-vtxs_position()[vtxidx].z()) - ((trks_vertex_p4()[trkidx].x()-vtxs_position()[vtxidx].x()) * trks_trk_p4()[trkidx].px() + (trks_vertex_p4()[trkidx].y() - vtxs_position()[vtxidx].y()) * trks_trk_p4()[trkidx].py())/trks_trk_p4()[trkidx].pt() * trks_trk_p4()[trkidx].pz()/trks_trk_p4()[trkidx].pt());
-
-  // this is for the slim
-  return trks_dz_pv(trkidx,vtxidx).first;
-
-}
-
 float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , float pt_thresh ){
 
   float iso = 0.0;
@@ -294,7 +284,7 @@ float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , flo
 
         if(!isGoodVertex(ivtx)) continue;
 
-        float mydz = dz_trk_vtx(itrk,ivtx);
+        float mydz = trks_dz_pv(itrk,ivtx).first;
 	//        fillOverFlow( h_dz_vtx_trk , mydz );
 
         if (fabs(mydz) < fabs(mindz)) {
@@ -310,7 +300,7 @@ float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , flo
 
       if ( vtxi != 0 )     continue;
     } else {
-      mindz = dz_trk_vtx(itrk,0);
+      mindz = trks_dz_pv(itrk,0).first;
     }
     if ( fabs(mindz) > dz_thresh )     continue;
 
