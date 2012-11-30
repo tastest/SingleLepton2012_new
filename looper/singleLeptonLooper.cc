@@ -2390,7 +2390,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// store L1FastL2L3Residual jet p4's pt > 15 GeV
 	if( vjet.pt() > 20 && fabs( vjet.eta() ) < 4.7 ){
 	  vipfjets_p4.push_back( ivjet );
-	  vpfjets_p4.push_back(vjet);
+
+	  // the following 2 vectors are passed to the recoHadronicTop function
+	  vpfjets_p4.push_back(vjet); 
 	  vpfjets_csv.push_back(pfjets_combinedSecondaryVertexBJetTag().at(ijet));
 	}
 
