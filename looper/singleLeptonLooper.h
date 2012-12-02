@@ -11,6 +11,7 @@
 #include "Math/LorentzVector.h"
 #include "Math/PxPyPzE4D.h"
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
+#include "../CORE/QuarkGluonTagger/QuarkGluonTagger.h"
 
 //#include "../CORE/topmass/ttdilepsolve.h" REPLACETOPMASS
 

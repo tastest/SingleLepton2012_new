@@ -931,6 +931,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   list_of_file_names.push_back("../CORE/jetsmear/data/jet_resolutions.txt");
   JetSmearer *jetSmearer = makeJetSmearer(list_of_file_names);
  
+  QGLikelihoodCalculator *qglikeli_ = new QGLikelihoodCalculator("../CORE/QuarkGluonTagger/QGTaggerConfig_nCharged_AK5PF.txt","../CORE/QuarkGluonTagger/QGTaggerConfig_nNeutral_AK5PF.txt","../CORE/QuarkGluonTagger/QGTaggerConfig_ptD_AK5PF.txt");
+
   //------------------------------------------------
   // set stop cross section file
   //------------------------------------------------
@@ -2619,6 +2621,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_beta_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,1));
 	pfjets_beta2_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,2));
 	pfjets_jetID_.push_back(passesPFJetID(vipfjets_p4.at(i).p4ind));
+	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
 	if (!isData) pfjets_mc3_.push_back(isGenQGMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
 	if (!isData) pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
        
