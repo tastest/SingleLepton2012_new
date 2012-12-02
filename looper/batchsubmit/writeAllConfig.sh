@@ -58,9 +58,9 @@ TAG="V00-02-03_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_matchingdown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTJets_MatchDown
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaleup_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTJets_ScaleUp
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaledown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTJets_ScaleDown
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTJets_Powheg
-##NEED TO UPDATE!
-##./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-13/ ${TAG}_TTJets_Powheg_Large
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-13_slim/ ${TAG}_TTJets_Powheg
+##SMALL POWHEG SAMPLE
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTJets_Powheg
 
 #
 # W+JETS
