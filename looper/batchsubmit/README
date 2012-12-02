@@ -3,7 +3,7 @@
 --------------------------------------------------
 1) copy files to run looper into job_input directory
 for example, from the looper directory
-> cp -r BtagFuncs.h processBaby.C jetCorrections jetSmearData jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
+> cp -r BtagFuncs.h processBaby.C jetCorrections jetSmearData QGTaggerConfig jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
 
 *) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
 PROXY (not nedded anymore unless you have a special location for your proxy file)

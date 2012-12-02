@@ -913,12 +913,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
    */
 
   std::vector<std::string> list_of_file_names;
-  list_of_file_names.push_back("../CORE/jetsmear/data/Spring10_PtResolution_AK5PF.txt");
-  list_of_file_names.push_back("../CORE/jetsmear/data/Spring10_PhiResolution_AK5PF.txt");
-  list_of_file_names.push_back("../CORE/jetsmear/data/jet_resolutions.txt");
+  list_of_file_names.push_back("jetSmearData/Spring10_PtResolution_AK5PF.txt");
+  list_of_file_names.push_back("jetSmearData/Spring10_PhiResolution_AK5PF.txt");
+  list_of_file_names.push_back("jetSmearData/jet_resolutions.txt");
   JetSmearer *jetSmearer = makeJetSmearer(list_of_file_names);
  
-  QGLikelihoodCalculator *qglikeli_ = new QGLikelihoodCalculator("../CORE/QuarkGluonTagger/QGTaggerConfig_nCharged_AK5PF.txt","../CORE/QuarkGluonTagger/QGTaggerConfig_nNeutral_AK5PF.txt","../CORE/QuarkGluonTagger/QGTaggerConfig_ptD_AK5PF.txt");
+  QGLikelihoodCalculator *qglikeli_ = new QGLikelihoodCalculator("QGTaggerConfig/QGTaggerConfig_nCharged_AK5PF.txt",
+								 "QGTaggerConfig/QGTaggerConfig_nNeutral_AK5PF.txt",
+								 "QGTaggerConfig/QGTaggerConfig_ptD_AK5PF.txt");
 
   //------------------------------------------------
   // set stop cross section file
