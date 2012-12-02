@@ -1418,6 +1418,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       if( !isData ){
 
 	bool foundwz = false;
+	bool foundlep = false;
+	bool foundnu  = false;
+
 	w1_     = leptonOrTauIsFromW( index1 , id1_ , isLM );
 	pthat_  = genps_pthat();
 	qscale_ = genps_qScale();
@@ -1496,6 +1499,16 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    }
 	  }
 
+	  // store lepton, neutrino and W for single lepton events                     
+	  if (pid==11 || pid==13) {
+	    foundlep = true;
+	    mclep_ = &genps_p4()[igen];
+	  }
+	  if (pid==12 || pid==14) {
+	    foundnu = true;
+	    mcnu_  = &genps_p4()[igen];
+	  }
+
 	  // store W or Z pT 
 	  // ignoring cases where have more than 1 boson for now
 	  if ( pid == 24 ) {
@@ -1525,7 +1538,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  npartons_ ++;
 	  if( genps_p4().at(igen).pt() > maxpartonpt_ ) maxpartonpt_ = genps_p4().at(igen).pt();
 	  //	  cout << "found parton, igen " << igen << " id " << pid << " motherid " << mothid << " pt " << genps_p4().at(igen).pt() << endl;
-
+    
 	}
 
 	// if( npartons_ > 0 ){
@@ -1544,6 +1557,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  ptttbar_  = ttbar_->pt();
 	  mttbar_   = ttbar_->mass();
 	  etattbar_ = ttbar_->eta();
+	}
+
+	if (foundlep && foundnu) {
+	  mcmln_ = (*mclep_+*mcnu_).mass();
+	  mcmtln_ = getMT( mclep_->Pt() , mclep_->Phi() , mcnu_->Pt() , mcnu_->Phi() );
 	}
 	
 	if( nels + nmus == 2) dilptgen = vdilepton.pt();
@@ -2961,28 +2979,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       //dijet mass two bs highest pT b-tagged jets
       if (mediumBJets.size()>1) {
 	mbb_ = (mediumBJets.at(0)+mediumBJets.at(1)).M();
-      }
-
-      //ugly bit of code to store information about the lepton, neutrino and W
-      //for single lepton events
-      if( !isData ){
-	bool foundlep = false;
-	bool foundnu  = false;
-	for (int igen = (genps_p4().size()-1); igen >-1; igen--) {
-	  int id = genps_id().at(igen);
-	  if (abs(id)==11 || abs(id)==13) {
-	    foundlep = true;
-	    mclep_ = &genps_p4()[igen];
-	  }
-	  if (abs(id)==12 || abs(id)==14) {
-	    foundnu = true;
-	    mcnu_  = &genps_p4()[igen];
-	  }
-	}
-	if (foundlep && foundnu) {
-	  mcmln_ = (*mclep_+*mcnu_).mass();
-	  mcmtln_ = getMT( mclep_->Pt() , mclep_->Phi() , mcnu_->Pt() , mcnu_->Phi() );
-	}
       }
 
       /*
