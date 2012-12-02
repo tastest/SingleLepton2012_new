@@ -365,49 +365,26 @@ class singleLeptonLooper
 
         VofP4 pfjets_;
         std::vector<float> pfjets_csv_;
-	std::vector<float> pfjets_beta_;
-	std::vector<float> pfjets_beta2_;
+	//jet corrections and ID
 	std::vector<float> pfjets_jetID_;
 	std::vector<float> pfjets_corr_;
+	//status 3 parton matching
 	std::vector<float> pfjets_mc3_;
+	//qg tagging
 	std::vector<float> pfjets_qgtag_;
+	//gen jet matching
 	std::vector<float> pfjets_genJetDr_;
-
-	// jet p4's
-        LorentzVector*  pfjet1_; 
-        LorentzVector*  pfjet2_; 
-        LorentzVector*  pfjet3_; 
-        LorentzVector*  pfjet4_; 
-        LorentzVector*  pfjet5_; 
-        LorentzVector*  pfjet6_; 
-	// b-tagging
-        Int_t bjet1_; 
-        Int_t bjet2_; 
-        Int_t bjet3_; 
-        Int_t bjet4_; 
-        Int_t bjet5_; 
-        Int_t bjet6_; 
-	// truth lepton
-        Int_t lepjet1_; 
-        Int_t lepjet2_; 
-        Int_t lepjet3_; 
-        Int_t lepjet4_; 
-        Int_t lepjet5_; 
-        Int_t lepjet6_; 
-	// status 3 parton
-        Int_t qgjet1_; 
-        Int_t qgjet2_; 
-        Int_t qgjet3_; 
-        Int_t qgjet4_; 
-        Int_t qgjet5_; 
-        Int_t qgjet6_; 
-	// gen-jet matching
-        Float_t genjetdr1_; 
-        Float_t genjetdr2_; 
-        Float_t genjetdr3_; 
-        Float_t genjetdr4_; 
-        Float_t genjetdr5_; 
-        Float_t genjetdr6_; 
+	//truth lepton matching
+        std::vector<int>   pfjets_lepjet_;
+	//beta variables
+	std::vector<float> pfjets_beta_;
+	std::vector<float> pfjets_beta2_;
+        std::vector<float> pfjets_beta_0p1_;
+        std::vector<float> pfjets_beta2_0p1_;
+        std::vector<float> pfjets_beta_0p15_;
+        std::vector<float> pfjets_beta2_0p15_;
+        std::vector<float> pfjets_beta_0p2_;
+        std::vector<float> pfjets_beta2_0p2_;
 
 	Int_t hyptype_;
 

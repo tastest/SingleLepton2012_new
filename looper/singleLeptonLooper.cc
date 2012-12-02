@@ -228,39 +228,6 @@ void singleLeptonLooper::InitBaby(){
   dilep_	= 0;
   jet_		= 0;
 
-  // jet p4's
-  pfjet1_	= 0;
-  pfjet2_	= 0;
-  pfjet3_	= 0;
-  pfjet4_	= 0;
-  pfjet5_	= 0;
-  pfjet6_	= 0;
-
-  bjet1_      = -999; 
-  bjet2_      = -999; 
-  bjet3_      = -999; 
-  bjet4_      = -999; 
-  bjet5_      = -999; 
-  bjet6_      = -999; 
-  lepjet1_    = -999; 
-  lepjet2_    = -999; 
-  lepjet3_    = -999; 
-  lepjet4_    = -999; 
-  lepjet5_    = -999; 
-  lepjet6_    = -999; 
-  qgjet1_     = -999; 
-  qgjet2_     = -999; 
-  qgjet3_     = -999; 
-  qgjet4_     = -999; 
-  qgjet5_     = -999; 
-  qgjet6_     = -999; 
-  genjetdr1_  = 9999.; 
-  genjetdr2_  = 9999.; 
-  genjetdr3_  = 9999.; 
-  genjetdr4_  = 9999.; 
-  genjetdr5_  = 9999.; 
-  genjetdr6_  = 9999.; 
-
   lep1chi2ndf_	= -9999.;
   lep2chi2ndf_	= -9999.;
   lep1dpt_	= -9999.;
@@ -391,6 +358,26 @@ void singleLeptonLooper::InitBaby(){
   eSCPresh2_ = -9999;  
   ecalveto2_ = -9999;
   hcalveto2_ = -9999;
+
+  //clear vectors
+  pfjets_.clear();
+  pfjets_csv_.clear();
+  pfjets_jetID_.clear();
+  pfjets_corr_.clear();
+  pfjets_mc3_.clear();
+  pfjets_qgtag_.clear();
+  pfjets_genJetDr_.clear();
+  pfjets_lepjet_.clear();
+  pfjets_beta_.clear();
+  pfjets_beta2_.clear();
+  pfjets_beta_0p1_.clear();
+  pfjets_beta2_0p1_.clear();
+  pfjets_beta_0p15_.clear();
+  pfjets_beta2_0p15_.clear();
+  pfjets_beta_0p2_.clear();
+  pfjets_beta2_0p2_.clear();
+  
+
 }
 
 //--------------------------------------------------------------------
@@ -862,7 +849,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     doTenPercent = false;
   }
 
-  cout << "ciao " << isData << endl;
+  cout << "IS DATA: " << isData << endl;
 
   if( doTenPercent ) cout << "Processing 10% of MC" << endl;
 
@@ -2636,70 +2623,22 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( int i = 0 ; i < vipfjets_p4.size() ; ++i ){
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
-	pfjets_beta_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,1));
-	pfjets_beta2_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,2));
 	pfjets_jetID_.push_back(passesPFJetID(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
 	if (!isData) pfjets_mc3_.push_back(isGenQGMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
 	if (!isData) pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
-       
-	// VARIABLES TO ADD
-	// gen branches below (lepje), q vs. g discrimination
-      }
-
-      if( vipfjets_p4.size() > 0 ) {
-	pfjet1_  = &vipfjets_p4.at(0).p4obj;
-	bjet1_  = isCSVTagged(  vipfjets_p4.at(0).p4ind );
-	if (!isData) {
-	  lepjet1_ = getLeptonMatchIndex ( pfjet1_, mclep1_, mclep2_, 0.4 );
-	  qgjet1_ = isGenQGMatched( vipfjets_p4.at(0).p4obj, 0.4 );
-	  genjetdr1_ = dRGenJet ( vipfjets_p4.at(0).p4obj );
-	}
-      } 
-      if( vipfjets_p4.size() > 1 ) {
-	pfjet2_  = &vipfjets_p4.at(1).p4obj;
-	bjet2_ = isCSVTagged(  vipfjets_p4.at(1).p4ind );
-	if (!isData) {
-	  lepjet2_ = getLeptonMatchIndex ( pfjet2_, mclep1_, mclep2_, 0.4 );
-	  qgjet2_ = isGenQGMatched( vipfjets_p4.at(1).p4obj, 0.4 );
-	  genjetdr2_ = dRGenJet ( vipfjets_p4.at(1).p4obj );
-	}
-      }
-      if( vipfjets_p4.size() > 2 ) {
-	pfjet3_  = &vipfjets_p4.at(2).p4obj;
-	bjet3_ = isCSVTagged(  vipfjets_p4.at(2).p4ind );
-	if (!isData) {
-	  lepjet3_ = getLeptonMatchIndex ( pfjet3_, mclep1_, mclep2_, 0.4 );
-	  qgjet3_ = isGenQGMatched( vipfjets_p4.at(2).p4obj, 0.4 );
-	  genjetdr3_ = dRGenJet ( vipfjets_p4.at(2).p4obj );
-	}
-      }
-      if( vipfjets_p4.size() > 3 ) {
-	pfjet4_  = &vipfjets_p4.at(3).p4obj;
-	bjet4_ = isCSVTagged(  vipfjets_p4.at(3).p4ind );
-	if (!isData) {
-	  lepjet4_ = getLeptonMatchIndex ( pfjet4_, mclep1_, mclep2_, 0.4 );
-	  qgjet4_ = isGenQGMatched( vipfjets_p4.at(3).p4obj, 0.4 );
-	  genjetdr4_ = dRGenJet ( vipfjets_p4.at(3).p4obj );
-	}
-      }
-      if( vipfjets_p4.size() > 4 ) {
-	pfjet5_  = &vipfjets_p4.at(4).p4obj;
-	bjet5_ = isCSVTagged(  vipfjets_p4.at(4).p4ind );
-	if (!isData) {
-	  lepjet5_ = getLeptonMatchIndex ( pfjet5_, mclep1_, mclep2_, 0.4 );
-	  qgjet5_ = isGenQGMatched( vipfjets_p4.at(4).p4obj, 0.4 );
-	  genjetdr5_ = dRGenJet ( vipfjets_p4.at(4).p4obj );
-	}
-      }
-      if( vipfjets_p4.size() > 5 ) {
-	pfjet6_  = &vipfjets_p4.at(5).p4obj;
-	bjet6_ = isCSVTagged(  vipfjets_p4.at(5).p4ind );
-	if (!isData) {
-	  lepjet6_ = getLeptonMatchIndex ( pfjet6_, mclep1_, mclep2_, 0.4 );
-	  qgjet6_ = isGenQGMatched( vipfjets_p4.at(5).p4obj, 0.4 );
-	  genjetdr6_ = dRGenJet ( vipfjets_p4.at(5).p4obj );
-	}
+	if (!isData) pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj, 
+								   mclep1_, mclep2_, 0.4 ));
+	//beta variables
+	pfjets_beta_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,1));
+	pfjets_beta2_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,2));
+        pfjets_beta_0p1_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.1 ) );
+        pfjets_beta2_0p1_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.1 ) );
+        pfjets_beta_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.15) );
+        pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
+        pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
+        pfjets_beta2_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.2 ) );
+	
       }
 
       //store distance to closest jet for pfcand
@@ -3504,30 +3443,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("nbtagscsvlcorr",   &nbtagscsvlcorr_,   "nbtagscsvlcorr/I");
   outTree->Branch("nbtagscsvmcorr",   &nbtagscsvmcorr_,   "nbtagscsvmcorr/I");
   outTree->Branch("nbtagscsvtcott",   &nbtagscsvtcorr_,   "nbtagscsvtcorr/I");
-  outTree->Branch("bjet1",            &bjet1_,            "bjet1/I");
-  outTree->Branch("bjet2",            &bjet2_,            "bjet2/I");
-  outTree->Branch("bjet3",            &bjet3_,            "bjet3/I");
-  outTree->Branch("bjet4",            &bjet4_,            "bjet4/I");
-  outTree->Branch("bjet5",            &bjet5_,            "bjet5/I");
-  outTree->Branch("bjet6",            &bjet6_,            "bjet6/I");
-  outTree->Branch("lepjet1",          &lepjet1_,          "lepjet1/I");
-  outTree->Branch("lepjet2",          &lepjet2_,          "lepjet2/I");
-  outTree->Branch("lepjet3",          &lepjet3_,          "lepjet3/I");
-  outTree->Branch("lepjet4",          &lepjet4_,          "lepjet4/I");
-  outTree->Branch("lepjet5",          &lepjet5_,          "lepjet5/I");
-  outTree->Branch("lepjet6",          &lepjet6_,          "lepjet6/I");
-  outTree->Branch("qgjet1",           &qgjet1_,           "qgjet1/I");
-  outTree->Branch("qgjet2",           &qgjet2_,           "qgjet2/I");
-  outTree->Branch("qgjet3",           &qgjet3_,           "qgjet3/I");
-  outTree->Branch("qgjet4",           &qgjet4_,           "qgjet4/I");
-  outTree->Branch("qgjet5",           &qgjet5_,           "qgjet5/I");
-  outTree->Branch("qgjet6",           &qgjet6_,           "qgjet6/I");
-  outTree->Branch("genjetdr1",        &genjetdr1_,        "genjetdr1/F");
-  outTree->Branch("genjetdr2",        &genjetdr2_,        "genjetdr2/F");
-  outTree->Branch("genjetdr3",        &genjetdr3_,        "genjetdr3/F");
-  outTree->Branch("genjetdr4",        &genjetdr4_,        "genjetdr4/F");
-  outTree->Branch("genjetdr5",        &genjetdr5_,        "genjetdr5/F");
-  outTree->Branch("genjetdr6",        &genjetdr6_,        "genjetdr6/F");
   outTree->Branch("njetsUp",          &njetsUp_,          "njetsUp/I");
   outTree->Branch("njetsDown",        &njetsDown_,        "njetsDown/I");
   outTree->Branch("htUp",             &htUp_,             "htUp/F");
@@ -3763,13 +3678,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcand10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand10_	);
   outTree->Branch("jet"	      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &jet_	);
 
-  outTree->Branch("pfjet1"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfjet1_	);
-  outTree->Branch("pfjet2"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfjet2_	);
-  outTree->Branch("pfjet3"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfjet3_	);
-  outTree->Branch("pfjet4"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfjet4_	);
-  outTree->Branch("pfjet5"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfjet5_	);
-  outTree->Branch("pfjet6"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfjet6_	);
-
   outTree->Branch("nonisoel"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &nonisoel_	);
   outTree->Branch("nonisomu"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &nonisomu_	);
   outTree->Branch("t"         , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &t_   	);
@@ -3790,13 +3698,21 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_ );
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
  
-  outTree->Branch("pfjets_beta", "std::vector<float>", &pfjets_beta_ );
-  outTree->Branch("pfjets_beta2", "std::vector<float>", &pfjets_beta2_ );
-  outTree->Branch("pfjets_jetID", "std::vector<float>", &pfjets_jetID_ );
-  outTree->Branch("pfjets_corr", "std::vector<float>", &pfjets_corr_ );
-  outTree->Branch("pfjets_mc3", "std::vector<float>", &pfjets_mc3_ ); 
-  outTree->Branch("pfjets_genJetDr", "std::vector<float>", &pfjets_genJetDr_ );
-  outTree->Branch("pfjets_qgtag", "std::vector<float>", &pfjets_qgtag_ );
+  outTree->Branch("pfjets_beta",      "std::vector<float>", &pfjets_beta_      );
+  outTree->Branch("pfjets_beta2",     "std::vector<float>", &pfjets_beta2_     );
+  outTree->Branch("pfjets_beta_0p1",  "std::vector<float>", &pfjets_beta_0p1_  );
+  outTree->Branch("pfjets_beta2_0p1", "std::vector<float>", &pfjets_beta2_0p1_ );
+  outTree->Branch("pfjets_beta_0p15", "std::vector<float>", &pfjets_beta_0p15_ );
+  outTree->Branch("pfjets_beta2_0p15","std::vector<float>", &pfjets_beta2_0p15_);
+  outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );
+  outTree->Branch("pfjets_beta2_0p2", "std::vector<float>", &pfjets_beta2_0p2_ );
+
+  outTree->Branch("pfjets_jetID",   "std::vector<float>", &pfjets_jetID_    );
+  outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
+  outTree->Branch("pfjets_mc3",     "std::vector<float>", &pfjets_mc3_      ); 
+  outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
+  outTree->Branch("pfjets_qgtag",   "std::vector<float>", &pfjets_qgtag_    );
+  outTree->Branch("pfjets_lepjet",  "std::vector<int>",   &pfjets_lepjet_   );
 
 }
 
