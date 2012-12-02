@@ -90,9 +90,6 @@ float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool d
 
 //--------------------------------------------------------------------   
                               
-double dRbetweenVectors(const LorentzVector &vec1,
-                        const LorentzVector &vec2 );
-
 bool isGenBMatched ( LorentzVector p4, float dR );
 
 int isGenQGMatched ( LorentzVector p4, float dR );

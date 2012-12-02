@@ -161,7 +161,7 @@ pair<float,float> getTrackerMET( P4 *lep, double deltaZCut, bool dolepcorr )
   for (unsigned int i=0; i<cms2.pfcands_particleId().size(); ++i){
     if ( cms2.pfcands_charge().at(i)==0 ) continue;
 
-    if ( dolepcorr && dRbetweenVectors( cms2.pfcands_p4().at(i) , *lep ) < 0.1 ) continue;
+    if ( dolepcorr && ROOT::Math::VectorUtil::DeltaR( cms2.pfcands_p4().at(i) , *lep ) < 0.1 ) continue;
 
     int trkIndex = cms2.pfcands_trkidx().at(i);
     if (trkIndex<0) continue;
@@ -262,7 +262,7 @@ float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , flo
     if( cms2.pfcands_charge().at(ipf) == 0 ) continue; // skip neutrals                                                                                                                          
     if( cms2.pfcands_p4().at(ipf).pt() < pt_thresh ) continue; // skip pfcands below pt threshold                                                                                                
 
-    if( dRbetweenVectors( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) ) > coneR ) continue;
+    if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) ) > coneR ) continue;
 
     int itrk = cms2.pfcands_trkidx().at(ipf);
 
@@ -316,21 +316,7 @@ float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , flo
 }
 
 
-
-
-
-
 //--------------------------------------------------------------------                                                                                                                                               
-
-double dRbetweenVectors(const LorentzVector &vec1,
-                        const LorentzVector &vec2 ){
-  double dphi = std::min(::fabs(vec1.Phi() - vec2.Phi()), 2 * M_PI - fabs(vec1.Phi() - vec2.Phi()));
-  double deta = vec1.Eta() - vec2.Eta();
-  return sqrt(dphi*dphi + deta*deta);
-}
-
-//--------------------------------------------------------------------                                                                                                                                               
-
 bool isGenBMatched ( LorentzVector p4, float dR ) {
 
   //For now only checking status 3 in dR                                                                                                                                                                             
@@ -339,7 +325,7 @@ bool isGenBMatched ( LorentzVector p4, float dR ) {
     int id = genps_id().at(igen);
     if( abs(id)!=5 ) continue;
 
-    if( dRbetweenVectors( p4 , genps_p4().at(igen) ) < dR ) return true;
+    if( ROOT::Math::VectorUtil::DeltaR( p4 , genps_p4().at(igen) ) < dR ) return true;
 
   }
   return false;
@@ -350,7 +336,7 @@ bool isGenBMatched ( LorentzVector p4, float dR ) {
 int isGenQGMatched ( LorentzVector p4, float dR ) {
   //Start from the end that seems to have the decay products of the W first                                                                                                                                          
   for (int igen = (genps_p4().size()-1); igen >-1; igen--) {
-    float deltaR = dRbetweenVectors( p4 , genps_p4().at(igen) );
+    float deltaR = ROOT::Math::VectorUtil::DeltaR( p4 , genps_p4().at(igen) );
     if ( deltaR > dR ) continue;
     int id = genps_id().at(igen);
     int mothid = genps_id_mother().at(igen);
@@ -375,7 +361,7 @@ float dRGenJet ( LorentzVector p4, float genminpt) {
   for (unsigned int igen = 0; igen < genjets_p4().size(); igen++) {
     LorentzVector vgenj = genjets_p4().at(igen);
     if ( vgenj.Pt() < genminpt ) continue;
-    float deltaR = dRbetweenVectors( p4 , vgenj );
+    float deltaR = ROOT::Math::VectorUtil::DeltaR( p4 , vgenj );
     if ( deltaR< mindeltaR ) mindeltaR = deltaR;
   }
   return mindeltaR;
@@ -388,7 +374,7 @@ float getminjdr( VofiP4 jets, LorentzVector *particle ) {
   float mindr = 9999.;
   if (jets.size()==0 || particle==0) return mindr;
   for ( unsigned int ijet = 0; ijet<jets.size(); ++ijet ) {
-    float partjdr = dRbetweenVectors(jets.at(ijet).p4obj,*particle);
+    float partjdr = ROOT::Math::VectorUtil::DeltaR(jets.at(ijet).p4obj,*particle);
     if ( partjdr<mindr ) mindr = partjdr;
   }
   return mindr;
@@ -423,7 +409,7 @@ int isCSVTagged ( int ijet ) {
 bool isBTagged ( LorentzVector p4, VofP4 bJets ) {
 
   for( int ijet = 0 ; ijet < (int)bJets.size() ; ijet++ ){
-    if( dRbetweenVectors( p4 , bJets.at(ijet) ) < 0.4 ) return true;
+    if( ROOT::Math::VectorUtil::DeltaR( p4 , bJets.at(ijet) ) < 0.4 ) return true;
   }
 
   return false;
@@ -433,8 +419,8 @@ bool isBTagged ( LorentzVector p4, VofP4 bJets ) {
 //--------------------------------------------------------------------                                                                                                                                               
 
 int getLeptonMatchIndex ( LorentzVector *jet, LorentzVector *lep1, LorentzVector *lep2, float dR ) {
-  if (lep1 && dRbetweenVectors( *lep1 , *jet ) < dR) return 1;
-  if (lep2 && dRbetweenVectors( *lep2 , *jet ) < dR) return 2;
+  if (lep1 && ROOT::Math::VectorUtil::DeltaR( *lep1 , *jet ) < dR) return 1;
+  if (lep2 && ROOT::Math::VectorUtil::DeltaR( *lep2 , *jet ) < dR) return 2;
   return -1;
 
 }
@@ -459,7 +445,7 @@ bool objectPassTrigger(const LorentzVector &obj, const std::vector<LorentzVector
   for (size_t i = 0; i < trigObjs.size(); ++i)
     {
       if (trigObjs[i].Pt() < pt) continue;
-      float dr = dRbetweenVectors(trigObjs[i], obj);
+      float dr = ROOT::Math::VectorUtil::DeltaR(trigObjs[i], obj);
       if (dr < drMin) drMin = dr;
     }
 
@@ -506,7 +492,7 @@ bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax = 0
   if( trigp4.size() == 0 ) return false;
 
   for (unsigned int i = 0; i < trigp4.size(); ++i){
-    float dr = dRbetweenVectors(trigp4[i], obj);
+    float dr = ROOT::Math::VectorUtil::DeltaR(trigp4[i], obj);
     if( dr < drmax ) return true;
   }
 

@@ -1377,7 +1377,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
 	if( els_p4().at(iel).pt() < 10 )                                                 continue;
 	if( !pass_electronSelection( iel , electronSelection_el_OSV3 , false , false ) ) continue;
-	if( dRbetweenVectors( *lep1_ , els_p4().at(iel) ) < 0.1 )                        continue;
+	if( ROOT::Math::VectorUtil::DeltaR( *lep1_ , els_p4().at(iel) ) < 0.1 )                        continue;
 	nosel_++;
       }
       
@@ -1620,7 +1620,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    nfoundleps++;
 	    mcid1_   = id;
 	    mclep1_  = &genps_p4().at(igen);
-	    mcdr1_   = dRbetweenVectors( *lep1_ , *mclep1_ );
+	    mcdr1_   = ROOT::Math::VectorUtil::DeltaR( *lep1_ , *mclep1_ );
 
 	    if( abs(id)==15 ){
 	      mcdecay1_ = 1;
@@ -1680,8 +1680,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	    nfoundleps++;
 
-	    if( dRbetweenVectors( *lep1_ , genps_p4().at(igen) ) < drmin ){
-	      drmin   = dRbetweenVectors( *lep1_ , genps_p4().at(igen) );
+	    if( ROOT::Math::VectorUtil::DeltaR( *lep1_ , genps_p4().at(igen) ) < drmin ){
+	      drmin   = ROOT::Math::VectorUtil::DeltaR( *lep1_ , genps_p4().at(igen) );
 	      igenmin = igen;
 	    }
 	  }
@@ -1694,7 +1694,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	  mcid1_   = genps_id().at(igenmin);
 	  mclep1_  = &genps_p4().at(igenmin);
-	  mcdr1_   = dRbetweenVectors( *lep1_ , *mclep1_ );
+	  mcdr1_   = ROOT::Math::VectorUtil::DeltaR( *lep1_ , *mclep1_ );
 
 	  if( abs(mcid1_)==15 ){
 	    mcdecay1_ = 1;
@@ -1746,7 +1746,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	    mcid2_   = id;
 	    mclep2_  = &genps_p4().at(igen);
-	    if( ngoodlep_ > 1 ) mcdr2_   = dRbetweenVectors( *lep2_ , *mclep2_ );
+	    if( ngoodlep_ > 1 ) mcdr2_   = ROOT::Math::VectorUtil::DeltaR( *lep2_ , *mclep2_ );
 
 	    if( abs(id)==15 ){
 	      mcdecay2_ = 1;
@@ -1853,7 +1853,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	      mlepiso_      = muonIsoValuePF2012_deltaBeta(imatch);
 	    }
 
-	    mlepdr_ = dRbetweenVectors( *mlep_ , *mclep2_ );
+	    mlepdr_ = ROOT::Math::VectorUtil::DeltaR( *mlep_ , *mclep2_ );
 	  }
 	  
 	}
@@ -1913,15 +1913,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  //Only remove leading lepton to see what happens to the sub-leading lepton
 	  // bool isGoodLepton = false;
 	  // for( int ilep = 0 ; ilep < goodLeptons.size() ; ilep++ ){
-	  //   if( dRbetweenVectors( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) 
+	  //   if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) 
 	  //     isGoodLepton = true;  
 	  // }
 	  // if( isGoodLepton ) continue;
-	  if( dRbetweenVectors( pfcands_p4().at(ipf) , goodLeptons.at(imaxpt) ) < 0.1 ) continue;
+	  if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(imaxpt) ) < 0.1 ) continue;
 
 	  //Store highest pT track within match radius or if none is found closest pfcand
 	  float matchR = 0.15;
-	  float drpf = dRbetweenVectors( pfcands_p4().at(ipf) , *mclep2_ );
+	  float drpf = ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , *mclep2_ );
 	  float iso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
 	  if ( drpf < matchR && pfcands_p4().at(ipf).pt() > pfleppt_ ) {
 	    pflepdr_ = drpf;
@@ -1936,7 +1936,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  }
 	  //check for tau decay and store information for daughter
 	  if (mctaudid2_==-1) continue;
-	  float taudrpf = dRbetweenVectors( pfcands_p4().at(ipf) , *mctaud2_ );
+	  float taudrpf = ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , *mctaud2_ );
 	  float tauiso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
 	  if ( taudrpf < matchR && pfcands_p4().at(ipf).pt() > pftaudpt_ ) {
 	    pftauddr_ = taudrpf;
@@ -1992,10 +1992,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	
 	bool isGoodLepton = false;
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( dRbetweenVectors( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) 
+	  if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) 
 	    isGoodLepton = true;  
 	}
-	bool isLeadLepton = ( dRbetweenVectors( pfcands_p4().at(ipf) , 
+	bool isLeadLepton = ( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , 
 						goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
 
 	//store loose definition to compare with previous results
@@ -2158,9 +2158,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	
 	bool isGoodLepton = false;
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( dRbetweenVectors( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
+	  if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
 	}
-	bool isLeadLepton = ( dRbetweenVectors( pfcands_p4().at(ipf) , goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
+	bool isLeadLepton = ( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
 
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
  	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut_loose ) continue;
@@ -2313,7 +2313,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	//---------------------------------------------------------------------------                                                                                 
         // Matching leptons with pfjet 
         //---------------------------------------------------------------------------                                                                                 
-	float dr1 = dRbetweenVectors( vjet, *lep1_ );
+	float dr1 = ROOT::Math::VectorUtil::DeltaR( vjet, *lep1_ );
 
 	if( dr1 < lep1pfjetdr_ ){
 	  lep1pfjetdr_    = dr1;
@@ -2321,7 +2321,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 
 	if(lep2_) {
-	  float dr2 = dRbetweenVectors( vjet, *lep2_ );
+	  float dr2 = ROOT::Math::VectorUtil::DeltaR( vjet, *lep2_ );
 	  
 	  if( dr2 < lep2pfjetdr_ ){
 	    lep2pfjetdr_    = dr2;
@@ -2332,7 +2332,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// lepton-jet overlap removal
 	bool rejectJet = false;
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( dRbetweenVectors( vjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
+	  if( ROOT::Math::VectorUtil::DeltaR( vjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
 	}
 	if( rejectJet ) continue;
 	          
@@ -2406,7 +2406,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         //count jets that are not overlapping with second lepton                                                                                             
         npfjets30lepcorr_ ++;
 	if (nleps_==2 &&  mclep2_->Pt() > 30.
-	    && dRbetweenVectors(*mclep2_, vjet) < 0.4 )
+	    && ROOT::Math::VectorUtil::DeltaR(*mclep2_, vjet) < 0.4 )
 	npfjets30lepcorr_ --;
      
 
@@ -2727,14 +2727,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// don't count the leptons that we already counted as good
 	bool isGoodLepton = false;
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( dRbetweenVectors( els_p4().at(iel) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
+	  if( ROOT::Math::VectorUtil::DeltaR( els_p4().at(iel) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
 	}
 	if( isGoodLepton ) continue;
 
 	// don't count leptons near b-jets (SSVM)
 	bool nearBJet = false;
 	for( int ijet = 0 ; ijet < (int)mediumBJets.size() ; ijet++ ){
-	  if( dRbetweenVectors( els_p4().at(iel) , mediumBJets.at(ijet) ) < 0.4 ) nearBJet = true;
+	  if( ROOT::Math::VectorUtil::DeltaR( els_p4().at(iel) , mediumBJets.at(ijet) ) < 0.4 ) nearBJet = true;
 	}
 	if( nearBJet ) continue;
 	
@@ -2757,14 +2757,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// don't count the leptons that we already counted as good
 	bool isGoodLepton = false;
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( dRbetweenVectors( mus_p4().at(imu) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
+	  if( ROOT::Math::VectorUtil::DeltaR( mus_p4().at(imu) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
 	}
 	if( isGoodLepton ) continue;
 
 	// don't count leptons near b-jets SSVM)
 	bool nearBJet = false;
 	for( int ijet = 0 ; ijet < (int)mediumBJets.size() ; ijet++ ){
-	  if( dRbetweenVectors( mus_p4().at(imu) , mediumBJets.at(ijet) ) < 0.4 ) nearBJet = true;
+	  if( ROOT::Math::VectorUtil::DeltaR( mus_p4().at(imu) , mediumBJets.at(ijet) ) < 0.4 ) nearBJet = true;
 	}
 	if( nearBJet ) continue;
 	
@@ -2801,7 +2801,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	  bool rejectJet = false;
 	  for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	    if( dRbetweenVectors( vgjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
+	    if( ROOT::Math::VectorUtil::DeltaR( vgjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
 	  }
 	  if( rejectJet ) continue;
 	    
@@ -3816,7 +3816,7 @@ std::vector<float> singleLeptonLooper::totalIso( int thisPf , float coneR , floa
   for (int ipf = 0; ipf < (int)cms2.pfcands_p4().size(); ipf++) {
 
     if( ipf == thisPf                 ) continue; // skip this PFCandidate
-    float dR = dRbetweenVectors( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) );
+    float dR = ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) );
     if( dR > coneR ) continue;
     float pfpt = cms2.pfcands_p4().at(ipf).pt();
 
