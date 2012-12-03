@@ -606,8 +606,10 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
 
   
   vector<int> mc;
-  for (unsigned int i=0; i<jets.size(); i++)
-    mc.push_back( isGenQGMatched( jets.at(i), 0.4 ) );
+  if (!isData) {
+    for (unsigned int i=0; i<jets.size(); i++)
+      mc.push_back( isGenQGMatched( jets.at(i), 0.4 ) );
+  }
 
   int ibl[5];
   int iw1[5];
