@@ -65,8 +65,6 @@ inline bool sortIP4ByPt(indP4 iP41, indP4 iP42) {
   return iP41.p4obj.pt() > iP42.p4obj.pt();
 }
 
-float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx );
-
 //--------------------------------------------------------------------                                                                                                                                                   
 pair<float, float> ScaleMET( pair<float, float> p_met, LorentzVector p4_dilep, double rescale = 1.0);
 

@@ -185,6 +185,8 @@ class singleLeptonLooper
 	Float_t trkreliso10pt1p0_;
 
 	// extra pfcand vars 
+        Int_t pfcandid5_;     
+        Int_t pfcandid10_;     
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
         Float_t pfcandpt5_;

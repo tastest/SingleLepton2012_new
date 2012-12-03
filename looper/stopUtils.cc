@@ -252,19 +252,39 @@ float getMT( float leppt , float lepphi , float met , float metphi ) {
   return sqrt( 2 * ( leppt * met * (1 - cos( dphi ) ) ) );
 }
 
-float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , float pt_thresh ){
 
-  float iso = 0.0;
+struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , float pt_thresh ){
 
-  for (int ipf = 0; ipf < (int)cms2.pfcands_p4().size(); ipf++) {
+  dovtxcut=false;
 
-    if( ipf == thisPf                 ) continue; // skip this PFCandidate                                                                                                                       
-    if( cms2.pfcands_charge().at(ipf) == 0 ) continue; // skip neutrals                                                                                                                          
-    if( cms2.pfcands_p4().at(ipf).pt() < pt_thresh ) continue; // skip pfcands below pt threshold                                                                                                
+  struct myTrackIso iso;
 
-    if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) ) > coneR ) continue;
+  // no cuts  
+  iso.iso_dr03_dz000_pt00=0.;
+  
+  // dz variation                                                                                                                        
+  iso.iso_dr03_dz005_pt00=0.; // this one will be the default
+  iso.iso_dr03_dz020_pt00=0.;
+  
+  //pt Variation                                                                                                                      
+  iso.iso_dr03_dz005_pt01=0.;
+  iso.iso_dr03_dz005_pt02=0.;
+  iso.iso_dr03_dz005_pt03=0.;
+  iso.iso_dr03_dz005_pt04=0.;
+  iso.iso_dr03_dz005_pt05=0.;
+  iso.iso_dr03_dz005_pt06=0.;
+  iso.iso_dr03_dz005_pt07=0.;
+  iso.iso_dr03_dz005_pt08=0.;
+  iso.iso_dr03_dz005_pt09=0.;
+  iso.iso_dr03_dz005_pt10=0.;
+  
 
-    int itrk = cms2.pfcands_trkidx().at(ipf);
+  for (int ipf = 0; ipf < (int)pfcands_p4().size(); ipf++) {
+
+    if( ipf == thisPf                 ) continue; // skip this PFCandidate
+                                                                                                               
+    if(pfcands_charge().at(ipf) == 0 ) continue; // skip neutrals                                                                                                                          
+    int itrk = pfcands_trkidx().at(ipf);
 
     if( itrk >= (int)trks_trk_p4().size() || itrk < 0 ){
       //note: this should only happen for electrons which do not have a matched track                                                                                                            
@@ -274,7 +294,7 @@ float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , flo
 
     //----------------------------------------                                                                                                                                                   
     // find closest PV and dz w.r.t. that PV                                                                                                                                                     
-    //----------------------------------------                                                                                                                                                   
+   //----------------------------------------                                                                                                                                                   
 
     float mindz = 999.;
     int vtxi    = -1;
@@ -302,15 +322,30 @@ float trackIso( int thisPf , float coneR , float dz_thresh , bool dovtxcut , flo
     } else {
       mindz = trks_dz_pv(itrk,0).first;
     }
-    if ( fabs(mindz) > dz_thresh )     continue;
 
-    //---------------------------------------                                                                                                                                                    
-    // passes cuts, add up isolation value                                                                                                                                                       
-    //---------------------------------------                                                                                                                                                    
+    //---------------------------------------                                                                                                                                     // passes cuts, add up isolation value                                                                                                                                        //---------------------------------------                                                                                                                                                    
+    coneR=0.3;    
+    if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) ) > coneR ) continue; // skip pfcands outside the cone                                     
+    // this is the default
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 ) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
 
-    iso += cms2.pfcands_p4().at(ipf).pt();
-
-  }
+    // some dz variation
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.00 ) iso.iso_dr03_dz000_pt00+= pfcands_p4().at(ipf).pt();      
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.20 ) iso.iso_dr03_dz020_pt00+= pfcands_p4().at(ipf).pt();
+    
+    // some pt variation
+    if(pfcands_p4().at(ipf).pt() >= 0.1 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt01+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.2 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt02+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.3 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt03+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.4 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt04+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.5 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt05+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.6 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt06+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.7 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt07+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.8 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt08+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 0.9 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt09+= pfcands_p4().at(ipf).pt();
+    if(pfcands_p4().at(ipf).pt() >= 1.0 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt10+= pfcands_p4().at(ipf).pt();    
+      
+  } // end loop of the cand 
 
   return iso;
 }

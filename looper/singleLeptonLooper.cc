@@ -248,6 +248,8 @@ void singleLeptonLooper::InitBaby(){
 
   pfcand5_        = 0;
   pfcand10_       = 0;
+  pfcandid5_       =-1; 
+  pfcandid10_       =-1;
   pfcandiso5_     = 9999.;     
   pfcandiso10_    = 9999.;     
   pfcandpt5_      = 9999.;
@@ -606,9 +608,10 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
 
   
   vector<int> mc;
+
   if (!isData) {
-    for (unsigned int i=0; i<jets.size(); i++)
-      mc.push_back( isGenQGMatched( jets.at(i), 0.4 ) );
+  for (unsigned int i=0; i<jets.size(); i++)
+    mc.push_back( isGenQGMatched( jets.at(i), 0.4 ) );
   }
 
   int ibl[5];
@@ -1011,6 +1014,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
     for(unsigned int z = 0; z < nEntries; ++z) {
       ++nEventsTotal;
+
+      /////////      cout << nEventsTotal << endl;
 
       if( doTenPercent ){
 	if( !(nEventsTotal%10==0) ) continue;
@@ -1922,7 +1927,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  //Store highest pT track within match radius or if none is found closest pfcand
 	  float matchR = 0.15;
 	  float drpf = ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , *mclep2_ );
-	  float iso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
+
+	  struct myTrackIso myTrackIso=trackIso(ipf);
+	  float iso = myTrackIso.iso_dr03_dz005_pt00 / pfcands_p4().at(ipf).pt();
+
+	  //	  float iso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
 	  if ( drpf < matchR && pfcands_p4().at(ipf).pt() > pfleppt_ ) {
 	    pflepdr_ = drpf;
 	    pfleppt_ = pfcands_p4().at(ipf).pt();
@@ -1937,7 +1946,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  //check for tau decay and store information for daughter
 	  if (mctaudid2_==-1) continue;
 	  float taudrpf = ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , *mctaud2_ );
-	  float tauiso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
+	  float tauiso = myTrackIso.iso_dr03_dz005_pt00 / pfcands_p4().at(ipf).pt();
 	  if ( taudrpf < matchR && pfcands_p4().at(ipf).pt() > pftaudpt_ ) {
 	    pftauddr_ = taudrpf;
 	    pftaudpt_ = pfcands_p4().at(ipf).pt();
@@ -1973,7 +1982,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float dz_cut_loose = 0.2;
 
       //------------------------------------------------------
-      // store pt and iso for most isolated track (pt>10 GeV)
+      // store pt and iso for most isolated track (pt>10 GeV) and (pt>5 GeV)
       //------------------------------------------------------
 
       trkpt10_           = -1.0;
@@ -1983,10 +1992,22 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       trkpt10loose_      = -1.0;
       trkreliso10loose_  = 1000.;
 
+
+      trkpt5_          = -1.0;
+      trkreliso5_      = 1000.;
+      mleptrk5_        = -1.0;
+      float miniso5    = 999;
+      trkpt5loose_     = -1.0;
+      trkreliso5loose_ = 1000.;
+
+
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 
-	if( pfcands_p4().at(ipf).pt() < 10  ) continue;
+	if( pfcands_p4().at(ipf).pt() < 5  ) continue;
+
 	if( pfcands_charge().at(ipf) == 0   ) continue;
+
+	struct myTrackIso myTrackIso=trackIso(ipf);
 
  	int itrk = pfcands_trkidx().at(ipf);
 	
@@ -1998,16 +2019,24 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	bool isLeadLepton = ( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , 
 						goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
 
+	//////////
+
 	//store loose definition to compare with previous results
-	float iso = trackIso(ipf, 0.3, dz_cut_loose, true) / pfcands_p4().at(ipf).pt();
+	float iso = myTrackIso.iso_dr03_dz020_pt00 / pfcands_p4().at(ipf).pt();
 
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
  	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut_loose ) continue;
  	}
 
-	if( iso < trkreliso10loose_ && !isGoodLepton ){
+	if(pfcands_p4().at(ipf).pt()>=10 && iso < trkreliso10loose_ && !isGoodLepton ){
 	  trkpt10loose_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10loose_   = iso;
+	}
+
+
+	if( pfcands_p4().at(ipf).pt()>=5 && iso < trkreliso5loose_ && !isGoodLepton ){
+	  trkpt5loose_     = pfcands_p4().at(ipf).pt();
+	  trkreliso5loose_ = iso;
 	}
 
 	//tighten dz cut
@@ -2015,27 +2044,47 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
  	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut ) continue;
  	}
 
-	//recalculated definition of the isolation
-	iso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
+	//recalculated definition of the isolation with the default values
+	iso = myTrackIso.iso_dr03_dz005_pt00 / pfcands_p4().at(ipf).pt();
 
-	if( iso < miniso10 && !isGoodLepton ){
+	if( pfcands_p4().at(ipf).pt()>=10 && iso < miniso10 && !isGoodLepton ){
 	  miniso10       = iso;
 	  trkpt10_       = pfcands_p4().at(ipf).pt();
 	  mleptrk10_     = (*lep1_+pfcands_p4().at(ipf)).pt();
 	  trkreliso10_   = iso;
 	}
 
-	if( iso < pfcandiso10_ && !isLeadLepton ){
-	  pfcandiso10_ = iso;
-	  pfcandpt10_ = pfcands_p4().at(ipf).pt();
-	  pfcand10_ = &pfcands_p4().at(ipf);
+	if( pfcands_p4().at(ipf).pt()>=5 && iso < miniso5 && !isGoodLepton ){
+	  miniso5     = iso;
+	  trkpt5_     = pfcands_p4().at(ipf).pt();
+	  mleptrk5_   = (*lep1_+pfcands_p4().at(ipf)).pt();
+	  trkreliso5_ = iso;
+	  //itrk       = ipf;
 	}
-	
-	//add all the variables with various pt thresholds
 
 	if (isLeadLepton) continue;
 
-	float iso0p1 = trackIso(ipf, 0.3, dz_cut, false, 0.1) / pfcands_p4().at(ipf).pt();
+	if( pfcands_p4().at(ipf).pt()>=5 && iso < pfcandiso5_){
+	  pfcandiso5_ = iso;
+	  pfcandpt5_ = pfcands_p4().at(ipf).pt();
+	  pfcand5_ = &pfcands_p4().at(ipf);
+          pfcandid5_ =  pfcands_particleId().at(ipf);
+	}
+
+	if( pfcands_p4().at(ipf).pt() < 10  ) continue;
+
+	/// this is the default case Track with dz<0.05 ; pt>10 ; notLeadingLepton
+
+	if( iso < pfcandiso10_ ){
+	  pfcandiso10_ = iso;
+	  pfcandpt10_ = pfcands_p4().at(ipf).pt();
+	  pfcand10_ = &pfcands_p4().at(ipf);
+	  pfcandid10_ =  pfcands_particleId().at(ipf);
+	}
+
+	/// Pt scan
+
+	float iso0p1 = myTrackIso.iso_dr03_dz005_pt01 / pfcands_p4().at(ipf).pt();
 	if( iso0p1 < trkreliso10pt0p1_ && !isGoodLepton ){
 	  trkpt10pt0p1_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p1_   = iso0p1;
@@ -2045,7 +2094,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p1_ = iso0p1;
 	}
 
-	float iso0p2 = trackIso(ipf, 0.3, dz_cut, false, 0.2) / pfcands_p4().at(ipf).pt();
+	float iso0p2 = myTrackIso.iso_dr03_dz005_pt02  / pfcands_p4().at(ipf).pt();
 	if( iso0p2 < trkreliso10pt0p2_ && !isGoodLepton ){
 	  trkpt10pt0p2_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p2_   = iso0p2;
@@ -2055,7 +2104,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p2_ = iso0p2;
 	}
 
-	float iso0p3 = trackIso(ipf, 0.3, dz_cut, false, 0.3) / pfcands_p4().at(ipf).pt();
+	float iso0p3 =myTrackIso.iso_dr03_dz005_pt03  / pfcands_p4().at(ipf).pt();
 	if( iso0p3 < trkreliso10pt0p3_ && !isGoodLepton ){
 	  trkpt10pt0p3_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p3_   = iso0p3;
@@ -2065,7 +2114,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p3_ = iso0p3;
 	}
 
-	float iso0p4 = trackIso(ipf, 0.3, dz_cut, false, 0.4) / pfcands_p4().at(ipf).pt();
+	float iso0p4 = myTrackIso.iso_dr03_dz005_pt04  / pfcands_p4().at(ipf).pt();
 	if( iso0p4 < trkreliso10pt0p4_ && !isGoodLepton ){
 	  trkpt10pt0p4_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p4_   = iso0p4;
@@ -2075,7 +2124,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p4_ = iso0p4;
 	}
 
-	float iso0p5 = trackIso(ipf, 0.3, dz_cut, false, 0.5) / pfcands_p4().at(ipf).pt();
+	float iso0p5 = myTrackIso.iso_dr03_dz005_pt05  / pfcands_p4().at(ipf).pt();
 	if( iso0p5 < trkreliso10pt0p5_ && !isGoodLepton ){
 	  trkpt10pt0p5_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p5_   = iso0p5;
@@ -2085,7 +2134,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p5_ = iso0p5;
 	}
 
-	float iso0p6 = trackIso(ipf, 0.3, dz_cut, false, 0.6) / pfcands_p4().at(ipf).pt();
+	float iso0p6 = myTrackIso.iso_dr03_dz005_pt06  / pfcands_p4().at(ipf).pt();
 	if( iso0p6 < trkreliso10pt0p6_ && !isGoodLepton ){
 	  trkpt10pt0p6_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p6_   = iso0p6;
@@ -2095,7 +2144,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p6_ = iso0p6;
 	}
 
-	float iso0p7 = trackIso(ipf, 0.3, dz_cut, false, 0.7) / pfcands_p4().at(ipf).pt();
+	float iso0p7 = myTrackIso.iso_dr03_dz005_pt07  / pfcands_p4().at(ipf).pt();
 	if( iso0p7 < trkreliso10pt0p7_ && !isGoodLepton ){
 	  trkpt10pt0p7_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p7_   = iso0p7;
@@ -2105,7 +2154,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p7_ = iso0p7;
 	}
 
-	float iso0p8 = trackIso(ipf, 0.3, dz_cut, false, 0.8) / pfcands_p4().at(ipf).pt();
+	float iso0p8 = myTrackIso.iso_dr03_dz005_pt08  / pfcands_p4().at(ipf).pt();
 	if( iso0p8 < trkreliso10pt0p8_ && !isGoodLepton ){
 	  trkpt10pt0p8_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p8_   = iso0p8;
@@ -2115,7 +2164,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p8_ = iso0p8;
 	}
 
-	float iso0p9 = trackIso(ipf, 0.3, dz_cut, false, 0.9) / pfcands_p4().at(ipf).pt();
+	float iso0p9 = myTrackIso.iso_dr03_dz005_pt09  / pfcands_p4().at(ipf).pt();
 	if( iso0p9 < trkreliso10pt0p9_ && !isGoodLepton ){
 	  trkpt10pt0p9_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt0p9_   = iso0p9;
@@ -2125,7 +2174,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt0p9_ = iso0p9;
 	}
 
-	float iso1p0 = trackIso(ipf, 0.3, dz_cut, false, 1.0) / pfcands_p4().at(ipf).pt();
+	float iso1p0 = myTrackIso.iso_dr03_dz005_pt10  / pfcands_p4().at(ipf).pt();
 	if( iso1p0 < trkreliso10pt1p0_ && !isGoodLepton ){
 	  trkpt10pt1p0_       = pfcands_p4().at(ipf).pt();
 	  trkreliso10pt1p0_   = iso1p0;
@@ -2135,64 +2184,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandiso10pt1p0_ = iso1p0;
 	}
 
-
-      }
-
-      //------------------------------------------------------
-      // store pt and iso for most isolated track (pt>5 GeV)
-      //------------------------------------------------------
-
-      trkpt5_          = -1.0;
-      trkreliso5_      = 1000.;
-      mleptrk5_        = -1.0;
-      float miniso5    = 999;
-      trkpt5loose_     = -1.0;
-      trkreliso5loose_ = 1000.;
-
-      for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
-
-	if( pfcands_p4().at(ipf).pt() < 5   ) continue;
-	if( pfcands_charge().at(ipf) == 0   ) continue;
-
- 	int itrk = pfcands_trkidx().at(ipf);
-	
-	bool isGoodLepton = false;
-	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
-	  if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(ilep) ) < 0.1 ) isGoodLepton = true;  
-	}
-	bool isLeadLepton = ( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
-
- 	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut_loose ) continue;
- 	}
-
-	float iso = trackIso(ipf, 0.3, dz_cut_loose, true) / pfcands_p4().at(ipf).pt();
-
-	if( iso < trkreliso5loose_ && !isGoodLepton ){
-	  trkpt5loose_     = pfcands_p4().at(ipf).pt();
-	  trkreliso5loose_ = iso;
-	}
-
-	//tighten dz cut
- 	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut ) continue;
- 	}
- 
-	iso = trackIso(ipf) / pfcands_p4().at(ipf).pt();
-
-	if( iso < miniso5 && !isGoodLepton ){
-	  miniso5     = iso;
-	  trkpt5_     = pfcands_p4().at(ipf).pt();
-	  mleptrk5_   = (*lep1_+pfcands_p4().at(ipf)).pt();
-	  trkreliso5_ = iso;
-	  //itrk       = ipf;
-	}
-
-	if( iso < pfcandiso5_ && !isLeadLepton ){
-	  pfcandiso5_ = iso;
-	  pfcandpt5_ = pfcands_p4().at(ipf).pt();
-	  pfcand5_ = &pfcands_p4().at(ipf);
-	}
 
       }
 
@@ -3562,9 +3553,11 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pftauddr",         &pftauddr_,         "pftauddr/F");  
   outTree->Branch("pftaudpt",         &pftaudpt_,         "pftaudpt/F");  
   outTree->Branch("pftaudmindrj",     &pftaudmindrj_,     "pftaudmindrj/F");  
+  outTree->Branch("pfcandid5",        &pfcandid5_,        "pfcandid5/I");
   outTree->Branch("pfcandiso5",       &pfcandiso5_,       "pfcandiso5/F");  
   outTree->Branch("pfcandpt5",        &pfcandpt5_,        "pfcandpt5/F");  
   outTree->Branch("pfcandmindrj5",    &pfcandmindrj5_,    "pfcandmindrj5/F");  
+  outTree->Branch("pfcandid10",       &pfcandid10_,       "pfcandid10/I");
   outTree->Branch("pfcandiso10",      &pfcandiso10_,      "pfcandiso10/F");  
   outTree->Branch("pfcandpt10",       &pfcandpt10_,       "pfcandpt10/F");  
   outTree->Branch("pfcandmindrj10",   &pfcandmindrj10_,   "pfcandmindrj10/F");  
