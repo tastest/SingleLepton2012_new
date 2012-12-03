@@ -10,6 +10,9 @@
 #include <map>
 #include "Math/LorentzVector.h"
 #include "Math/PxPyPzE4D.h"
+
+#include "stopUtils.h"
+
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
 #include "../CORE/QuarkGluonTagger/QuarkGluonTagger.h"
 
@@ -226,13 +229,6 @@ class singleLeptonLooper
 
 	// pfjet counters
 	Int_t   npfjets30_;
-	Int_t   npfjets35_;
-	Int_t   npfjets40_;
-	Int_t   npfjets45_;
-	Int_t   npfresjets30_;
-	Int_t   npfresjets35_;
-	Int_t   npfresjets40_;
-	Int_t   npfresjets45_;
 	Int_t   npfjets30lepcorr_;
 	Float_t knjets_;
 
@@ -241,13 +237,6 @@ class singleLeptonLooper
 
 	// pfht vars
 	Float_t htpf30_;
-	Float_t htpf35_;
-	Float_t htpf40_;
-	Float_t htpf45_;
-	Float_t htpfres30_;
-	Float_t htpfres35_;
-	Float_t htpfres40_;
-	Float_t htpfres45_;
 
 	// matched lepton vars
 	Int_t   mlepid_;
@@ -366,7 +355,6 @@ class singleLeptonLooper
         VofP4 pfjets_;
         std::vector<float> pfjets_csv_;
 	//jet corrections and ID
-	std::vector<float> pfjets_jetID_;
 	std::vector<float> pfjets_corr_;
 	//status 3 parton matching
 	std::vector<float> pfjets_mc3_;

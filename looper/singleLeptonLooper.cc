@@ -9,7 +9,7 @@
 #include "BtagFuncs.h"
 //#include "../Tools/bTagEff_BTV.h"
 
-#include "stopUtils.h"
+//#include "stopUtils.h"
 
 bool verbose              = false;
 bool doTenPercent         = false;
@@ -146,20 +146,10 @@ void singleLeptonLooper::InitBaby(){
   
   // pfjet vars
   npfjets30_	= 0;
-  npfjets35_	= 0;
-  npfjets40_	= 0;
-  npfjets45_	= 0;
   npfjets30lepcorr_ = 0;
   knjets_       = 1.;
 
   htpf30_	= 0.;
-  htpf35_	= 0.;
-  htpf40_	= 0.;
-  htpf45_	= 0.;
-  htpfres30_	= 0.;
-  htpfres35_	= 0.;
-  htpfres40_	= 0.;
-  htpfres45_	= 0.;
 
   //iso trk vars
   trkpt5_ 	    = -999.;
@@ -362,7 +352,6 @@ void singleLeptonLooper::InitBaby(){
   //clear vectors
   pfjets_.clear();
   pfjets_csv_.clear();
-  pfjets_jetID_.clear();
   pfjets_corr_.clear();
   pfjets_mc3_.clear();
   pfjets_qgtag_.clear();
@@ -2625,7 +2614,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( int i = 0 ; i < vipfjets_p4.size() ; ++i ){
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
-	pfjets_jetID_.push_back(passesPFJetID(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
 	if (!isData) pfjets_mc3_.push_back(isGenQGMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
 	if (!isData) pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
@@ -3382,19 +3370,12 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
   // pfjets L1FastL2L3Res
   outTree->Branch("npfjets30",        &npfjets30_,        "npfjets30/I");
-  outTree->Branch("npfjets35",        &npfjets35_,        "npfjets35/I");
-  outTree->Branch("npfjets40",        &npfjets40_,        "npfjets40/I");
-  outTree->Branch("npfjets45",        &npfjets45_,        "npfjets45/I");
   outTree->Branch("npfjets30lepcorr", &npfjets30lepcorr_, "npfjets30lepcorr/I");
   outTree->Branch("knjets",           &knjets_,           "knjets/F");
 
   //rho correction
   outTree->Branch("rhovor",          &rhovor_,           "rhovor/F");
-
   outTree->Branch("htpf30",          &htpf30_,           "htpf30/F");
-  outTree->Branch("htpf35",          &htpf35_,           "htpf35/F");
-  outTree->Branch("htpf40",          &htpf40_,           "htpf40/F");
-  outTree->Branch("htpf45",          &htpf45_,           "htpf45/F");
 
   // type1 met flavors
   outTree->Branch("t1met10",         &t1met10_,          "t1met10/F");
@@ -3427,11 +3408,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t1metphicorrmtdn"   , &t1metphicorrmtdn_   , "t1metphicorrmtdn/F");
   outTree->Branch("t1metphicorrlepmt"  , &t1metphicorrlepmt_  , "t1metphicorrlepmt/F");
 
-  outTree->Branch("htpfres30",        &htpfres30_,        "htpfres30/F");
-  outTree->Branch("htpfres35",        &htpfres35_,        "htpfres35/F");
-  outTree->Branch("htpfres40",        &htpfres40_,        "htpfres40/F");
-  outTree->Branch("htpfres45",        &htpfres45_,        "htpfres45/F");
-				      
   // btag variables		      
   outTree->Branch("nbtagsssv",        &nbtagsssv_,        "nbtagsssv/I");
   outTree->Branch("nbtagstcl",        &nbtagstcl_,        "nbtagstcl/I");
@@ -3709,7 +3685,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );
   outTree->Branch("pfjets_beta2_0p2", "std::vector<float>", &pfjets_beta2_0p2_ );
 
-  outTree->Branch("pfjets_jetID",   "std::vector<float>", &pfjets_jetID_    );
   outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
   outTree->Branch("pfjets_mc3",     "std::vector<float>", &pfjets_mc3_      ); 
   outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
