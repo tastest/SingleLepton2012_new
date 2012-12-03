@@ -130,7 +130,7 @@ std::set<DorkyEventIdentifier> events_lasercalib;
 int load_badlaserevents  () {
 
   ifstream in;
-  in.open("badlaser_events.txt");
+  in.open("../Core/badlaser_events.txt");
 
    int run, event, lumi;
    int nlines = 0;
