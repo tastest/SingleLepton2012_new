@@ -86,10 +86,13 @@ float getMT( float leppt , float lepphi , float met , float metphi );
 struct myTrackIso {
 
   //defaultValue 
-  float iso_dr03_dz000_pt00;
+  float iso_dr03_dz005_pt00;
+
+  // iso sum options
+  float isoDir_dr03_dz005_pt00;
 
   // dz variation
-  float iso_dr03_dz005_pt00; // default value
+  float iso_dr03_dz000_pt00;
   float iso_dr03_dz020_pt00;
 
   //pt Variation

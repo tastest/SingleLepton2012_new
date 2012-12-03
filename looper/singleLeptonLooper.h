@@ -187,12 +187,16 @@ class singleLeptonLooper
 	// extra pfcand vars 
         Int_t pfcandid5_;     
         Int_t pfcandid10_;     
+        Int_t pfcanddirid10_;     
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
+        Float_t pfcanddiriso10_;     
         Float_t pfcandpt5_;
         Float_t pfcandpt10_;
+        Float_t pfcanddirpt10_;
         Float_t pfcandmindrj5_;
         Float_t pfcandmindrj10_;
+        Float_t pfcanddirmindrj10_;
 
 	Float_t pfcandpt10pt0p1_;
 	Float_t pfcandiso10pt0p1_;
@@ -333,6 +337,7 @@ class singleLeptonLooper
         LorentzVector*  pftaud_;
         LorentzVector*  pfcand5_;
         LorentzVector*  pfcand10_;
+        LorentzVector*  pfcanddir10_;
         LorentzVector*  lep1_;
         LorentzVector*  lep2_;
         LorentzVector*  trklep1_;

@@ -260,12 +260,14 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
   struct myTrackIso iso;
 
   // no cuts  
+  iso.iso_dr03_dz005_pt00=0.; // this one will be the default
+  
+  // dz variation                                                                                                                          iso.iso_dr03_dz020_pt00=0.;
   iso.iso_dr03_dz000_pt00=0.;
   
-  // dz variation                                                                                                                        
-  iso.iso_dr03_dz005_pt00=0.; // this one will be the default
-  iso.iso_dr03_dz020_pt00=0.;
-  
+  // isolation sum option
+  iso.isoDir_dr03_dz005_pt00=0.;
+
   //pt Variation                                                                                                                      
   iso.iso_dr03_dz005_pt01=0.;
   iso.iso_dr03_dz005_pt02=0.;
@@ -325,9 +327,14 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
 
     //---------------------------------------                                                                                                                                     // passes cuts, add up isolation value                                                                                                                                        //---------------------------------------                                                                                                                                                    
     coneR=0.3;    
-    if( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) ) > coneR ) continue; // skip pfcands outside the cone                                     
+    double dr=ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) );
+    if( dr > coneR ) continue; // skip pfcands outside the cone                                     
+
     // this is the default
     if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 ) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
+
+    // this is the iso-sum option
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 ) iso.isoDir_dr03_dz005_pt00 +=pfcands_p4().at(ipf).pt()*(1-3*dr);
 
     // some dz variation
     if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.00 ) iso.iso_dr03_dz000_pt00+= pfcands_p4().at(ipf).pt();      
