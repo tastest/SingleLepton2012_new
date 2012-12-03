@@ -4,13 +4,15 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TError.h"
+#include "TObject.h"
 
 #include "Math/LorentzVector.h"
 
 #include <cmath>
+#include <vector>
 #include "assert.h"
 
-#include "../../../looper/Candidate.h"
+//#include "../../looper/Candidate.h"
 
 using namespace std;
 using namespace ROOT::Math;
@@ -19,6 +21,18 @@ using namespace ROOT::Math;
 // Ntuple structure:
 //
 // Ntuple content:
+
+class Candidate : public TObject {
+public:
+ float chi2, mt2w, mt2bl, mt2b;
+ int j1, j2, bi, oi;
+ float k1, k2;
+ bool match;
+
+ ClassDef(Candidate, 2)
+};
+
+typedef vector<Candidate> CANDIDATES;
 
 class StopTree {
 
