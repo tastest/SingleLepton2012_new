@@ -207,8 +207,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   unsigned int nEventsChain=0;
   unsigned int nEvents = chain->GetEntries();
   nEventsChain = nEvents;
-  unsigned int nEventsTotal = 0;
-  int i_permille_old = 0;
+  ULong64_t nEventsTotal = 0;
+  //  ULong64_t i_permille_old = 0;
 
   bool isData = name.Contains("data") ? true : false;
 
@@ -236,7 +236,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       ++nEventsTotal;
       if (nEventsTotal%10000==0) {
-	int i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
+	ULong64_t i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
 	//if (i_permille != i_permille_old) {//this prints too often!
 	// xterm magic from L. Vacavant and A. Cerri
 	if (isatty(1)) {
@@ -244,7 +244,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		 "\033[0m\033[32m <---\033[0m\015", i_permille/10.);
 	  fflush(stdout);
 	}
-	i_permille_old = i_permille;
+	//	i_permille_old = i_permille;
       }
 
       //---------------------
