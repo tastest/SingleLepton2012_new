@@ -1,6 +1,7 @@
 
 #include "StopTreeLooper.h"
 #include "../Core/StopTree.h"
+//#include "../Core/HadronicTop.h"
 #include "../Plotting/PlotUtilities.h"
 
 #include "TROOT.h"
@@ -16,6 +17,13 @@
 #include <utility>
 #include <map>
 #include <set>
+
+//#include "../../CORE/jetcorr/FactorizedJetCorrector.h"
+//#include "../../CORE/jetcorr/JetCorrectionUncertainty.h"
+//#include "../../CORE/jetSelections.h"
+#include "../../CORE/jetSmearingTools.h"
+//#include "../../CORE/jetsmear/JetSmearer.h"
+
 
 
 float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData ) 
@@ -163,6 +171,16 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
   //------------------------------
+  // build JetSmearer
+  //------------------------------
+
+  std::vector<std::string> list_of_file_names;
+  list_of_file_names.push_back("jetSmearData/Spring10_PtResolution_AK5PF.txt");
+  list_of_file_names.push_back("jetSmearData/Spring10_PhiResolution_AK5PF.txt");
+  list_of_file_names.push_back("jetSmearData/jet_resolutions.txt");
+  JetSmearer *jetSmearer = makeJetSmearer(list_of_file_names);
+
+  //------------------------------
   // check for valid chain
   //------------------------------
 
@@ -297,6 +315,20 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // ADD CODE BELOW THIS LINE
       //----------------------------------------------------------------------------
 
+      cout << endl;
+      cout << "nCandidates " << tree->candidates_->size() << endl;
+
+      for( int i = 0 ; i < tree->candidates_->size() ; ++i ){
+	cout << "i           " << i << endl;
+	cout << "chi2        " << (tree->candidates_->at(i)).chi2  << endl;
+	cout << "mt2w        " << (tree->candidates_->at(i)).mt2w  << endl;
+	cout << "mt2bl       " << (tree->candidates_->at(i)).mt2bl << endl;
+	cout << "mt2b        " << (tree->candidates_->at(i)).mt2b  << endl;
+	cout << "j1 j2 bi oi " << (tree->candidates_->at(i)).j1 << " " << (tree->candidates_->at(i)).j2
+	     << " " << (tree->candidates_->at(i)).bi << " " << (tree->candidates_->at(i)).oi << endl;
+	cout << "k1 k2       " << (tree->candidates_->at(i)).k1 << " " << (tree->candidates_->at(i)).k2 << endl;
+	cout << "match       " << (tree->candidates_->at(i)).match << endl;
+      }
 
 
 
