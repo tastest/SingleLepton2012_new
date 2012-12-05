@@ -1,4 +1,11 @@
-{
+#ifndef __CINT__
+#include "TChain.h"
+#include "TSystem.h"
+#include "TROOT.h"
+#include "StopTreeLooper.h"
+#endif
+
+void doAll() {
 
   gSystem->Load("libTree.so");
   gSystem->Load("libPhysics.so");
@@ -21,7 +28,7 @@
   const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
     "tt_powheg_merged_ntuple_2_smallTree"
-  }
+  };
 
   TChain *ch[NSAMPLES];
     
