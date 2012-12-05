@@ -5,6 +5,8 @@
   gSystem->Load("libEG.so");
   gSystem->Load("libMathCore.so");
 
+  gSystem->Load("../../Tools/MiniFWLite/libMiniFWLite.so");
+
   gROOT->ProcessLine(".L ../Core/StopTree.h+");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
 
