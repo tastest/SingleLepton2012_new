@@ -101,6 +101,9 @@ class StopTree {
 	float         trkpt10loose_;
 	float         trkreliso10loose_;
 	int           nleps_;
+	int           nmus_;
+	int           nels_;
+	int           ntaus_;
 	
 	Int_t         nwzpartons_;
 	Int_t         nbtagscsvl_;
@@ -146,17 +149,15 @@ class StopTree {
 	LorentzVector stop_t_;
 	LorentzVector stop_tbar_;
 	LorentzVector pfcand10_;
-	LorentzVector pfjet1_;
-	LorentzVector pfjet2_;
-	LorentzVector pfjet3_;
-	LorentzVector pfjet4_;
-	LorentzVector pfjet5_;
-	LorentzVector pfjet6_;
+
 	LorentzVector pflep1_;
 	LorentzVector pflep2_;
 
         CANDIDATES* candidates_;
-        vector<LorentzVector>* jets_;
+	//        vector<LorentzVector>* jets_;
+        vector<LorentzVector>* pfjets_;
+	vector<float> pfjets_csv_;
+	vector<float> pfjets_qgtag_;
 
     public:
         /// this is the main element
@@ -167,7 +168,7 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
- StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
+ StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
  //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
@@ -255,6 +256,9 @@ class StopTree {
 	    tree_->Branch("trkpt10loose", 	&trkpt10loose_, 	"trkpt10loose/F");        
 	    tree_->Branch("trkreliso10loose", 	&trkreliso10loose_, 	"trkreliso10loose/F");      
 	    tree_->Branch("nleps", 		&nleps_, 		"nleps/I");
+	    tree_->Branch("nmus",               &nmus_,                 "nmuus/I");
+	    tree_->Branch("nels",               &nels_,                 "nels/I");
+	    tree_->Branch("ntaus",              &ntaus_,                "ntaus/I");
 	    
 	    tree_->Branch("nwzpartons", &nwzpartons_, "nwzpartons/F");
 	    tree_->Branch("nbtagscsvl", &nbtagscsvl_, "nbtagscsvl/F");
@@ -300,18 +304,23 @@ class StopTree {
             tree_->Branch("mclep1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &mclep1Ptr_);
             tree_->Branch("mclep2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &mclep2Ptr_);
             tree_->Branch("pfcand10","ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pfcand10Ptr_);
+	    /*
             tree_->Branch("pfjet1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet1Ptr_);
             tree_->Branch("pfjet2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet2Ptr_);
             tree_->Branch("pfjet3",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet3Ptr_);
             tree_->Branch("pfjet4",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet4Ptr_);
             tree_->Branch("pfjet5",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet5Ptr_);
             tree_->Branch("pfjet6",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &jet6Ptr_);
-
+	    */
             tree_->Branch("pflep1",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep1Ptr_);
             tree_->Branch("pflep2",  "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &pflep2Ptr_);
 
             tree_->Branch("candidates", "std::vector<Candidate>", &candidates_);
-            tree_->Branch("jets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &jets_);
+	    //            tree_->Branch("jets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &jets_);
+            tree_->Branch("pfjets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &pfjets_);
+            tree_->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_);
+            tree_->Branch("pfjets_qgtag", "std::vector<float>", &pfjets_qgtag_);
+
         }
 
         // initialze a StopTree
@@ -384,7 +393,11 @@ class StopTree {
 	    tree_->SetBranchAddress("pfcandiso10", 	  &pfcandiso10_);      
 	    tree_->SetBranchAddress("trkpt10loose", 	  &trkpt10loose_);        
 	    tree_->SetBranchAddress("trkreliso10loose",   &trkreliso10loose_);      
-	    tree_->SetBranchAddress("nleps", 		  &nleps_);     
+	    tree_->SetBranchAddress("nleps", 		  &nleps_);
+	    tree_->SetBranchAddress("nmus",               &nmus_);       
+	    tree_->SetBranchAddress("nels",               &nels_);       
+	    tree_->SetBranchAddress("ntaus",              &ntaus_);       
+
 	    
 	    tree_->SetBranchAddress("nwzpartons",   &nwzpartons_);
 	    tree_->SetBranchAddress("nbtagscsvl",   &nbtagscsvl_);
@@ -430,17 +443,22 @@ class StopTree {
             tree_->SetBranchAddress("mclep1",   	  &mclep1Ptr_);
             tree_->SetBranchAddress("mclep2",   	  &mclep2Ptr_);
             tree_->SetBranchAddress("pfcand10",   	  &pfcand10Ptr_);
+	    /*
             tree_->SetBranchAddress("pfjet1", 		  &jet1Ptr_);
             tree_->SetBranchAddress("pfjet2", 		  &jet2Ptr_);
             tree_->SetBranchAddress("pfjet3", 		  &jet3Ptr_);
             tree_->SetBranchAddress("pfjet4", 		  &jet4Ptr_);
             tree_->SetBranchAddress("pfjet5", 		  &jet5Ptr_);
             tree_->SetBranchAddress("pfjet6", 		  &jet6Ptr_);
+	    */
             tree_->SetBranchAddress("pflep1",   	  &pflep1Ptr_);
             tree_->SetBranchAddress("pflep2",   	  &pflep2Ptr_);
 
             tree_->SetBranchAddress("candidates",  &candidates_);
-            tree_->SetBranchAddress("jets",  &jets_);
+	    //            tree_->SetBranchAddress("jets",  &jets_);
+            tree_->SetBranchAddress("pfjets",  &pfjets_);
+            tree_->SetBranchAddress("pfjets_csv",  &pfjets_csv_);
+            tree_->SetBranchAddress("pfjets_qgtag",  &pfjets_qgtag_);
 
             gErrorIgnoreLevel = currentState;
         }
@@ -464,12 +482,14 @@ class StopTree {
         LorentzVector *mclep1Ptr_;
         LorentzVector *mclep2Ptr_;
         LorentzVector *pfcand10Ptr_;
+	/*
         LorentzVector *jet1Ptr_;
         LorentzVector *jet2Ptr_;
         LorentzVector *jet3Ptr_;
         LorentzVector *jet4Ptr_;
         LorentzVector *jet5Ptr_;
         LorentzVector *jet6Ptr_;
+	*/
         LorentzVector *pflep1Ptr_;
         LorentzVector *pflep2Ptr_;
 
@@ -541,6 +561,9 @@ StopTree::InitVariables(){
 	variables_.push_back(string("trkpt10loose"	));
 	variables_.push_back(string("trkreliso10loose"	));
 	variables_.push_back(string("nleps"		));         
+	variables_.push_back(string("nmus"		));         
+	variables_.push_back(string("nels"		));         
+	variables_.push_back(string("ntaus"		));         
 	
 	variables_.push_back(string("nwzpartons"));
 	variables_.push_back(string("nbtagscsvl"));
@@ -658,6 +681,9 @@ StopTree::InitVariables(){
     trkpt10loose_	= -999.;
     trkreliso10loose_	= -999.;
     nleps_		= 999;
+    nmus_		= 999;
+    nels_		= 999;
+    ntaus_		= 999;
     
     nwzpartons_= -999;
     nbtagscsvl_= -999;
@@ -703,17 +729,15 @@ StopTree::InitVariables(){
     mclep1_		= LorentzVector();
     mclep2_		= LorentzVector();
     pfcand10_		= LorentzVector();
-    pfjet1_		= LorentzVector();
-    pfjet2_		= LorentzVector();
-    pfjet3_		= LorentzVector();
-    pfjet4_		= LorentzVector();
-    pfjet5_		= LorentzVector();
-    pfjet6_		= LorentzVector();
+
     pflep1_		= LorentzVector();
     pflep2_		= LorentzVector();
 
     candidates_ = 0;
-    jets_ = 0;
+    //    jets_ = 0;
+    pfjets_ = 0;
+    pfjets_csv_.clear();
+    pfjets_qgtag_.clear();
 
 }
 
@@ -782,7 +806,10 @@ StopTree::Get(string value)
   if(value=="trkpt10loose" 	) { return this->trkpt10loose_;		}        
   if(value=="trkreliso10loose" 	) { return this->trkreliso10loose_;	}      
   if(value=="nleps" 		) { return this->nleps_;		}     
-  
+  if(value=="nmus"              ) { return this->nmus_;} 
+  if(value=="nels"              ) { return this->nels_;} 
+  if(value=="ntaus"             ) { return this->ntaus_;} 
+
   if(value=="nwzpartons" ) { return this->nwzpartons_; }
   if(value=="nbtagscsvl" ) { return this->nbtagscsvl_; }
   if(value=="trkmet_nolepcorr" ) { return this->trkmet_nolepcorr_; }
