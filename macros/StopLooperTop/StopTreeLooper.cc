@@ -493,6 +493,102 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
 //--------------------------------------------------------------------
 
+MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData){
+
+  list<Candidate> candidates = recoHadronicTop(tree, isData );
+
+  if (candidates.size() == 0){
+    MT2struct mfail;
+    mfail.mt2w  = -999;
+    mfail.mt2b  = -999;
+    mfail.mt2bl = -999;
+    mfail.chi2  = -999;
+    return mfail;
+  }
+
+  double chi2_min  = 9999;
+  double mt2b_min  = 9999;
+  double mt2bl_min = 9999;
+  double mt2w_min  = 9999;
+
+  // count btags among leading 4 jets
+  int n_btag = 0;
+
+  for( int i = 0 ; i < 4 ; i++ ){
+    if( tree->pfjets_csv_.at(i) < 0.679 ) n_btag++;
+  }
+
+  list<Candidate>::iterator candIter;
+
+  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
+
+    // loop over all candidiates
+    //for (unsigned int i=0; i<candidates.size(); ++i) {
+
+    //if ( ! candidates_->at(i).match ) continue;
+
+    // get indices of 4 jets used for hadronic top reconstruction
+    // int b  = candidates.at(i).bi;
+    // int o  = candidates.at(i).oi;
+    // int j1 = candidates.at(i).j1;
+    // int j2 = candidates.at(i).j2;
+
+    int b  = (*candIter).bi;
+    int o  = (*candIter).oi;
+    int j1 = (*candIter).j1;
+    int j2 = (*candIter).j2;
+
+    // require the 4 jets used for the hadronic top mass are the 4 leading jets
+    if (b>3 || o > 3 || j1 > 3 || j2 > 3) continue;
+
+    // store whether the 2 jets used for MT2 calculation are btagged
+    bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
+    bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
+    //bool j1_btag = (btag_->at(j1) > 0.679);
+    //bool j2_btag = (btag_->at(j2) > 0.679);
+
+    // 2 btags: require jets used for MT2 are the 2 b-jets
+    if ( n_btag == 2 ){ 
+      if ( !b_btag || !o_btag ) continue;
+    } 
+
+    // 1 btag: 
+    else if ( n_btag == 1) {
+      if (b>1 || o>1) continue;
+    } 
+
+    // 0 or >=3 btags: require jets used for MT2 are among 3 leading jets
+    else {
+      if (b>2 || o>2) continue;
+    }
+
+    // double chi2  = candidates.at(i).chi2;
+    // double mt2b  = candidates.at(i).mt2b;
+    // double mt2bl = candidates.at(i).mt2bl;
+    // double mt2w  = candidates.at(i).mt2w;
+
+    double chi2  = (*candIter).chi2;
+    double mt2b  = (*candIter).mt2b;
+    double mt2bl = (*candIter).mt2bl;
+    double mt2w  = (*candIter).mt2w;
+ 
+    //    cout << " " << b << ":" << b_btag  << " " << o << ":" << o_btag << " " << j1 << " " << j2 << " = " << mt2w  << "  " << chi2 <<endl;
+    if (chi2  < chi2_min  ) chi2_min  = chi2;
+    if (mt2b  < mt2b_min  ) mt2b_min  = mt2b;
+    if (mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
+    if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
+  }
+
+  MT2struct m;
+  m.mt2w  = mt2w_min;
+  m.mt2b  = mt2b_min;
+  m.mt2bl = mt2bl_min;
+  m.chi2  = chi2_min;
+
+  return m;
+
+}
+
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 

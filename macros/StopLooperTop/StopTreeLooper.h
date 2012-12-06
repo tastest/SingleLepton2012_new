@@ -63,7 +63,7 @@ class StopTreeLooper {
 	float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
 	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 
-
+	MT2struct Best_MT2Calculator_Ricardo(StopTree*, bool);
         list<Candidate> recoHadronicTop(StopTree*, bool);
 
     private:
