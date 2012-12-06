@@ -1,72 +1,47 @@
 {
 
-    gSystem->Load("libTree.so");
-    gSystem->Load("libPhysics.so");
-    gSystem->Load("libEG.so");
-    gSystem->Load("libMathCore.so");
+  //------------------------------ 
+  // load stuff
+  //------------------------------ 
 
-    gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
-    gROOT->ProcessLine(".L libStopTreeLooper.so");
-    gROOT->ProcessLine(".L Core/StopTree.h+");
+  gSystem->Load("libTree.so");
+  gSystem->Load("libPhysics.so");
+  gSystem->Load("libEG.so");
+  gSystem->Load("libMathCore.so");
 
-    StopTreeLooper *looper = new StopTreeLooper();
+  gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
+  gROOT->ProcessLine(".L libStopTreeLooper.so");
+  gROOT->ProcessLine(".L ../Core/StopTree.h+");
 
-    // 
-    // samples to run over
-    //
+  StopTreeLooper *looper = new StopTreeLooper();
+
+  //------------------------------ 
+  // samples to run over
+  //------------------------------ 
  
-   char* path = "/tas/benhoob/StopBabies/output/output_V00-01_05_2012_4jskim";
+  char* path = "/tas/benhoob/StopBabies/output/V00-02-03_2012_TTJets_Powheg";
 
-   const int NSAMPLES = 1;//17;
-   char* sampletag[NSAMPLES] = {
-     //     "ttlpsl",
-     "ttlpdl"};
-//     "triboson",
-//     "diboson",
-//     "ttV",
-//     "data_mueg",
-//     "data_dimu",
-//     "data_diel",
-//     "DYStitchtot",
-//     "tWall",
-//     "tWsl",
-//     "tWdl",
-//     "wstitchjets",
-//      "ttsl",
-//      "ttdl",
- //    "data_ele",
- //    "data_muo"};
+  const int NSAMPLES = 1;
+  char* sampletag[NSAMPLES] = {
+    "tt_powheg_merged_ntuple_2_smallTree"
+  }
 
-//     char* path = "/home/users/vimartin/output/output_V00-01_05_2012/altttbar";
+  //------------------------------ 
+  // process samples
+  //------------------------------ 
 
-//     const int NSAMPLES = 12;
-//     char* sampletag[NSAMPLES] = {
-//       "ttsl_massup",
-//       "ttsl_matchup",
-//       "ttsl_massdw",
-//       "ttsl_scaleup",
-//       "ttsl_scaledw",
-//       "ttsl_matchdw",
-//       "ttdl_massup",
-//       "ttdl_matchup",
-//       "ttdl_massdw",
-//       "ttdl_scaleup",
-//       "ttdl_scaledw",
-//       "ttdl_matchdw"};
-
-
-    TChain *ch[NSAMPLES];
+  TChain *ch[NSAMPLES];
     
-    for (int i=0; i<NSAMPLES; ++i) {
-      ch[i] = new TChain("t");
-      ch[i]->Add(Form("%s/%s*.root", path, sampletag[i]));
-      looper->setOutFileName(Form("output/%s_histos.root", sampletag[i]));
-      looper->loop(ch[i], sampletag[i]);
-    }
+  for (int i=0; i<NSAMPLES; ++i) {
+    ch[i] = new TChain("t");
+    ch[i]->Add(Form("%s/%s*.root", path, sampletag[i]));
+    looper->setOutFileName(Form("output/%s_histos.root", sampletag[i]));
+    looper->loop(ch[i], sampletag[i]);
+  }
 
-    delete looper;
-    for (int i=0; i<NSAMPLES; ++i) 
-      delete ch[i];
+  delete looper;
+  for (int i=0; i<NSAMPLES; ++i) 
+    delete ch[i];
 
 }
 

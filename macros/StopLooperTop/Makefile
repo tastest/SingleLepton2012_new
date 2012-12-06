@@ -45,8 +45,8 @@ clean:
 	rm -f */*.d \
 	rm -f */*.o \
 	rm -f *.so \
-	rm -f Core/StopTree_h.d \
-	rm -f Core/StopTree_h.so \
+	rm -f ../Core/StopTree_h.d \
+	rm -f ../Core/StopTree_h.so \
 	rm -f LinkDef_out* 
 
 -include $(SOURCES:.cc=.d)
