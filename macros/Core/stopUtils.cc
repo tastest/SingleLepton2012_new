@@ -51,7 +51,6 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
   // get the lepton pt and MET
   //-----------------------------------------
 
-  //LorentzVector* lep = &tree->lep1_;
   StopTree::LorentzVector* lep = &tree->lep1_;
   double met         = tree->t1metphicorr_;
   double metphi      = tree->t1metphicorrphi_;
@@ -74,9 +73,8 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
   } 
 
   int n_jets = jets.size();
-  //int n_jets = tree->pfjets_->size();
-
-  //assert( jets.size() == btag.size() );
+  
+  assert( jets.size() == btag.size() );
 
   //-----------------------------------------
   // initialize stuff for
@@ -106,7 +104,6 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
         continue;
 
       double pt_b = jets[b].Pt();
-      //double pt_b = tree->pfjets_->at(b).pt();
 
       if ( btag[b] >= BTAG_MIN && pt_b < PTMIN_BTAG )
         continue;
@@ -115,7 +112,6 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
         continue;
 
       double pt_o = jets[o].Pt();
-      //double pt_o = tree->pfjets_->at(o).pt();
 
       if ( btag[o] >= BTAG_MIN && pt_o < PTMIN_OTAG )
         continue;
@@ -138,11 +134,6 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
       pl[2]= lep->Py(); 
       pl[3]= lep->Pz();
 
-      // pl[0]= (&tree->lep1_)->E(); 
-      // pl[1]= (&tree->lep1_)->Px(); 
-      // pl[2]= (&tree->lep1_)->Py(); 
-      // pl[3]= (&tree->lep1_)->Pz();
-
       pb1[0] = jets[o].E();  
       pb1[1] = jets[o].Px(); 
       pb1[2] = jets[o].Py(); 
@@ -152,9 +143,6 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
       pb2[1] = jets[b].Px(); 
       pb2[2] = jets[b].Py(); 
       pb2[3] = jets[b].Pz();
-
-      // double pt_o = tree->pfjets_->at(o).pt();
-      // p
 
       pmiss[0] = 0.; 
       pmiss[1] = metx; 
