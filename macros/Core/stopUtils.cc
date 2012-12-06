@@ -397,8 +397,8 @@ MT2struct Best_MT2Calculator(StopTree* tree, bool isData){
   m.mt2w  = mt2w_min;
   m.mt2b  = mt2b_min;
   m.mt2bl = mt2bl_min;
+  m.chi2  = -1;
 
   return m;
 
 }
-

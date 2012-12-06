@@ -22,10 +22,11 @@ using namespace ROOT::Math;
 //
 // Ntuple content:
 
-struct MT2struct {		 	   
- float mt2w;
- float mt2b;	 	   
- float mt2bl;
+struct MT2struct {
+  float mt2w;
+  float mt2b;
+  float mt2bl;
+  float chi2;
 };
 
 class Candidate : public TObject {
