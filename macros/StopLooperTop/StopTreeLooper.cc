@@ -6,6 +6,8 @@
 #include "../Core/mt2bl_bisect.h"
 #include "../Core/mt2w_bisect.h"
 
+#include "../Core/stopUtils.h"
+
 #include "TROOT.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -502,7 +504,6 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
    return chi2candidates;
 }
 
-
 //--------------------------------------------------------------------
 
 void StopTreeLooper::loop(TChain *chain, TString name)
@@ -666,8 +667,22 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	++i;
       }
 
+      //----------------------------------------------------------------------------------------
+      // calculate the MT2 variables only
+      //----------------------------------------------------------------------------------------
 
-      plot1D("h_chi2",  candidates.front().chi2,       evtweight, h_1d_z, 100, 0, 20);
+      list<Candidate> mt2candidates = MT2Calculator(tree, isData );
+
+      cout << "Found " << mt2candidates.size() << " MT2 candidates" << endl;
+
+      for(candIter = mt2candidates.begin() ; candIter != mt2candidates.end() ; candIter++ ){
+	cout << "mt2w        " << (*candIter).mt2w   << endl;
+	cout << "mt2bl       " << (*candIter).mt2bl  << endl;
+	cout << "mt2b        " << (*candIter).mt2b   << endl;
+	cout << endl;
+      }
+
+      //plot1D("h_chi2",  candidates.front().chi2,       evtweight, h_1d_z, 100, 0, 20);
 
     } // end event loop
 

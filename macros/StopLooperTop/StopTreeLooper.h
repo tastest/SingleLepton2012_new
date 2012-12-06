@@ -66,7 +66,6 @@ class StopTreeLooper {
 
         list<Candidate> recoHadronicTop(StopTree*, bool);
 
-
     private:
 
 	string m_outfilename_;
