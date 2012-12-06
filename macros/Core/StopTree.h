@@ -159,6 +159,8 @@ class StopTree {
 	vector<float> pfjets_csv_;
 	vector<float> pfjets_qgtag_;
 
+
+
     public:
         /// this is the main element
         TTree *tree_;
@@ -168,7 +170,7 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
- StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_) {}
+ StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_), pfjets_csv_Ptr_(&pfjets_csv_), pfjets_qgtag_Ptr_(&pfjets_qgtag_) {}
  //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
@@ -317,9 +319,9 @@ class StopTree {
 
             tree_->Branch("candidates", "std::vector<Candidate>", &candidates_);
 	    //            tree_->Branch("jets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &jets_);
-            tree_->Branch("pfjets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &pfjets_);
-            tree_->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_);
-            tree_->Branch("pfjets_qgtag", "std::vector<float>", &pfjets_qgtag_);
+            tree_->Branch("pfjets"      , "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &pfjets_);
+            tree_->Branch("pfjets_csv"  , "std::vector<float>", &pfjets_csv_Ptr_);
+            tree_->Branch("pfjets_qgtag", "std::vector<float>", &pfjets_qgtag_Ptr_);
 
         }
 
@@ -456,9 +458,9 @@ class StopTree {
 
             tree_->SetBranchAddress("candidates",  &candidates_);
 	    //            tree_->SetBranchAddress("jets",  &jets_);
-            tree_->SetBranchAddress("pfjets",  &pfjets_);
-            tree_->SetBranchAddress("pfjets_csv",  &pfjets_csv_);
-            tree_->SetBranchAddress("pfjets_qgtag",  &pfjets_qgtag_);
+            tree_->SetBranchAddress("pfjets"      ,  &pfjets_);
+            tree_->SetBranchAddress("pfjets_csv"  ,  &pfjets_csv_Ptr_);
+            tree_->SetBranchAddress("pfjets_qgtag",  &pfjets_qgtag_Ptr_);
 
             gErrorIgnoreLevel = currentState;
         }
@@ -493,6 +495,8 @@ class StopTree {
         LorentzVector *pflep1Ptr_;
         LorentzVector *pflep2Ptr_;
 
+	vector<float>* pfjets_csv_Ptr_;
+	vector<float>* pfjets_qgtag_Ptr_;
 }; 
 
 inline void 
