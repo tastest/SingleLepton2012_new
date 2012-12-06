@@ -235,6 +235,8 @@ float getDataMCRatio(float eta){
 
 list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
+  assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
+
   static JetSmearer* jetSmearer = 0;
   if (jetSmearer == 0 ){
     std::vector<std::string> list_of_file_names;
@@ -251,19 +253,17 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
   vector<LorentzVector> jets;
   vector<float> btag;
 
-  jets.push_back( tree->pfjet1_ );
-  jets.push_back( tree->pfjet2_ );
-  jets.push_back( tree->pfjet3_ );
-  jets.push_back( tree->pfjet4_ );
-  jets.push_back( tree->pfjet5_ );
-  jets.push_back( tree->pfjet6_ );
+  //cout << endl << "baby branches:" << endl;
+  for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
+    //cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
+    jets.push_back( tree->pfjets_->at(i) );
+    btag.push_back( tree->pfjets_csv_.at(i) );
+  } 
 
-  btag.push_back( tree->bjet1_ );
-  btag.push_back( tree->bjet2_ );
-  btag.push_back( tree->bjet3_ );
-  btag.push_back( tree->bjet4_ );
-  btag.push_back( tree->bjet5_ );
-  btag.push_back( tree->bjet6_ );
+  // cout << endl << "stored:" << endl;
+  // for( unsigned int i = 0 ; i < jets.size() ; ++i ){
+  //   cout << i << " pt csv " << jets.at(i).pt() << " " << btag.at(i) << endl;
+  // } 
 
   assert( jets.size() == btag.size() );
 
@@ -279,7 +279,10 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
     for (int i=0; i<n_jets; ++i)
       sigma_jets[i] *= getDataMCRatio(jets[i].eta());
 
-  
+  /*
+    // TO BE UPDATED
+    // we don't currently store the qgjet variables, to be added
+
   vector<int> mc;
 
   if (!isData) {
@@ -316,8 +319,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
                     match++;
             }
   }
-
-
+  */
   
 ////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
   
@@ -474,7 +476,8 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
         double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
                       + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
 
-        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
+        //bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
+        bool c_match = false;
 
         Candidate c;
         c.chi2  = c_chi2;
@@ -583,7 +586,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     ULong64_t nEvents = tree->tree_->GetEntries();
 
-    nEvents = 1000;
+    //nEvents = 100;
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
       tree->tree_->GetEntry(event);
@@ -642,7 +645,28 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       if (candidates.size() < 1 ) continue;    
 
-      cout << "chi2 = " << candidates.front().chi2 << endl;
+      //----------------------------------------------------------------------------------------
+      // calculate the hadronic top and MT2 variables and compare to values stored in babies
+      //----------------------------------------------------------------------------------------
+
+      cout << endl << endl << endl;
+      cout << "On-the-fly : " << candidates.size()         << " candidates" << endl;
+      cout << "From baby  : " << tree->candidates_->size() << " candidates" << endl << endl;
+
+      list<Candidate>::iterator candIter;
+
+      int i = 0;
+
+      for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
+	cout << "chi2        " << (*candIter).chi2   << " " << (tree->candidates_->at(i)).chi2  << endl;
+	cout << "mt2w        " << (*candIter).mt2w   << " " << (tree->candidates_->at(i)).mt2w  << endl;
+	cout << "mt2bl       " << (*candIter).mt2bl  << " " << (tree->candidates_->at(i)).mt2bl << endl;
+	cout << "mt2b        " << (*candIter).mt2b   << " " << (tree->candidates_->at(i)).mt2b  << endl;
+	cout << endl;
+	++i;
+      }
+
+
       plot1D("h_chi2",  candidates.front().chi2,       evtweight, h_1d_z, 100, 0, 20);
 
     } // end event loop
