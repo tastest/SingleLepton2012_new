@@ -244,7 +244,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
     std::vector<std::string> list_of_file_names;
     list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PtResolution_AK5PF.txt");
     list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PhiResolution_AK5PF.txt");
-    list_of_file_names.push_back("../../COREjetsmear/data/jet_resolutions.txt");
+    list_of_file_names.push_back("../../CORE/jetsmear/data/jet_resolutions.txt");
     jetSmearer = makeJetSmearer(list_of_file_names);
   }
 
@@ -253,13 +253,15 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
   double metphi = tree->t1metphicorrphi_;
 
   vector<LorentzVector> jets;
-  vector<float> btag;
+  vector<float>         btag;
+  vector<int>           mc;
 
   //cout << endl << "baby branches:" << endl;
   for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
     //cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
-    jets.push_back( tree->pfjets_->at(i) );
+    jets.push_back( tree->pfjets_->at(i)    );
     btag.push_back( tree->pfjets_csv_.at(i) );
+    mc.push_back  ( tree->pfjets_mc3_.at(i) );
   } 
 
   // cout << endl << "stored:" << endl;
@@ -281,20 +283,6 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
     for (int i=0; i<n_jets; ++i)
       sigma_jets[i] *= getDataMCRatio(jets[i].eta());
 
-  /*
-    // TO BE UPDATED
-    // we don't currently store the qgjet variables, to be added
-
-  vector<int> mc;
-
-  if (!isData) {
-    mc.push_back( tree->qgjet1_ );
-    mc.push_back( tree->qgjet2_ );
-    mc.push_back( tree->qgjet3_ );
-    mc.push_back( tree->qgjet4_ );
-    mc.push_back( tree->qgjet5_ );
-    mc.push_back( tree->qgjet6_ );
-  }
 
   int ibl[5];
   int iw1[5];
@@ -321,9 +309,9 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
                     match++;
             }
   }
-  */
+
   
-////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
+  ////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
   
   vector<int> v_i, v_j;
   vector<double> v_k1, v_k2;
@@ -478,9 +466,8 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
         double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
                       + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
 
-        //bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
-        bool c_match = false;
-
+        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
+  
         Candidate c;
         c.chi2  = c_chi2;
         c.mt2b  = c_mt2b;
@@ -534,14 +521,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   //plotting map
   std::map<std::string, TH1F*> h_1d;
-  //also for control regions
-  std::map<std::string, TH1F*> h_1d_cr1, h_1d_cr2, h_1d_cr4, h_1d_cr5;
-  //for signal region 
-  std::map<std::string, TH1F*> h_1d_sig;
-  //for ttbar dilepton njets distribution
-  std::map<std::string, TH1F*> h_1d_nj;
-  //z sample for yields etc
-  std::map<std::string, TH1F*> h_1d_z;
 
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
@@ -632,8 +611,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( tree->nvtx_, h_vtx_wgt, isData );
 
-      plot1D("h_vtx",       tree->nvtx_,       evtweight, h_1d_z, 40, 0, 40);
-      plot1D("h_vtxweight", tree->nvtxweight_, evtweight, h_1d_z, 41, -4., 4.);
+      plot1D("h_vtx",       tree->nvtx_,       evtweight, h_1d, 40, 0, 40);
+      plot1D("h_vtxweight", tree->nvtxweight_, evtweight, h_1d, 41, -4., 4.);
 
       // 
       // selection criteria
@@ -649,14 +628,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //----------------------------------------------------------------------------------------
       // calculate the hadronic top and MT2 variables and compare to values stored in babies
       //----------------------------------------------------------------------------------------
+      /*
+      list<Candidate>::iterator candIter;
+
+      int i = 0;
 
       cout << endl << endl << endl;
       cout << "On-the-fly : " << candidates.size()         << " candidates" << endl;
       cout << "From baby  : " << tree->candidates_->size() << " candidates" << endl << endl;
-
-      list<Candidate>::iterator candIter;
-
-      int i = 0;
 
       for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
 	cout << "chi2        " << (*candIter).chi2   << " " << (tree->candidates_->at(i)).chi2  << endl;
@@ -681,8 +660,22 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	cout << "mt2b        " << (*candIter).mt2b   << endl;
 	cout << endl;
       }
+      */
 
-      //plot1D("h_chi2",  candidates.front().chi2,       evtweight, h_1d_z, 100, 0, 20);
+      //----------------------------------------------------------------------------------------
+      // calculate the BEST MT2 variables only
+      //----------------------------------------------------------------------------------------
+
+      MT2struct m = Best_MT2Calculator(tree, isData);
+
+      // cout << endl;
+      // cout << "MT2W  " << m.mt2w  << endl;
+      // cout << "MT2b  " << m.mt2b  << endl;
+      // cout << "MT2bl " << m.mt2bl << endl;
+
+      plot1D("h_mt2w"  , TMath::Min(m.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+      plot1D("h_mt2b"  , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+      plot1D("h_mt2bl" , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
 
     } // end event loop
 
@@ -693,6 +686,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //
     // finish
     //
+
+  char* outfilename = Form("output/%s.root",name.Data());
+
+  TFile outfile(outfilename,"RECREATE") ; 
+
+  printf("[StopTreeLooper::loop] Saving histograms to %s\n", outfilename);
+  
+  std::map<std::string, TH1F*>::iterator it1d;
+  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
+    it1d->second->Write(); 
+    delete it1d->second;
+  }
+  
+  outfile.Write();
+  outfile.Close();
 
   already_seen.clear();
 
