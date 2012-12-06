@@ -195,4 +195,210 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
   return mt2candidates;
 }
 
+int leadingJetIndex(vector<StopTree::LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
+
+  int imaxpt  = -1;
+  float maxpt = -1.0;
+
+  // loop over jets
+  for ( int i = 0 ; i < (int) jets.size() ; ++i ){      
+      
+    // skip these indices
+    if( i == iskip1 ) continue;
+    if( i == iskip2 ) continue;
+
+    // store index of max pt jet
+    if( jets.at(i).pt() > maxpt ){
+      maxpt  = jets.at(i).pt();
+      imaxpt = i;
+    }
+  }
+
+  return imaxpt;
+}
+
 //------------------------------------------------------------------------------------------------
+
+MT2struct Best_MT2Calculator(StopTree* tree, bool isData){
+
+  //--------------------------------------------------------------------------------------------
+  // This function returns the "best" MT2 variables over the list of possible b-jet pairs
+  //
+  // The algorithm depends on whether nbtags = 1, 2, >=3
+  // nbtag = 1: use pair with tagged jet, 1 of the 2 leading non-b jets, choose minimum MT2
+  // nbtag = 2: use pair with 2 b-jets
+  // nbtag > 2: ignore btagging, do all combinations with 3 leading jets, choose minimum MT2
+  //
+  // For all cases there is a 2-fold ambiguity depending on which b is grouped with the lepton,
+  // so we always take the minimum of the 2 jet pair assignments
+  //
+  //--------------------------------------------------------------------------------------------
+
+  //----------------------------------------------------------------
+  // start by counting jets with minimum pt and CSV thresholds
+  //----------------------------------------------------------------
+
+  const double PTMIN_BTAG = 30;
+  const double BTAG_MIN   = 0.679;
+
+  int nbtags = 0;
+
+  assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
+
+  vector<StopTree::LorentzVector> jets;
+  vector<float> btag;
+
+  for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
+    jets.push_back( tree->pfjets_->at(i) );
+    btag.push_back( tree->pfjets_csv_.at(i) );
+  } 
+
+  int n_jets = jets.size();
+
+  vector<int> btagJets;
+
+  for ( int i = 0 ; i < n_jets ; ++i ){      
+    if( jets.at(i).pt() < PTMIN_BTAG ) continue;
+    if( btag.at(i)      < BTAG_MIN   ) continue;
+    nbtags++;
+    btagJets.push_back(i);
+  }
+
+  //----------------------------------------------------------------
+  // get the indices of the leading jets
+  //----------------------------------------------------------------
+  
+  int imaxpt1 = -1;
+  int imaxpt2 = -1;
+  int imaxpt3 = -1;
+
+  // if 1 btag, we want the indices of the 2 leading non-b jets
+
+  if( nbtags == 1 ){
+
+    imaxpt1 = leadingJetIndex( jets , btagJets.at(0) );           // leading non-b jet
+    imaxpt2 = leadingJetIndex( jets , btagJets.at(0) , imaxpt1 ); // 2nd leading non-b jet
+
+    // cout << endl << endl;
+    // cout << "btagged jet " << btagJets.at(0) << endl;
+    // cout << "jet pt's" << endl;
+    
+    // for ( int i = 0 ; i < n_jets ; ++i ){      
+    //   cout << i << " " << jets.at(i).pt() << endl;
+    // }
+    
+    // cout << "Leading jet     " << imaxpt  << " " << jets.at(imaxpt).pt()  << endl;
+    // cout << "2nd leading jet " << imaxpt2 << " " << jets.at(imaxpt2).pt() << endl;
+  }
+
+  // if >=3 btags, we want the indices of the 3 leading jets
+
+  if( nbtags >= 3 ){
+    imaxpt1 = leadingJetIndex( jets                     ); // leading jet
+    imaxpt2 = leadingJetIndex( jets  , imaxpt1          ); // 2nd leading jet
+    imaxpt3 = leadingJetIndex( jets  , imaxpt1 , imaxpt2); // 3rd leading jet
+
+    // cout << endl << endl;
+    // cout << "jet pt's" << endl;
+    
+    // for ( int i = 0 ; i < n_jets ; ++i ){      
+    //   cout << i << " " << jets.at(i).pt() << endl;
+    // }
+    
+    // cout << "Leading jet     " << imaxpt1 << " " << jets.at(imaxpt1).pt() << endl;
+    // cout << "2nd leading jet " << imaxpt2 << " " << jets.at(imaxpt2).pt() << endl;
+    // cout << "3rd leading jet " << imaxpt3 << " " << jets.at(imaxpt3).pt() << endl;
+
+  }
+
+
+  //----------------------------------------------------------------
+  // get all the MT2 values for all jet pairings
+  //----------------------------------------------------------------
+
+  list<Candidate> mt2candidates = MT2Calculator(tree, isData );
+
+  list<Candidate>::iterator candIter;
+
+  float mt2w_min  = 1e10;
+  float mt2b_min  = 1e10;
+  float mt2bl_min = 1e10;
+
+  //------------------------------------------------------------------------------
+  // loop over jet pairings, choose jet pairing best on algorithm described above
+  // bi is the index of the jet grouped with the lepton
+  // oi is the index of the jet not grouped with the lepton
+  //------------------------------------------------------------------------------
+      
+  for(candIter = mt2candidates.begin() ; candIter != mt2candidates.end() ; candIter++ ){
+
+    //--------------
+    // 1 btags
+    //--------------
+      
+    if( nbtags == 1 ){
+
+      // require that either bi or oi is the btagged jet
+      if( (*candIter).bi != btagJets.at(0) && (*candIter).oi != btagJets.at(0) ) continue;
+
+      bool goodCombo = false;
+
+      // bi is btagged, oi is one of the 2 leading non-b jets
+      if( (*candIter).bi == btagJets.at(0) && ( (*candIter).oi == imaxpt1 || (*candIter).oi == imaxpt2) ) goodCombo = true;
+
+      // oi is btagged, bi is one of the 2 leading non-b jets
+      if( (*candIter).oi == btagJets.at(0) && ( (*candIter).bi == imaxpt1 || (*candIter).bi == imaxpt2) ) goodCombo = true;
+
+      if( !goodCombo) continue;
+    }
+
+    //--------------
+    // 2 btags
+    //--------------
+
+    else if( nbtags == 2 ){
+	
+      // require bi is one of the 2 btagged jets
+      if( (*candIter).bi != btagJets.at(0) && (*candIter).bi != btagJets.at(1) ) continue; 
+	
+      // require oi is one of the 2 btagged jets
+      if( (*candIter).oi != btagJets.at(0) && (*candIter).oi != btagJets.at(1) ) continue; 
+
+    }
+
+    //--------------
+    // >=3 btags
+    //--------------
+      
+    else if( nbtags >= 3 ){
+	
+      // bi must be one of 3 leading jets
+      if( (*candIter).bi != imaxpt1 && (*candIter).bi != imaxpt2 && (*candIter).bi != imaxpt3 ) continue;
+
+      // oi must be one of 3 leading jets
+      if( (*candIter).oi != imaxpt1 && (*candIter).oi != imaxpt2 && (*candIter).oi != imaxpt3 ) continue;
+    }
+      
+    else{
+      cout << __FILE__ << " " << __LINE__ << " should never get here!!!" << endl;
+    }
+
+    float mt2w  = (*candIter).mt2w;
+    float mt2b  = (*candIter).mt2b;
+    float mt2bl = (*candIter).mt2bl;
+
+    if( mt2w  < mt2w_min  ) mt2w_min  = mt2w;
+    if( mt2b  < mt2b_min  ) mt2b_min  = mt2b;
+    if( mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
+
+  }
+
+  MT2struct m;
+  m.mt2w  = mt2w_min;
+  m.mt2b  = mt2b_min;
+  m.mt2bl = mt2bl_min;
+
+  return m;
+
+}
+

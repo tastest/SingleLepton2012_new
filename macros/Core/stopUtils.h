@@ -23,5 +23,6 @@
 using namespace std;
 
 list<Candidate> MT2Calculator(StopTree* tree, bool isData);
+MT2struct Best_MT2Calculator(StopTree* tree, bool isData);
 
 #endif
