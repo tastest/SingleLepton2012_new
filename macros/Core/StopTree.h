@@ -22,10 +22,10 @@ using namespace ROOT::Math;
 //
 // Ntuple content:
 
-struct MT2struct {
-  float mt2w;
-  float mt2b;
-  float mt2bl;
+struct MT2struct {		 	   
+ float mt2w;
+ float mt2b;	 	   
+ float mt2bl;
 };
 
 class Candidate : public TObject {
@@ -110,7 +110,8 @@ class StopTree {
 	int           nmus_;
 	int           nels_;
 	int           ntaus_;
-	
+
+	Float_t         mcmtln_;
 	Int_t         nwzpartons_;
 	Int_t         nbtagscsvl_;
 	Float_t         trkmet_nolepcorr_;
@@ -166,6 +167,7 @@ class StopTree {
 	vector<float> pfjets_qgtag_;
 	vector<float> pfjets_mc3_;
 	vector<float> pfjets_beta2_;
+	vector<float> pfjets_beta_;
 	vector<int> pfjets_lepjet_;
 
     public:
@@ -177,7 +179,7 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
-	StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_), pfjets_csv_Ptr_(&pfjets_csv_), pfjets_qgtag_Ptr_(&pfjets_qgtag_), pfjets_mc3_Ptr_(&pfjets_mc3_), pfjets_beta2_Ptr_(&pfjets_beta2_), pfjets_lepjet_Ptr_(&pfjets_lepjet_)  {}
+	StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_), pfjets_csv_Ptr_(&pfjets_csv_), pfjets_qgtag_Ptr_(&pfjets_qgtag_), pfjets_mc3_Ptr_(&pfjets_mc3_), pfjets_beta_Ptr_(&pfjets_beta_), pfjets_beta2_Ptr_(&pfjets_beta2_), pfjets_lepjet_Ptr_(&pfjets_lepjet_)  {}
  //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
@@ -269,6 +271,8 @@ class StopTree {
 	    tree_->Branch("nels",               &nels_,                 "nels/I");
 	    tree_->Branch("ntaus",              &ntaus_,                "ntaus/I");
 	    
+
+	    tree_->Branch("mcmtlns", &mcmtln_, "mcmtln/F");
 	    tree_->Branch("nwzpartons", &nwzpartons_, "nwzpartons/F");
 	    tree_->Branch("nbtagscsvl", &nbtagscsvl_, "nbtagscsvl/F");
 	    tree_->Branch("trkmet_nolepcorr", &trkmet_nolepcorr_, "trkmet_nolepcorr/F");
@@ -330,6 +334,7 @@ class StopTree {
             tree_->Branch("pfjets_csv"  , "std::vector<float>", &pfjets_csv_Ptr_);
             tree_->Branch("pfjets_qgtag", "std::vector<float>", &pfjets_qgtag_Ptr_);
             tree_->Branch("pfjets_mc3", "std::vector<float>", &pfjets_mc3_Ptr_);
+            tree_->Branch("pfjets_beta", "std::vector<float>", &pfjets_beta_Ptr_);
             tree_->Branch("pfjets_beta2", "std::vector<float>", &pfjets_beta2_Ptr_);
             tree_->Branch("pfjets_lepjet", "std::vector<int>", &pfjets_lepjet_Ptr_);
 
@@ -411,6 +416,7 @@ class StopTree {
 	    tree_->SetBranchAddress("ntaus",              &ntaus_);       
 
 	    
+	    tree_->SetBranchAddress("mcmtlns",   &mcmtln_);
 	    tree_->SetBranchAddress("nwzpartons",   &nwzpartons_);
 	    tree_->SetBranchAddress("nbtagscsvl",   &nbtagscsvl_);
 	    tree_->SetBranchAddress("trkmet_nolepcorr",   &trkmet_nolepcorr_);
@@ -472,6 +478,7 @@ class StopTree {
             tree_->SetBranchAddress("pfjets_csv"  ,  &pfjets_csv_Ptr_);
             tree_->SetBranchAddress("pfjets_qgtag",  &pfjets_qgtag_Ptr_);
             tree_->SetBranchAddress("pfjets_mc3",  &pfjets_mc3_Ptr_);
+            tree_->SetBranchAddress("pfjets_beta",  &pfjets_beta_Ptr_);
             tree_->SetBranchAddress("pfjets_beta2",  &pfjets_beta2_Ptr_);
             tree_->SetBranchAddress("pfjets_lepjet",  &pfjets_lepjet_Ptr_);
 
@@ -511,6 +518,7 @@ class StopTree {
 	vector<float>* pfjets_csv_Ptr_;
 	vector<float>* pfjets_qgtag_Ptr_;
 	vector<float>* pfjets_mc3_Ptr_;
+	vector<float>* pfjets_beta_Ptr_;
 	vector<float>* pfjets_beta2_Ptr_;
 	vector<int>* pfjets_lepjet_Ptr_;
 
@@ -586,6 +594,7 @@ StopTree::InitVariables(){
 	variables_.push_back(string("nels"		));         
 	variables_.push_back(string("ntaus"		));         
 	
+	variables_.push_back(string("mcmtln"));
 	variables_.push_back(string("nwzpartons"));
 	variables_.push_back(string("nbtagscsvl"));
 	variables_.push_back(string("trkmet_nolepcorr"));
@@ -706,6 +715,7 @@ StopTree::InitVariables(){
     nels_		= 999;
     ntaus_		= 999;
     
+    mcmtln_= -999;
     nwzpartons_= -999;
     nbtagscsvl_= -999;
     trkmet_nolepcorr_= -999.;
@@ -760,6 +770,7 @@ StopTree::InitVariables(){
     pfjets_csv_.clear();
     pfjets_qgtag_.clear();
     pfjets_mc3_.clear();
+    pfjets_beta_.clear();
     pfjets_beta2_.clear();
     pfjets_lepjet_.clear();
 
@@ -834,6 +845,7 @@ StopTree::Get(string value)
   if(value=="nels"              ) { return this->nels_;} 
   if(value=="ntaus"             ) { return this->ntaus_;} 
 
+  if(value=="mcmtln" ) { return this->mcmtln_; }
   if(value=="nwzpartons" ) { return this->nwzpartons_; }
   if(value=="nbtagscsvl" ) { return this->nbtagscsvl_; }
   if(value=="trkmet_nolepcorr" ) { return this->trkmet_nolepcorr_; }
