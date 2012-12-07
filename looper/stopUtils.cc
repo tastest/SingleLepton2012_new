@@ -110,19 +110,9 @@ pair<float, float> ScaleMET( pair<float, float> p_met, LorentzVector p4_dilep, d
 
 pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) {                                                 
 
-  //using met phi corrections from C. Veelken (emails from Oct. 4th)                                                                                 
-  //previous versions are available here:                                                                                                            
+  //using met phi corrections from C. Veelken (revision 1.6)
+  //functions are available here:                                                                                                            
   //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py                               
-
-  // Data                                                                                                                                            
-  // ------                                                                                                                                          
-  // x :  "+2.87340e-01 + 3.29813e-01*Nvtx"                                                                                                          
-  // y : "-2.27938e-01 - 1.71272e-01*Nvtx"                                                                                                           
-  // MC                                                                                                                                              
-  // ------                                                                                                                                          
-  // x : "+8.72683e-02 - 1.66671e-02*Nvtx"                                                                                                           
-  // y :  "+1.86650e-01 - 1.21946e-01*Nvtx"                                                                                                                                                
-
 
   float metx = met * cos( metphi );
   float mety = met * sin( metphi );
@@ -131,10 +121,10 @@ pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) 
   float shifty = 0.;
 
   //use correction for data vs. mc                                                                                                                  
-  shiftx = ismc ? (+8.72683e-02 - 1.66671e-02*nvtx)
-    : (+2.87340e-01 + 3.29813e-01*nvtx);
-  shifty = ismc ? (+1.86650e-01 - 1.21946e-01*nvtx)
-    : (-2.27938e-01 - 1.71272e-01*nvtx);
+  shiftx = ismc ? (0.1166 + 0.0200*nvtx)
+    : (0.2661 + 0.3217*nvtx);
+  shifty = ismc ? (0.2764 - 0.1280*nvtx)
+    : (-0.2251 - 0.1747*nvtx);
 
   metx -= shiftx;
   mety -= shifty;
