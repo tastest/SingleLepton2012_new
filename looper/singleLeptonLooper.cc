@@ -1875,6 +1875,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       }
 
+      /*
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 
 	if( pfcands_charge().at(ipf) == 0   ) continue;
@@ -1887,6 +1888,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
  	  }
  	}
       }
+      */
 
       //------------------------------------------------------
       // store closest pf cand information for 2nd lepton
@@ -2015,7 +2017,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	struct myTrackIso myTrackIso=trackIso(ipf);
 
- 	int itrk = pfcands_trkidx().at(ipf);
+	// 	int itrk = pfcands_trkidx().at(ipf);
 	
 	bool isGoodLepton = false;
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
@@ -2027,11 +2029,27 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	//////////
 
+	int itrk = -1;
+	float mindz=999;
+
+	if (abs(pfcands_particleId().at(ipf))!=11) {
+	  itrk = pfcands_trkidx().at(ipf);
+	  if( itrk >= (int)trks_trk_p4().size() || itrk < 0 ) continue;
+	  mindz=trks_dz_pv(itrk,0).first;
+	}
+
+	if (abs(pfcands_particleId().at(ipf))==11 && pfcands_pfelsidx().at(ipf)>=0) {
+	  itrk = els_gsftrkidx().at(pfcands_pfelsidx().at(ipf));
+	  if( itrk >= (int)gsftrks_p4().size() || itrk < 0 ) continue;
+	  mindz=gsftrks_dz_pv(itrk,0).first;
+	}
+
+      
 	//store loose definition to compare with previous results
 	float iso = myTrackIso.iso_dr03_dz020_pt00 / pfcands_p4().at(ipf).pt();
 
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut_loose ) continue;
+ 	  if( fabs(mindz) > dz_cut_loose ) continue;
  	}
 
 	if(pfcands_p4().at(ipf).pt()>=10 && iso < trkreliso10loose_ && !isGoodLepton ){
@@ -2047,7 +2065,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	//tighten dz cut
  	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs( trks_dz_pv(itrk,0).first ) > dz_cut ) continue;
+ 	  if( fabs(mindz) > dz_cut ) continue;
  	}
 
 

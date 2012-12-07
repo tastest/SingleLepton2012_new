@@ -280,14 +280,6 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
     if( ipf == thisPf                 ) continue; // skip this PFCandidate
                                                                                                                
     if(pfcands_charge().at(ipf) == 0 ) continue; // skip neutrals                                                                                                                          
-    int itrk = pfcands_trkidx().at(ipf);
-
-    if( itrk >= (int)trks_trk_p4().size() || itrk < 0 ){
-      //note: this should only happen for electrons which do not have a matched track                                                                                                            
-      //currently we are just ignoring these guys                                                                                                                                                
-      continue;
-    }
-
     //----------------------------------------                                                                                                                                                   
     // find closest PV and dz w.r.t. that PV                                                                                                                                                     
    //----------------------------------------                                                                                                                                                   
@@ -297,6 +289,17 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
 
     if (dovtxcut) {
       for (unsigned int ivtx = 0; ivtx < cms2.vtxs_position().size(); ivtx++) {
+
+
+	int itrk = pfcands_trkidx().at(ipf);
+
+	if( itrk >= (int)trks_trk_p4().size() || itrk < 0 ){
+	  //note: this should only happen for electrons which do not have a matched track                                                                                                            
+	  //currently we are just ignoring these guys                                                                                                                                                
+	  continue;
+	}
+
+	////////
 
         if(!isGoodVertex(ivtx)) continue;
 
@@ -316,7 +319,23 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
 
       if ( vtxi != 0 )     continue;
     } else {
-      mindz = trks_dz_pv(itrk,0).first;
+      //      mindz = trks_dz_pv(itrk,0).first;
+
+      int itrk = -1;
+
+      if (abs(pfcands_particleId().at(ipf))!=11) {
+        itrk = pfcands_trkidx().at(ipf);
+        if( itrk >= (int)trks_trk_p4().size() || itrk < 0 ) continue;
+        mindz=trks_dz_pv(itrk,0).first;
+      }
+
+      if (abs(pfcands_particleId().at(ipf))==11 && pfcands_pfelsidx().at(ipf)>=0) {
+        itrk = els_gsftrkidx().at(pfcands_pfelsidx().at(ipf));
+        if( itrk >= (int)gsftrks_p4().size() || itrk < 0 ) continue;
+        mindz=gsftrks_dz_pv(itrk,0).first;
+      }
+
+
     }
 
     //---------------------------------------                                                                                                                                     // passes cuts, add up isolation value                                                                                                                                        //---------------------------------------                                                                                                                                                    
