@@ -91,6 +91,9 @@ struct myTrackIso {
   // iso sum options
   float isoDir_dr03_dz005_pt00;
 
+  // r cone option
+  float iso_dr04_dz005_pt00;
+
   // dz variation
   float iso_dr03_dz000_pt00;
   float iso_dr03_dz020_pt00;
@@ -118,6 +121,8 @@ struct myTrackIso trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0
 bool isGenBMatched ( LorentzVector p4, float dR );
 
 int isGenQGMatched ( LorentzVector p4, float dR );
+
+int isGenQGLMatched ( LorentzVector p4, float dR );
 
 float dRGenJet ( LorentzVector p4, float genminpt=20. );
 
