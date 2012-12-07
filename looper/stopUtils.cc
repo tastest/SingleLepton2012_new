@@ -252,11 +252,15 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
   // no cuts  
   iso.iso_dr03_dz005_pt00=0.; // this one will be the default
   
-  // dz variation                                                                                                                          iso.iso_dr03_dz020_pt00=0.;
+  // dz variation                                                                                                                         
+  iso.iso_dr03_dz020_pt00=0.;
   iso.iso_dr03_dz000_pt00=0.;
   
   // isolation sum option
   iso.isoDir_dr03_dz005_pt00=0.;
+
+  // ceon04
+  iso.iso_dr04_dz005_pt00=0.; // this one will be the default
 
   //pt Variation                                                                                                                      
   iso.iso_dr03_dz005_pt01=0.;
@@ -321,14 +325,17 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
     if( dr > coneR ) continue; // skip pfcands outside the cone                                     
 
     // this is the default
-    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 ) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
+
+    // cone 04
+    //    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
 
     // this is the iso-sum option
-    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 ) iso.isoDir_dr03_dz005_pt00 +=pfcands_p4().at(ipf).pt()*(1-3*dr);
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.isoDir_dr03_dz005_pt00 +=pfcands_p4().at(ipf).pt()*(1-3*dr);
 
     // some dz variation
-    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.00 ) iso.iso_dr03_dz000_pt00+= pfcands_p4().at(ipf).pt();      
-    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.20 ) iso.iso_dr03_dz020_pt00+= pfcands_p4().at(ipf).pt();
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.00) iso.iso_dr03_dz000_pt00+= pfcands_p4().at(ipf).pt();      
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.20) iso.iso_dr03_dz020_pt00+= pfcands_p4().at(ipf).pt();
     
     // some pt variation
     if(pfcands_p4().at(ipf).pt() >= 0.1 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt01+= pfcands_p4().at(ipf).pt();
@@ -380,6 +387,36 @@ int isGenQGMatched ( LorentzVector p4, float dR ) {
       return (mothid>0) ? 1 : -1;
     if (abs(id)==21) return 3;
     if (abs(id)<6) return 4;
+  }
+  return -9;
+}
+
+//--------------------------------------------------------------------                                                                                                                                               
+
+int isGenQGLMatched ( LorentzVector p4, float dR ) {
+  //Start from the end that seems to have the decay products of the W first                                                                                                                                          
+  for (int igen = (genps_p4().size()-1); igen >-1; igen--) {
+    float deltaR = ROOT::Math::VectorUtil::DeltaR( p4 , genps_p4().at(igen) );
+    if ( deltaR > dR ) continue;
+    int id = genps_id().at(igen);
+    int mothid = genps_id_mother().at(igen);
+    // cout<<"status 3 particle ID "<<id<<" mother "<<mothid                                                                                                                                                         
+    //  <<" dR to jet "<<deltaR<<endl;                                                                                                                                                                               
+    if (abs(id)<6 && abs(mothid)==24)
+      return (mothid>0) ? 2 : -2;
+    if (abs(id)==5 && abs(mothid)==6)
+      return (mothid>0) ? 1 : -1;
+
+    if (abs(id)==11 && abs(mothid)==24)
+      return (mothid>0) ? 11 : -11;
+    if (abs(id)==13 && abs(mothid)==24)
+      return (mothid>0) ? 13 : -13;
+    if (abs(id)==15 && abs(mothid)==24)
+      return (mothid>0) ? 15 : -15;
+
+    if (abs(id)==21) return 3;
+    if (abs(id)<6) return 4;
+
   }
   return -9;
 }

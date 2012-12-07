@@ -2627,6 +2627,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
 
+	pfjets_corr_.push_back(vipfjets_p4.at(i).p4obj.pt()/pfjets_p4().at(vipfjets_p4.at(i).p4ind).pt());
 	pfjets_sigma_.push_back( getJetResolution(vipfjets_p4.at(i).p4obj, jetSmearer ) );
 
 	if( isData ){
@@ -2635,7 +2636,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfjets_lepjet_.push_back( -1 );
 	}
 	else{
-	  pfjets_mc3_.push_back(isGenQGMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
+	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
 	}
