@@ -364,22 +364,24 @@ class singleLeptonLooper
 	//jet corrections and ID
 	std::vector<float> pfjets_corr_;
 	//status 3 parton matching
-	std::vector<float> pfjets_mc3_;
+	std::vector<int>   pfjets_mc3_;
 	//qg tagging
 	std::vector<float> pfjets_qgtag_;
 	//gen jet matching
 	std::vector<float> pfjets_genJetDr_;
 	//truth lepton matching
         std::vector<int>   pfjets_lepjet_;
+	//jet resolution
+	std::vector<float> pfjets_sigma_;
 	//beta variables
 	std::vector<float> pfjets_beta_;
 	std::vector<float> pfjets_beta2_;
         std::vector<float> pfjets_beta_0p1_;
         std::vector<float> pfjets_beta2_0p1_;
-        std::vector<float> pfjets_beta_0p15_;
-        std::vector<float> pfjets_beta2_0p15_;
-        std::vector<float> pfjets_beta_0p2_;
-        std::vector<float> pfjets_beta2_0p2_;
+        /* std::vector<float> pfjets_beta_0p15_;  */
+        /* std::vector<float> pfjets_beta2_0p15_; */
+        /* std::vector<float> pfjets_beta_0p2_;   */
+        /* std::vector<float> pfjets_beta2_0p2_;  */
 
 	Int_t hyptype_;
 
