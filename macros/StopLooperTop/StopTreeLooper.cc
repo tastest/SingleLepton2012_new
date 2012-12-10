@@ -552,9 +552,20 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData
       if ( !b_btag || !o_btag ) continue;
     } 
 
-    // 1 btag: 
+    // 1 btag: require the bjet and one of the 2 leading non bjets is used for MT2
     else if ( n_btag == 1) {
-      if (b>1 || o>1) continue;
+
+      if( b_btag ){
+	if( b == 3  && o > 1 ) continue;
+	if( b <   3 && o > 2 ) continue;
+      }
+
+      if( o_btag ){
+	if( o == 3  && b > 1 ) continue;
+	if( o <   3 && b > 2 ) continue;
+      }
+
+      //if (b>1 || o>1) continue;
     } 
 
     // 0 or >=3 btags: require jets used for MT2 are among 3 leading jets
@@ -578,6 +589,11 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData
     if (mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
     if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
   }
+
+  if( mt2w_min  > 9000 ) mt2w_min  = 0.0;
+  if( mt2b_min  > 9000 ) mt2b_min  = 0.0;
+  if( mt2bl_min > 9000 ) mt2bl_min = 0.0;
+  if( chi2_min  > 9000 ) chi2_min  = 0.0;
 
   MT2struct m;
   m.mt2w  = mt2w_min;
@@ -772,6 +788,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       plot1D("h_mt2w"  , TMath::Min(m.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
       plot1D("h_mt2b"  , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
       plot1D("h_mt2bl" , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+
+      //----------------------------------------------------------------------------------------
+      // calculate the BEST MT2 variables only using Ricardo's algorithm
+      //----------------------------------------------------------------------------------------
+
+      MT2struct mr = Best_MT2Calculator_Ricardo(tree, isData);
+
+      // cout << endl;
+      // cout << "MT2W  " << m.mt2w  << endl;
+      // cout << "MT2b  " << m.mt2b  << endl;
+      // cout << "MT2bl " << m.mt2bl << endl;
+
+      plot1D("h_mt2wr"  , TMath::Min(mr.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+      plot1D("h_mt2br"  , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+      plot1D("h_mt2blr" , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
 
     } // end event loop
 
