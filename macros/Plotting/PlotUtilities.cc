@@ -235,6 +235,21 @@ void plot1D(string title, float xval, double weight, std::map<string, TH1F*> &al
   
 }
 
+void savePlots(std::map<string, TH1F*> &h_1d, char* outfilename){
+  TFile outfile(outfilename,"RECREATE") ;
+
+  printf("[StopTreeLooper::loop] Saving histograms to %s\n", outfilename);
+
+  std::map<std::string, TH1F*>::iterator it1d;
+  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
+    it1d->second->Write();
+    delete it1d->second;
+  }
+
+  outfile.Write();
+  outfile.Close();
+}
+
 void plot2D(string title, float xval, float yval, double weight, std::map<string, TH2F*> &allhistos, 
 	    int numbinsx, float xmin, float xmax, int numbinsy, float ymin, float ymax){
 
