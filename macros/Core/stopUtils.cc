@@ -393,6 +393,10 @@ MT2struct Best_MT2Calculator(StopTree* tree, bool isData){
 
   }
 
+  if( mt2w_min  > 9000 ) mt2w_min  = 0.0;
+  if( mt2b_min  > 9000 ) mt2b_min  = 0.0;
+  if( mt2bl_min > 9000 ) mt2bl_min = 0.0;
+
   MT2struct m;
   m.mt2w  = mt2w_min;
   m.mt2b  = mt2b_min;
