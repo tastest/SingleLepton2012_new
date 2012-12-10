@@ -19,11 +19,11 @@
   // samples to run over
   //------------------------------ 
  
-  char* path = "/tas/benhoob/StopBabies/output/V00-02-03_2012_TTJets_Powheg";
+  char* path = "/nfs-3/userdata/stop/output_V00-02-04_2012_4jskim";
 
   const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
-    "tt_powheg_merged_ntuple_2_smallTree"
+    "ttdl_powheg"
   }
 
   //------------------------------ 

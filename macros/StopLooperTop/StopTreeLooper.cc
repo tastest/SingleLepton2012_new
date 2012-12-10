@@ -607,7 +607,7 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData
 
 }
 
-void plotStuff(map<string,TH1F*> h1_d, MT2struct mr, StopTree* tree){
+void plotStuff(map<string,TH1F*> h_1d, MT2struct mr, StopTree* tree, float evtweight){
       plot1D("h_mt2w"  , TMath::Min(mr.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
       plot1D("h_mt2b"  , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
       plot1D("h_mt2bl" , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
@@ -640,7 +640,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   cout << "[StopTreeLooper::loop] setting up histos" << endl;
 
   //plotting map
-  std::map<std::string, TH1F*> h_cr1, h_cr4, h_cr5;
+  std::map<std::string, TH1F*> h_1d;//h_cr1, h_cr4, h_cr5;
 
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
@@ -741,9 +741,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //preselection
       if ( !passEvtSelection(tree, name) ) continue;
 
-      bool CR1 = cr1Selection(tree;)
-      bool CR4 = cr1Selection(tree;)
-      bool CR5 = cr1Selection(tree;)
+      // bool CR1 = cr1Selection(tree);
+      // bool CR4 = cr1Selection(tree);
+      // bool CR5 = cr1Selection(tree);
 
       list<Candidate> candidates = recoHadronicTop(tree, isData );
 
