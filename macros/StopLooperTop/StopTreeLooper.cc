@@ -401,30 +401,32 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
       ///
       //  MT2 Variables
       ///
-         
+
       double pl[4];     // Visible lepton
       double pb1[4];    // bottom on the same side as the visible lepton
       double pb2[4];    // other bottom, paired with the invisible W
       double pmiss[3];  // <unused>, pmx, pmy   missing pT
       pl[0]= lep->E(); pl[1]= lep->Px(); pl[2]= lep->Py(); pl[3]= lep->Pz();
-      pb1[0] = jets[o].E();  pb1[1] = jets[o].Px(); 
-      pb1[2] = jets[o].Py(); pb1[3] = jets[o].Pz();
-      pb2[0] = jets[b].E();  pb2[1] = jets[b].Px(); 
-      pb2[2] = jets[b].Py(); pb2[3] = jets[b].Pz();
+      pb1[1] = jets[o].Px();  pb1[2] = jets[o].Py();   pb1[3] = jets[o].Pz();
+      pb2[1] = jets[b].Px();  pb2[2] = jets[b].Py();   pb2[3] = jets[b].Pz();
       pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
 
       double pmiss_lep[3];
       pmiss_lep[0] = 0.;
       pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
 
+      pb1[0] = jets[o].mass();
+      pb2[0] = jets[b].mass();
       mt2_event.set_momenta( pb1, pb2, pmiss_lep );
-      mt2_event.set_mn( 0.0 );   // Invisible particle mass
+      mt2_event.set_mn( 80.385 );   // Invisible particle mass
       double c_mt2b = mt2_event.get_mt2();
-         
-      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss); 
+
+      pb1[0] = jets[o].E();
+      pb2[0] = jets[b].E();
+      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2bl = mt2bl_event.get_mt2bl();
 
-      mt2w_event.set_momenta(pl, pb1, pb2, pmiss); 
+      mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2w = mt2w_event.get_mt2w();
 
 //      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
@@ -605,6 +607,12 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData
 
 }
 
+void plotStuff(map<string,TH1F*> h1_d, MT2struct mr, StopTree* tree){
+      plot1D("h_mt2w"  , TMath::Min(mr.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+      plot1D("h_mt2b"  , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+      plot1D("h_mt2bl" , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+}
+
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
@@ -632,7 +640,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   cout << "[StopTreeLooper::loop] setting up histos" << endl;
 
   //plotting map
-  std::map<std::string, TH1F*> h_1d;
+  std::map<std::string, TH1F*> h_cr1, h_cr4, h_cr5;
 
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
@@ -723,8 +731,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( tree->nvtx_, h_vtx_wgt, isData );
 
-      plot1D("h_vtx",       tree->nvtx_,       evtweight, h_1d, 40, 0, 40);
-      plot1D("h_vtxweight", tree->nvtxweight_, evtweight, h_1d, 41, -4., 4.);
+  //    plot1D("h_vtx",       tree->nvtx_,       evtweight, h_1d, 40, 0, 40);
+//      plot1D("h_vtxweight", tree->nvtxweight_, evtweight, h_1d, 41, -4., 4.);
 
       // 
       // selection criteria
@@ -732,6 +740,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       //preselection
       if ( !passEvtSelection(tree, name) ) continue;
+
+      bool CR1 = cr1Selection(tree;)
+      bool CR4 = cr1Selection(tree;)
+      bool CR5 = cr1Selection(tree;)
 
       list<Candidate> candidates = recoHadronicTop(tree, isData );
 
@@ -778,16 +790,16 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // calculate the BEST MT2 variables only
       //----------------------------------------------------------------------------------------
 
-      MT2struct m = Best_MT2Calculator(tree, isData);
+//      MT2struct m = Best_MT2Calculator(tree, isData);
 
       // cout << endl;
       // cout << "MT2W  " << m.mt2w  << endl;
       // cout << "MT2b  " << m.mt2b  << endl;
       // cout << "MT2bl " << m.mt2bl << endl;
 
-      plot1D("h_mt2w"  , TMath::Min(m.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-      plot1D("h_mt2b"  , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-      plot1D("h_mt2bl" , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+//      plot1D("h_mt2w"  , TMath::Min(m.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+//      plot1D("h_mt2b"  , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+//      plot1D("h_mt2bl" , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
 
       //----------------------------------------------------------------------------------------
       // calculate the BEST MT2 variables only using Ricardo's algorithm
@@ -816,18 +828,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   char* outfilename = Form("output/%s.root",name.Data());
 
-  TFile outfile(outfilename,"RECREATE") ; 
-
-  printf("[StopTreeLooper::loop] Saving histograms to %s\n", outfilename);
-  
-  std::map<std::string, TH1F*>::iterator it1d;
-  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
-    it1d->second->Write(); 
-    delete it1d->second;
-  }
-  
-  outfile.Write();
-  outfile.Close();
+  savePlots(h_1d, outfilename);
 
   already_seen.clear();
 
