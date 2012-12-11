@@ -261,7 +261,10 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
     //cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
     jets.push_back( tree->pfjets_->at(i)    );
     btag.push_back( tree->pfjets_csv_.at(i) );
-    mc.push_back  ( tree->pfjets_mc3_.at(i) );
+    if ( !isData ) 
+	mc.push_back  ( tree->pfjets_mc3_.at(i) );
+    else
+	mc.push_back  ( 0 );
   } 
 
   // cout << endl << "stored:" << endl;
@@ -764,8 +767,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       if ( tree->npfjets30_ < 4 ) continue; 
 
       //baseline met and mt requirements
-      if (tree->t1metphicorr_  <100.) continue;
-      if (tree->t1metphicorrmt_<120.) continue;
+      if (tree->t1metphicorr_  <50.) continue;
+      if (tree->t1metphicorrmt_<50.) continue;
 
       // histogram tags
       //flavor types
