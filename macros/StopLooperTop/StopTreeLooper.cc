@@ -235,7 +235,7 @@ float getDataMCRatio(float eta){
  * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
 */ 
 
-list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
+list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, bool wbtag){
 
   assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
 
@@ -381,21 +381,21 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
       if ( b == o )
         continue;
 
-      if ( btag[b] < BTAG_MIN && btag[o] < BTAG_MIN )
+      if ( wbtag && btag[b] < BTAG_MIN && btag[o] < BTAG_MIN )
         continue;
 
       double pt_b = jets[b].Pt();
-      if ( btag[b] >= BTAG_MIN && pt_b < PTMIN_BTAG )
+      if ( wbtag && btag[b] >= BTAG_MIN && pt_b < PTMIN_BTAG )
         continue;
 
       if ( btag[b] < BTAG_MIN && pt_b < PTMIN_B )
         continue;
 
       double pt_o = jets[o].Pt();
-      if ( btag[o] >= BTAG_MIN && pt_o < PTMIN_OTAG )
+      if ( wbtag && btag[o] >= BTAG_MIN && pt_o < PTMIN_OTAG )
         continue;
 
-      if ( btag[o] < BTAG_MIN && pt_o < PTMIN_O)
+      if ( wbtag && btag[o] < BTAG_MIN && pt_o < PTMIN_O)
         continue;
 
       ///
@@ -495,16 +495,35 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
 //--------------------------------------------------------------------
 
-MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData){
+// removes candidates without b-tagging requirement
+list<Candidate> StopTreeLooper::getBTaggedCands(list<Candidate> &candidates, StopTree* tree) 
+{
 
-  list<Candidate> candidates = recoHadronicTop(tree, isData );
+  list<Candidate> bcands; 
+
+  list<Candidate>::iterator candIter;
+
+  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
+
+    if( tree->pfjets_csv_.at(candIter->bi) < BTAG_MIN && tree->pfjets_csv_.at(candIter->oi) < BTAG_MIN ) continue;
+    bcands.push_back(*candIter);
+
+  }
+
+  return bcands;
+
+}
+
+//--------------------------------------------------------------------
+
+MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
 
   if (candidates.size() == 0){
     MT2struct mfail;
-    mfail.mt2w  = -999;
-    mfail.mt2b  = -999;
-    mfail.mt2bl = -999;
-    mfail.chi2  = -999;
+    mfail.mt2w  = -0.999;
+    mfail.mt2b  = -0.999;
+    mfail.mt2bl = -0.999;
+    mfail.chi2  = -0.999;
     return mfail;
   }
 
@@ -607,10 +626,13 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(StopTree* tree, bool isData
 
 }
 
-void plotStuff(map<string,TH1F*> h_1d, MT2struct mr, StopTree* tree, float evtweight){
-      plot1D("h_mt2w"  , TMath::Min(mr.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-      plot1D("h_mt2b"  , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-      plot1D("h_mt2bl" , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+void plotCandidate( MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
+
+  plot1D("h_"+tag+"_hadchi2"+sel, TMath::Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 ); 
+  plot1D("h_"+tag+"_mt2w"   +sel, TMath::Min(mr.mt2w, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
+  plot1D("h_"+tag+"_mt2b"   +sel, TMath::Min(mr.mt2b, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
+  plot1D("h_"+tag+"_mt2bl"  +sel, TMath::Min(mr.mt2bl,(float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
+
 }
 
 void StopTreeLooper::loop(TChain *chain, TString name)
@@ -727,27 +749,38 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // event weight
       // 
 
-      float evtweight = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
-      // to reweight from file - also need to comment stuff before
-      //      float vtxweight = vtxweight_n( tree->nvtx_, h_vtx_wgt, isData );
-
-  //    plot1D("h_vtx",       tree->nvtx_,       evtweight, h_1d, 40, 0, 40);
-//      plot1D("h_vtxweight", tree->nvtxweight_, evtweight, h_1d, 41, -4., 4.);
+      float evtweight    = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
+      float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
+      float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
 
       // 
       // selection criteria
       // 
-
+      
       //preselection
       if ( !passEvtSelection(tree, name) ) continue;
 
-      // bool CR1 = cr1Selection(tree);
-      // bool CR4 = cr1Selection(tree);
-      // bool CR5 = cr1Selection(tree);
+      //ask for at least 4 jets
+      if ( tree->npfjets30_ < 4 ) continue; 
 
-      list<Candidate> candidates = recoHadronicTop(tree, isData );
+      //baseline met and mt requirements
+      if (tree->t1metphicorr_  <100.) continue;
+      if (tree->t1metphicorrmt_<120.) continue;
 
-      if (candidates.size() < 1 ) continue;    
+      // histogram tags
+      //flavor types
+      string flav_tag_sl;
+      if ( abs(tree->id1_)==13 ) flav_tag_sl = "_muo";
+      else if ( abs(tree->id1_)==11 ) flav_tag_sl = "_ele";
+      else flav_tag_sl = "_mysterysl";
+      string flav_tag_dl;
+      if      ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_dimu";
+      else if ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_diel";
+      else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_muel";
+      else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_elmu";
+      else flav_tag_dl = "_mysterydl";
+      string basic_flav_tag_dl = flav_tag_dl;
+      if ( abs(tree->id1_) != abs(tree->id2_) ) basic_flav_tag_dl = "_mueg";
 
       //----------------------------------------------------------------------------------------
       // calculate the hadronic top and MT2 variables and compare to values stored in babies
@@ -797,25 +830,84 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // cout << "MT2b  " << m.mt2b  << endl;
       // cout << "MT2bl " << m.mt2bl << endl;
 
-//      plot1D("h_mt2w"  , TMath::Min(m.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-//      plot1D("h_mt2b"  , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-//      plot1D("h_mt2bl" , TMath::Min(m.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+//      plot1D("h_mt2w"  , TMath::Min(m.mt2w, (float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+//      plot1D("h_mt2b"  , TMath::Min(m.mt2b, (float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+//      plot1D("h_mt2bl" , TMath::Min(m.mt2bl,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
 
       //----------------------------------------------------------------------------------------
       // calculate the BEST MT2 variables only using Ricardo's algorithm
       //----------------------------------------------------------------------------------------
 
-      MT2struct mr = Best_MT2Calculator_Ricardo(tree, isData);
+      // get list of candidates
+      list<Candidate> allcandidates = recoHadronicTop(tree, isData , false);
+      
+      //
+      // CR1 - single lepton + b-veto
+      //
 
-      // cout << endl;
-      // cout << "MT2W  " << m.mt2w  << endl;
-      // cout << "MT2b  " << m.mt2b  << endl;
-      // cout << "MT2bl " << m.mt2bl << endl;
+      // selection - 1 lepton + iso track veto
+      // Add b-tag veto
+      if ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 )
+	{
+	  MT2struct mr = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
 
-      plot1D("h_mt2wr"  , TMath::Min(mr.mt2w,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-      plot1D("h_mt2br"  , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-      plot1D("h_mt2blr" , TMath::Min(mr.mt2b,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
+	  plotCandidate(mr , "cr1" ,          "" , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
 
+	}
+      
+      //remove candidates from the list that do not ask for a b-tag
+      if (tree->nbtagscsvm_<1) continue;
+      list<Candidate> candidates = getBTaggedCands(allcandidates, tree);
+      MT2struct mr = Best_MT2Calculator_Ricardo(candidates, tree, isData);
+
+      
+      //
+      // SIGNAL REGION - single lepton + b-tag
+      //
+
+      // selection - 1 lepton 
+      // Add iso track veto
+      // Add b-tag
+      if ( passSingleLeptonSelection(tree, isData) && passIsoTrkVeto(tree) )
+	{
+
+	  plotCandidate(mr , "sig" ,          "" , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
+
+	  
+	}
+
+      //
+      // CR4 - ttbar dilepton sample with 2 good leptons
+      //
+      
+      // selection - all dilepton, z-veto for SF dilepton
+      // Add b-tag requirement
+      if ( passDileptonSelection(tree, isData) 
+	   && (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) ) 
+	{
+
+	  plotCandidate(mr , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
+	  plotCandidate(mr , "cr4" , flav_tag_dl , h_1d , evtweight*trigweightdl);
+	  plotCandidate(mr , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
+
+	}
+
+      //
+      // CR5 - lepton + isolated track
+      //
+
+      // selection - lepton + isolated track
+      // Add b-tag requirement
+      if ( passLepPlusIsoTrkSelection(tree, isData) ) 
+	{
+	  
+	  plotCandidate(mr , "cr5" ,          "" , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
+
+	}
+      
     } // end event loop
 
     // delete tree;
