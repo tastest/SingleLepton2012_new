@@ -738,30 +738,32 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
       ///
       //  MT2 Variables
       ///
-         
+
       double pl[4];     // Visible lepton
       double pb1[4];    // bottom on the same side as the visible lepton
       double pb2[4];    // other bottom, paired with the invisible W
       double pmiss[3];  // <unused>, pmx, pmy   missing pT
       pl[0]= lep->E(); pl[1]= lep->Px(); pl[2]= lep->Py(); pl[3]= lep->Pz();
-      pb1[0] = jets[o].E();  pb1[1] = jets[o].Px(); 
-      pb1[2] = jets[o].Py(); pb1[3] = jets[o].Pz();
-      pb2[0] = jets[b].E();  pb2[1] = jets[b].Px(); 
-      pb2[2] = jets[b].Py(); pb2[3] = jets[b].Pz();
+      pb1[1] = jets[o].Px();  pb1[2] = jets[o].Py();   pb1[3] = jets[o].Pz();
+      pb2[1] = jets[b].Px();  pb2[2] = jets[b].Py();   pb2[3] = jets[b].Pz();
       pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
 
       double pmiss_lep[3];
       pmiss_lep[0] = 0.;
       pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
 
+      pb1[0] = jets[o].mass();
+      pb2[0] = jets[b].mass();
       mt2_event.set_momenta( pb1, pb2, pmiss_lep );
-      mt2_event.set_mn( 0.0 );   // Invisible particle mass
+      mt2_event.set_mn( 80.385 );   // Invisible particle mass
       double c_mt2b = mt2_event.get_mt2();
-         
-      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss); 
+
+      pb1[0] = jets[o].E();
+      pb2[0] = jets[b].E();
+      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2bl = mt2bl_event.get_mt2bl();
 
-      mt2w_event.set_momenta(pl, pb1, pb2, pmiss); 
+      mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2w = mt2w_event.get_mt2w();
 
 //      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
