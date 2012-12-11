@@ -627,12 +627,13 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
 
 }
 
-void plotCandidate( MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
+void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
 
   plot1D("h_"+tag+"_hadchi2"+sel, TMath::Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 ); 
   plot1D("h_"+tag+"_mt2w"   +sel, TMath::Min(mr.mt2w, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
   plot1D("h_"+tag+"_mt2b"   +sel, TMath::Min(mr.mt2b, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
   plot1D("h_"+tag+"_mt2bl"  +sel, TMath::Min(mr.mt2bl,(float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
+  plot1D("h_"+tag+"_qgtag"  +sel, tree->pfjets_qgtag_.at(0) , evtweight , h_1d , 210 , 0. , 1. );
 
 }
 
@@ -852,10 +853,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	{
 	  MT2struct mr = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
 
-	  plotCandidate(mr , "cr1" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr1" ,          "" , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 
 	}
       
@@ -875,10 +876,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       if ( passSingleLeptonSelection(tree, isData) && passIsoTrkVeto(tree) )
 	{
 
-	  plotCandidate(mr , "sig" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "sig" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "sig" ,          "" , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "sig" ,             mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 	  
 	}
 
@@ -892,10 +893,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	   && (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) ) 
 	{
 
-	  plotCandidate(mr , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
-	  plotCandidate(mr , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
-	  plotCandidate(mr , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
-	  plotCandidate(mr , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
+	  plotCandidate(tree, mr , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
+	  plotCandidate(tree, mr , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
+	  plotCandidate(tree, mr , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
+	  plotCandidate(tree, mr , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
 
 	}
 
@@ -908,10 +909,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       if ( passLepPlusIsoTrkSelection(tree, isData) ) 
 	{
 	  
-	  plotCandidate(mr , "cr5" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(mr , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr5" ,          "" , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(tree, mr , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 
 	}
       
