@@ -261,10 +261,8 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
     //cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
     jets.push_back( tree->pfjets_->at(i)    );
     btag.push_back( tree->pfjets_csv_.at(i) );
-    if ( !isData ) 
-	mc.push_back  ( tree->pfjets_mc3_.at(i) );
-    else
-	mc.push_back  ( 0 );
+    if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
+    else mc.push_back  ( 0 );
   } 
 
   // cout << endl << "stored:" << endl;
@@ -614,10 +612,10 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
     if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
   }
 
-  if( mt2w_min  > 9000 ) mt2w_min  = 0.0;
-  if( mt2b_min  > 9000 ) mt2b_min  = 0.0;
-  if( mt2bl_min > 9000 ) mt2bl_min = 0.0;
-  if( chi2_min  > 9000 ) chi2_min  = 0.0;
+  if( mt2w_min  > 9000 ) mt2w_min  = -0.999;
+  if( mt2b_min  > 9000 ) mt2b_min  = -0.999;
+  if( mt2bl_min > 9000 ) mt2bl_min = -0.999;
+  if( chi2_min  > 9000 ) chi2_min  = -0.999;
 
   MT2struct m;
   m.mt2w  = mt2w_min;
@@ -767,8 +765,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       if ( tree->npfjets30_ < 4 ) continue; 
 
       //baseline met and mt requirements
-      if (tree->t1metphicorr_  <50.) continue;
-      if (tree->t1metphicorrmt_<50.) continue;
+      if (tree->t1metphicorr_  <100.) continue;
+      string mtcut = tree->t1metphicorrmt_<120. ? "_lomt" : "_himt";
 
       // histogram tags
       //flavor types
@@ -856,6 +854,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	  plotCandidate(mr , "cr1" ,          "" , h_1d , evtweight*trigweight);
 	  plotCandidate(mr , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 
 	}
       
@@ -877,7 +877,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	  plotCandidate(mr , "sig" ,          "" , h_1d , evtweight*trigweight);
 	  plotCandidate(mr , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
-
+	  plotCandidate(mr , "sig" ,             mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 	  
 	}
 
@@ -892,8 +893,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	{
 
 	  plotCandidate(mr , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
-	  plotCandidate(mr , "cr4" , flav_tag_dl , h_1d , evtweight*trigweightdl);
 	  plotCandidate(mr , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
+	  plotCandidate(mr , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
+	  plotCandidate(mr , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
 
 	}
 
@@ -908,10 +910,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  
 	  plotCandidate(mr , "cr5" ,          "" , h_1d , evtweight*trigweight);
 	  plotCandidate(mr , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
+	  plotCandidate(mr , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 
 	}
       
-    } // end event loop
+	} // end event loop
 
     // delete tree;
 
