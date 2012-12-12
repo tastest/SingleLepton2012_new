@@ -18,15 +18,16 @@ using namespace std;
 
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
-const double PTMIN_J1   = 25;
-const double PTMIN_J2   = 25;
-const double PTMIN_BTAG = 30;
-const double PTMIN_OTAG = 30; 
-const double PTMIN_B    = 30;  //  This Two should be tigther than the  
-const double PTMIN_O    = 30;  //  b-tagged versions.
-const double PDG_TOP_MASS = 173.5;
-const double PDG_W_MASS = 80.385;
-const double BTAG_MIN = 0.679;
+const float PTMIN_J1   = 30;
+const float PTMIN_J2   = 30;
+const float PTMIN_B    = 30;  
+const float PTMIN_O    = 30;  
+const float JET_PT     = 30.;
+const float JET_ETA    = 2.5;
+const float PDG_TOP_MASS = 173.5;
+const float PDG_W_MASS = 80.385;
+const float BTAG_MED = 0.679;
+const float BTAG_LOW = 0.244;
 
 const bool __SORT = true;
 
@@ -64,8 +65,8 @@ class StopTreeLooper {
 	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 
 	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
-        list<Candidate> recoHadronicTop(StopTree*, bool, bool);
-        list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree);
+        list<Candidate> recoHadronicTop(StopTree*, bool);
+        list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree, float btagcut);
 
         static float Poor_MVA(Candidate&);
         static float Smart_Compare(Candidate&, Candidate&); 
@@ -80,6 +81,11 @@ class StopTreeLooper {
 	//for mt peak definition
 	float min_mtpeak;
 	float max_mtpeak; 
+
+	int n_jets;
+	vector<LorentzVector> jets;
+	vector<float>         btag;
+	vector<int>           mc;
 
 };
 
