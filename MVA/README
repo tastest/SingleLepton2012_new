@@ -24,10 +24,10 @@ Overview
   variables.
 
 
-  TMVA_HWW.C
+  TMVA.C
   -------------
 
-  TMVA_HWW.C explains the usage of the TMVA::Factory class, which
+  TMVA.C explains the usage of the TMVA::Factory class, which
   is the framework for the whole training process. The following steps
   are taken:
 
@@ -61,7 +61,7 @@ Overview
   performance results are stored in the root file (see last step)
 
 
-  Classify_HWW.C 
+  Classify.C 
   ----------------
 
   TMVAClassificationApplication.C explains the usage of the TMVA::Reader class, which
@@ -86,11 +86,11 @@ Overview
 How to run the example
 ======================
 
-  First, TMVA_HWW.C needs to be run to perform the training. You
-  can edit TMVA_HWW.C (boolean flags at the head of the file) to
+  First, TMVA.C needs to be run to perform the training. You
+  can edit TMVA.C (boolean flags at the head of the file) to
   enable (disable) the methods you would (not) like to use. Then run
 
-  > root TMVA_HWW.C
+  > root TMVA.C
 
   Add the end a file TMVA.root is written, and a GUI opens. Once
   TMVA.root exists, the GUI can also be started via
@@ -99,7 +99,7 @@ How to run the example
 
   You can also run
 
-  > root Classify_HWW.C 
+  > root Classify.C 
 
   which evaluates the methods on the signal data from the toy
   tmva_example.root and writes the result to TMVApp.root. However,

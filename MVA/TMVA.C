@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVA.C,v 1.1 2012/12/11 11:48:17 benhoob Exp $
+// @(#)root/tmva $Id: TMVA.C,v 1.2 2012/12/12 11:16:51 benhoob Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -49,7 +49,7 @@
 #endif
 
 
-void TMVA_HWW( TString myMethodList = "" )
+void TMVA( TString myMethodList = "" )
 {
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
    // if you use your private .rootrc, or run from a different directory, please copy the
@@ -66,65 +66,29 @@ void TMVA_HWW( TString myMethodList = "" )
    // but of course the real application is when you write your own
    // method based)
 
-
   //-----------------------------------------------------
   // define event selection (store in TCut sel)
   //-----------------------------------------------------
+
+  TCut njets4("njets>=4");
+  TCut met50("met>=50");
+  TCut mt120("mt>=120");
+  TCut nb1("nb>=1");
    
-  TCut met_projpt = "((event_type<0.5||event_type>2.5)&met_projpt>35)|((event_type>0.5&&event_type<2.5)&met_projpt>20)";
-  TCut pt2020      = "lephard_pt > 20 && lepsoft_pt > 20";
-  TCut pt2010      = "lephard_pt > 20 && lepsoft_pt > 10";
-  TCut jetveto     = "jets_num==0 && extralep_num==0 && lowptbtags_num==0 && softmu_num==0";
-  TCut mll12       = "dil_mass > 12.";
-  TCut mll90       = "dil_mass < 90.";
-  TCut mll100      = "dil_mass < 100.";
-  TCut mll130      = "dil_mass < 130.";
-  TCut tight_el_ID = "lepsoft_passTighterId==1";
-  TCut mutype      = "event_type < 1.5";
-  TCut eltype      = "event_type > 1.5";
-  TCut elsoft15    = "event_type < 1.5 || lepsoft_pt > 15.";
- 
-  //------------
-  //Higgs130
-  //------------
-  
-  //TCut sel     = pt2010 + met_projpt + jetveto + mll12 + mll90 + tight_el_ID;
-  //int  mH      = 130;
- 
-  //------------
-  //Higgs160
-  //------------
-  
-  TCut sel     = pt2020 + met_projpt + jetveto + mll12 + mll100 + "dil_dphi<2.5";
-  int  mH      = 160;
-
-  //------------
-  //Higgs200
-  //------------
-
-  //TCut sel     = pt2020 + met_projpt + jetveto + mll12 + mll130;
-  //int  mH      = 200;
+  TCut  sel    = njets4 + met50 + mt120 + nb1;
+  char* sig    = "T2tt_450_0";
 
   //-----------------------------------------------------
   // choose which variables to include in MVA training
   //-----------------------------------------------------
   
   std::map<std::string,int> mvaVar;
-  mvaVar[ "lephard_pt" ]        = 1;
-  mvaVar[ "lepsoft_pt" ]        = 1;
-  mvaVar[ "dil_dphi" ]          = 1;
-  mvaVar[ "dil_mass" ]          = 1;
-  mvaVar[ "event_type" ]        = 0;
-  mvaVar[ "met_projpt" ]        = 1;
-  mvaVar[ "met_pt" ]            = 0;
-  mvaVar[ "mt_lephardmet" ]     = 1;
-  mvaVar[ "mt_lepsoftmet" ]     = 1;
-  mvaVar[ "mthiggs" ]           = 1;
-  mvaVar[ "dphi_lephardmet" ]   = 1;
-  mvaVar[ "dphi_lepsoftmet" ]   = 1;
-  mvaVar[ "lepsoft_fbrem" ]     = 0;
-  mvaVar[ "lepsoft_eOverPIn" ]  = 0;
-  mvaVar[ "lepsoft_qdphi" ]     = 0;
+  mvaVar[ "met" ]            = 1;
+  mvaVar[ "mt" ]             = 1;
+  mvaVar[ "mt2w" ]           = 1;
+  mvaVar[ "mt2bl" ]          = 1;
+  mvaVar[ "mt2b" ]           = 1;
+  mvaVar[ "chi2" ]           = 1;
 
   //---------------------------------
   //choose bkg samples to include
@@ -135,23 +99,6 @@ void TMVA_HWW( TString myMethodList = "" )
   TChain *chbackground = new TChain("Events");
   chbackground->Add(Form("%s/WWTo2L2Nu_PU_testFinal_baby.root",babyPath));
   chbackground->Add(Form("%s/GluGluToWWTo4L_PU_testFinal_baby.root",babyPath));
-//   chbackground->Add(Form("%s/WZ_PU_testFinal_baby.root",babyPath));
-//   chbackground->Add(Form("%s/ZZ_PU_testFinal_baby.root",babyPath));
-//   chbackground->Add(Form("%s/TTJets_PU_testFinal_baby.root",babyPath));
-//   chbackground->Add(Form("%s/tW_PU_testFinal_baby.root",babyPath));
-//   chbackground->Add(Form("%s/WJetsToLNu_PU_testFinal_baby.root",babyPath));
-//   chbackground->Add(Form("%s/DYToMuMuM20_PU_testFinal_baby.root",babyPath) );
-//   chbackground->Add(Form("%s/DYToMuMuM10To20_PU_testFinal_baby.root",babyPath) );
-//   chbackground->Add(Form("%s/DYToEEM20_PU_testFinal_baby.root",babyPath) );
-//   chbackground->Add(Form("%s/DYToEEM10To20_PU_testFinal_baby.root",babyPath) );
-//   chbackground->Add(Form("%s/DYToTauTauM20_PU_testFinal_baby.root",babyPath) );
-//   chbackground->Add(Form("%s/DYToTauTauM10To20_PU_testFinal_baby.root",babyPath) );
-  
-  //   chbackground->Add(Form("%s/WJetsToLNu_PU_testFinal_baby_FO1.root",babyPath));
-  //   chbackground->Add(Form("%s/WJetsToLNu_PU_testFinal_baby_FO2.root",babyPath));
-  //   chbackground->Add(Form("%s/WJetsToLNu_PU_testFinal_baby_FO3.root",babyPath));
-  //   chbackground->Add(Form("%s/WToLNu_FOv3_testFinal_baby.root",babyPath));
-  //   chbackground->Add(Form("%s/WJetsToLNu_PU_testFinal_baby_FO4.root",babyPath));
 
   //---------------------------------
   //choose signal sample to include
@@ -159,46 +106,28 @@ void TMVA_HWW( TString myMethodList = "" )
 
   TChain *chsignal = new TChain("Events");
 
-  if( mH == 130 ){
-    chsignal->Add(Form("%s/HToWWTo2L2NuM130_PU_testFinal_baby.root",babyPath));
-    chsignal->Add(Form("%s/HToWWToLNuTauNuM130_PU_testFinal_baby.root",babyPath));
-    chsignal->Add(Form("%s/HToWWTo2Tau2NuM130_PU_testFinal_baby.root",babyPath));
-  }
-  else if( mH == 160 ){
-    chsignal->Add(Form("%s/HToWWTo2L2NuM160_PU_testFinal_baby.root",babyPath));
-    chsignal->Add(Form("%s/HToWWToLNuTauNuM160_PU_testFinal_baby.root",babyPath));
-    chsignal->Add(Form("%s/HToWWTo2Tau2NuM160_PU_testFinal_baby.root",babyPath));
-  }
-  else if( mH == 200 ){
-    chsignal->Add(Form("%s/HToWWTo2L2NuM200_PU_testFinal_baby.root",babyPath));
-    chsignal->Add(Form("%s/HToWWToLNuTauNuM200_PU_testFinal_baby.root",babyPath));
-    chsignal->Add(Form("%s/HToWWTo2Tau2NuM200_PU_testFinal_baby.root",babyPath));
-  }
-  else{
-    std::cout << "Error, unrecognized higgs mass " << mH << " GeV, quitting" << std::endl;
-    exit(0);
-  }
+  chsignal->Add(Form("%s/HToWWTo2L2NuM130_PU_testFinal_baby.root",babyPath));
 
   //-----------------------------------------------------
   // choose backgrounds to include for multiple outputs
   //-----------------------------------------------------
   
-  bool doMultipleOutputs = false;
+  // bool doMultipleOutputs = false;
 
-   TChain *chww = new TChain("Events");
-   chww->Add(Form("%s/WWTo2L2Nu_PU_testFinal_baby.root",babyPath));
-   chww->Add(Form("%s/GluGluToWWTo4L_PU_testFinal_baby.root",babyPath));
-
-   TChain *chwjets = new TChain("Events");
-   chwjets->Add(Form("%s/WJetsToLNu_PU_testFinal_baby.root",babyPath));
-
-   TChain *chtt = new TChain("Events");
-   chtt->Add(Form("%s/TTJets_PU_testFinal_baby.root",babyPath));
-
-   std::map<std::string,int> includeBkg;
-   includeBkg["ww"]      = 1;
-   includeBkg["wjets"]   = 0;
-   includeBkg["tt"]      = 0;
+  // TChain *chww = new TChain("Events");
+  // chww->Add(Form("%s/WWTo2L2Nu_PU_testFinal_baby.root",babyPath));
+  // chww->Add(Form("%s/GluGluToWWTo4L_PU_testFinal_baby.root",babyPath));
+  
+  // TChain *chwjets = new TChain("Events");
+  // chwjets->Add(Form("%s/WJetsToLNu_PU_testFinal_baby.root",babyPath));
+  
+  // TChain *chtt = new TChain("Events");
+  // chtt->Add(Form("%s/TTJets_PU_testFinal_baby.root",babyPath));
+  
+  // std::map<std::string,int> includeBkg;
+  // includeBkg["ww"]      = 1;
+  // includeBkg["wjets"]   = 0;
+  // includeBkg["tt"]      = 0;
 
    //---------------------------------------------------------------
    // This loads the library
@@ -301,10 +230,13 @@ void TMVA_HWW( TString myMethodList = "" )
    TString outfileName( "TMVA_HWW.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
+   /*
    TString multioutfileName( "TMVA_HWW_multi.root" );
    TFile* multioutputFile;
+
    if( doMultipleOutputs )
      multioutputFile = TFile::Open( multioutfileName, "RECREATE" );
+   */
 
    // Create the factory object. Later you can choose the methods
    // whose performance you'd like to investigate. The factory is 
@@ -318,12 +250,12 @@ void TMVA_HWW( TString myMethodList = "" )
    // front of the "Silent" argument in the option string
    TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
                                                "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
-   
+   /*
    TMVA::Factory *multifactory;
    if( doMultipleOutputs )
      multifactory= new TMVA::Factory( "TMVAMulticlass", multioutputFile,
                                       "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=multiclass" );
-
+   */
    
    // If you wish to modify default settings
    // (please check "src/Config.h" to see all available global options)
@@ -358,6 +290,7 @@ void TMVA_HWW( TString myMethodList = "" )
    if (mvaVar["lepsoft_eOverPIn"]) factory->AddVariable( "lepsoft_eOverPIn",           "2nd lepton E/p",               "",    'F' );
    if (mvaVar["lepsoft_qdphi"])    factory->AddVariable( "lepsoft_q * lepsoft_dPhiIn", "2nd lepton q#times#Delta#phi", "",    'F' );
 
+   /*
    if( doMultipleOutputs ){
      if (mvaVar["lephard_pt"])       multifactory->AddVariable( "lephard_pt",                 "1st lepton pt",                "GeV", 'F' );
      if (mvaVar["lepsoft_pt"])       multifactory->AddVariable( "lepsoft_pt",                 "2nd lepton pt",                "GeV", 'F' );
@@ -375,6 +308,7 @@ void TMVA_HWW( TString myMethodList = "" )
      if (mvaVar["lepsoft_eOverPIn"]) multifactory->AddVariable( "lepsoft_eOverPIn",           "2nd lepton E/p",               "",    'F' );
      if (mvaVar["lepsoft_qdphi"])    multifactory->AddVariable( "lepsoft_q * lepsoft_dPhiIn", "2nd lepton q#times#Delta#phi", "",    'F' );
    }
+   */
 
    if (mvaVar["lephard_pt"])       cout << "Adding variable to MVA training: lephard_pt"      << endl;
    if (mvaVar["lepsoft_pt"])       cout << "Adding variable to MVA training: lepsoft_pt"      << endl;
@@ -469,9 +403,10 @@ void TMVA_HWW( TString myMethodList = "" )
    // --- end of tree registration 
    
    // Set individual event weights (the variables must exist in the original TTree)
-   factory->SetSignalWeightExpression    ("event_scale1fb * lepsoft_fr");
-   factory->SetBackgroundWeightExpression("event_scale1fb * lepsoft_fr");
-   
+   factory->SetSignalWeightExpression    ("weight");
+   factory->SetBackgroundWeightExpression("weight");
+
+   /*
    if( doMultipleOutputs ){
      multifactory->AddTree(signal,"Signal");
      multifactory->SetSignalWeightExpression    ("event_scale1fb");
@@ -494,6 +429,7 @@ void TMVA_HWW( TString myMethodList = "" )
        cout << "Added ttbar multi-MVA" << endl;
      }
    }
+   */
 
    // Apply additional cuts on the signal and background samples (can be different)
    TCut mycuts = sel; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
@@ -512,10 +448,10 @@ void TMVA_HWW( TString myMethodList = "" )
    factory->PrepareTrainingAndTestTree( mycuts, mycutb,
                                         "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
 
-   if( doMultipleOutputs ){
-     multifactory->PrepareTrainingAndTestTree( mycuts, mycutb,
-                                               "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
-   }
+   // if( doMultipleOutputs ){
+   //   multifactory->PrepareTrainingAndTestTree( mycuts, mycutb,
+   //                                             "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
+   // }
 
    //Use alternate splitting 
    //(this is preferable since its easier to track which events were used for training, but the job crashes! need to fix this...)
@@ -695,14 +631,14 @@ void TMVA_HWW( TString myMethodList = "" )
       factory->BookMethod( TMVA::Types::kRuleFit, "RuleFit",
                            "H:!V:RuleFitModule=RFTMVA:Model=ModRuleLinear:MinImp=0.001:RuleMinDist=0.001:NTrees=20:fEventsMin=0.01:fEventsMax=0.5:GDTau=-1.0:GDTauPrec=0.01:GDStep=0.01:GDNSteps=10000:GDErrScale=1.02" );
 
-   if( doMultipleOutputs ){
-     if (Use["multi_BDTG"]) // gradient boosted decision trees
-       multifactory->BookMethod( TMVA::Types::kBDT, "BDTG", "!H:!V:NTrees=1000:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.50:nCuts=20:NNodesMax=8");
-     if (Use["multi_MLP"]) // neural network
-       multifactory->BookMethod( TMVA::Types::kMLP, "MLP", "!H:!V:NeuronType=tanh:NCycles=1000:HiddenLayers=N+5,5:TestRate=5:EstimatorType=MSE");
-     if (Use["multi_FDA_GA"]) // functional discriminant with GA minimizer
-       multifactory->BookMethod( TMVA::Types::kFDA, "FDA_GA", "H:!V:Formula=(0)+(1)*x0+(2)*x1+(3)*x2+(4)*x3:ParRanges=(-1,1);(-10,10);(-10,10);(-10,10);(-10,10):FitMethod=GA:PopSize=300:Cycles=3:Steps=20:Trim=True:SaveBestGen=1" );
-   }
+   // if( doMultipleOutputs ){
+   //   if (Use["multi_BDTG"]) // gradient boosted decision trees
+   //     multifactory->BookMethod( TMVA::Types::kBDT, "BDTG", "!H:!V:NTrees=1000:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.50:nCuts=20:NNodesMax=8");
+   //   if (Use["multi_MLP"]) // neural network
+   //     multifactory->BookMethod( TMVA::Types::kMLP, "MLP", "!H:!V:NeuronType=tanh:NCycles=1000:HiddenLayers=N+5,5:TestRate=5:EstimatorType=MSE");
+   //   if (Use["multi_FDA_GA"]) // functional discriminant with GA minimizer
+   //     multifactory->BookMethod( TMVA::Types::kFDA, "FDA_GA", "H:!V:Formula=(0)+(1)*x0+(2)*x1+(3)*x2+(4)*x3:ParRanges=(-1,1);(-10,10);(-10,10);(-10,10);(-10,10):FitMethod=GA:PopSize=300:Cycles=3:Steps=20:Trim=True:SaveBestGen=1" );
+   // }
    
    // For an example of the category classifier usage, see: TMVAClassificationCategory
 
@@ -726,22 +662,22 @@ void TMVA_HWW( TString myMethodList = "" )
    // ----- Evaluate and compare performance of all configured MVAs
    factory->EvaluateAllMethods();
   
-   if( doMultipleOutputs ){
-     // Train nulti-MVAs using the set of training events
-     multifactory->TrainAllMethods();
+   // if( doMultipleOutputs ){
+   //   // Train nulti-MVAs using the set of training events
+   //   multifactory->TrainAllMethods();
      
-     // ---- Evaluate all multi-MVAs using the set of test events
-     multifactory->TestAllMethods();
+   //   // ---- Evaluate all multi-MVAs using the set of test events
+   //   multifactory->TestAllMethods();
      
-     // ----- Evaluate and compare performance of all configured multi-MVAs
-     multifactory->EvaluateAllMethods();
-   }
+   //   // ----- Evaluate and compare performance of all configured multi-MVAs
+   //   multifactory->EvaluateAllMethods();
+   // }
    
    // --------------------------------------------------------------
 
    // Save the output
    outputFile->Close();
-   if( doMultipleOutputs )  multioutputFile->Close();
+   //if( doMultipleOutputs )  multioutputFile->Close();
 
    std::cout << "==> Wrote root file: " << outputFile->GetName() << std::endl;
    std::cout << "==> TMVAClassification is done!" << std::endl;
