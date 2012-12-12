@@ -508,6 +508,8 @@ list<Candidate> StopTreeLooper::getBTaggedCands(list<Candidate> &candidates, Sto
 
     if( tree->pfjets_csv_.at(candIter->bi) < BTAG_MIN && tree->pfjets_csv_.at(candIter->oi) < BTAG_MIN ) continue;
     bcands.push_back(*candIter);
+    if( tree->pfjets_csv_.at(candIter->bi) < 0.3 || tree->pfjets_csv_.at(candIter->oi) < 0.3 ) continue;
+    bcands.push_back(*candIter);
 
   }
 
@@ -516,7 +518,40 @@ list<Candidate> StopTreeLooper::getBTaggedCands(list<Candidate> &candidates, Sto
 }
 
 //--------------------------------------------------------------------
+float StopTreeLooper::Poor_MVA(Candidate &c){
+  float TOP_MASS = 500;
+  float beta = 1./200.;
+  return TMath::Exp(-c.chi2 + beta*(c.mt2w - TOP_MASS));
+}
 
+float StopTreeLooper::Smart_Compare(Candidate &a, Candidate &b){
+   return Poor_MVA(a) > Poor_MVA(b);
+}
+
+MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
+
+  if (candidates.size() == 0){
+    MT2struct mfail;
+    mfail.mt2w  = -0.999;
+    mfail.mt2b  = -0.999;
+    mfail.mt2bl = -0.999;
+    mfail.chi2  = -0.999;
+    return mfail;
+  }
+
+  candidates.sort(StopTreeLooper::Smart_Compare);
+
+  MT2struct m;
+  m.mt2w  = Poor_MVA(candidates.front());
+  m.mt2b  = candidates.front().mt2b;
+  m.mt2bl = candidates.front().mt2bl;
+  m.chi2  = candidates.front().chi2; 
+
+  return m;
+
+}
+
+/*
 MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
 
   if (candidates.size() == 0){
@@ -624,13 +659,13 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
   m.chi2  = chi2_min;
 
   return m;
-
 }
+*/
 
 void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
 
   plot1D("h_"+tag+"_hadchi2"+sel, TMath::Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 ); 
-  plot1D("h_"+tag+"_mt2w"   +sel, TMath::Min(mr.mt2w, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
+  plot1D("h_"+tag+"_mt2w"   +sel, TMath::Max(TMath::Min(mr.mt2w, (float)0.99),(float)-0.09) , evtweight , h_1d ,110 , -0.1 , 1. );
   plot1D("h_"+tag+"_mt2b"   +sel, TMath::Min(mr.mt2b, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
   plot1D("h_"+tag+"_mt2bl"  +sel, TMath::Min(mr.mt2bl,(float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
   plot1D("h_"+tag+"_qgtag"  +sel, tree->pfjets_qgtag_.at(0) , evtweight , h_1d , 210 , 0. , 1. );
@@ -665,6 +700,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   //plotting map
   std::map<std::string, TH1F*> h_1d;//h_cr1, h_cr4, h_cr5;
+  std::map<std::string, TH2F*> h_2d;//h_cr1, h_cr4, h_cr5;
 
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
@@ -842,7 +878,20 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       // get list of candidates
       list<Candidate> allcandidates = recoHadronicTop(tree, isData , false);
-      
+
+     list<Candidate>::iterator candIter;
+     for(candIter = allcandidates.begin() ; candIter != allcandidates.end() ; candIter++ ){
+        float mva = Poor_MVA(*candIter);
+        plot2D("h_xm", TMath::Min(candIter->mt2bl, (float)599.0), TMath::Min(candIter->chi2, (float)14.99) , evtweight , h_2d , 606 , -1. , 605, 96, -1, 15);
+        plot2D("h_xm" +mtcut, TMath::Min(candIter->mt2bl, (float)599.0), TMath::Min(candIter->chi2, (float)14.99) , evtweight , h_2d , 606 , -1. , 605, 96, -1, 15);
+        plot2D("h_xmW" +mtcut, TMath::Min(candIter->mt2bl, (float)599.0), TMath::Min(candIter->chi2, (float)14.99) , evtweight*mva , h_2d , 606 , -1. , 605, 96, -1, 15);
+        if (candIter->match){
+          plot2D("h_xmM", TMath::Min(candIter->mt2bl, (float)599.0), TMath::Min(candIter->chi2, (float)14.99) , evtweight , h_2d , 606 , -1. , 605, 96, -1, 15);
+          plot2D("h_xmM" +mtcut, TMath::Min(candIter->mt2bl, (float)599.0), TMath::Min(candIter->chi2, (float)14.99) , evtweight , h_2d , 606 , -1. , 605, 96, -1, 15);
+          plot2D("h_xmMW" +mtcut, TMath::Min(candIter->mt2bl, (float)599.0), TMath::Min(candIter->chi2, (float)14.99) , evtweight*mva , h_2d , 606 , -1. , 605, 96, -1, 15);
+        }
+      }
+ 
       //
       // CR1 - single lepton + b-veto
       //
@@ -927,8 +976,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //
 
   char* outfilename = Form("output/%s.root",name.Data());
-
   savePlots(h_1d, outfilename);
+  char* outfilename2 = Form("output/x_%s.root",name.Data());
+  savePlots2(h_2d, outfilename2);
 
   already_seen.clear();
 

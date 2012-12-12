@@ -67,6 +67,9 @@ class StopTreeLooper {
         list<Candidate> recoHadronicTop(StopTree*, bool, bool);
         list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree);
 
+        static float Poor_MVA(Candidate&);
+        static float Smart_Compare(Candidate&, Candidate&); 
+
     private:
 
 	string m_outfilename_;
