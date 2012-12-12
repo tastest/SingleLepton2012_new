@@ -134,12 +134,10 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
       pl[2]= lep->Py(); 
       pl[3]= lep->Pz();
 
-      pb1[0] = jets[o].E();  
       pb1[1] = jets[o].Px(); 
       pb1[2] = jets[o].Py(); 
       pb1[3] = jets[o].Pz();
 
-      pb2[0] = jets[b].E();
       pb2[1] = jets[b].Px(); 
       pb2[2] = jets[b].Py(); 
       pb2[3] = jets[b].Pz();
@@ -156,14 +154,18 @@ list<Candidate> MT2Calculator(StopTree* tree, bool isData){
       // calculate MT2 variables in 3 flavors: MT2b, MT2bl, MT2W
       //-------------------------------------------------------------------------------
 
+      pb1[0] = jets[o].mass();
+      pb2[0] = jets[b].mass();
       mt2_event.set_momenta( pb1, pb2, pmiss_lep );
-      mt2_event.set_mn( 0.0 );   // Invisible particle mass
+      mt2_event.set_mn( 80.385 );   // Invisible particle mass
       double c_mt2b = mt2_event.get_mt2();
-         
-      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss); 
+
+      pb1[0] = jets[o].E();
+      pb2[0] = jets[b].E();
+      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2bl = mt2bl_event.get_mt2bl();
 
-      mt2w_event.set_momenta(pl, pb1, pb2, pmiss); 
+      mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2w = mt2w_event.get_mt2w();
 
       //-------------------------------------------------------------------------------
