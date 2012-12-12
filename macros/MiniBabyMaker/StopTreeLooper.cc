@@ -627,16 +627,6 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
 
 }
 
-void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
-
-  plot1D("h_"+tag+"_hadchi2"+sel, TMath::Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 ); 
-  plot1D("h_"+tag+"_mt2w"   +sel, TMath::Min(mr.mt2w, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
-  plot1D("h_"+tag+"_mt2b"   +sel, TMath::Min(mr.mt2b, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
-  plot1D("h_"+tag+"_mt2bl"  +sel, TMath::Min(mr.mt2bl,(float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
-  plot1D("h_"+tag+"_qgtag"  +sel, tree->pfjets_qgtag_.at(0) , evtweight , h_1d , 210 , 0. , 1. );
-
-}
-
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
@@ -644,9 +634,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   load_badlaserevents  ();
 
-  //
+  //---------------------------------
   // check for valid chain
-  //
+  //---------------------------------
 
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
@@ -655,9 +645,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     return;
   }
 
-  //
+  //---------------------------------
   // set up histograms
-  //
+  //---------------------------------
 
   gROOT->cd();
 
@@ -687,37 +677,30 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   bool isData = name.Contains("data") ? true : false;
 
-  //Define peak region 
-  min_mtpeak = 50.; 
-  max_mtpeak = 80.; 
-  printf("[StopTreeLooper::loop] MT PEAK definition %.0f - %.0f GeV \n", min_mtpeak, max_mtpeak);
-
   cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
 
   while (TChainElement *currentFile = (TChainElement*)fileIter.Next()) {
 
-    //
+    //---------------------------------
     // load the stop baby tree
-    //
+    //---------------------------------
 
     StopTree *tree = new StopTree();
     tree->LoadTree(currentFile->GetTitle());
     tree->InitTree();
 
-    //
+    //---------------------------------
     // event loop
-    //
+    //---------------------------------
 
     ULong64_t nEvents = tree->tree_->GetEntries();
-
-    //nEvents = 100;
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
       tree->tree_->GetEntry(event);
 
-      //
+      //---------------------------------
       // increment counters
-      //
+      //---------------------------------
 
       ++nEventsTotal;
       if (nEventsTotal%10000==0) {
@@ -732,9 +715,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	i_permille_old = i_permille;
       }
 
-      //---------------------
+      //---------------------------------
       // skip duplicates
-      //---------------------
+      //---------------------------------
 
       if( isData ) {
         DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
@@ -747,181 +730,73 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	}
       }
 
-      // 
+      //------------------------------------------ 
       // event weight
-      // 
+      //------------------------------------------ 
 
       float evtweight    = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
       float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
       float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
 
-      // 
+      //------------------------------------------ 
       // selection criteria
-      // 
+      //------------------------------------------ 
       
-      //preselection
-      if ( !passEvtSelection(tree, name) ) continue;
+      if ( !passEvtSelection(tree, name) ) continue; // >=1 lepton, rho cut, MET filters, veto 2 nearby leptons
+      if ( tree->npfjets30_ < 4          ) continue; // >=4 jets
+      if ( tree->t1metphicorr_ < 50.0    ) continue; // MET > 50 GeV
 
-      //ask for at least 4 jets
-      if ( tree->npfjets30_ < 4 ) continue; 
+      //------------------------------------------ 
+      // variables to add to baby
+      //------------------------------------------ 
+      
+      initBaby();
 
-      //baseline met and mt requirements
-      if (tree->t1metphicorr_  <100.) continue;
-      string mtcut = tree->t1metphicorrmt_<120. ? "_lomt" : "_himt";
-
-      // histogram tags
-      //flavor types
-      string flav_tag_sl;
-      if ( abs(tree->id1_)==13 ) flav_tag_sl = "_muo";
-      else if ( abs(tree->id1_)==11 ) flav_tag_sl = "_ele";
-      else flav_tag_sl = "_mysterysl";
-      string flav_tag_dl;
-      if      ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_dimu";
-      else if ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_diel";
-      else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_muel";
-      else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_elmu";
-      else flav_tag_dl = "_mysterydl";
-      string basic_flav_tag_dl = flav_tag_dl;
-      if ( abs(tree->id1_) != abs(tree->id2_) ) basic_flav_tag_dl = "_mueg";
-
-      //----------------------------------------------------------------------------------------
-      // calculate the hadronic top and MT2 variables and compare to values stored in babies
-      //----------------------------------------------------------------------------------------
-      /*
-      list<Candidate>::iterator candIter;
-
-      int i = 0;
-
-      cout << endl << endl << endl;
-      cout << "On-the-fly : " << candidates.size()         << " candidates" << endl;
-      cout << "From baby  : " << tree->candidates_->size() << " candidates" << endl << endl;
-
-      for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
-	cout << "chi2        " << (*candIter).chi2   << " " << (tree->candidates_->at(i)).chi2  << endl;
-	cout << "mt2w        " << (*candIter).mt2w   << " " << (tree->candidates_->at(i)).mt2w  << endl;
-	cout << "mt2bl       " << (*candIter).mt2bl  << " " << (tree->candidates_->at(i)).mt2bl << endl;
-	cout << "mt2b        " << (*candIter).mt2b   << " " << (tree->candidates_->at(i)).mt2b  << endl;
-	cout << endl;
-	++i;
-      }
-
-      //----------------------------------------------------------------------------------------
-      // calculate the MT2 variables only
-      //----------------------------------------------------------------------------------------
-
-      list<Candidate> mt2candidates = MT2Calculator(tree, isData );
-
-      cout << "Found " << mt2candidates.size() << " MT2 candidates" << endl;
-
-      for(candIter = mt2candidates.begin() ; candIter != mt2candidates.end() ; candIter++ ){
-	cout << "mt2w        " << (*candIter).mt2w   << endl;
-	cout << "mt2bl       " << (*candIter).mt2bl  << endl;
-	cout << "mt2b        " << (*candIter).mt2b   << endl;
-	cout << endl;
-      }
-      */
-
-      //----------------------------------------------------------------------------------------
-      // calculate the BEST MT2 variables only
-      //----------------------------------------------------------------------------------------
-
-//      MT2struct m = Best_MT2Calculator(tree, isData);
-
-      // cout << endl;
-      // cout << "MT2W  " << m.mt2w  << endl;
-      // cout << "MT2b  " << m.mt2b  << endl;
-      // cout << "MT2bl " << m.mt2bl << endl;
-
-//      plot1D("h_mt2w"  , TMath::Min(m.mt2w, (float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-//      plot1D("h_mt2b"  , TMath::Min(m.mt2b, (float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-//      plot1D("h_mt2bl" , TMath::Min(m.mt2bl,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-
-      //----------------------------------------------------------------------------------------
-      // calculate the BEST MT2 variables only using Ricardo's algorithm
-      //----------------------------------------------------------------------------------------
-
-      // get list of candidates
       list<Candidate> allcandidates = recoHadronicTop(tree, isData , false);
-      
-      //
-      // CR1 - single lepton + b-veto
-      //
+      MT2struct mr                  = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
 
-      // selection - 1 lepton + iso track veto
-      // Add b-tag veto
-      if ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 )
-	{
-	  MT2struct mr = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
+      // which selections are passed
+      sig_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_>=1 ) ? 1 : 0;
+      cr1_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 ) ? 1 : 0;
+      cr4_        = ( passDileptonSelection(tree, isData) )                          ? 1 : 0;
+      cr5_        = ( passLepPlusIsoTrkSelection(tree, isData) )                     ? 1 : 0;
 
-	  plotCandidate(tree, mr , "cr1" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+      // kinematic variables
+      met_        = tree->t1metphicorr_;
+      mt_         = tree->t1metphicorrmt_;
+      chi2_       = mr.chi2;
+      mt2w_       = mr.mt2w;
+      mt2b_       = mr.mt2b;
+      mt2l_       = mr.mt2l;
 
-	}
-      
-      //remove candidates from the list that do not ask for a b-tag
-      if (tree->nbtagscsvm_<1) continue;
-      list<Candidate> candidates = getBTaggedCands(allcandidates, tree);
-      MT2struct mr = Best_MT2Calculator_Ricardo(candidates, tree, isData);
+      // weights
+      weight_     = evtweight;
+      sltrigeff_  = trigweight;
+      dltrigeff_  = trigweightdl;
 
-      
-      //
-      // SIGNAL REGION - single lepton + b-tag
-      //
+      // hadronic variables
+      nb_         = tree->nbtagscsvm_;
+      njets_      = tree->npfjets30_;
 
-      // selection - 1 lepton 
-      // Add iso track veto
-      // Add b-tag
-      if ( passSingleLeptonSelection(tree, isData) && passIsoTrkVeto(tree) )
-	{
+      // lepton variables
+      passisotrk_ = passIsoTrkVeto(tree) ? 1 : 0;
+      nlep_       = tree->ngoodlep_;
 
-	  plotCandidate(tree, mr , "sig" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "sig" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-	  
-	}
+      lep1pt_     = tree->lep1_->pt();
+      lep1eta_    = tree->lep1_->eta();
 
-      //
-      // CR4 - ttbar dilepton sample with 2 good leptons
-      //
-      
-      // selection - all dilepton, z-veto for SF dilepton
-      // Add b-tag requirement
-      if ( passDileptonSelection(tree, isData) 
-	   && (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) ) 
-	{
+      if( nlep_ > 1 ){
+	lep2pt_    = tree->lep1_->pt();
+	lep2eta_   = tree->lep1_->eta();
+	dilmass_   = tree->dilmass_;
+      }
 
-	  plotCandidate(tree, mr , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
-	  plotCandidate(tree, mr , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
-	  plotCandidate(tree, mr , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
-	  plotCandidate(tree, mr , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
-
-	}
-
-      //
-      // CR5 - lepton + isolated track
-      //
-
-      // selection - lepton + isolated track
-      // Add b-tag requirement
-      if ( passLepPlusIsoTrkSelection(tree, isData) ) 
-	{
-	  
-	  plotCandidate(tree, mr , "cr5" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-
-	}
-      
-	} // end event loop
+    } // end event loop
 
     // delete tree;
 
   } // end file loop
-
+  
     //
     // finish
     //
