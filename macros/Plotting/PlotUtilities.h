@@ -28,6 +28,7 @@ void plot2D(string title, float xval, float yval, double weight, std::map<string
 	    int numbinsx, float xmin, float xmax, int numbinsy, float ymin, float ymax);
 
 void savePlots(std::map<string, TH1F*>&, char* );
+void savePlots2(std::map<string, TH2F*>&, char* );
 
 #endif
 
