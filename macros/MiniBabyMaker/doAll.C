@@ -21,7 +21,7 @@
  
   char* path = "/nfs-3/userdata/stop/output_V00-02-04_2012_4jskim";
 
-  const int NSAMPLES = 1;
+  const int NSAMPLES = 2;
   char* sampletag[NSAMPLES] = {
     // "T2tt_250_0",
     // "T2tt_350_0",
@@ -29,7 +29,7 @@
     // "T2tt_300_50",
     // "T2tt_300_100",
     "ttdl_powheg",
-    // "ttsl_powheg",
+    "ttsl_powheg",
     // "w1to4jets",
     // "data_muo",
     // "data_ele",

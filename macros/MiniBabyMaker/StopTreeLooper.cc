@@ -24,60 +24,14 @@
 #include <set>
 #include <list>
 
-
-float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData ) 
-{
-
-  if( isData ) return 1;
-
-  int nvtx = nvertices;
-  if( nvtx > hist->GetNbinsX() )
-        nvtx = hist->GetNbinsX();
-
-  float weight = 0;
-  weight = hist->GetBinContent( hist->FindBin(nvtx) );
-  if( weight <= 0 ) //we don't want to kill events bc they have no weight
-        weight = 1.;
-  //  cout << "nvtx " << nvtx << " weight " << weight << endl;
-  return weight;
-
-}
-
-float StopTreeLooper::getdphi( float phi1 , float phi2 ) 
-{
-  float dphi = fabs( phi1 - phi2 );
-  if( dphi > TMath::Pi() ) dphi = TMath::TwoPi() - dphi;
-  return dphi;
-}
-
-float StopTreeLooper::getMT( float pt1 , float phi1 , float pt2 , float phi2 ) 
-{
-
-  float dphi = getdphi(phi1, phi2);
-  return sqrt( 2 * ( pt1 * pt2 * (1 - cos( dphi ) ) ) );
-
-}
-
-float StopTreeLooper::dRbetweenVectors(LorentzVector vec1, 
-				       LorentzVector vec2 )
-{ 
-
-  float dphi = std::min(::fabs(vec1.Phi() - vec2.Phi()), 2 * M_PI - fabs(vec1.Phi() - vec2.Phi()));
-  float deta = vec1.Eta() - vec2.Eta();
-
-  return sqrt(dphi*dphi + deta*deta);
-
-}
-
-
 StopTreeLooper::StopTreeLooper()
 {
   m_outfilename_ = "histos.root";
-  t1metphicorr = -9999.;
-  t1metphicorrphi = -9999.;
-  t1metphicorrmt = -9999.;
-  min_mtpeak = -9999.;
-  max_mtpeak = -9999.; 
+  // t1metphicorr = -9999.;
+  // t1metphicorrphi = -9999.;
+  // t1metphicorrmt = -9999.;
+  // min_mtpeak = -9999.;
+  // max_mtpeak = -9999.; 
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -139,21 +93,21 @@ int load_badlaserevents  () {
   ifstream in;
   in.open("../Core/badlaser_events.txt");
 
-   int run, event, lumi;
-   int nlines = 0;
+  int run, event, lumi;
+  int nlines = 0;
 
-   while (1) {
-      in >> run >> event >> lumi;
-      if (!in.good()) break;
-      nlines++;
-      DorkyEventIdentifier id = {run, event, lumi };
-      events_lasercalib.insert(id);
-   }
-   printf(" found %d bad events \n",nlines);
+  while (1) {
+    in >> run >> event >> lumi;
+    if (!in.good()) break;
+    nlines++;
+    DorkyEventIdentifier id = {run, event, lumi };
+    events_lasercalib.insert(id);
+  }
+  printf(" found %d bad events \n",nlines);
 
-   in.close();
+  in.close();
 
-   return 0;
+  return 0;
 
 }
 
@@ -170,42 +124,42 @@ bool compare_candidates( Candidate x, Candidate y ){
 
 double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
 {
-    if (verbose) {
-        printf("c1: %4.2f\n", c1);
-        printf("m12: %4.2f\n", m12);
-        printf("m22: %4.2f\n", m22);
-        printf("m02: %4.2f\n", m02);
-    }
+  if (verbose) {
+    printf("c1: %4.2f\n", c1);
+    printf("m12: %4.2f\n", m12);
+    printf("m22: %4.2f\n", m22);
+    printf("m02: %4.2f\n", m02);
+  }
 
-    double a = m22;
-    double b = (m02 - m12 - m22) * c1;
-    double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
+  double a = m22;
+  double b = (m02 - m12 - m22) * c1;
+  double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
 
-    if (verbose) {
-        printf("a: %4.2f\n", a);
-        printf("b: %4.2f\n", b);
-        printf("c: %4.2f\n", c);
-    }
+  if (verbose) {
+    printf("a: %4.2f\n", a);
+    printf("b: %4.2f\n", b);
+    printf("c: %4.2f\n", c);
+  }
 
-    double num = -1. * b + sqrt(b * b - 4 * a * c);
-    double den = 2 * a;
+  double num = -1. * b + sqrt(b * b - 4 * a * c);
+  double den = 2 * a;
 
-    if (verbose) {
-        printf("num: %4.2f\n", num);
-        printf("den: %4.2f\n", den);
-        printf("num/den: %4.2f\n", num/den);
-    }
+  if (verbose) {
+    printf("num: %4.2f\n", num);
+    printf("den: %4.2f\n", den);
+    printf("num/den: %4.2f\n", num/den);
+  }
 
-    return (num/den);
+  return (num/den);
 }
 
 
 double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
               double m12, double m22, double m02){
-    double rat1 = pt1 * (1 - c1) / sigma1;
-    double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
+  double rat1 = pt1 * (1 - c1) / sigma1;
+  double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
 
-    return ( rat1 * rat1 + rat2 * rat2);
+  return ( rat1 * rat1 + rat2 * rat2);
 }
 
 //void StopSelector::minuitFunction(int& npar, double *gout, double &result, double par[], int flg)
@@ -233,7 +187,7 @@ float getDataMCRatio(float eta){
  * mc - qgjet montecarlo match number for the jets
  * 
  * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
-*/ 
+ */ 
 
 list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, bool wbtag){
 
@@ -292,10 +246,10 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
 
   if ( !isData ){
      
-     // Matching MC algoritm search over all conbinations  until the 
-     // right combination is found. More than one candidate is suported 
-     //  but later only the first is used.
-     // 
+    // Matching MC algoritm search over all conbinations  until the 
+    // right combination is found. More than one candidate is suported 
+    //  but later only the first is used.
+    // 
     int match = 0;
     for (int jbl=0; jbl<n_jets; ++jbl )
       for (int jb=0; jb<n_jets; ++jb )
@@ -303,11 +257,11 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
           for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
             if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
                  (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
-                    ibl[match] = jbl;
-                    iw1[match] = jw1;
-                    iw2[match] = jw2;
-                    ib[match] = jb;
-                    match++;
+	      ibl[match] = jbl;
+	      iw1[match] = jw1;
+	      iw2[match] = jw2;
+	      ib[match] = jb;
+	      match++;
             }
   }
 
@@ -357,12 +311,12 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
       delete minimizer;
 
      
-  //     * W Mass check :)
-  //     *  Never trust a computer you can't throw out a window. 
- //      *  - Steve Wozniak 
+      //     * W Mass check :)
+      //     *  Never trust a computer you can't throw out a window. 
+      //      *  - Steve Wozniak 
 
-//      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
-//           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
+      //      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
+      //           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
       
       v_i.push_back(i);
       v_j.push_back(j);
@@ -430,13 +384,13 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
       mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2w = mt2w_event.get_mt2w();
 
-//      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
+      //      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
 
       for (unsigned int w = 0; w < v_i.size() ; ++w ){
         int i = v_i[w];
         int j = v_j[w];
         if ( i==o || i==b || j==o || j==b )
-            continue;
+	  continue;
 
         double pt_w1 = jets[i].Pt();
         double pt_w2 = jets[j].Pt();
@@ -458,16 +412,16 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
 
         double pt_w = hadW.Pt();
         double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
-                        + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
+	  + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
         double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
         double pt_t = hadT.Pt();
         double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
-                        + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
-                        + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
+	  + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
+	  + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
         double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
 
         double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
-                      + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+	  + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
 
         bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
   
@@ -488,10 +442,10 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
       }
     }
 
-   if (__SORT) 
-     chi2candidates.sort(compare_candidates);
+  if (__SORT) 
+    chi2candidates.sort(compare_candidates);
 
-   return chi2candidates;
+  return chi2candidates;
 }
 
 //--------------------------------------------------------------------
@@ -656,6 +610,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   //plotting map
   std::map<std::string, TH1F*> h_1d;//h_cr1, h_cr4, h_cr5;
 
+  makeTree(name.Data());
+
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
   //   cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
@@ -694,6 +650,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //---------------------------------
 
     ULong64_t nEvents = tree->tree_->GetEntries();
+    nEvents = 1000;
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
       tree->tree_->GetEntry(event);
@@ -715,9 +672,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	i_permille_old = i_permille;
       }
 
-      //---------------------------------
+      //------------------------------------------ 
       // skip duplicates
-      //---------------------------------
+      //------------------------------------------ 
 
       if( isData ) {
         DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
@@ -734,7 +691,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // event weight
       //------------------------------------------ 
 
-      float evtweight    = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
+      float evtweight    = isData ? 1. : ( tree->weight_ * tree->nvtxweight_ * tree->mgcor_ );
       float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
       float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
 
@@ -750,7 +707,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // variables to add to baby
       //------------------------------------------ 
       
-      initBaby();
+      initBaby(); // set all branches to -1
 
       list<Candidate> allcandidates = recoHadronicTop(tree, isData , false);
       MT2struct mr                  = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
@@ -767,7 +724,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       chi2_       = mr.chi2;
       mt2w_       = mr.mt2w;
       mt2b_       = mr.mt2b;
-      mt2l_       = mr.mt2l;
+      mt2bl_      = mr.mt2bl;
 
       // weights
       weight_     = evtweight;
@@ -782,28 +739,29 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       passisotrk_ = passIsoTrkVeto(tree) ? 1 : 0;
       nlep_       = tree->ngoodlep_;
 
-      lep1pt_     = tree->lep1_->pt();
-      lep1eta_    = tree->lep1_->eta();
+      lep1pt_     = tree->lep1_.pt();
+      lep1eta_    = tree->lep1_.eta();
 
       if( nlep_ > 1 ){
-	lep2pt_    = tree->lep1_->pt();
-	lep2eta_   = tree->lep1_->eta();
+	lep2pt_    = tree->lep1_.pt();
+	lep2eta_   = tree->lep1_.eta();
 	dilmass_   = tree->dilmass_;
       }
+      
+      // fill me up
+      outTree_->Fill();
 
     } // end event loop
-
-    // delete tree;
-
   } // end file loop
   
-    //
-    // finish
-    //
+  //-------------------------
+  // finish and clean up
+  //-------------------------
 
-  char* outfilename = Form("output/%s.root",name.Data());
-
-  savePlots(h_1d, outfilename);
+  outFile_->cd();
+  outTree_->Write();
+  outFile_->Close();
+  delete outFile_;
 
   already_seen.clear();
 
@@ -811,304 +769,85 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 }
 
-bool StopTreeLooper::passEvtSelection(const StopTree *sTree, TString name) 
-{
+//--------------------------------------------
+// create the tree and set branch addresses
+//--------------------------------------------
 
-  //rho requirement
-  if ( sTree->rhovor_<0. || sTree->rhovor_>=40. ) return false;
+void StopTreeLooper::makeTree(const char *prefix){
 
-  if (!name.Contains("T2")) {
-      //met filters
-      if ( sTree->csc_      != 0 ) return false;
-      if ( sTree->hbhe_     != 1 ) return false;
-      if ( sTree->hcallaser_!= 1 ) return false;
-      if ( sTree->ecaltp_   != 1 ) return false;
-      if ( sTree->trkfail_  != 1 ) return false;
-      if ( sTree->eebadsc_  != 1 ) return false;
-      if ( sTree->hbhenew_  != 1 ) return false;
-    }
+  TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
+  rootdir->cd();
 
-  //at least 1 lepton
-  if ( sTree->ngoodlep_ < 1 ) return false;
+  outFile_   = new TFile(Form("output/%s_mini.root",prefix), "RECREATE");
+  outFile_->cd();
 
-  //if have more than 1 lepton, remove cases where have 2 close together
-  if ( sTree->ngoodlep_ > 1 && 
-       dRbetweenVectors( sTree->lep1_ ,  sTree->lep2_ )<0.1 ) return false;
+  outTree_ = new TTree("t","Tree");
 
-  return true;
+  outTree_->Branch("lep1pt"       ,        &lep1pt_      ,         "lep1pt/F"		);
+  outTree_->Branch("lep1eta"      ,        &lep1eta_     ,         "lep1eta/F"		);
+  outTree_->Branch("sig"          ,        &sig_         ,         "sig/I"		);
+  outTree_->Branch("cr1"          ,        &cr1_         ,         "cr1/I"		);
+  outTree_->Branch("cr4"          ,        &cr4_         ,         "cr4/I"		);
+  outTree_->Branch("cr5"          ,        &cr5_         ,         "cr5/I"		);
+  outTree_->Branch("met"          ,        &met_         ,         "met/F"		);
+  outTree_->Branch("mt"           ,        &mt_          ,         "mt/F"		);
+  outTree_->Branch("chi2"         ,        &chi2_        ,         "chi2/F"		);
+  outTree_->Branch("mt2w"         ,        &mt2w_        ,         "mt2w/F"		);
+  outTree_->Branch("mt2b"         ,        &mt2b_        ,         "mt2b/F"		);
+  outTree_->Branch("mt2bl"        ,        &mt2bl_       ,         "mt2bl/F"		);
+  outTree_->Branch("weight"       ,        &weight_      ,         "weight/F"		);
+  outTree_->Branch("sltrigeff"    ,        &sltrigeff_   ,         "sltrigeff/F"	);
+  outTree_->Branch("dltrigeff"    ,        &dltrigeff_   ,         "dltrigeff/F"	);
+  outTree_->Branch("nb"           ,        &nb_          ,         "nb/I"		);
+  outTree_->Branch("njets"        ,        &njets_       ,         "njets/I"		);
+  outTree_->Branch("passisotrk"   ,        &passisotrk_  ,         "passisotrk/I"	);
+  outTree_->Branch("nlep"         ,        &nlep_        ,         "nlep/I"		);
+  outTree_->Branch("lep1pt"       ,        &lep1pt_      ,         "lep1pt/F"		);
+  outTree_->Branch("lep1eta"      ,        &lep1eta_     ,         "lep1eta/F"		);
+  outTree_->Branch("lep2pt"       ,        &lep2pt_      ,         "lep2pt/F"		);
+  outTree_->Branch("lep2eta"      ,        &lep2eta_     ,         "lep2eta/F"		);
+  outTree_->Branch("dilmass"      ,        &dilmass_     ,         "dilmass/F"		);
+
 
 }
 
-bool StopTreeLooper::passOneLeptonSelection(const StopTree *sTree, bool isData) 
-{
-  //single lepton selection for 8 TeV 53 analysis
-  if ( !passSingleLeptonSelection(sTree, isData) ) return false;
+//--------------------------------------------
+// set all branches to -1
+//--------------------------------------------
 
-  //pass isolated track veto
-  //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
+void StopTreeLooper::initBaby(){
 
-  return true;
+  // which selections are passed
+  sig_        = -1;
+  cr1_        = -1;
+  cr4_        = -1;
+  cr5_        = -1; 
 
-}
+  // kinematic variables
+  met_        = -1.0;
+  mt_         = -1.0;
+  chi2_       = -1.0;
+  mt2w_       = -1.0;
+  mt2b_       = -1.0;
+  mt2bl_      = -1.0;
 
-bool StopTreeLooper::passTwoLeptonSelection(const StopTree *sTree, bool isData) 
-{
-  //single lepton selection for 8 TeV 53 analysis
-  if ( !passDileptonSelection(sTree, isData) ) return false;
+  // weights
+  weight_     = -1.0;
+  sltrigeff_  = -1.0;
+  dltrigeff_  = -1.0;
 
-  //apply isolated track veto in addition to 2 leptons
-  //default value for this one is -999
-  if ( sTree->trkpt10loose_ >0. && sTree->trkreliso10loose_ < 0.1 ) return false;
+  // hadronic variables
+  nb_         = -1;
+  njets_      = -1;
 
-  return true;
-
-}
-
-bool StopTreeLooper::passIsoTrkVeto(const StopTree *sTree) 
-{
-
-  //pass isolated track veto
-  //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
-
-  return true;
-
-}
-
-bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isData) 
-{
-  //single lepton selection for 8 TeV 53 analysis
-
-  //at least one lepton
-  if ( sTree->ngoodlep_ < 1 ) return false;
-
-  //lepton flavor - trigger, pt and eta requirements
-  if ( sTree->lep1_.Pt() < 30 )          return false;
-  if ( fabs( sTree->pflep1_.Pt() - sTree->lep1_.Pt() ) > 10. )  return false;
-  if ( ( sTree->isopf1_ * sTree->lep1_.Pt() ) > 5. )  return false; 
-  
-  if ( sTree->leptype_ == 0 ) {
-
-    //pass trigger if data - single electron
-    if ( isData && sTree->ele27wp80_ != 1 ) return false;
-    //    if ( isData && sTree->trgel1_ != 1 )  return false;
-    
-    //barrel only electrons
-    if ( fabs(sTree->lep1_.Eta() ) > 1.4442) return false;
-    if ( sTree->eoverpin_ > 4. ) return false;
-    
-
-  } else if ( sTree->leptype_ == 1 ) {
-
-    //pass trigger if data - single muon
-    if ( isData && sTree->isomu24_ != 1 ) return false;
-    //    if ( isData && sTree->trgmu1_ != 1 )  return false;
-    
-    if ( fabs(sTree->lep1_.Eta() ) > 2.1)  return false;
-
-  }
-
-  return true;
+  // lepton variables
+  passisotrk_ = -1;
+  nlep_       = -1;
+  lep1pt_     = -1.0;
+  lep1eta_    = -1.0;
+  lep2pt_     = -1.0;
+  lep2eta_    = -1.0;
+  dilmass_    = -1.0;
 
 }
 
-
-bool StopTreeLooper::passDileptonSelection(const StopTree *sTree, bool isData) 
-{
-  //two lepton selection for 8 TeV 53 analysis
-
-  //exactly 2 leptons
-  if ( sTree->ngoodlep_ != 2 ) return false;
-
-  //opposite sign
-  if ( sTree->id1_*sTree->id2_>0 ) return false;
-
-  //pass trigger if data - dilepton
-  if ( isData && sTree->mm_ != 1 && sTree->me_ != 1 
-       && sTree->em_ != 1 && sTree->ee_ != 1 ) return false;
-
-  //passes pt and eta requirements
-  if ( sTree->lep1_.Pt() < 20 )          return false;
-  if ( sTree->lep2_.Pt() < 20 )          return false;
-  if ( fabs(sTree->lep1_.Eta() ) > 2.4)  return false;
-  if ( fabs(sTree->lep2_.Eta() ) > 2.4)  return false;
-
-  //consistency with pf leptons
-  if ( fabs( sTree->pflep1_.Pt() - sTree->lep1_.Pt() ) > 10. )  return false;
-  if ( fabs( sTree->pflep2_.Pt() - sTree->lep2_.Pt() ) > 10. )  return false;
-
-  //information is only stored for leading lepton
-  if ( ( sTree->isopf1_ * sTree->lep1_.Pt() ) > 5. )  return false; 
-  if ( fabs(sTree->id1_)==11 && sTree->eoverpin_ > 4. ) return false;
-
-  //barrel only electrons
-  if (fabs(sTree->id1_)==11 && fabs(sTree->lep1_.Eta() ) > 1.4442) return false;
-  if (fabs(sTree->id2_)==11 && fabs(sTree->lep2_.Eta() ) > 1.4442) return false;
-  
-  return true;
-
-}
-
-bool StopTreeLooper::passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData) 
-{
-  //single lepton plus iso trk selection for 8 TeV 53 analysis
-
-  //at least one lepton
-  if ( !passSingleLeptonSelection(sTree, isData) ) return false;
-
-  //pass isolated track requirement
-  //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ > 9990. || sTree->pfcandiso10_ > 0.1 ) return false;
-
-  return true;
-
-}
-
-pair<float,float> StopTreeLooper::getPhiCorrMET( float met, float metphi, int nvtx, bool ismc){
-
-  //using met phi corrections from C. Veelken (emails from Oct. 4th)
-  //previous versions are available here:
-  //http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py
-
-  // Data
-  // ------
-  // x :  "+2.87340e-01 + 3.29813e-01*Nvtx" 
-  // y : "-2.27938e-01 - 1.71272e-01*Nvtx"
-  // MC
-  // ------            
-  // x : "+8.72683e-02 - 1.66671e-02*Nvtx"
-  // y :  "+1.86650e-01 - 1.21946e-01*Nvtx"
-  
-
-  float metx = met * cos( metphi );
-  float mety = met * sin( metphi );
-
-  float shiftx = 0.;
-  float shifty = 0.;
-
-  //use correction for data vs. mc 
-  shiftx = ismc ? (+8.72683e-02 - 1.66671e-02*nvtx)
-    : (+2.87340e-01 + 3.29813e-01*nvtx);
-  shifty = ismc ? (+1.86650e-01 - 1.21946e-01*nvtx)
-    : (-2.27938e-01 - 1.71272e-01*nvtx);
-  
-  metx -= shiftx;
-  mety -= shifty;
-
-  pair<float, float> phicorrmet = make_pair( sqrt( metx*metx + mety*mety ), atan2( mety , metx ) );
-  return phicorrmet;
-}
-
-float StopTreeLooper::getdltrigweight(int id1, int id2)
-{ 
-  if (abs(id1)==11 && abs(id2)==11) return 0.95;
-  if (abs(id1)==13 && abs(id2)==13) return 0.88;
-  if (abs(id1)!=abs(id2)) return 0.92;
-  return -999.;
-
-}
-
-float StopTreeLooper::getsltrigweight(int id1, float pt, float eta) {
-
-  //electron efficiencies
-  if ( abs(id1)==11 ) {
-    if ( fabs(eta)<1.5) {
-      if ( pt>=20 && pt<22 ) return 0.00;
-      if ( pt>=22 && pt<24 ) return 0.00;
-      if ( pt>=24 && pt<26 ) return 0.00;
-      if ( pt>=26 && pt<28 ) return 0.08;
-      if ( pt>=28 && pt<30 ) return 0.61;
-      if ( pt>=30 && pt<32 ) return 0.86;
-      if ( pt>=32 && pt<34 ) return 0.88;
-      if ( pt>=34 && pt<36 ) return 0.90;
-      if ( pt>=36 && pt<38 ) return 0.91;
-      if ( pt>=38 && pt<40 ) return 0.92;
-      if ( pt>=40 && pt<50 ) return 0.94;
-      if ( pt>=50 && pt<60 ) return 0.95;
-      if ( pt>=60 && pt<80 ) return 0.96;
-      if ( pt>=80 && pt<100 ) return 0.96;
-      if ( pt>=100 && pt<150 ) return 0.96;
-      if ( pt>=150 && pt<200 ) return 0.97;
-      if ( pt>=200 ) return 0.97;
-    } else if ( fabs(eta)>=1.5 && fabs(eta)<2.1) {
-      if ( pt>=20 && pt<22 ) return 0.00;
-      if ( pt>=22 && pt<24 ) return 0.00;
-      if ( pt>=24 && pt<26 ) return 0.02;
-      if ( pt>=26 && pt<28 ) return 0.18;
-      if ( pt>=28 && pt<30 ) return 0.50;
-      if ( pt>=30 && pt<32 ) return 0.63;
-      if ( pt>=32 && pt<34 ) return 0.68;
-      if ( pt>=34 && pt<36 ) return 0.70;
-      if ( pt>=36 && pt<38 ) return 0.72;
-      if ( pt>=38 && pt<40 ) return 0.74;
-      if ( pt>=40 && pt<50 ) return 0.76;
-      if ( pt>=50 && pt<60 ) return 0.77;
-      if ( pt>=60 && pt<80 ) return 0.78;
-      if ( pt>=80 && pt<100 ) return 0.80;
-      if ( pt>=100 && pt<150 ) return 0.79;
-      if ( pt>=150 && pt<200 ) return 0.76;
-      if ( pt>=200 ) return 0.81;
-    }
-  } else if ( abs(id1)==13 ) {//muon efficiencies
-
-    if ( fabs(eta)<0.8 ) {
-      if (pt>=20 && pt<22)  return  0.00;	 
-      if (pt>=22 && pt<24)  return  0.03; 	 
-      if (pt>=24 && pt<26)  return  0.87; 
-      if (pt>=26 && pt<28)  return  0.90; 
-      if (pt>=28 && pt<30)  return  0.91; 
-      if (pt>=30 && pt<32)  return  0.91; 
-      if (pt>=32 && pt<34)  return  0.92; 
-      if (pt>=34 && pt<36)  return  0.93; 
-      if (pt>=36 && pt<38)  return  0.93; 
-      if (pt>=38 && pt<40)  return  0.93; 
-      if (pt>=40 && pt<50)  return  0.94; 
-      if (pt>=50 && pt<60)  return  0.95; 
-      if (pt>=60 && pt<80)  return  0.95; 
-      if (pt>=80 && pt<100) return 0.94; 
-      if (pt>=100 && pt<150) return 0.94; 
-      if (pt>=150 && pt<200) return 0.93; 
-      if (pt>=200) return 0.92; 
-    } else if ( fabs(eta)>=0.8 && fabs(eta)<1.5 ) {
-      if (pt>=20 && pt<22)  return  0.00;
-      if (pt>=22 && pt<24)  return  0.05;
-      if (pt>=24 && pt<26)  return  0.78;
-      if (pt>=26 && pt<28)  return  0.81;
-      if (pt>=28 && pt<30)  return  0.81;
-      if (pt>=30 && pt<32)  return  0.81;
-      if (pt>=32 && pt<34)  return  0.82;
-      if (pt>=34 && pt<36)  return  0.82;
-      if (pt>=36 && pt<38)  return  0.83;
-      if (pt>=38 && pt<40)  return  0.83;
-      if (pt>=40 && pt<50)  return  0.84;
-      if (pt>=50 && pt<60)  return  0.84;
-      if (pt>=60 && pt<80)  return  0.84;
-      if (pt>=80 && pt<100) return 0.84; 
-      if (pt>=100 && pt<150) return 0.84;
-      if (pt>=150 && pt<200) return 0.84;
-      if (pt>=200) return 0.82;
-    } else if ( fabs(eta)>=1.5 && fabs(eta)<2.1 ) {
-      if (pt>=20 && pt<22)  return  0.00;
-      if (pt>=22 && pt<24)  return  0.11;
-      if (pt>=24 && pt<26)  return  0.76;
-      if (pt>=26 && pt<28)  return  0.78;
-      if (pt>=28 && pt<30)  return  0.79;
-      if (pt>=30 && pt<32)  return  0.80;
-      if (pt>=32 && pt<34)  return  0.80;
-      if (pt>=34 && pt<36)  return  0.81;
-      if (pt>=36 && pt<38)  return  0.81;
-      if (pt>=38 && pt<40)  return  0.82;
-      if (pt>=40 && pt<50)  return  0.82;
-      if (pt>=50 && pt<60)  return  0.83;
-      if (pt>=60 && pt<80)  return  0.83;
-      if (pt>=80 && pt<100) return 0.83;
-      if (pt>=100 && pt<150) return 0.83;
-      if (pt>=150 && pt<200) return 0.82;
-      if (pt>=200) return 0.82;
-    }
-  }//end check for muons
-
-  return 1.;
-
-}

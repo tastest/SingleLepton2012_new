@@ -45,38 +45,59 @@ class StopTreeLooper {
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
 
-	//selection
-	bool passEvtSelection(const StopTree *sTree, TString name);
-	bool passOneLeptonSelection(const StopTree *sTree, bool isData);
-	bool passTwoLeptonSelection(const StopTree *sTree, bool isData);
-	bool passSingleLeptonSelection(const StopTree *sTree, bool isData);
-	bool passDileptonSelection(const StopTree *sTree, bool isData);
-	bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);
-	bool passIsoTrkVeto(const StopTree *sTree);
-
-	//helper
-	float getdltrigweight(int id1, int id2);
-	float getsltrigweight(int id1, float pt, float eta);
-	float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
-	float dRbetweenVectors(LorentzVector vec1, LorentzVector vec2 );
-	float getdphi( float phi1 , float phi2 );
-	float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
-	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
-
 	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
         list<Candidate> recoHadronicTop(StopTree*, bool, bool);
         list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree);
+	void initBaby();
+	void makeTree(const char*);
+
+        TTree  *outTree_;
+        TFile  *outFile_;
+
+	// which selections are passed
+	Int_t sig_;
+	Int_t cr1_;   
+	Int_t cr4_;
+	Int_t cr5_;   
+	
+	// kinematic variables
+	Float_t met_;
+	Float_t mt_;
+	Float_t chi2_;
+	Float_t mt2w_;
+	Float_t mt2b_;
+	Float_t mt2bl_;
+
+	// weights
+	Float_t weight_;
+	Float_t sltrigeff_;
+	Float_t dltrigeff_;
+
+	// hadronic variables
+	Int_t nb_;
+	Int_t njets_;
+
+	// lepton variables
+	Int_t passisotrk_;
+	Int_t nlep_;
+
+	Float_t lep1pt_;
+	Float_t lep1eta_;
+
+	Float_t lep2pt_;
+	Float_t lep2eta_;
+	Float_t dilmass_;
 
     private:
 
 	string m_outfilename_;
 	//for phi corrected met
-	float t1metphicorr;
-	float t1metphicorrphi;
-	float t1metphicorrmt;
-	//for mt peak definition
-	float min_mtpeak;
-	float max_mtpeak; 
+	/* float t1metphicorr; */
+	/* float t1metphicorrphi; */
+	/* float t1metphicorrmt; */
+	/* //for mt peak definition */
+	/* float min_mtpeak; */
+	/* float max_mtpeak;  */
 
 };
 
