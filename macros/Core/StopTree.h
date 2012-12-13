@@ -166,7 +166,7 @@ class StopTree {
         vector<LorentzVector>* pfjets_;
 	vector<float> pfjets_csv_;
 	vector<float> pfjets_qgtag_;
-	vector<float> pfjets_mc3_;
+	vector<int>   pfjets_mc3_;
 	vector<float> pfjets_beta2_;
 	vector<float> pfjets_beta_;
 	vector<int> pfjets_lepjet_;
@@ -334,7 +334,7 @@ class StopTree {
             tree_->Branch("pfjets"      , "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &pfjets_);
             tree_->Branch("pfjets_csv"  , "std::vector<float>", &pfjets_csv_Ptr_);
             tree_->Branch("pfjets_qgtag", "std::vector<float>", &pfjets_qgtag_Ptr_);
-            tree_->Branch("pfjets_mc3", "std::vector<float>", &pfjets_mc3_Ptr_);
+            tree_->Branch("pfjets_mc3", "std::vector<int>", &pfjets_mc3_Ptr_);
             tree_->Branch("pfjets_beta", "std::vector<float>", &pfjets_beta_Ptr_);
             tree_->Branch("pfjets_beta2", "std::vector<float>", &pfjets_beta2_Ptr_);
             tree_->Branch("pfjets_lepjet", "std::vector<int>", &pfjets_lepjet_Ptr_);
@@ -518,7 +518,7 @@ class StopTree {
 
 	vector<float>* pfjets_csv_Ptr_;
 	vector<float>* pfjets_qgtag_Ptr_;
-	vector<float>* pfjets_mc3_Ptr_;
+	vector<int>* pfjets_mc3_Ptr_;
 	vector<float>* pfjets_beta_Ptr_;
 	vector<float>* pfjets_beta2_Ptr_;
 	vector<int>* pfjets_lepjet_Ptr_;
