@@ -26,6 +26,7 @@
 
 using namespace TMath;
 
+//--------------------------------------------------------------------
 float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData ) 
 {
 
@@ -44,6 +45,7 @@ float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData 
 
 }
 
+//--------------------------------------------------------------------
 float StopTreeLooper::getdphi( float phi1 , float phi2 ) 
 {
   float dphi = fabs( phi1 - phi2 );
@@ -51,6 +53,7 @@ float StopTreeLooper::getdphi( float phi1 , float phi2 )
   return dphi;
 }
 
+//--------------------------------------------------------------------
 float StopTreeLooper::getMT( float pt1 , float phi1 , float pt2 , float phi2 ) 
 {
 
@@ -59,6 +62,7 @@ float StopTreeLooper::getMT( float pt1 , float phi1 , float pt2 , float phi2 )
 
 }
 
+//--------------------------------------------------------------------
 float StopTreeLooper::dRbetweenVectors(LorentzVector vec1, 
 				       LorentzVector vec2 )
 { 
@@ -70,7 +74,7 @@ float StopTreeLooper::dRbetweenVectors(LorentzVector vec1,
 
 }
 
-
+//--------------------------------------------------------------------
 StopTreeLooper::StopTreeLooper()
 {
   m_outfilename_ = "histos.root";
@@ -86,17 +90,19 @@ StopTreeLooper::StopTreeLooper()
    
 }
 
+//--------------------------------------------------------------------
 StopTreeLooper::~StopTreeLooper()
 {
 }
 
+//--------------------------------------------------------------------
 void StopTreeLooper::setOutFileName(string filename)
 {
   m_outfilename_ = filename;
 
 }
-//--------------------------------------------------------------------
 
+//--------------------------------------------------------------------
 struct DorkyEventIdentifier {
   // this is a workaround for not having unique event id's in MC
   unsigned long int run, event,lumi;
@@ -105,7 +111,6 @@ struct DorkyEventIdentifier {
 };
 
 //--------------------------------------------------------------------
-
 bool DorkyEventIdentifier::operator < (const DorkyEventIdentifier &other) const
 {
   if (run != other.run)
@@ -118,7 +123,6 @@ bool DorkyEventIdentifier::operator < (const DorkyEventIdentifier &other) const
 }
 
 //--------------------------------------------------------------------
-
 bool DorkyEventIdentifier::operator == (const DorkyEventIdentifier &other) const
 {
   if (run != other.run)
@@ -129,7 +133,6 @@ bool DorkyEventIdentifier::operator == (const DorkyEventIdentifier &other) const
 }
 
 //--------------------------------------------------------------------
-
 std::set<DorkyEventIdentifier> already_seen; 
 bool is_duplicate (const DorkyEventIdentifier &id) {
   std::pair<std::set<DorkyEventIdentifier>::const_iterator, bool> ret =
@@ -138,7 +141,6 @@ bool is_duplicate (const DorkyEventIdentifier &id) {
 }
 
 //--------------------------------------------------------------------
-
 std::set<DorkyEventIdentifier> events_lasercalib; 
 int load_badlaserevents  () {
 
@@ -163,17 +165,33 @@ int load_badlaserevents  () {
 
 }
 
+//--------------------------------------------------------------------
 bool is_badLaserEvent (const DorkyEventIdentifier &id) {
   if (events_lasercalib.find(id) != events_lasercalib.end()) return true;
   return false;
 }
 
-
-
-bool compare_candidates( Candidate x, Candidate y ){
+//--------------------------------------------------------------------
+bool compare_in_chi2( Candidate x, Candidate y ){
   return x.chi2 < y.chi2;
 }
 
+//--------------------------------------------------------------------
+bool compare_in_mt2b( Candidate x, Candidate y ){
+  return x.mt2b < y.mt2b;
+}
+
+//--------------------------------------------------------------------
+bool compare_in_mt2bl( Candidate x, Candidate y ){
+  return x.mt2bl < y.mt2bl;
+}
+
+//--------------------------------------------------------------------
+bool compare_in_mt2w( Candidate x, Candidate y ){
+  return x.mt2w < y.mt2w;
+}
+
+//--------------------------------------------------------------------
 double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
 {
   if (verbose) {
@@ -205,7 +223,7 @@ double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
   return (num/den);
 }
 
-
+//--------------------------------------------------------------------
 double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
               double m12, double m22, double m02){
   double rat1 = pt1 * (1 - c1) / sigma1;
@@ -214,11 +232,12 @@ double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
   return ( rat1 * rat1 + rat2 * rat2);
 }
 
-//void StopSelector::minuitFunction(int& npar, double *gout, double &result, double par[], int flg)
+//--------------------------------------------------------------------
 void minuitFunction(int&, double* , double &result, double par[], int){
   result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
 }
 
+//--------------------------------------------------------------------
 float getDataMCRatio(float eta){
   if (eta >=0.0 && eta < 0.5) return 1.052;
   if (eta >=0.5 && eta < 1.1) return 1.057;
@@ -240,7 +259,6 @@ float getDataMCRatio(float eta){
  * 
  * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
  */ 
-
 list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
   static JetSmearer* jetSmearer = 0;
@@ -465,233 +483,152 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 }
 
 //--------------------------------------------------------------------
+list<Candidate> StopTreeLooper::applyBConsistency(list<Candidate> &candidates, StopTree* tree, float btagcut){
+	int n_btag = 0;
+	vector<int> non_bjets;
+	for( int i = 0 ; i < n_jets ; i++ ){
+		if( btag.at(i) > btagcut )
+			n_btag++;
+		else
+			non_bjets.push_back(i);
+	}
 
-// removes candidates without b-tagging requirement
-list<Candidate> StopTreeLooper::getBTaggedCands(list<Candidate> &candidates, StopTree* tree, float btagcut) 
-{
+	bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
+	bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
 
-  int n_btag = 0;
+	list<Candidate> b_candidates;
 
-  for( int i = 0 ; i < n_jets ; i++ )
-    if( btag.at(i) > btagcut ) n_btag++;
+	for(list<Candidate>::iterator c_it = candidates.begin() ; c_it != candidates.end() ; c_it++ ){
+		int bi = c_it->bi;
+		int oi = c_it->oi;
+		int j1 = c_it->j1;
+		int j2 = c_it->j2;
 
-  //if no b-tags, return all combinations
-  if (n_btag==0) return candidates;
+		if (n_btag == 0){
+			if ( bi > (NUM_LEAD_JETS_1B - 1) ||
+			     oi > (NUM_LEAD_JETS_1B - 1) ||
+			     j1 > (NUM_LEAD_JETS_1B - 1) ||
+			     j2 > (NUM_LEAD_JETS_1B - 1) )
+				continue;
+		} else if (n_btag == 1){
+			if ( b_btag ){
+				bool is_lead = false;
+				for (int i=0; i < NUM_LEAD_JETS_1B ; i++)
+					if (oi == non_bjets.at(i))
+						is_lead = true;
 
-  list<Candidate> bcands; 
+				if ( not is_lead )
+					continue;
 
-  list<Candidate>::iterator candIter;
+			} else if ( o_btag ){
+				bool is_lead = false;
+				for (int i=0; i < NUM_LEAD_JETS_1B ; i++)
+					if (bi == non_bjets.at(i))
+						is_lead = true;
 
-  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
+				if ( not is_lead )
+					continue;
 
-    //either b-jet or other jet should be tagged
-    if( btag.at(candIter->bi) < btagcut && 
-	btag.at(candIter->oi) < btagcut ) continue;
+			} else {
+				continue;
+			}
+		} else if (n_btag >= 2){
+			if ( not (b_btag and o_btag) )
+				continue;
+		}
 
-    //if more than 1 b-tag, BOTH b-jet AND other jet should be tagged
-    if (n_btag>1 && (btag.at(candIter->bi) < btagcut || 
-		     btag.at(candIter->oi) < btagcut) ) continue;
+		b_candidates.push_back(*c_it);
+	}
 
-    bcands.push_back(*candIter);
-
-  }
-
-  return bcands;
-
+	return b_candidates;
 }
 
 //--------------------------------------------------------------------
-// returns few candidates that are consistent with b-tagging requirement
-list<Candidate> StopTreeLooper::getFewBTaggedCands(list<Candidate> &candidates, StopTree* tree, float btagcut) 
-{
-
-  int n_btag = 0;
-
-  for( int i = 0 ; i < n_jets ; i++ )
-    if( btag.at(i) > btagcut ) n_btag++;
-
-  list<Candidate> bcands; 
-
-  list<Candidate>::iterator candIter;
-
-  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
-
-    //either b-jet or other jet should be tagged
-    if( btag.at(candIter->bi) < btagcut && 
-	btag.at(candIter->oi) < btagcut ) continue;
-
-    //if more than 1 b-tag, BOTH b-jet AND other jet should be tagged
-    if (n_btag>1 && (btag.at(candIter->bi) < btagcut || 
-		     btag.at(candIter->oi) < btagcut) ) continue;
-
-    //limit jet multiplicity
-    //if no b-tags, return all combinations using first 4 jets
-    if (n_btag==0 && (candIter->j1 > 3 || 
-		      candIter->j2 > 3 || 
-		      candIter->bi > 3 || 
-		      candIter->oi > 3 ) ) continue;
-    //if 1 b-tag, return combinations with at most 5 jets, including b
-    
-    
-
-    bcands.push_back(*candIter);
-
-  }
-
-  return bcands;
-
-}
-
-//--------------------------------------------------------------------
-float StopTreeLooper::Poor_MVA(Candidate &c){
-  float TOP_MASS = 500;
-  float beta = 1./200.;
-  return Exp(-c.chi2 + beta*(c.mt2w - TOP_MASS));
-}
-
-float StopTreeLooper::Smart_Compare(Candidate &a, Candidate &b){
-  return Poor_MVA(a) > Poor_MVA(b);
-}
-
-//--------------------------------------------------------------------
-
-MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
+MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> candidates, StopTree* tree){
+	MT2CHI2 mt2chi2;
+	mt2chi2.one_chi2    = -0.999;
+	mt2chi2.two_mt2b    = -0.999;
+	mt2chi2.two_mt2bl   = -0.999;
+	mt2chi2.two_mt2w    = -0.999;
+	mt2chi2.three_mt2b  = -0.999;
+	mt2chi2.three_mt2bl = -0.999;
+	mt2chi2.three_mt2w  = -0.999;
+	mt2chi2.four_chi2b  = -0.999;
+	mt2chi2.four_chi2bl = -0.999;
+	mt2chi2.four_chi2w  = -0.999;
 
   if (candidates.size() == 0){
-    MT2struct mfail;
-    mfail.mt2w  = -9999.;
-    mfail.mt2b  = -9999.;
-    mfail.mt2bl = -9999.;
-    mfail.chi2  = -9999.;
-    return mfail;
+    return mt2chi2;
   }
 
-  candidates.sort(StopTreeLooper::Smart_Compare);
+  // Calculate Variable 1
+  candidates.sort(StopTreeLooper::compare_in_chi2);
+  mt2chi2.one = candidates.front().chi2;
 
-  MT2struct m;
-  m.mt2w  = Poor_MVA(candidates.front());
-  m.mt2b  = candidates.front().mt2b;
-  m.mt2bl = candidates.front().mt2bl;
-  m.chi2  = candidates.front().chi2; 
+  //Calculate Variable 2b, 2bl, 2bw
+  class {
+	  float chi2;
+	  bool operator () (Candidate &c) { return c.chi2 == chi2 };
+  } reducer_one;
 
-  return m;
+  reducer_one.chi2 = mt2ch2.one;
 
+  list<Candidate> one_cands = candidates;
+  Candidate c_two = one_cands.reduce_if(reducer_one).front();
+  mt2chi2.two_mt2b = c_two.mt2b;
+  mt2chi2.two_mt2bl = c_two.mt2bl;
+  mt2chi2.two_mt2w = c_two.mt2w;
+
+  //Calculate Variable 3b, 3bl, 3bw
+  candidates.sort(StopTreeLooper::compare_in_mt2b);
+  mt2chi2.three_mt2b = candidates.front().mt2b;
+
+  candidates.sort(StopTreeLooper::compare_in_mt2bl);
+  mt2chi2.three_mt2bl = candidates.front().mt2bl;
+
+  candidates.sort(StopTreeLooper::compare_in_mt2w);
+  mt2chi2.three_mt2w = candidates.front().mt2w;
+
+  //Calculate Variable 4b, 4bl, 4w
+  list<Candidate> four_cands
+  //Calculate Variable 4b
+  class {
+	  float mt2b;
+	  bool operator () (Candidate &c) { return c.mt2b == mt2b };
+  } reducer_four_mt2b;
+
+  reducer_four_mt2b.mt2b mt2chi2.three_mt2b;
+
+  four_cands = candidates;
+  mt2chi2.four_chi2b = four_cands.reduce_if(reducer_four_mt2b).front().chi2;
+
+  //Calculate Variable 4bl
+  class {
+	  float mt2bl;
+	  bool operator () (Candidate &c) { return c.mt2bl == mt2bl };
+  } reducer_four_mt2bl;
+
+  reducer_four_mt2bl.mt2bl mt2chi2.three_mt2bl;
+
+  four_cands = candidates;
+  mt2chi2.four_chi2bl = four_cands.reduce_if(reducer_four_mt2bl).front().chi2;
+
+  //Calculate Variable 4w
+  class {
+	  float mt2w;
+	  bool operator () (Candidate &c) { return c.mt2b == mt2w };
+  } reducer_four_mt2w;
+
+  reducer_four_mt2w.mt2w mt2chi2.three_mt2w;
+
+  four_cands = candidates;
+  mt2chi2.four_chi2w = four_cands.reduce_if(reducer_four_mt2w).front().chi2;
+
+  return mt2chi2;
 }
-
-/*
-  MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
-
-  if (candidates.size() == 0){
-  MT2struct mfail;
-  mfail.mt2w  = -0.999;
-  mfail.mt2b  = -0.999;
-  mfail.mt2bl = -0.999;
-  mfail.chi2  = -0.999;
-  return mfail;
-  }
-
-  double chi2_min  = 9999;
-  double mt2b_min  = 9999;
-  double mt2bl_min = 9999;
-  double mt2w_min  = 9999;
-
-  // count btags among leading 4 jets
-  int n_btag = 0;
-
-  for( int i = 0 ; i < 4 ; i++ ){
-  if( tree->pfjets_csv_.at(i) < 0.679 ) n_btag++;
-  }
-
-  list<Candidate>::iterator candIter;
-
-  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
-
-  // loop over all candidiates
-  //for (unsigned int i=0; i<candidates.size(); ++i) {
-
-  //if ( ! candidates_->at(i).match ) continue;
-
-  // get indices of 4 jets used for hadronic top reconstruction
-  // int b  = candidates.at(i).bi;
-  // int o  = candidates.at(i).oi;
-  // int j1 = candidates.at(i).j1;
-  // int j2 = candidates.at(i).j2;
-
-  int b  = (*candIter).bi;
-  int o  = (*candIter).oi;
-  int j1 = (*candIter).j1;
-  int j2 = (*candIter).j2;
-
-  // require the 4 jets used for the hadronic top mass are the 4 leading jets
-  if (b>3 || o > 3 || j1 > 3 || j2 > 3) continue;
-
-  // store whether the 2 jets used for MT2 calculation are btagged
-  bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
-  bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
-  //bool j1_btag = (btag_->at(j1) > 0.679);
-  //bool j2_btag = (btag_->at(j2) > 0.679);
-
-  // 2 btags: require jets used for MT2 are the 2 b-jets
-  if ( n_btag == 2 ){ 
-  if ( !b_btag || !o_btag ) continue;
-  } 
-
-  // 1 btag: require the bjet and one of the 2 leading non bjets is used for MT2
-  else if ( n_btag == 1) {
-
-  if( b_btag ){
-  if( b == 3  && o > 1 ) continue;
-  if( b <   3 && o > 2 ) continue;
-  }
-
-  if( o_btag ){
-  if( o == 3  && b > 1 ) continue;
-  if( o <   3 && b > 2 ) continue;
-  }
-
-  //if (b>1 || o>1) continue;
-  } 
-
-  // 0 or >=3 btags: require jets used for MT2 are among 3 leading jets
-  else {
-  if (b>2 || o>2) continue;
-  }
-
-  // double chi2  = candidates.at(i).chi2;
-  // double mt2b  = candidates.at(i).mt2b;
-  // double mt2bl = candidates.at(i).mt2bl;
-  // double mt2w  = candidates.at(i).mt2w;
-
-  double chi2  = (*candIter).chi2;
-  double mt2b  = (*candIter).mt2b;
-  double mt2bl = (*candIter).mt2bl;
-  double mt2w  = (*candIter).mt2w;
- 
-  //    cout << " " << b << ":" << b_btag  << " " << o << ":" << o_btag << " " << j1 << " " << j2 << " = " << mt2w  << "  " << chi2 <<endl;
-  if (chi2  < chi2_min  ) chi2_min  = chi2;
-  if (mt2b  < mt2b_min  ) mt2b_min  = mt2b;
-  if (mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
-  if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
-  }
-
-  if( mt2w_min  > 9000 ) mt2w_min  = -0.999;
-  if( mt2b_min  > 9000 ) mt2b_min  = -0.999;
-  if( mt2bl_min > 9000 ) mt2bl_min = -0.999;
-  if( chi2_min  > 9000 ) chi2_min  = -0.999;
-
-  MT2struct m;
-  m.mt2w  = mt2w_min;
-  m.mt2b  = mt2b_min;
-  m.mt2bl = mt2bl_min;
-  m.chi2  = chi2_min;
-
-  return m;
-  }
-*/
 
 void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
-
-  plot1D("h_"+tag+"_hadchi2"+sel, Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 ); 
+  plot1D("h_"+tag+"_hadchi2"+sel, Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 );
   plot1D("h_"+tag+"_mt2w"   +sel, Max(Min(mr.mt2w, (float)0.99),(float)-0.09) , evtweight , h_1d ,110 , -0.1 , 1. );
   plot1D("h_"+tag+"_mt2b"   +sel, Min(mr.mt2b, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
   plot1D("h_"+tag+"_mt2bl"  +sel, Min(mr.mt2bl,(float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
@@ -702,316 +639,308 @@ void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<str
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
-  printf("[StopTreeLooper::loop] %s\n", name.Data());
+	printf("[StopTreeLooper::loop] %s\n", name.Data());
 
-  load_badlaserevents  ();
+	load_badlaserevents  ();
 
-  //
-  // check for valid chain
-  //
+	//
+	// check for valid chain
+	//
 
-  TObjArray *listOfFiles = chain->GetListOfFiles();
-  TIter fileIter(listOfFiles);
-  if (listOfFiles->GetEntries() == 0) {
-    cout << "[StopTreeLooper::loop] no files in chain" << endl;
-    return;
-  }
-
-  //
-  // set up histograms
-  //
-
-  gROOT->cd();
-
-  cout << "[StopTreeLooper::loop] setting up histos" << endl;
-
-  //plotting map
-  std::map<std::string, TH1F*> h_1d;//h_cr1, h_cr4, h_cr5;
-  std::map<std::string, TH2F*> h_2d;//h_cr1, h_cr4, h_cr5;
-
-  // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
-  // if( vtx_file == 0 ){
-  //   cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
-  //   exit(0);
-  // }
-
-  // TH1F* h_vtx_wgt = (TH1F*)vtx_file->Get("hratio");
-  // h_vtx_wgt->SetName("h_vtx_wgt");
-
-  //
-  // file loop
-  //
-
-  unsigned int nEventsChain=0;
-  unsigned int nEvents = chain->GetEntries();
-  nEventsChain = nEvents;
-  unsigned int nEventsTotal = 0;
-  int i_permille_old = 0;
-
-  bool isData = name.Contains("data") ? true : false;
-
-  //Define peak region 
-  min_mtpeak = 50.; 
-  max_mtpeak = 80.; 
-  printf("[StopTreeLooper::loop] MT PEAK definition %.0f - %.0f GeV \n", min_mtpeak, max_mtpeak);
-
-  cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
-
-  while (TChainElement *currentFile = (TChainElement*)fileIter.Next()) {
-
-    //
-    // load the stop baby tree
-    //
-
-    StopTree *tree = new StopTree();
-    tree->LoadTree(currentFile->GetTitle());
-    tree->InitTree();
-
-    //
-    // event loop
-    //
-
-    ULong64_t nEvents = tree->tree_->GetEntries();
-
-    //nEvents = 100;
-
-    for(ULong64_t event = 0; event < nEvents; ++event) {
-      tree->tree_->GetEntry(event);
-
-      //
-      // increment counters
-      //
-
-      ++nEventsTotal;
-      if (nEventsTotal%10000==0) {
-	int i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
-	//if (i_permille != i_permille_old) {//this prints too often!
-	// xterm magic from L. Vacavant and A. Cerri
-	if (isatty(1)) {
-	  printf("\015\033[32m ---> \033[1m\033[31m%4.1f%%"
-		 "\033[0m\033[32m <---\033[0m\015", i_permille/10.);
-	  fflush(stdout);
+	TObjArray *listOfFiles = chain->GetListOfFiles();
+	TIter fileIter(listOfFiles);
+	if (listOfFiles->GetEntries() == 0) {
+		cout << "[StopTreeLooper::loop] no files in chain" << endl;
+		return;
 	}
-	i_permille_old = i_permille;
-      }
 
-      //---------------------
-      // skip duplicates
-      //---------------------
+	//
+	// set up histograms
+	//
 
-      if( isData ) {
-        DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
-        if (is_duplicate(id) ){
-          continue;
-        }
-	if (is_badLaserEvent(id) ){
-	  //std::cout<<"Removed bad laser calibration event:" <<tree->run_<<"   "<<tree->event_<<"\n";
-	  continue;
-	}
-      }
+	gROOT->cd();
 
-      // 
-      // event weight
-      // 
+	cout << "[StopTreeLooper::loop] setting up histos" << endl;
 
-      float evtweight    = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
-      float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
-      float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
+	//plotting map
+	std::map<std::string, TH1F*> h_1d;//h_cr1, h_cr4, h_cr5;
+	std::map<std::string, TH2F*> h_2d;//h_cr1, h_cr4, h_cr5;
 
-      // 
-      // selection criteria
-      // 
-      
-      //preselection
-      if ( !passEvtSelection(tree, name) ) continue;
+	// TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
+	// if( vtx_file == 0 ){
+	//   cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
+	//   exit(0);
+	// }
 
-      //ask for at least 4 jets
-      if ( tree->npfjets30_ < 4 ) continue; 
+	// TH1F* h_vtx_wgt = (TH1F*)vtx_file->Get("hratio");
+	// h_vtx_wgt->SetName("h_vtx_wgt");
 
-      //baseline met and mt requirements
-      if (tree->t1metphicorr_  <100.) continue;
-      string mtcut = tree->t1metphicorrmt_<120. ? "_lomt" : "_himt";
+	//
+	// file loop
+	//
 
-      // histogram tags
-      //flavor types
-      string flav_tag_sl;
-      if ( abs(tree->id1_)==13 ) flav_tag_sl = "_muo";
-      else if ( abs(tree->id1_)==11 ) flav_tag_sl = "_ele";
-      else flav_tag_sl = "_mysterysl";
-      string flav_tag_dl;
-      if      ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_dimu";
-      else if ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_diel";
-      else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_muel";
-      else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_elmu";
-      else flav_tag_dl = "_mysterydl";
-      string basic_flav_tag_dl = flav_tag_dl;
-      if ( abs(tree->id1_) != abs(tree->id2_) ) basic_flav_tag_dl = "_mueg";
+	unsigned int nEventsChain=0;
+	unsigned int nEvents = chain->GetEntries();
+	nEventsChain = nEvents;
+	unsigned int nEventsTotal = 0;
+	int i_permille_old = 0;
 
-      //apply the cuts on the jets and check the b-tagging for the hadronic top reconstruction
-      assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
+	bool isData = name.Contains("data") ? true : false;
 
-      n_jets = 0;
-      jets.clear();
-      btag.clear();
-      mc.clear();
-      
-      int n_bm = 0;
-      int n_bl = 0;
+	//Define peak region
+	min_mtpeak = 50.;
+	max_mtpeak = 80.;
+	printf("[StopTreeLooper::loop] MT PEAK definition %.0f - %.0f GeV \n", min_mtpeak, max_mtpeak);
 
-      for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
-	
-	if ( tree->pfjets_->at(i).Pt() < JET_PT ) continue;
-	if ( fabs(tree->pfjets_->at(i).Eta()) > JET_ETA ) continue;
-	
-	//cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
-	n_jets++;
-	jets.push_back( tree->pfjets_->at(i)    );
-	btag.push_back( tree->pfjets_csv_.at(i) );
-	if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
+	cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
 
-	if( tree->pfjets_csv_.at(i) > BTAG_MED ) n_bm++;
-	if( tree->pfjets_csv_.at(i) > BTAG_LOW ) n_bl++;
+	while (TChainElement *currentFile = (TChainElement*)fileIter.Next()) {
+
+		//
+		// load the stop baby tree
+		//
+
+		StopTree *tree = new StopTree();
+		tree->LoadTree(currentFile->GetTitle());
+		tree->InitTree();
+
+		//
+		// event loop
+		//
+
+		ULong64_t nEvents = tree->tree_->GetEntries();
+
+		//nEvents = 100;
+
+		for(ULong64_t event = 0; event < nEvents; ++event) {
+			tree->tree_->GetEntry(event);
+
+			//
+			// increment counters
+			//
+
+			++nEventsTotal;
+			if (nEventsTotal%10000==0) {
+				int i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
+				//if (i_permille != i_permille_old) {//this prints too often!
+				// xterm magic from L. Vacavant and A. Cerri
+				if (isatty(1)) {
+					printf("\015\033[32m ---> \033[1m\033[31m%4.1f%%"
+							"\033[0m\033[32m <---\033[0m\015", i_permille/10.);
+					fflush(stdout);
+				}
+				i_permille_old = i_permille;
+			}
+
+			//---------------------
+			// skip duplicates
+			//---------------------
+
+			if( isData ) {
+				DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
+				if (is_duplicate(id) ){
+					continue;
+				}
+				if (is_badLaserEvent(id) ){
+					//std::cout<<"Removed bad laser calibration event:" <<tree->run_<<"   "<<tree->event_<<"\n";
+					continue;
+				}
+			}
+
+			//
+			// event weight
+			//
+
+			float evtweight    = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
+			float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
+			float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
+
+			//
+			// selection criteria
+			//
+
+			//preselection
+			if ( !passEvtSelection(tree, name) ) continue;
+
+			//ask for at least 4 jets
+			if ( tree->npfjets30_ < 4 ) continue;
+
+			//baseline met and mt requirements
+			if (tree->t1metphicorr_  <100.) continue;
+			string mtcut = tree->t1metphicorrmt_<120. ? "_lomt" : "_himt";
+
+			// histogram tags
+			//flavor types
+			string flav_tag_sl;
+			if ( abs(tree->id1_)==13 ) flav_tag_sl = "_muo";
+			else if ( abs(tree->id1_)==11 ) flav_tag_sl = "_ele";
+			else flav_tag_sl = "_mysterysl";
+			string flav_tag_dl;
+			if      ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_dimu";
+			else if ( abs(tree->id1_) == abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_diel";
+			else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 13 ) flav_tag_dl = "_muel";
+			else if ( abs(tree->id1_) != abs(tree->id2_) && abs(tree->id1_) == 11 ) flav_tag_dl = "_elmu";
+			else flav_tag_dl = "_mysterydl";
+			string basic_flav_tag_dl = flav_tag_dl;
+			if ( abs(tree->id1_) != abs(tree->id2_) ) basic_flav_tag_dl = "_mueg";
+
+			//apply the cuts on the jets and check the b-tagging for the hadronic top reconstruction
+			assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
+
+			n_jets = 0;
+			jets.clear();
+			btag.clear();
+			mc.clear();
+
+			int n_bm = 0;
+			int n_bl = 0;
+
+			for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
+
+				if ( tree->pfjets_->at(i).Pt() < JET_PT ) continue;
+				if ( fabs(tree->pfjets_->at(i).Eta()) > JET_ETA ) continue;
+
+				//cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
+				n_jets++;
+				jets.push_back( tree->pfjets_->at(i)    );
+				btag.push_back( tree->pfjets_csv_.at(i) );
+				if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
+
+				if( tree->pfjets_csv_.at(i) > BTAG_MED ) n_bm++;
+				if( tree->pfjets_csv_.at(i) > BTAG_LOW ) n_bl++;
 
 
-      } 
-      
-      // cout << endl << "stored:" << endl;
-      // for( unsigned int i = 0 ; i < jets.size() ; ++i ){
-      //   cout << i << " pt csv " << jets.at(i).pt() << " " << btag.at(i) << endl;
-      // } 
-      
-      assert( jets.size() == btag.size() );
+			}
 
-      //
-      // SIGNAL REGION - single lepton + b-tag
-      //
+			// cout << endl << "stored:" << endl;
+			// for( unsigned int i = 0 ; i < jets.size() ; ++i ){
+			//   cout << i << " pt csv " << jets.at(i).pt() << " " << btag.at(i) << endl;
+			// }
 
-      // selection - 1 lepton 
-      // Add iso track veto
-      // Add b-tag
-      if ( !passSingleLeptonSelection(tree, isData) ) continue; 
-      if ( !passIsoTrkVeto(tree) ) continue;
+			assert( jets.size() == btag.size() );
 
-      // jet info
-      plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 );
-      plot1D("h_bmjets", Min(n_bm,4)   , evtweight , h_1d , 5 , 0 ,  5 );
-      plot1D("h_bljets", Min(n_bl,4)   , evtweight , h_1d , 5 , 0 ,  5 );
-	  
-      plot2D("h_njets_vs_bmjets" , Min(n_jets,9), Min(n_bm,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
-      plot2D("h_njets_vs_bljets" , Min(n_jets,9), Min(n_bl,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
-      
-      //-----------------------------------------------------------------
-      // calculate the BEST MT2 variables only using Ricardo's algorithm
-      //-----------------------------------------------------------------
-	  
-      //histogram ranges
-      int xnbins = 35;
-      float xmin = -100.;
-      float xmax = 600;
-      int ynbins = 32;
-      float ymin = -1.;
-      float ymax = 15;
-	  
-      // get list of candidates
-      list<Candidate> allcandidates = recoHadronicTop(tree, isData);
-	  
-      plot1D("h_ncand", Min((int)allcandidates.size(),49) , evtweight , h_1d , 50, 0, 50);
-	  
-      list<Candidate>::iterator candIter;
-      for(candIter = allcandidates.begin() ; candIter != allcandidates.end() ; candIter++ ){
-	    
-	float cand_mt2w = candIter->mt2w;
-	if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
-	if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
-	float cand_chi2 = candIter->chi2;
-	if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
-	if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;	
-	    
-	float mva = Poor_MVA(*candIter);
-	    
-	plot2D("h_xm",                 cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	plot2D("h_xm" +mtcut,          cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	plot2D("h_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	if (candIter->match){
-	  plot2D("h_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	  plot2D("h_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	  plot2D("h_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	}
-      }
+			//
+			// SIGNAL REGION - single lepton + b-tag
+			//
 
-      //require at least 1 btag
-      if (tree->nbtagscsvm_<1) continue;
-      list<Candidate> candidates = getBTaggedCands(allcandidates, tree, BTAG_MED);
-      MT2struct mr = Best_MT2Calculator_Ricardo(candidates, tree, isData);
+			// selection - 1 lepton
+			// Add iso track veto
+			// Add b-tag
+			if ( !passSingleLeptonSelection(tree, isData) ) continue;
+			if ( !passIsoTrkVeto(tree) ) continue;
 
-      plot1D("h_nbcand", Min((int)candidates.size(),49) , evtweight , h_1d , 50, 0, 50);
+			// jet info
+			plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 );
+			plot1D("h_bmjets", Min(n_bm,4)   , evtweight , h_1d , 5 , 0 ,  5 );
+			plot1D("h_bljets", Min(n_bl,4)   , evtweight , h_1d , 5 , 0 ,  5 );
 
-      list<Candidate>::iterator candIterB;
-      for(candIterB = candidates.begin() ; candIterB != candidates.end() ; candIterB++ ){
+			plot2D("h_njets_vs_bmjets" , Min(n_jets,9), Min(n_bm,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
+			plot2D("h_njets_vs_bljets" , Min(n_jets,9), Min(n_bl,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
 
-	float cand_mt2w = candIterB->mt2w;
-	if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
-	if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
-	float cand_chi2 = candIterB->chi2;
-	if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
-	if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;	
+			//-----------------------------------------------------------------
+			// calculate the BEST MT2 variables only using Ricardo's algorithm
+			//-----------------------------------------------------------------
 
-	float mva = Poor_MVA(*candIterB);
+			//histogram ranges
+			int xnbins = 35;
+			float xmin = -100.;
+			float xmax = 600;
+			int ynbins = 32;
+			float ymin = -1.;
+			float ymax = 15;
 
-	plot2D("h_bcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	plot2D("h_bcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	plot2D("h_bcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	if (candIterB->match){
-	  plot2D("h_bcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	  plot2D("h_bcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	  plot2D("h_bcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	}
-      }
-      
-      list<Candidate> candidatesBL = getBTaggedCands(allcandidates, tree, BTAG_LOW);
+			// get list of candidates
+			list<Candidate> allcandidates = recoHadronicTop(tree, isData);
 
-      plot1D("h_nblcand", Min((int)candidatesBL.size(),49) , evtweight , h_1d , 50, 0, 50);
+			plot1D("h_ncand", Min((int)allcandidates.size(),49) , evtweight , h_1d , 50, 0, 50);
 
-      list<Candidate>::iterator candIterBL;
-      for(candIterBL = candidatesBL.begin() ; candIterBL != candidatesBL.end() ; candIterBL++ ){
+			list<Candidate>::iterator candIter;
+			for(candIter = allcandidates.begin() ; candIter != allcandidates.end() ; candIter++ ){
 
-	float cand_mt2w = candIterBL->mt2w;
-	if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
-	if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
-	float cand_chi2 = candIterBL->chi2;
-	if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
-	if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;	
+				float cand_mt2w = candIter->mt2w;
+				if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
+				if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
+				float cand_chi2 = candIter->chi2;
+				if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
+				if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;
 
-	float mva = Poor_MVA(*candIterBL);
+				plot2D("h_xm",                 cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				plot2D("h_xm" +mtcut,          cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				if (candIter->match){
+					plot2D("h_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+					plot2D("h_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				}
+			}
 
-	plot2D("h_blcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	plot2D("h_blcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	plot2D("h_blcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	if (candIterBL->match){
-	  plot2D("h_blcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	  plot2D("h_blcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	  plot2D("h_blcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-	}
-      }
-      
-    } // end event loop
+			//require at least 1 btag
+			if (tree->nbtagscsvm_<1) continue;
+			list<Candidate> candidates = applyBConsistency(allcandidates, tree, BTAG_MED);
+			MT2CHI2 mc = MT2CHI2Calculator(candidates, tree);
 
-    // delete tree;
+			plot1D("h_nbcand", Min((int)candidates.size(),49) , evtweight , h_1d , 50, 0, 50);
 
-  } // end file loop
+			list<Candidate>::iterator candIterB;
+			for(candIterB = candidates.begin() ; candIterB != candidates.end() ; candIterB++ ){
 
-    //
-    // finish
-    //
+				float cand_mt2w = candIterB->mt2w;
+				if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
+				if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
+				float cand_chi2 = candIterB->chi2;
+				if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
+				if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;
 
-  char* outfilename = Form("output/%s.root",name.Data());
-  savePlots(h_1d, outfilename);
-  char* outfilename2 = Form("output/x_%s.root",name.Data());
-  savePlots2(h_2d, outfilename2);
+				plot2D("h_bcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				plot2D("h_bcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				if (candIterB->match){
+					plot2D("h_bcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+					plot2D("h_bcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				}
+			}
 
-  already_seen.clear();
+			list<Candidate> candidatesBL = getBTaggedCands(allcandidates, tree, BTAG_LOW);
 
-  gROOT->cd();
+			plot1D("h_nblcand", Min((int)candidatesBL.size(),49) , evtweight , h_1d , 50, 0, 50);
+
+			list<Candidate>::iterator candIterBL;
+			for(candIterBL = candidatesBL.begin() ; candIterBL != candidatesBL.end() ; candIterBL++ ){
+
+				float cand_mt2w = candIterBL->mt2w;
+				if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
+				if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
+				float cand_chi2 = candIterBL->chi2;
+				if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
+				if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;
+
+				float mva = Poor_MVA(*candIterBL);
+
+				plot2D("h_blcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				plot2D("h_blcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				plot2D("h_blcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				if (candIterBL->match){
+					plot2D("h_blcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+					plot2D("h_blcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+					plot2D("h_blcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+				}
+			}
+
+		} // end event loop
+
+		// delete tree;
+
+	} // end file loop
+
+	//
+	// finish
+	//
+
+	char* outfilename = Form("output/%s.root",name.Data());
+	savePlots(h_1d, outfilename);
+	char* outfilename2 = Form("output/x_%s.root",name.Data());
+	savePlots2(h_2d, outfilename2);
+
+	already_seen.clear();
+
+	gROOT->cd();
 
 }
 
@@ -1116,7 +1045,6 @@ bool StopTreeLooper::passSingleLeptonSelection(const StopTree *sTree, bool isDat
   return true;
 
 }
-
 
 bool StopTreeLooper::passDileptonSelection(const StopTree *sTree, bool isData) 
 {
