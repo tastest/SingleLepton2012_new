@@ -198,17 +198,17 @@ float min_with_value(list<Candidate> &candidates, float value, const char* fix, 
 	  if (strcmp(fix, "chi2") == 0 && it->chi2 == value ){
 		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b  < min_value ) min_value = it->mt2b;
 		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min_value ) min_value = it->mt2bl;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2bw;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2w;
 	  }
 	  if (strcmp(fix, "mt2b") == 0 && it->mt2b == value ){
 		     if ( strcmp(var, "chi2")  == 0  && it->chi2  < min_value ) min_value = it->chi2;
 		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min_value ) min_value = it->mt2bl;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2bw;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2w;
 	  }
 	  if (strcmp(fix, "mt2bl") == 0 && it->mt2bl == value ){
 		     if ( strcmp(var, "chi2")  == 0  && it->chi2  < min_value ) min_value = it->chi2;
 		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b  < min_value ) min_value = it->mt2b;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2bw;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2w;
 	  }
 	  if (strcmp(fix, "mt2w") == 0 && it->mt2w == value ){
 		     if ( strcmp(var, "chi2")  == 0  && it->chi2  < min_value ) min_value = it->chi2;
