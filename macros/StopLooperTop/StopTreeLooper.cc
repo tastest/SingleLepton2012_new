@@ -191,15 +191,40 @@ bool compare_in_mt2w( Candidate &x, Candidate &y ){
   return x.mt2w < y.mt2w;
 }
 
-Candidate min_with_value(list<Candidate> &candidates, float value, const char* var){
-  list<Candidate>::iterator min = candidates.begin(); 
+Candidate min_with_value(list<Candidate> &candidates, float value, const char* fix, const char* var){
+  list<Candidate>::iterator min = candidates.begin();
+
   for(list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); it++){
-     if ( strcmp(var, "chi2") == 0  && it->chi2 < min->chi2 ) min = it;
-     if ( strcmp(var, "mt2b") == 0  && it->mt2b < min->mt2b ) min = it;
-     if ( strcmp(var, "mt2bl") == 0 && it->mt2bl < min->mt2bl ) min = it;
-     if ( strcmp(var, "mt2w") == 0  && it->mt2w < min->mt2w ) min = it;
+	  if (strcmp(fix, "chi2") == 0 && it->chi2 == value ){
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+	  }
+	  if (strcmp(fix, "mt2b") == 0 && it->mt2b == value ){
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+	  }
+	  if (strcmp(fix, "mt2bl") == 0 && it->mt2bl == value ){
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+	  }
+	  if (strcmp(fix, "mt2w") == 0 && it->mt2w == value ){
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+	  }
   }
-  return *min;
+
+  if (strcmp(fix, "chi2") return min->chi2;
+  if (strcmp(fix, "mt2b") return min->mt2b;
+  if (strcmp(fix, "mt2bl") return min->mt2bl;
+  if (strcmp(fix, "mt2w") return min->mt2w;
 }
 //--------------------------------------------------------------------
 double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
@@ -516,9 +541,7 @@ list<Candidate> StopTreeLooper::applyBConsistency(list<Candidate> &candidates, S
 
 		if (n_btag == 0){
 			if ( bi > (NUM_LEAD_JETS_0B - 1) ||
-			     oi > (NUM_LEAD_JETS_0B - 1) ||
-			     j1 > (NUM_LEAD_JETS_0B - 1) ||
-			     j2 > (NUM_LEAD_JETS_0B - 1) )
+			     oi > (NUM_LEAD_JETS_0B - 1) )
 				continue;
 		} else if (n_btag == 1){
 			if ( b_btag ){
@@ -554,7 +577,7 @@ list<Candidate> StopTreeLooper::applyBConsistency(list<Candidate> &candidates, S
 }
 
 //--------------------------------------------------------------------
-MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> candidates, StopTree* tree){
+MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> &candidates, StopTree* tree){
 	MT2CHI2 mt2chi2;
 	mt2chi2.one_chi2    = -0.999;
 	mt2chi2.two_mt2b    = -0.999;
@@ -576,10 +599,9 @@ MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> candidates, StopTree* 
   mt2chi2.one_chi2 = candidates.front().chi2;
 
   //Calculate Variable 2b, 2bl, 2bw
-  Candidate c_two = min_with_value(candidates, mt2chi2.one_chi2, "chi2");
-  mt2chi2.two_mt2b = c_two.mt2b;
-  mt2chi2.two_mt2bl = c_two.mt2bl;
-  mt2chi2.two_mt2w = c_two.mt2w;
+  mt2chi2.two_mt2b = min_with_value(candidates, mt2chi2.one_chi2, "chi2", "mt2b");
+  mt2chi2.two_mt2bl = min_with_value(candidates, mt2chi2.one_chi2, "chi2", "mt2bl");
+  mt2chi2.two_mt2w = min_with_value(candidates, mt2chi2.one_chi2, "chi2", "mt2w");
 
   //Calculate Variable 3b, 3bl, 3bw
   candidates.sort(compare_in_mt2b);
@@ -592,9 +614,9 @@ MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> candidates, StopTree* 
   mt2chi2.three_mt2w = candidates.front().mt2w;
 
   //Calculate Variable 4b, 4bl, 4w
-  mt2chi2.four_chi2b  = min_with_value(candidates, mt2chi2.three_mt2b,  "mt2b").chi2;
-  mt2chi2.four_chi2bl = min_with_value(candidates, mt2chi2.three_mt2bl, "mt2bl").chi2;
-  mt2chi2.four_chi2w  = min_with_value(candidates, mt2chi2.three_mt2w,  "mt2bw").chi2;
+  mt2chi2.four_chi2b  = min_with_value(candidates, mt2chi2.three_mt2b, "mt2b", "chi2");
+  mt2chi2.four_chi2bl = min_with_value(candidates, mt2chi2.three_mt2bl, "mt2bl", "chi2");
+  mt2chi2.four_chi2w  = min_with_value(candidates, mt2chi2.three_mt2w,  "mt2bw", "chi2");
 
   return mt2chi2;
 }

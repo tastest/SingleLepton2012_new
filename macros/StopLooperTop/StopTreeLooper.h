@@ -37,12 +37,12 @@ const bool __SORT = true;
 
 class StopTree;
 
-        typedef struct {
-                float one_chi2;
-                float two_mt2b, two_mt2bl, two_mt2w;
-                float three_mt2b, three_mt2bl, three_mt2w;
-                float four_chi2b, four_chi2bl, four_chi2w;
-        } MT2CHI2;
+typedef struct {
+	float one_chi2;
+	float two_mt2b, two_mt2bl, two_mt2w;
+	float three_mt2b, three_mt2bl, three_mt2w;
+	float four_chi2b, four_chi2bl, four_chi2w;
+} MT2CHI2;
 
 
 class StopTreeLooper {
@@ -75,8 +75,8 @@ public:
 			bool ismc);
 
 	list<Candidate> recoHadronicTop(StopTree*, bool);
-        list<Candidate> applyBConsistency(list<Candidate> &candidates, StopTree* tree, float btagcut);
-        MT2CHI2 MT2CHI2Calculator(list<Candidate> candidates, StopTree* tree);
+	list<Candidate> applyBConsistency(list<Candidate> &candidates, StopTree* tree, float btagcut);
+	MT2CHI2 MT2CHI2Calculator(list<Candidate> &candidates, StopTree* tree);
 
 
 private:
