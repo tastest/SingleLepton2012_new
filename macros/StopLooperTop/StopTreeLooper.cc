@@ -830,8 +830,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 			if ( !passIsoTrkVeto(tree) ) continue;
 
 			// jet info
-			plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 );
+			plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 )
 			plot1D("h_bmjets", Min(n_bm,4)   , evtweight , h_1d , 5 , 0 ,  5 );
+			plot1D("h_njets_minus_bjets" , Min(n_jets-n_bm,9) , evtweight , h_1d ,10 , 0 , 10 )
 			plot1D("h_bljets", Min(n_bl,4)   , evtweight , h_1d , 5 , 0 ,  5 );
 
 			plot2D("h_njets_vs_bmjets" , Min(n_jets,9), Min(n_bm,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
@@ -897,31 +898,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 				}
 			}
 
-			list<Candidate> candidatesBL = getBTaggedCands(allcandidates, tree, BTAG_LOW);
+			plot2D("h_one_three",                 mc.three_mt2w, mc.one_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+			plot2D("h_one_three" +mtcut,          mc.three_mt2w, mc.one_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
 
-			plot1D("h_nblcand", Min((int)candidatesBL.size(),49) , evtweight , h_1d , 50, 0, 50);
+			plot2D("h_one_four",                  mc.one_chi2, mc.four_chi2w , evtweight ,     h_2d , ynbins , ymin , ymax , ynbins , ymin , ymax);
+			plot2D("h_one_four" +mtcut,           mc.one_chi2, mc.four_chi2w , evtweight ,     h_2d , ynbins , ymin , ymax , ynbins , ymin , ymax);
 
-			list<Candidate>::iterator candIterBL;
-			for(candIterBL = candidatesBL.begin() ; candIterBL != candidatesBL.end() ; candIterBL++ ){
-
-				float cand_mt2w = candIterBL->mt2w;
-				if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
-				if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
-				float cand_chi2 = candIterBL->chi2;
-				if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
-				if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;
-
-				float mva = Poor_MVA(*candIterBL);
-
-				plot2D("h_blcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-				plot2D("h_blcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-				plot2D("h_blcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-				if (candIterBL->match){
-					plot2D("h_blcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-					plot2D("h_blcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-					plot2D("h_blcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-				}
-			}
+			plot2D("h_two_three",                 mc.two_mt2w, mc.three_mt2w , evtweight ,     h_2d , xnbins , xmin , xmax , xnbins , xmin , xmax);
+			plot2D("h_two_three" +mtcut,          mc.two_mt2w, mc.three_mt2w , evtweight ,     h_2d , xnbins , xmin , xmax , xnbins , xmin , xmax);
 
 		} // end event loop
 
