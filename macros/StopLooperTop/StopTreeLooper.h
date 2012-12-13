@@ -30,7 +30,7 @@ const float BTAG_MED = 0.679;
 const float BTAG_LOW = 0.244;
 
 const int NUM_LEAD_JETS_0B = 3;
-const int NUM_LEAD_JETS_2B = 3;
+const int NUM_LEAD_JETS_1B = 3;
 
 const bool __SORT = true;
 
