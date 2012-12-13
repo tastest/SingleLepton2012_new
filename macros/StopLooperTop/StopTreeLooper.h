@@ -29,12 +29,20 @@ const float PDG_W_MASS = 80.385;
 const float BTAG_MED = 0.679;
 const float BTAG_LOW = 0.244;
 
-const int NUM_LEAD_JETS_1B = 3;
+const int NUM_LEAD_JETS_0B = 3;
 const int NUM_LEAD_JETS_2B = 3;
 
 const bool __SORT = true;
 
 class StopTree;
+
+        typedef struct {
+                float one_chi2;
+                float two_mt2b, two_mt2bl, two_mt2w;
+                float three_mt2b, three_mt2bl, three_mt2w;
+                float four_chi2b, four_chi2bl, four_chi2w;
+        } MT2CHI2;
+
 
 class StopTreeLooper {
 public:
@@ -65,24 +73,12 @@ public:
 	pair<float, float> getPhiCorrMET(float met, float metphi, int nvtx,
 			bool ismc);
 
-	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
 	list<Candidate> recoHadronicTop(StopTree*, bool);
-	list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree,
-			float btagcut);
-	list<Candidate> getFewBTaggedCands(list<Candidate> &candidates,
-			StopTree* tree, float btagcut);
+        list<Candidate> applyBConsistency(list<Candidate> &candidates, StopTree* tree, float btagcut);
+        MT2CHI2 MT2CHI2Calculator(list<Candidate> candidates, StopTree* tree);
 
-	static float Poor_MVA(Candidate&);
-	static float Smart_Compare(Candidate&, Candidate&);
 
 private:
-
-	struct MT2CHI2{
-		float one_chi2;
-		float two_mt2b, two_mt2bl, two_mt2w;
-		float three_mt2b, three_mt2bl, three_mt2w;
-		float four_chi2b, four_chi2bl, four_chi2w;
-	};
 
 	string m_outfilename_;
 	//for phi corrected met

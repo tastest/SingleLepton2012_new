@@ -172,25 +172,35 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id) {
 }
 
 //--------------------------------------------------------------------
-bool compare_in_chi2( Candidate x, Candidate y ){
+bool compare_in_chi2( Candidate &x, Candidate &y ){
   return x.chi2 < y.chi2;
 }
 
 //--------------------------------------------------------------------
-bool compare_in_mt2b( Candidate x, Candidate y ){
+bool compare_in_mt2b( Candidate &x, Candidate &y ){
   return x.mt2b < y.mt2b;
 }
 
 //--------------------------------------------------------------------
-bool compare_in_mt2bl( Candidate x, Candidate y ){
+bool compare_in_mt2bl( Candidate &x, Candidate &y ){
   return x.mt2bl < y.mt2bl;
 }
 
 //--------------------------------------------------------------------
-bool compare_in_mt2w( Candidate x, Candidate y ){
+bool compare_in_mt2w( Candidate &x, Candidate &y ){
   return x.mt2w < y.mt2w;
 }
 
+Candidate min_with_value(list<Candidate> &candidates, float value, const char* var){
+  list<Candidate>::iterator min = candidates.begin(); 
+  for(list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); it++){
+     if ( strcmp(var, "chi2") == 0  && it->chi2 < min->chi2 ) min = it;
+     if ( strcmp(var, "mt2b") == 0  && it->mt2b < min->mt2b ) min = it;
+     if ( strcmp(var, "mt2bl") == 0 && it->mt2bl < min->mt2bl ) min = it;
+     if ( strcmp(var, "mt2w") == 0  && it->mt2w < min->mt2w ) min = it;
+  }
+  return *min;
+}
 //--------------------------------------------------------------------
 double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
 {
@@ -477,7 +487,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
     }
 
   if (__SORT) 
-    chi2candidates.sort(compare_candidates);
+    chi2candidates.sort(compare_in_chi2);
 
   return chi2candidates;
 }
@@ -493,9 +503,6 @@ list<Candidate> StopTreeLooper::applyBConsistency(list<Candidate> &candidates, S
 			non_bjets.push_back(i);
 	}
 
-	bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
-	bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
-
 	list<Candidate> b_candidates;
 
 	for(list<Candidate>::iterator c_it = candidates.begin() ; c_it != candidates.end() ; c_it++ ){
@@ -504,11 +511,14 @@ list<Candidate> StopTreeLooper::applyBConsistency(list<Candidate> &candidates, S
 		int j1 = c_it->j1;
 		int j2 = c_it->j2;
 
+          	bool b_btag  = (btag.at(bi)  > btagcut);
+         	bool o_btag  = (btag.at(oi)  > btagcut);
+
 		if (n_btag == 0){
-			if ( bi > (NUM_LEAD_JETS_1B - 1) ||
-			     oi > (NUM_LEAD_JETS_1B - 1) ||
-			     j1 > (NUM_LEAD_JETS_1B - 1) ||
-			     j2 > (NUM_LEAD_JETS_1B - 1) )
+			if ( bi > (NUM_LEAD_JETS_0B - 1) ||
+			     oi > (NUM_LEAD_JETS_0B - 1) ||
+			     j1 > (NUM_LEAD_JETS_0B - 1) ||
+			     j2 > (NUM_LEAD_JETS_0B - 1) )
 				continue;
 		} else if (n_btag == 1){
 			if ( b_btag ){
@@ -562,67 +572,29 @@ MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> candidates, StopTree* 
   }
 
   // Calculate Variable 1
-  candidates.sort(StopTreeLooper::compare_in_chi2);
-  mt2chi2.one = candidates.front().chi2;
+  candidates.sort(compare_in_chi2);
+  mt2chi2.one_chi2 = candidates.front().chi2;
 
   //Calculate Variable 2b, 2bl, 2bw
-  class {
-	  float chi2;
-	  bool operator () (Candidate &c) { return c.chi2 == chi2 };
-  } reducer_one;
-
-  reducer_one.chi2 = mt2ch2.one;
-
-  list<Candidate> one_cands = candidates;
-  Candidate c_two = one_cands.reduce_if(reducer_one).front();
+  Candidate c_two = min_with_value(candidates, mt2chi2.one_chi2, "chi2");
   mt2chi2.two_mt2b = c_two.mt2b;
   mt2chi2.two_mt2bl = c_two.mt2bl;
   mt2chi2.two_mt2w = c_two.mt2w;
 
   //Calculate Variable 3b, 3bl, 3bw
-  candidates.sort(StopTreeLooper::compare_in_mt2b);
+  candidates.sort(compare_in_mt2b);
   mt2chi2.three_mt2b = candidates.front().mt2b;
 
-  candidates.sort(StopTreeLooper::compare_in_mt2bl);
+  candidates.sort(compare_in_mt2bl);
   mt2chi2.three_mt2bl = candidates.front().mt2bl;
 
-  candidates.sort(StopTreeLooper::compare_in_mt2w);
+  candidates.sort(compare_in_mt2w);
   mt2chi2.three_mt2w = candidates.front().mt2w;
 
   //Calculate Variable 4b, 4bl, 4w
-  list<Candidate> four_cands
-  //Calculate Variable 4b
-  class {
-	  float mt2b;
-	  bool operator () (Candidate &c) { return c.mt2b == mt2b };
-  } reducer_four_mt2b;
-
-  reducer_four_mt2b.mt2b mt2chi2.three_mt2b;
-
-  four_cands = candidates;
-  mt2chi2.four_chi2b = four_cands.reduce_if(reducer_four_mt2b).front().chi2;
-
-  //Calculate Variable 4bl
-  class {
-	  float mt2bl;
-	  bool operator () (Candidate &c) { return c.mt2bl == mt2bl };
-  } reducer_four_mt2bl;
-
-  reducer_four_mt2bl.mt2bl mt2chi2.three_mt2bl;
-
-  four_cands = candidates;
-  mt2chi2.four_chi2bl = four_cands.reduce_if(reducer_four_mt2bl).front().chi2;
-
-  //Calculate Variable 4w
-  class {
-	  float mt2w;
-	  bool operator () (Candidate &c) { return c.mt2b == mt2w };
-  } reducer_four_mt2w;
-
-  reducer_four_mt2w.mt2w mt2chi2.three_mt2w;
-
-  four_cands = candidates;
-  mt2chi2.four_chi2w = four_cands.reduce_if(reducer_four_mt2w).front().chi2;
+  mt2chi2.four_chi2b  = min_with_value(candidates, mt2chi2.three_mt2b,  "mt2b").chi2;
+  mt2chi2.four_chi2bl = min_with_value(candidates, mt2chi2.three_mt2bl, "mt2bl").chi2;
+  mt2chi2.four_chi2w  = min_with_value(candidates, mt2chi2.three_mt2w,  "mt2bw").chi2;
 
   return mt2chi2;
 }
@@ -830,9 +802,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 			if ( !passIsoTrkVeto(tree) ) continue;
 
 			// jet info
-			plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 )
+			plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 );
 			plot1D("h_bmjets", Min(n_bm,4)   , evtweight , h_1d , 5 , 0 ,  5 );
-			plot1D("h_njets_minus_bjets" , Min(n_jets-n_bm,9) , evtweight , h_1d ,10 , 0 , 10 )
+			plot1D("h_njets_minus_bjets" , Min(n_jets-n_bm,9) , evtweight , h_1d ,10 , 0 , 10 );
 			plot1D("h_bljets", Min(n_bl,4)   , evtweight , h_1d , 5 , 0 ,  5 );
 
 			plot2D("h_njets_vs_bmjets" , Min(n_jets,9), Min(n_bm,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
