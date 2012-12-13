@@ -67,6 +67,7 @@ class StopTreeLooper {
 	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
         list<Candidate> recoHadronicTop(StopTree*, bool);
         list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree, float btagcut);
+        list<Candidate> getFewBTaggedCands(list<Candidate> &candidates, StopTree* tree, float btagcut);
 
         static float Poor_MVA(Candidate&);
         static float Smart_Compare(Candidate&, Candidate&); 

@@ -33,12 +33,12 @@ float StopTreeLooper::vtxweight_n( const int nvertices, TH1F *hist, bool isData 
 
   int nvtx = nvertices;
   if( nvtx > hist->GetNbinsX() )
-        nvtx = hist->GetNbinsX();
+    nvtx = hist->GetNbinsX();
 
   float weight = 0;
   weight = hist->GetBinContent( hist->FindBin(nvtx) );
   if( weight <= 0 ) //we don't want to kill events bc they have no weight
-        weight = 1.;
+    weight = 1.;
   //  cout << "nvtx " << nvtx << " weight " << weight << endl;
   return weight;
 
@@ -145,21 +145,21 @@ int load_badlaserevents  () {
   ifstream in;
   in.open("../Core/badlaser_events.txt");
 
-   int run, event, lumi;
-   int nlines = 0;
+  int run, event, lumi;
+  int nlines = 0;
 
-   while (1) {
-      in >> run >> event >> lumi;
-      if (!in.good()) break;
-      nlines++;
-      DorkyEventIdentifier id = {run, event, lumi };
-      events_lasercalib.insert(id);
-   }
-   printf(" found %d bad events \n",nlines);
+  while (1) {
+    in >> run >> event >> lumi;
+    if (!in.good()) break;
+    nlines++;
+    DorkyEventIdentifier id = {run, event, lumi };
+    events_lasercalib.insert(id);
+  }
+  printf(" found %d bad events \n",nlines);
 
-   in.close();
+  in.close();
 
-   return 0;
+  return 0;
 
 }
 
@@ -176,42 +176,42 @@ bool compare_candidates( Candidate x, Candidate y ){
 
 double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
 {
-    if (verbose) {
-        printf("c1: %4.2f\n", c1);
-        printf("m12: %4.2f\n", m12);
-        printf("m22: %4.2f\n", m22);
-        printf("m02: %4.2f\n", m02);
-    }
+  if (verbose) {
+    printf("c1: %4.2f\n", c1);
+    printf("m12: %4.2f\n", m12);
+    printf("m22: %4.2f\n", m22);
+    printf("m02: %4.2f\n", m02);
+  }
 
-    double a = m22;
-    double b = (m02 - m12 - m22) * c1;
-    double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
+  double a = m22;
+  double b = (m02 - m12 - m22) * c1;
+  double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
 
-    if (verbose) {
-        printf("a: %4.2f\n", a);
-        printf("b: %4.2f\n", b);
-        printf("c: %4.2f\n", c);
-    }
+  if (verbose) {
+    printf("a: %4.2f\n", a);
+    printf("b: %4.2f\n", b);
+    printf("c: %4.2f\n", c);
+  }
 
-    double num = -1. * b + sqrt(b * b - 4 * a * c);
-    double den = 2 * a;
+  double num = -1. * b + sqrt(b * b - 4 * a * c);
+  double den = 2 * a;
 
-    if (verbose) {
-        printf("num: %4.2f\n", num);
-        printf("den: %4.2f\n", den);
-        printf("num/den: %4.2f\n", num/den);
-    }
+  if (verbose) {
+    printf("num: %4.2f\n", num);
+    printf("den: %4.2f\n", den);
+    printf("num/den: %4.2f\n", num/den);
+  }
 
-    return (num/den);
+  return (num/den);
 }
 
 
 double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
               double m12, double m22, double m02){
-    double rat1 = pt1 * (1 - c1) / sigma1;
-    double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
+  double rat1 = pt1 * (1 - c1) / sigma1;
+  double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
 
-    return ( rat1 * rat1 + rat2 * rat2);
+  return ( rat1 * rat1 + rat2 * rat2);
 }
 
 //void StopSelector::minuitFunction(int& npar, double *gout, double &result, double par[], int flg)
@@ -239,7 +239,7 @@ float getDataMCRatio(float eta){
  * mc - qgjet montecarlo match number for the jets
  * 
  * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
-*/ 
+ */ 
 
 list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
@@ -275,9 +275,9 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
   if ( !isData ){
      
-     // Matching MC algoritm search over all conbinations  until the 
-     // right combination is found. More than one candidate is suported 
-     //  but later only the first is used.
+    // Matching MC algoritm search over all conbinations  until the 
+    // right combination is found. More than one candidate is suported 
+    //  but later only the first is used.
 
     int match = 0;
     for (int jbl=0; jbl<n_jets; ++jbl )
@@ -286,11 +286,11 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
           for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
             if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
                  (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
-                    ibl[match] = jbl;
-                    iw1[match] = jw1;
-                    iw2[match] = jw2;
-                    ib[match] = jb;
-                    match++;
+	      ibl[match] = jbl;
+	      iw1[match] = jw1;
+	      iw2[match] = jw2;
+	      ib[match] = jb;
+	      match++;
             }
   }
 
@@ -340,12 +340,12 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
       delete minimizer;
 
      
-  //     * W Mass check :)
-  //     *  Never trust a computer you can't throw out a window. 
- //      *  - Steve Wozniak 
+      //     * W Mass check :)
+      //     *  Never trust a computer you can't throw out a window. 
+      //      *  - Steve Wozniak 
 
-//      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
-//           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
+      //      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
+      //           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
       
       v_i.push_back(i);
       v_j.push_back(j);
@@ -401,7 +401,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
       mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
       double c_mt2w = mt2w_event.get_mt2w();
 
-//      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
+      //      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
 
       for (unsigned int w = 0; w < v_i.size() ; ++w ){
         int i = v_i[w];
@@ -428,16 +428,16 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
 
         double pt_w = hadW.Pt();
         double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
-                        + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
+	  + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
         double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
         double pt_t = hadT.Pt();
         double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
-                        + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
-                        + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
+	  + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
+	  + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
         double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
 
         double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
-                      + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+	  + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
 
         bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
   
@@ -458,10 +458,10 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData){
       }
     }
 
-   if (__SORT) 
-     chi2candidates.sort(compare_candidates);
+  if (__SORT) 
+    chi2candidates.sort(compare_candidates);
 
-   return chi2candidates;
+  return chi2candidates;
 }
 
 //--------------------------------------------------------------------
@@ -501,6 +501,48 @@ list<Candidate> StopTreeLooper::getBTaggedCands(list<Candidate> &candidates, Sto
 }
 
 //--------------------------------------------------------------------
+// returns few candidates that are consistent with b-tagging requirement
+list<Candidate> StopTreeLooper::getFewBTaggedCands(list<Candidate> &candidates, StopTree* tree, float btagcut) 
+{
+
+  int n_btag = 0;
+
+  for( int i = 0 ; i < n_jets ; i++ )
+    if( btag.at(i) > btagcut ) n_btag++;
+
+  list<Candidate> bcands; 
+
+  list<Candidate>::iterator candIter;
+
+  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
+
+    //either b-jet or other jet should be tagged
+    if( btag.at(candIter->bi) < btagcut && 
+	btag.at(candIter->oi) < btagcut ) continue;
+
+    //if more than 1 b-tag, BOTH b-jet AND other jet should be tagged
+    if (n_btag>1 && (btag.at(candIter->bi) < btagcut || 
+		     btag.at(candIter->oi) < btagcut) ) continue;
+
+    //limit jet multiplicity
+    //if no b-tags, return all combinations using first 4 jets
+    if (n_btag==0 && (candIter->j1 > 3 || 
+		      candIter->j2 > 3 || 
+		      candIter->bi > 3 || 
+		      candIter->oi > 3 ) ) continue;
+    //if 1 b-tag, return combinations with at most 5 jets, including b
+    
+    
+
+    bcands.push_back(*candIter);
+
+  }
+
+  return bcands;
+
+}
+
+//--------------------------------------------------------------------
 float StopTreeLooper::Poor_MVA(Candidate &c){
   float TOP_MASS = 500;
   float beta = 1./200.;
@@ -508,7 +550,7 @@ float StopTreeLooper::Poor_MVA(Candidate &c){
 }
 
 float StopTreeLooper::Smart_Compare(Candidate &a, Candidate &b){
-   return Poor_MVA(a) > Poor_MVA(b);
+  return Poor_MVA(a) > Poor_MVA(b);
 }
 
 //--------------------------------------------------------------------
@@ -537,15 +579,15 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
 }
 
 /*
-MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
+  MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
 
   if (candidates.size() == 0){
-    MT2struct mfail;
-    mfail.mt2w  = -0.999;
-    mfail.mt2b  = -0.999;
-    mfail.mt2bl = -0.999;
-    mfail.chi2  = -0.999;
-    return mfail;
+  MT2struct mfail;
+  mfail.mt2w  = -0.999;
+  mfail.mt2b  = -0.999;
+  mfail.mt2bl = -0.999;
+  mfail.chi2  = -0.999;
+  return mfail;
   }
 
   double chi2_min  = 9999;
@@ -557,79 +599,79 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
   int n_btag = 0;
 
   for( int i = 0 ; i < 4 ; i++ ){
-    if( tree->pfjets_csv_.at(i) < 0.679 ) n_btag++;
+  if( tree->pfjets_csv_.at(i) < 0.679 ) n_btag++;
   }
 
   list<Candidate>::iterator candIter;
 
   for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
 
-    // loop over all candidiates
-    //for (unsigned int i=0; i<candidates.size(); ++i) {
+  // loop over all candidiates
+  //for (unsigned int i=0; i<candidates.size(); ++i) {
 
-    //if ( ! candidates_->at(i).match ) continue;
+  //if ( ! candidates_->at(i).match ) continue;
 
-    // get indices of 4 jets used for hadronic top reconstruction
-    // int b  = candidates.at(i).bi;
-    // int o  = candidates.at(i).oi;
-    // int j1 = candidates.at(i).j1;
-    // int j2 = candidates.at(i).j2;
+  // get indices of 4 jets used for hadronic top reconstruction
+  // int b  = candidates.at(i).bi;
+  // int o  = candidates.at(i).oi;
+  // int j1 = candidates.at(i).j1;
+  // int j2 = candidates.at(i).j2;
 
-    int b  = (*candIter).bi;
-    int o  = (*candIter).oi;
-    int j1 = (*candIter).j1;
-    int j2 = (*candIter).j2;
+  int b  = (*candIter).bi;
+  int o  = (*candIter).oi;
+  int j1 = (*candIter).j1;
+  int j2 = (*candIter).j2;
 
-    // require the 4 jets used for the hadronic top mass are the 4 leading jets
-    if (b>3 || o > 3 || j1 > 3 || j2 > 3) continue;
+  // require the 4 jets used for the hadronic top mass are the 4 leading jets
+  if (b>3 || o > 3 || j1 > 3 || j2 > 3) continue;
 
-    // store whether the 2 jets used for MT2 calculation are btagged
-    bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
-    bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
-    //bool j1_btag = (btag_->at(j1) > 0.679);
-    //bool j2_btag = (btag_->at(j2) > 0.679);
+  // store whether the 2 jets used for MT2 calculation are btagged
+  bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
+  bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
+  //bool j1_btag = (btag_->at(j1) > 0.679);
+  //bool j2_btag = (btag_->at(j2) > 0.679);
 
-    // 2 btags: require jets used for MT2 are the 2 b-jets
-    if ( n_btag == 2 ){ 
-      if ( !b_btag || !o_btag ) continue;
-    } 
+  // 2 btags: require jets used for MT2 are the 2 b-jets
+  if ( n_btag == 2 ){ 
+  if ( !b_btag || !o_btag ) continue;
+  } 
 
-    // 1 btag: require the bjet and one of the 2 leading non bjets is used for MT2
-    else if ( n_btag == 1) {
+  // 1 btag: require the bjet and one of the 2 leading non bjets is used for MT2
+  else if ( n_btag == 1) {
 
-      if( b_btag ){
-	if( b == 3  && o > 1 ) continue;
-	if( b <   3 && o > 2 ) continue;
-      }
+  if( b_btag ){
+  if( b == 3  && o > 1 ) continue;
+  if( b <   3 && o > 2 ) continue;
+  }
 
-      if( o_btag ){
-	if( o == 3  && b > 1 ) continue;
-	if( o <   3 && b > 2 ) continue;
-      }
+  if( o_btag ){
+  if( o == 3  && b > 1 ) continue;
+  if( o <   3 && b > 2 ) continue;
+  }
 
-      //if (b>1 || o>1) continue;
-    } 
+  //if (b>1 || o>1) continue;
+  } 
 
-    // 0 or >=3 btags: require jets used for MT2 are among 3 leading jets
-    else {
-      if (b>2 || o>2) continue;
-    }
+  // 0 or >=3 btags: require jets used for MT2 are among 3 leading jets
+  else {
+  if (b>2 || o>2) continue;
+  }
 
-    // double chi2  = candidates.at(i).chi2;
-    // double mt2b  = candidates.at(i).mt2b;
-    // double mt2bl = candidates.at(i).mt2bl;
-    // double mt2w  = candidates.at(i).mt2w;
+  // double chi2  = candidates.at(i).chi2;
+  // double mt2b  = candidates.at(i).mt2b;
+  // double mt2bl = candidates.at(i).mt2bl;
+  // double mt2w  = candidates.at(i).mt2w;
 
-    double chi2  = (*candIter).chi2;
-    double mt2b  = (*candIter).mt2b;
-    double mt2bl = (*candIter).mt2bl;
-    double mt2w  = (*candIter).mt2w;
+  double chi2  = (*candIter).chi2;
+  double mt2b  = (*candIter).mt2b;
+  double mt2bl = (*candIter).mt2bl;
+  double mt2w  = (*candIter).mt2w;
  
-    //    cout << " " << b << ":" << b_btag  << " " << o << ":" << o_btag << " " << j1 << " " << j2 << " = " << mt2w  << "  " << chi2 <<endl;
-    if (chi2  < chi2_min  ) chi2_min  = chi2;
-    if (mt2b  < mt2b_min  ) mt2b_min  = mt2b;
-    if (mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
-    if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
+  //    cout << " " << b << ":" << b_btag  << " " << o << ":" << o_btag << " " << j1 << " " << j2 << " = " << mt2w  << "  " << chi2 <<endl;
+  if (chi2  < chi2_min  ) chi2_min  = chi2;
+  if (mt2b  < mt2b_min  ) mt2b_min  = mt2b;
+  if (mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
+  if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
   }
 
   if( mt2w_min  > 9000 ) mt2w_min  = -0.999;
@@ -644,7 +686,7 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
   m.chi2  = chi2_min;
 
   return m;
-}
+  }
 */
 
 void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
@@ -813,6 +855,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       btag.clear();
       mc.clear();
       
+      int n_bm = 0;
+      int n_bl = 0;
+
       for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
 	
 	if ( tree->pfjets_->at(i).Pt() < JET_PT ) continue;
@@ -824,6 +869,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	btag.push_back( tree->pfjets_csv_.at(i) );
 	if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
 
+	if( tree->pfjets_csv_.at(i) > BTAG_MED ) n_bm++;
+	if( tree->pfjets_csv_.at(i) > BTAG_LOW ) n_bl++;
+
+
       } 
       
       // cout << endl << "stored:" << endl;
@@ -833,62 +882,28 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       
       assert( jets.size() == btag.size() );
 
-      //----------------------------------------------------------------------------------------
-      // calculate the hadronic top and MT2 variables and compare to values stored in babies
-      //----------------------------------------------------------------------------------------
-      /*
-      list<Candidate>::iterator candIter;
+      //
+      // SIGNAL REGION - single lepton + b-tag
+      //
 
-      int i = 0;
+      // selection - 1 lepton 
+      // Add iso track veto
+      // Add b-tag
+      if ( !passSingleLeptonSelection(tree, isData) ) continue; 
+      if ( !passIsoTrkVeto(tree) ) continue;
 
-      cout << endl << endl << endl;
-      cout << "On-the-fly : " << candidates.size()         << " candidates" << endl;
-      cout << "From baby  : " << tree->candidates_->size() << " candidates" << endl << endl;
-
-      for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
-	cout << "chi2        " << (*candIter).chi2   << " " << (tree->candidates_->at(i)).chi2  << endl;
-	cout << "mt2w        " << (*candIter).mt2w   << " " << (tree->candidates_->at(i)).mt2w  << endl;
-	cout << "mt2bl       " << (*candIter).mt2bl  << " " << (tree->candidates_->at(i)).mt2bl << endl;
-	cout << "mt2b        " << (*candIter).mt2b   << " " << (tree->candidates_->at(i)).mt2b  << endl;
-	cout << endl;
-	++i;
-      }
-
-      //----------------------------------------------------------------------------------------
-      // calculate the MT2 variables only
-      //----------------------------------------------------------------------------------------
-
-      list<Candidate> mt2candidates = MT2Calculator(tree, isData );
-
-      cout << "Found " << mt2candidates.size() << " MT2 candidates" << endl;
-
-      for(candIter = mt2candidates.begin() ; candIter != mt2candidates.end() ; candIter++ ){
-	cout << "mt2w        " << (*candIter).mt2w   << endl;
-	cout << "mt2bl       " << (*candIter).mt2bl  << endl;
-	cout << "mt2b        " << (*candIter).mt2b   << endl;
-	cout << endl;
-      }
-      */
-
-      //----------------------------------------------------------------------------------------
-      // calculate the BEST MT2 variables only
-      //----------------------------------------------------------------------------------------
-
-//      MT2struct m = Best_MT2Calculator(tree, isData);
-
-      // cout << endl;
-      // cout << "MT2W  " << m.mt2w  << endl;
-      // cout << "MT2b  " << m.mt2b  << endl;
-      // cout << "MT2bl " << m.mt2bl << endl;
-
-//      plot1D("h_mt2w"  , Min(m.mt2w, (float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-//      plot1D("h_mt2b"  , Min(m.mt2b, (float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-//      plot1D("h_mt2bl" , Min(m.mt2bl,(float)999.0) , evtweight , h_1d , 100 , 0 , 1000 );
-
-      //----------------------------------------------------------------------------------------
+      // jet info
+      plot1D("h_njets" , Min(n_jets,9) , evtweight , h_1d ,10 , 0 , 10 );
+      plot1D("h_bmjets", Min(n_bm,4)   , evtweight , h_1d , 5 , 0 ,  5 );
+      plot1D("h_bljets", Min(n_bl,4)   , evtweight , h_1d , 5 , 0 ,  5 );
+	  
+      plot2D("h_njets_vs_bmjets" , Min(n_jets,9), Min(n_bm,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
+      plot2D("h_njets_vs_bljets" , Min(n_jets,9), Min(n_bl,4) , evtweight , h_2d ,10 , 0 , 10 , 5 , 0 ,  5 );
+      
+      //-----------------------------------------------------------------
       // calculate the BEST MT2 variables only using Ricardo's algorithm
-      //----------------------------------------------------------------------------------------
-
+      //-----------------------------------------------------------------
+	  
       //histogram ranges
       int xnbins = 35;
       float xmin = -100.;
@@ -896,52 +911,35 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       int ynbins = 32;
       float ymin = -1.;
       float ymax = 15;
-
+	  
       // get list of candidates
       list<Candidate> allcandidates = recoHadronicTop(tree, isData);
-
+	  
       plot1D("h_ncand", Min((int)allcandidates.size(),49) , evtweight , h_1d , 50, 0, 50);
-
+	  
       list<Candidate>::iterator candIter;
       for(candIter = allcandidates.begin() ; candIter != allcandidates.end() ; candIter++ ){
-
+	    
 	float cand_mt2w = candIter->mt2w;
 	if (cand_mt2w > xmax-0.0001) cand_mt2w = xmax-0.0001;
 	if (cand_mt2w < xmin+0.0001) cand_mt2w = xmin+0.0001;
 	float cand_chi2 = candIter->chi2;
 	if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
 	if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;	
-
-        float mva = Poor_MVA(*candIter);
-
-        plot2D("h_xm",                 cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        plot2D("h_xm" +mtcut,          cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        plot2D("h_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        if (candIter->match){
-          plot2D("h_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-          plot2D("h_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-          plot2D("h_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        }
-      }
-      
-      //
-      // CR1 - single lepton + b-veto
-      //
-
-      // selection - 1 lepton + iso track veto
-      // Add b-tag veto
-      if ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 )
-	{
-	  MT2struct mr = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
-
-	  plotCandidate(tree, mr , "cr1" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-
+	    
+	float mva = Poor_MVA(*candIter);
+	    
+	plot2D("h_xm",                 cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	plot2D("h_xm" +mtcut,          cand_mt2w, cand_chi2 ,     evtweight , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	plot2D("h_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	if (candIter->match){
+	  plot2D("h_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	  plot2D("h_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	  plot2D("h_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
 	}
-      
-      //remove candidates from the list that do not ask for a b-tag
+      }
+
+      //require at least 1 btag
       if (tree->nbtagscsvm_<1) continue;
       list<Candidate> candidates = getBTaggedCands(allcandidates, tree, BTAG_MED);
       MT2struct mr = Best_MT2Calculator_Ricardo(candidates, tree, isData);
@@ -958,16 +956,16 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
 	if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;	
 
-        float mva = Poor_MVA(*candIterB);
+	float mva = Poor_MVA(*candIterB);
 
-        plot2D("h_bcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        plot2D("h_bcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        plot2D("h_bcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        if (candIterB->match){
-          plot2D("h_bcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-          plot2D("h_bcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-          plot2D("h_bcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        }
+	plot2D("h_bcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	plot2D("h_bcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	plot2D("h_bcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	if (candIterB->match){
+	  plot2D("h_bcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	  plot2D("h_bcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	  plot2D("h_bcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	}
       }
       
       list<Candidate> candidatesBL = getBTaggedCands(allcandidates, tree, BTAG_LOW);
@@ -984,68 +982,19 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	if (cand_chi2 > ymax-0.0001) cand_chi2 = ymax-0.0001;
 	if (cand_chi2 < ymin+0.0001) cand_chi2 = ymin+0.0001;	
 
-        float mva = Poor_MVA(*candIterBL);
+	float mva = Poor_MVA(*candIterBL);
 
-        plot2D("h_blcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        plot2D("h_blcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        plot2D("h_blcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        if (candIterBL->match){
-          plot2D("h_blcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-          plot2D("h_blcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-          plot2D("h_blcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
-        }
+	plot2D("h_blcands_xm",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	plot2D("h_blcands_xm" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	plot2D("h_blcands_xm_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	if (candIterBL->match){
+	  plot2D("h_blcands_xm_match",                 cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	  plot2D("h_blcands_xm_match" +mtcut,          cand_mt2w, cand_chi2 , evtweight ,     h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	  plot2D("h_blcands_xm_match_weighted" +mtcut, cand_mt2w, cand_chi2 , evtweight*mva , h_2d , xnbins , xmin , xmax , ynbins , ymin , ymax);
+	}
       }
-      //
-      // SIGNAL REGION - single lepton + b-tag
-      //
-
-      // selection - 1 lepton 
-      // Add iso track veto
-      // Add b-tag
-      if ( passSingleLeptonSelection(tree, isData) && passIsoTrkVeto(tree) )
-	{
-
-	  plotCandidate(tree, mr , "sig" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "sig" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-	  
-	}
-
-      //
-      // CR4 - ttbar dilepton sample with 2 good leptons
-      //
       
-      // selection - all dilepton, z-veto for SF dilepton
-      // Add b-tag requirement
-      if ( passDileptonSelection(tree, isData) 
-	   && (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) ) 
-	{
-
-	  plotCandidate(tree, mr , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
-	  plotCandidate(tree, mr , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
-	  plotCandidate(tree, mr , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
-	  plotCandidate(tree, mr , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
-
-	}
-
-      //
-      // CR5 - lepton + isolated track
-      //
-
-      // selection - lepton + isolated track
-      // Add b-tag requirement
-      if ( passLepPlusIsoTrkSelection(tree, isData) ) 
-	{
-	  
-	  plotCandidate(tree, mr , "cr5" ,          "" , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
-	  plotCandidate(tree, mr , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-
-	}
-      
-	} // end event loop
+    } // end event loop
 
     // delete tree;
 
@@ -1073,15 +1022,15 @@ bool StopTreeLooper::passEvtSelection(const StopTree *sTree, TString name)
   if ( sTree->rhovor_<0. || sTree->rhovor_>=40. ) return false;
 
   if (!name.Contains("T2")) {
-      //met filters
-      if ( sTree->csc_      != 0 ) return false;
-      if ( sTree->hbhe_     != 1 ) return false;
-      if ( sTree->hcallaser_!= 1 ) return false;
-      if ( sTree->ecaltp_   != 1 ) return false;
-      if ( sTree->trkfail_  != 1 ) return false;
-      if ( sTree->eebadsc_  != 1 ) return false;
-      if ( sTree->hbhenew_  != 1 ) return false;
-    }
+    //met filters
+    if ( sTree->csc_      != 0 ) return false;
+    if ( sTree->hbhe_     != 1 ) return false;
+    if ( sTree->hcallaser_!= 1 ) return false;
+    if ( sTree->ecaltp_   != 1 ) return false;
+    if ( sTree->trkfail_  != 1 ) return false;
+    if ( sTree->eebadsc_  != 1 ) return false;
+    if ( sTree->hbhenew_  != 1 ) return false;
+  }
 
   //at least 1 lepton
   if ( sTree->ngoodlep_ < 1 ) return false;
