@@ -191,40 +191,34 @@ bool compare_in_mt2w( Candidate &x, Candidate &y ){
   return x.mt2w < y.mt2w;
 }
 
-Candidate min_with_value(list<Candidate> &candidates, float value, const char* fix, const char* var){
-  list<Candidate>::iterator min = candidates.begin();
+float min_with_value(list<Candidate> &candidates, float value, const char* fix, const char* var){
+  float min_value = 9999.0;
 
   for(list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); it++){
 	  if (strcmp(fix, "chi2") == 0 && it->chi2 == value ){
-		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
-		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
-		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b  < min_value ) min_value = it->mt2b;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min_value ) min_value = it->mt2bl;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2bw;
 	  }
 	  if (strcmp(fix, "mt2b") == 0 && it->mt2b == value ){
-		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
-		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
-		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2  < min_value ) min_value = it->chi2;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min_value ) min_value = it->mt2bl;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2bw;
 	  }
 	  if (strcmp(fix, "mt2bl") == 0 && it->mt2bl == value ){
-		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
-		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
-		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2  < min_value ) min_value = it->chi2;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b  < min_value ) min_value = it->mt2b;
+		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w  < min_value ) min_value = it->mt2bw;
 	  }
 	  if (strcmp(fix, "mt2w") == 0 && it->mt2w == value ){
-		     if ( strcmp(var, "chi2")  == 0  && it->chi2 < min->chi2 ) min = it;
-		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b < min->mt2b ) min = it;
-		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min->mt2bl ) min = it;
-		     if ( strcmp(var, "mt2w")  == 0  && it->mt2w < min->mt2w ) min = it;
+		     if ( strcmp(var, "chi2")  == 0  && it->chi2  < min_value ) min_value = it->chi2;
+		     if ( strcmp(var, "mt2b")  == 0  && it->mt2b  < min_value ) min_value = it->mt2b;
+		     if ( strcmp(var, "mt2bl") == 0  && it->mt2bl < min_value ) min_value = it->mt2bl;
 	  }
   }
 
-  if (strcmp(fix, "chi2") return min->chi2;
-  if (strcmp(fix, "mt2b") return min->mt2b;
-  if (strcmp(fix, "mt2bl") return min->mt2bl;
-  if (strcmp(fix, "mt2w") return min->mt2w;
+  if ( min_value > 9998.0 ) return -0.999;
+  return min_value;
 }
 //--------------------------------------------------------------------
 double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
