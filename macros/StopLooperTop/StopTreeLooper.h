@@ -52,6 +52,14 @@ public:
 
 private:
 
+	static const float JET_PT = 30.;
+	static const float JET_ETA = 3.0;
+
+	static const int N_JETS_TO_CONSIDER = 6;
+
+   	static const float BTAG_MED = 0.679;
+	static const float BTAG_LOW = 0.244;
+
 	string m_outfilename_;
 	//for phi corrected met
 	float t1metphicorr;

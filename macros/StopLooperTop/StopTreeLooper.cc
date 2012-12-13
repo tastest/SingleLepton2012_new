@@ -5,6 +5,7 @@
 #include "../Core/MT2Utility.h"
 #include "../Core/mt2bl_bisect.h"
 #include "../Core/mt2w_bisect.h"
+#include "PartonCombinatorics.h"
 
 #include "../Core/stopUtils.h"
 
@@ -401,16 +402,15 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 			float met = tree->t1metphicorr_;
 			float metphi = tree->t1metphicorrphi_;
 
-			double sigma_jets[n_jets];
-			for (int i=0; i<n_jets; ++i)
-				sigma_jets[i] = getJetResolution(jets[i], jetSmearer);
-
-			if ( isData )
-				for (int i=0; i<n_jets; ++i)
-					sigma_jets[i] *= getDataMCRatio(jets[i].eta());
+                        vector<float> sigma_jets;
+			for (int i=0; i<n_jets; ++i){
+                                float sigma = getJetResolution(jets[i], jetSmearer);
+                                if ( isData) sigma *= getDataMCRatio(jets[i].eta());
+				sigma_jets.push_back(sigma);
+                        }
 
 			// get list of candidates
-			PartonCombinatorics pc (jets, btag, sigma_jets, mc, lep, met, metphi, isData);
+			PartonCombinatorics pc (jets, btag, sigma_jets, mc, *lep, met, metphi, isData);
 			list<Candidate> allcandidates = pc.candidates_;
 
 
@@ -463,7 +463,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 			//require at least 1 btag
 			if (tree->nbtagscsvm_<1) continue;
 			list<Candidate> candidates = pc.b_candidates_;
-			MT2CHI2 mc = pc.GetMt2Chi2();
+			MT2CHI2 mc = pc.getMt2Chi2();
 
 			plot1D("h_nbcand", Min((int)candidates.size(),49) , evtweight , h_1d , 50, 0, 50);
 
@@ -821,3 +821,4 @@ float StopTreeLooper::getsltrigweight(int id1, float pt, float eta) {
   return 1.;
 
 }
+

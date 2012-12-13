@@ -1,7 +1,12 @@
-#include PartonCombinatorics.h
+#include "PartonCombinatorics.h"
+
+#include "TFitter.h"
+#include "../Core/MT2Utility.h"
+#include "../Core/mt2bl_bisect.h"
+#include "../Core/mt2w_bisect.h"
 
 PartonCombinatorics::PartonCombinatorics(vector<LorentzVector> jets, vector<float> btag, vector<float> sigma_jets,
-		vector<int> mc, LorentzVector lep, double met, double metphi, bool isData);
+		vector<int> mc, LorentzVector lep, float met, float metphi, bool isData){
 	isData_ = isData;
 	jets_ = jets;
 	btag_ = btag;
@@ -10,6 +15,7 @@ PartonCombinatorics::PartonCombinatorics(vector<LorentzVector> jets, vector<floa
 	lep_ = lep;
 	met_ = met;
 	metphi_ = metphi;
+        n_jets_ = jets.size();
 
 	recoHadronicTop();
 	applyBConsistency(BTAG_MED);
@@ -163,15 +169,15 @@ void PartonCombinatorics::recoHadronicTop(){
   vector<double> v_k1, v_k2;
   for ( int i=0; i<n_jets_; ++i )
     for ( int j=i+1; j<n_jets_; ++j ){
-      double pt_w1 = jets[i].Pt();
-      double pt_w2 = jets[j].Pt();
-      if ( pt_w1 < PTMIN_J1 || fabs(jets[i].Eta()) > JET_ETA ) continue;
-      if ( pt_w2 < PTMIN_J2 || fabs(jets[j].Eta()) > JET_ETA ) continue;
+      double pt_w1 = jets_[i].Pt();
+      double pt_w2 = jets_[j].Pt();
+      if ( pt_w1 < PTMIN_J1 || fabs(jets_[i].Eta()) > JET_ETA ) continue;
+      if ( pt_w2 < PTMIN_J2 || fabs(jets_[j].Eta()) > JET_ETA ) continue;
 
       //
       //  W
       //
-      LorentzVector hadW = jets[i] + jets_[j];
+      LorentzVector hadW = jets_[i] + jets_[j];
 
       //
       //  W Mass Constraint.
@@ -240,7 +246,7 @@ void PartonCombinatorics::recoHadronicTop(){
       double pb1[4];    // bottom on the same side as the visible lepton
       double pb2[4];    // other bottom, paired with the invisible W
       double pmiss[3];  // <unused>, pmx, pmy   missing pT
-      pl[0]= lep_->E(); pl[1]= lep_->Px(); pl[2]= lep_->Py(); pl[3]= lep_->Pz();
+      pl[0]= lep_.E(); pl[1]= lep_.Px(); pl[2]= lep_.Py(); pl[3]= lep_.Pz();
       pb1[1] = jets_[o].Px();  pb1[2] = jets_[o].Py();   pb1[3] = jets_[o].Pz();
       pb2[1] = jets_[b].Px();  pb2[2] = jets_[b].Py();   pb2[3] = jets_[b].Pz();
       pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
@@ -316,14 +322,13 @@ void PartonCombinatorics::recoHadronicTop(){
         c.k2 = c2;
         c.match = c_match;
 
-        chi2candidates.push_back(c);
+        candidates_.push_back(c);
       }
     }
 
   if (__SORT)
-    chi2candidates.sort(compare_in_chi2);
+    candidates_.sort(compare_in_chi2);
 
-  return chi2candidates;
 }
 
 //--------------------------------------------------------------------
@@ -341,8 +346,8 @@ void PartonCombinatorics::applyBConsistency(float btagcut){
 		int bi = c_it->bi;
 		int oi = c_it->oi;
 
-		bool b_btag  = (btag.at(bi)  > btagcut);
-		bool o_btag  = (btag.at(oi)  > btagcut);
+		bool b_btag  = (btag_.at(bi)  > btagcut);
+		bool o_btag  = (btag_.at(oi)  > btagcut);
 
 		if (n_btag == 0){
 			if ( bi > (NUM_LEAD_JETS_0B - 1) ||
