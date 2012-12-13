@@ -607,13 +607,13 @@ void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<str
 
 	plot1D("h_"+tag+"_one_chi2"+sel, Min(mc.one_chi2, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
 
-	plot1D("h_"+tag+"_two_mt2b"   +sel, Max(Min(mc.two_mt2b, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
-	plot1D("h_"+tag+"_two_mt2bl"  +sel, Max(Min(mc.two_mt2bl, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
-	plot1D("h_"+tag+"_two_mt2w"   +sel, Max(Min(mc.two_mt2w, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_two_mt2b"   +sel, Max(Min(mc.two_mt2b, (float)(mt_max-0.01)),(float)(mt_min+0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_two_mt2bl"  +sel, Max(Min(mc.two_mt2bl, (float)(mt_max-0.01)),(float)(mt_min+0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_two_mt2w"   +sel, Max(Min(mc.two_mt2w, (float)(mt_max-0.01)),(float)(mt_min+0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
 
-	plot1D("h_"+tag+"_three_mt2b"   +sel, Max(Min(mc.three_mt2b, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
-	plot1D("h_"+tag+"_three_mt2bl"   +sel, Max(Min(mc.three_mt2bl, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
-	plot1D("h_"+tag+"_three_mt2w"   +sel, Max(Min(mc.three_mt2w, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_three_mt2b"   +sel, Max(Min(mc.three_mt2b, (float)(mt_max-0.01)),(float)(mt_min+0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_three_mt2bl"   +sel, Max(Min(mc.three_mt2bl, (float)(mt_max-0.01)),(float)(mt_min+0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_three_mt2w"   +sel, Max(Min(mc.three_mt2w, (float)(mt_max-0.01)),(float)(mt_min+0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
 
 	plot1D("h_"+tag+"_four_chi2b"+sel, Min(mc.four_chi2b, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
 	plot1D("h_"+tag+"_four_chi2bl"+sel, Min(mc.four_chi2bl, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
