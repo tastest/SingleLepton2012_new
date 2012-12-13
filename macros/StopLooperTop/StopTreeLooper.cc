@@ -797,11 +797,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 			}
 
-			// cout << endl << "stored:" << endl;
-			// for( unsigned int i = 0 ; i < jets.size() ; ++i ){
-			//   cout << i << " pt csv " << jets.at(i).pt() << " " << btag.at(i) << endl;
-			// }
-
 			assert( jets.size() == btag.size() );
 
 			//
@@ -837,23 +832,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 			// get list of candidates
 			list<Candidate> allcandidates = recoHadronicTop(tree, isData);
-
-			//
-			// CR1 - single lepton + b-veto
-			//
-
-			// selection - 1 lepton + iso track veto
-			// Add b-tag veto
-			if ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 )
-			{
-				MT2CHI2 mc = MT2CHI2Calculator(candidates, tree);
-
-				plotCandidate(tree, mc , "cr1" ,          "" , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-
-			}
 
 			plot1D("h_ncand", Min((int)allcandidates.size(),49) , evtweight , h_1d , 50, 0, 50);
 
@@ -910,55 +888,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 			plot2D("h_two_three" +mtcut,          mc.two_mt2w, mc.three_mt2w , evtweight ,     h_2d , xnbins , xmin , xmax , xnbins , xmin , xmax);
 
 
-			//
-			// SIGNAL REGION - single lepton + b-tag
-			//
-
-			// selection - 1 lepton
-			// Add iso track veto
-			// Add b-tag
-			if ( passSingleLeptonSelection(tree, isData) && passIsoTrkVeto(tree) )
-			{
-
-				plotCandidate(tree, mc , "sig" ,          "" , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "sig" ,             mtcut , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-
-			}
-
-			//
-			// CR4 - ttbar dilepton sample with 2 good leptons
-			//
-
-			// selection - all dilepton, z-veto for SF dilepton
-			// Add b-tag requirement
-			if ( passDileptonSelection(tree, isData)
-					&& (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) )
-			{
-
-				plotCandidate(tree, mc , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
-				plotCandidate(tree, mc , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
-				plotCandidate(tree, mc , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
-				plotCandidate(tree, mc , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
-
-			}
-
-			//
-			// CR5 - lepton + isolated track
-			//
-
-			// selection - lepton + isolated track
-			// Add b-tag requirement
-			if ( passLepPlusIsoTrkSelection(tree, isData) )
-			{
-
-				plotCandidate(tree, mc , "cr5" ,          "" , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
-				plotCandidate(tree, mc , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
-
-			}
+			plotCandidate(tree, mc , "sig" ,          "" , h_1d , evtweight*trigweight);
+			plotCandidate(tree, mc , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
+			plotCandidate(tree, mc , "sig" ,             mtcut , h_1d , evtweight*trigweight);
+			plotCandidate(tree, mc , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
 
 		} // end event loop
 
