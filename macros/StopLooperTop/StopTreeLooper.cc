@@ -527,8 +527,6 @@ list<Candidate> StopTreeLooper::applyBConsistency(list<Candidate> &candidates, S
 	for(list<Candidate>::iterator c_it = candidates.begin() ; c_it != candidates.end() ; c_it++ ){
 		int bi = c_it->bi;
 		int oi = c_it->oi;
-		int j1 = c_it->j1;
-		int j2 = c_it->j2;
 
           	bool b_btag  = (btag.at(bi)  > btagcut);
          	bool o_btag  = (btag.at(oi)  > btagcut);
@@ -610,7 +608,7 @@ MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> &candidates, StopTree*
   //Calculate Variable 4b, 4bl, 4w
   mt2chi2.four_chi2b  = min_with_value(candidates, mt2chi2.three_mt2b, "mt2b", "chi2");
   mt2chi2.four_chi2bl = min_with_value(candidates, mt2chi2.three_mt2bl, "mt2bl", "chi2");
-  mt2chi2.four_chi2w  = min_with_value(candidates, mt2chi2.three_mt2w,  "mt2bw", "chi2");
+  mt2chi2.four_chi2w  = min_with_value(candidates, mt2chi2.three_mt2w,  "mt2w", "chi2");
 
   return mt2chi2;
 }
