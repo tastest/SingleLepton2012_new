@@ -781,6 +781,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 			for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
 
+				if ( i > (N_JETS_TO_CONSIDER-1) ) break;
 				if ( tree->pfjets_->at(i).Pt() < JET_PT ) continue;
 				if ( fabs(tree->pfjets_->at(i).Eta()) > JET_ETA ) continue;
 

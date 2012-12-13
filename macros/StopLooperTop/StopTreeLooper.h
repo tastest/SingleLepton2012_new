@@ -29,6 +29,7 @@ const float PDG_W_MASS = 80.385;
 const float BTAG_MED = 0.679;
 const float BTAG_LOW = 0.244;
 
+const int N_JETS_TO_CONSIDER = 6;
 const int NUM_LEAD_JETS_0B = 3;
 const int NUM_LEAD_JETS_1B = 3;
 
