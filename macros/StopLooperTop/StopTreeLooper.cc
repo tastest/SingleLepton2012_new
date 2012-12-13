@@ -600,12 +600,24 @@ MT2CHI2 StopTreeLooper::MT2CHI2Calculator(list<Candidate> candidates, StopTree* 
 }
 
 void plotCandidate(StopTree* tree, MT2struct mr, string tag, string sel, map<string,TH1F*> &h_1d , float evtweight){
-  plot1D("h_"+tag+"_hadchi2"+sel, Min(mr.chi2, (float)14.99) , evtweight , h_1d , 96  , -1. ,  15 );
-  plot1D("h_"+tag+"_mt2w"   +sel, Max(Min(mr.mt2w, (float)0.99),(float)-0.09) , evtweight , h_1d ,110 , -0.1 , 1. );
-  plot1D("h_"+tag+"_mt2b"   +sel, Min(mr.mt2b, (float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
-  plot1D("h_"+tag+"_mt2bl"  +sel, Min(mr.mt2bl,(float)599.0) , evtweight , h_1d , 100 , -1. , 600 );
-  plot1D("h_"+tag+"_qgtag"  +sel, tree->pfjets_qgtag_.at(0) , evtweight , h_1d , 210 , 0. , 1. );
+	float chi_min = -1;
+	float chi_max = 15;
+	float mt_min = -10;
+	float mt_max = 600;
 
+	plot1D("h_"+tag+"_one_chi2"+sel, Min(mc.one_chi2, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
+
+	plot1D("h_"+tag+"_two_mt2b"   +sel, Max(Min(mc.two_mt2b, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_two_mt2bl"  +sel, Max(Min(mc.two_mt2bl, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_two_mt2w"   +sel, Max(Min(mc.two_mt2w, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+
+	plot1D("h_"+tag+"_three_mt2b"   +sel, Max(Min(mc.three_mt2b, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_three_mt2bl"   +sel, Max(Min(mc.three_mt2bl, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+	plot1D("h_"+tag+"_three_mt2w"   +sel, Max(Min(mc.three_mt2w, (float)(mt_min+0.01)),(float)(mt_max-0.01)) , evtweight , h_1d ,110 , mt_min , mt_max );
+
+	plot1D("h_"+tag+"_four_chi2b"+sel, Min(mc.four_chi2b, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
+	plot1D("h_"+tag+"_four_chi2bl"+sel, Min(mc.four_chi2bl, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
+	plot1D("h_"+tag+"_four_chi2w"+sel, Min(mc.four_chi2w, (float)(chi_max-0.01)) , evtweight , h_1d , 96  , chi_min ,  chi_max );
 }
 
 void StopTreeLooper::loop(TChain *chain, TString name)
@@ -825,6 +837,23 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 			// get list of candidates
 			list<Candidate> allcandidates = recoHadronicTop(tree, isData);
 
+			//
+			// CR1 - single lepton + b-veto
+			//
+
+			// selection - 1 lepton + iso track veto
+			// Add b-tag veto
+			if ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 )
+			{
+				MT2CHI2 mc = MT2CHI2Calculator(candidates, tree);
+
+				plotCandidate(tree, mc , "cr1" ,          "" , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "cr1" , flav_tag_sl , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "cr1" ,             mtcut , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "cr1" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+
+			}
+
 			plot1D("h_ncand", Min((int)allcandidates.size(),49) , evtweight , h_1d , 50, 0, 50);
 
 			list<Candidate>::iterator candIter;
@@ -878,6 +907,57 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 			plot2D("h_two_three",                 mc.two_mt2w, mc.three_mt2w , evtweight ,     h_2d , xnbins , xmin , xmax , xnbins , xmin , xmax);
 			plot2D("h_two_three" +mtcut,          mc.two_mt2w, mc.three_mt2w , evtweight ,     h_2d , xnbins , xmin , xmax , xnbins , xmin , xmax);
+
+
+			//
+			// SIGNAL REGION - single lepton + b-tag
+			//
+
+			// selection - 1 lepton
+			// Add iso track veto
+			// Add b-tag
+			if ( passSingleLeptonSelection(tree, isData) && passIsoTrkVeto(tree) )
+			{
+
+				plotCandidate(tree, mc , "sig" ,          "" , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "sig" , flav_tag_sl , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "sig" ,             mtcut , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "sig" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+
+			}
+
+			//
+			// CR4 - ttbar dilepton sample with 2 good leptons
+			//
+
+			// selection - all dilepton, z-veto for SF dilepton
+			// Add b-tag requirement
+			if ( passDileptonSelection(tree, isData)
+					&& (abs(tree->id1_) != abs(tree->id2_) || fabs( tree->dilmass_ - 91.) > 15. ) )
+			{
+
+				plotCandidate(tree, mc , "cr4" ,          "" , h_1d , evtweight*trigweightdl);
+				plotCandidate(tree, mc , "cr4" , flav_tag_sl , h_1d , evtweight*trigweightdl);
+				plotCandidate(tree, mc , "cr4" ,             mtcut , h_1d , evtweight*trigweightdl);
+				plotCandidate(tree, mc , "cr4" , flav_tag_sl+mtcut , h_1d , evtweight*trigweightdl);
+
+			}
+
+			//
+			// CR5 - lepton + isolated track
+			//
+
+			// selection - lepton + isolated track
+			// Add b-tag requirement
+			if ( passLepPlusIsoTrkSelection(tree, isData) )
+			{
+
+				plotCandidate(tree, mc , "cr5" ,          "" , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "cr5" , flav_tag_sl , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "cr5" ,             mtcut , h_1d , evtweight*trigweight);
+				plotCandidate(tree, mc , "cr5" , flav_tag_sl+mtcut , h_1d , evtweight*trigweight);
+
+			}
 
 		} // end event loop
 
