@@ -891,19 +891,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   //string caloUncertaintyFile;
 
   if ( isData ) {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L1FastJet_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L2Relative_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L3Absolute_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_R_52_V9_L2L3Residual_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_P_V39_AN3_L1FastJet_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_P_V39_AN3_L2Relative_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_P_V39_AN3_L3Absolute_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/GR_P_V39_AN3_L2L3Residual_AK5PF.txt");
 
-    pfUncertaintyFile = "jetCorrections/GR_R_52_V9_Uncertainty_AK5PF.txt";
+    pfUncertaintyFile = "jetCorrections/GR_P_V39_AN3_Uncertainty_AK5PF.txt";
   } 
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START52_V9B_L1FastJet_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START52_V9B_L2Relative_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START52_V9B_L3Absolute_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V13_L1FastJet_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V13_L2Relative_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V13_L3Absolute_AK5PF.txt");
     
-    pfUncertaintyFile = "jetCorrections/START52_V9B_Uncertainty_AK5PF.txt";
+    pfUncertaintyFile = "jetCorrections/DESIGN53_V13_Uncertainty_AK5PF.txt";
   }
 
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
@@ -1854,7 +1854,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	      mlep_         = &els_p4().at(imatch);
 	      mleppassid_   = passElectronSelection_Stop2012_v3_NoIso( imatch , vetoTransition,vetoTransition,useOldIsolation) ? 1 : 0;
 	      mleppassiso_  = passElectronSelection_Stop2012_v3_Iso  ( imatch , vetoTransition,vetoTransition,useOldIsolation) ? 1 : 0;
-	      mlepiso_      = electronIsoValuePF2012_FastJetEffArea_v2( imatch , 0.3 , 0 );
+	      mlepiso_      = electronIsoValuePF2012_FastJetEffArea_v3( imatch , 0.3 , 0 );
 	    }
 
 	    // found matched muon
@@ -3025,7 +3025,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	iso1_   = electronIsolation_rel   ( index1 , true ); //truncated
 	isont1_ = electronIsolation_rel_v1( index1 , true ); //non-truncated
 	isopfold1_ = electronIsoValuePF2012_FastJetEffArea( index1 , 0.3 , 0 );
-	isopf1_ = electronIsoValuePF2012_FastJetEffArea_v2( index1 , 0.3 , 0 , false);
+	isopf1_ = electronIsoValuePF2012_FastJetEffArea_v3( index1 , 0.3 , 0 , false);
 	etasc1_ = els_etaSC()[index1];
 	eoverpin_  = els_eOverPIn ()[index1];
 	eoverpout_ = els_eOverPOut()[index1];
