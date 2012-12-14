@@ -103,6 +103,9 @@ class StopTreeLooper {
 	Float_t htosm_;
 	Float_t htratiom_;
 
+	Float_t dphimj1_;
+	Float_t dphimj2_;
+
 	// weights
 	Float_t weight_;
 	Float_t sltrigeff_;

@@ -915,6 +915,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       htosm_      = HT_OSM;
       htratiom_   = HT_SSM / HT_OSM;
 
+      dphimj1_    = getdphi(tree->t1metphicorrphi_, jetVector.at(0).phi() );
+      dphimj2_    = getdphi(tree->t1metphicorrphi_, jetVector.at(1).phi() );
+
       // fill me up
       nEventsPass++;
       outTree_->Fill();
@@ -1008,6 +1011,8 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("htssm"            ,        &htssm_           ,         "htssm/F"            );
   outTree_->Branch("htosm"            ,        &htosm_           ,         "htosm/F"            );
   outTree_->Branch("htratiom"         ,        &htosm_           ,         "htraiom/F"          );
+  outTree_->Branch("dphimj1"          ,        &dphimj1_         ,         "dphimj1/F"          );
+  outTree_->Branch("dphimj2"          ,        &dphimj2_         ,         "dphimj2/F"          );
 
 }
 
