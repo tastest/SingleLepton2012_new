@@ -68,6 +68,41 @@ class StopTreeLooper {
 	Float_t mt2b_;
 	Float_t mt2bl_;
 
+	// "best" chi2 and MT2 variables
+	Float_t chi2min_;
+	Float_t chi2min_mt2b_;  
+	Float_t chi2min_mt2bl_; 
+	Float_t chi2min_mt2w_;  
+	Float_t mt2bmin_;       
+	Float_t mt2blmin_;      
+	Float_t mt2wmin_;       
+	Float_t mt2bmin_chi2_;  
+	Float_t mt2blmin_chi2_; 
+	Float_t mt2wmin_chi2_;  
+
+	// event shapes
+	Float_t thrjet_;
+	Float_t apljet_;
+	Float_t sphjet_;
+	Float_t cirjet_;
+
+	Float_t thrjetl_;
+	Float_t apljetl_;
+	Float_t sphjetl_;
+	Float_t cirjetl_;
+
+	Float_t thrjetlm_;
+	Float_t apljetlm_;
+	Float_t sphjetlm_;
+	Float_t cirjetlm_;
+
+	Float_t htssl_;
+	Float_t htosl_;
+	Float_t htratiol_;
+	Float_t htssm_;
+	Float_t htosm_;
+	Float_t htratiom_;
+
 	// weights
 	Float_t weight_;
 	Float_t sltrigeff_;
@@ -88,16 +123,24 @@ class StopTreeLooper {
 	Float_t lep2eta_;
 	Float_t dilmass_;
 
+	// susy variables
+	Float_t mstop_;
+	Float_t mlsp_;
+	Float_t x_;
+
     private:
 
+	static const float JET_PT = 30.;
+	static const float JET_ETA = 3.0;
+
+	static const int N_JETS_TO_CONSIDER = 6;
+
 	string m_outfilename_;
-	//for phi corrected met
-	/* float t1metphicorr; */
-	/* float t1metphicorrphi; */
-	/* float t1metphicorrmt; */
-	/* //for mt peak definition */
-	/* float min_mtpeak; */
-	/* float max_mtpeak;  */
+
+	int n_jets;
+	vector<LorentzVector> jets;
+	vector<float> btag;
+	vector<int> mc;
 
 };
 

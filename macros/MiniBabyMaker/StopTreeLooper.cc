@@ -1,11 +1,13 @@
 #include "../../CORE/jetSmearingTools.h"
+#include "../../CORE/Thrust.h"
+#include "../../CORE/EventShape.h"
 
 #include "StopTreeLooper.h"
 #include "../Plotting/PlotUtilities.h"
 #include "../Core/MT2Utility.h"
 #include "../Core/mt2bl_bisect.h"
 #include "../Core/mt2w_bisect.h"
-
+#include "../Core/PartonCombinatorics.h"
 #include "../Core/stopUtils.h"
 
 #include "TROOT.h"
@@ -605,11 +607,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   gROOT->cd();
 
-  cout << "[StopTreeLooper::loop] setting up histos" << endl;
-
-  //plotting map
-  std::map<std::string, TH1F*> h_1d;//h_cr1, h_cr4, h_cr5;
-
   makeTree(name.Data());
 
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
@@ -625,6 +622,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   // file loop
   //
 
+  unsigned int nEventsPass=0;
   unsigned int nEventsChain=0;
   unsigned int nEvents = chain->GetEntries();
   nEventsChain = nEvents;
@@ -650,7 +648,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //---------------------------------
 
     ULong64_t nEvents = tree->tree_->GetEntries();
-    nEvents = 1000;
+    //nEvents = 1000;
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
       tree->tree_->GetEntry(event);
@@ -692,6 +690,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //------------------------------------------ 
 
       float evtweight    = isData ? 1. : ( tree->weight_ * tree->nvtxweight_ * tree->mgcor_ );
+      // TO BE FIXED (NOT ALL POINTS HAVE 50K EVENTS)
+      if( name.Contains("T2") ) evtweight = tree->xsecsusy_ * 1000.0 / 50000.0; 
+
       float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
       float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
 
@@ -704,6 +705,126 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       if ( tree->t1metphicorr_ < 50.0    ) continue; // MET > 50 GeV
 
       //------------------------------------------ 
+      // get list of jets
+      //------------------------------------------ 
+
+      n_jets = 0;
+      jets.clear();
+      btag.clear();
+      mc.clear();
+
+      for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
+
+	if ( i > (N_JETS_TO_CONSIDER-1) ) break;
+	if ( tree->pfjets_->at(i).Pt() < JET_PT ) continue;
+	if ( fabs(tree->pfjets_->at(i).Eta()) > JET_ETA ) continue;
+
+	n_jets++;
+	jets.push_back( tree->pfjets_->at(i)    );
+	btag.push_back( tree->pfjets_csv_.at(i) );
+	if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
+      }
+
+      //------------------------------------------ 
+      // get list of candidates
+      //------------------------------------------ 
+      
+      static JetSmearer* jetSmearer = 0;
+      if (jetSmearer == 0 ){
+	std::vector<std::string> list_of_file_names;
+	list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PtResolution_AK5PF.txt");
+	list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PhiResolution_AK5PF.txt");
+	list_of_file_names.push_back("../../CORE/jetsmear/data/jet_resolutions.txt");
+	jetSmearer = makeJetSmearer(list_of_file_names);
+      }
+
+      LorentzVector* lep = &tree->lep1_;
+      float met = tree->t1metphicorr_;
+      float metphi = tree->t1metphicorrphi_;
+
+      vector<float> sigma_jets;
+      for (int i=0; i<n_jets; ++i){
+	float sigma = getJetResolution(jets[i], jetSmearer);
+	if ( isData) sigma *= getDataMCRatio(jets[i].eta());
+	sigma_jets.push_back(sigma);
+      }
+
+      // get list of candidates
+      PartonCombinatorics pc (jets, btag, sigma_jets, mc, *lep, met, metphi, isData);
+      MT2CHI2 mc = pc.getMt2Chi2();
+
+      //------------------------------------------ 
+      // event shapes
+      //------------------------------------------ 
+
+      std::vector<LorentzVector>* myPfJets = tree->pfjets_;
+      std::vector<LorentzVector>  jetVector;
+      std::vector<LorentzVector>  jetLeptonVector;
+      std::vector<LorentzVector>  jetLeptonMetVector;
+
+      jetVector.clear();
+      jetLeptonVector.clear();
+      jetLeptonMetVector.clear();
+
+      float HT_SSL=0;
+      float HT_OSL=0;
+
+      float HT_SSM=0;
+      float HT_OSM=0;
+
+
+      LorentzVector lep1_p4( tree->lep1_.px() , tree->lep1_.py() , 0 , tree->lep1_.E() ); 
+
+      LorentzVector met_p4( tree->t1metphicorr_ * cos( tree->t1metphicorr_ ) , 
+			    tree->t1metphicorr_ * sin( tree->t1metphicorr_ ) , 
+			    0,
+			    tree->t1metphicorr_
+			    );
+
+      jetLeptonVector.push_back(lep1_p4);
+
+      jetLeptonMetVector.push_back(lep1_p4);
+      jetLeptonMetVector.push_back(met_p4);
+
+      for ( unsigned int i=0; i<myPfJets->size() ; i++) {
+
+	if( myPfJets->at(i).pt()<30 )          continue;
+	if( fabs(myPfJets->at(i).eta())>3.0 )  continue;
+
+	LorentzVector jet_p4( myPfJets->at(i).px() , myPfJets->at(i).py() , 0 , myPfJets->at(i).E() );
+    
+	// jetVector.push_back(myPfJets->at(i));
+	// jetLeptonVector.push_back(myPfJets->at(i));
+	// jetLeptonMetVector.push_back(myPfJets->at(i));
+
+	jetVector.push_back(jet_p4);
+	jetLeptonVector.push_back(jet_p4);
+	jetLeptonMetVector.push_back(jet_p4);
+
+	float dPhiL = getdphi(tree->lep1_.Phi(), myPfJets->at(i).phi() );
+	float dPhiM = getdphi(tree->t1metphicorrphi_, myPfJets->at(i).phi() );
+    
+	if(dPhiL<(3.14/2))  HT_SSL=HT_SSL+myPfJets->at(i).pt();
+	if(dPhiL>=(3.14/2)) HT_OSL=HT_OSL+myPfJets->at(i).pt();
+
+	if(dPhiM<(3.14/2))  HT_SSM=HT_SSM+myPfJets->at(i).pt();
+	if(dPhiM>=(3.14/2)) HT_OSM=HT_OSM+myPfJets->at(i).pt();
+
+      }
+  
+      // from jets only
+      Thrust thrust(jetVector);
+      EventShape eventshape(jetVector);
+
+      // from jets and lepton
+      Thrust thrustl(jetLeptonVector);
+      EventShape eventshapel(jetLeptonVector);
+
+      // from jets and lepton and MET
+      Thrust thrustlm(jetLeptonMetVector);
+      EventShape eventshapelm(jetLeptonMetVector);
+
+      //------------------------------------------ 
       // variables to add to baby
       //------------------------------------------ 
       
@@ -713,42 +834,89 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       MT2struct mr                  = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
 
       // which selections are passed
-      sig_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_>=1 ) ? 1 : 0;
-      cr1_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 ) ? 1 : 0;
-      cr4_        = ( passDileptonSelection(tree, isData) )                          ? 1 : 0;
-      cr5_        = ( passLepPlusIsoTrkSelection(tree, isData) )                     ? 1 : 0;
+      sig_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_>=1 ) ? 1 : 0; // pass signal region preselection
+      cr1_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
+      cr4_        = ( passDileptonSelection(tree, isData) )                          ? 1 : 0; // pass CR4 (dilepton) control region preselection
+      cr5_        = ( passLepPlusIsoTrkSelection(tree, isData) )                     ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
 
       // kinematic variables
-      met_        = tree->t1metphicorr_;
-      mt_         = tree->t1metphicorrmt_;
-      chi2_       = mr.chi2;
-      mt2w_       = mr.mt2w;
+      met_        = tree->t1metphicorr_;       // MET (type1, MET-phi corrections)
+      mt_         = tree->t1metphicorrmt_;     // MT (type1, MET-phi corrections)
+
+      // the following variables are obsolete, to be updated
+      chi2_       = mr.chi2;                   
+      mt2w_       = mr.mt2w;                   
       mt2b_       = mr.mt2b;
       mt2bl_      = mr.mt2bl;
 
-      // weights
-      weight_     = evtweight;
-      sltrigeff_  = trigweight;
-      dltrigeff_  = trigweightdl;
+      // chi2 and MT2 variables
+      chi2min_       = mc.one_chi2;               // minimum chi2 
+      chi2min_mt2b_  = mc.two_mt2b;               // minimum MT2b consistent with chi2min
+      chi2min_mt2bl_ = mc.two_mt2bl;              // minimum MT2bl consistent with chi2min
+      chi2min_mt2w_  = mc.two_mt2w;               // minimum MT2w consistent with chi2min
+      mt2bmin_       = mc.three_mt2b;             // minimum MT2b
+      mt2blmin_      = mc.three_mt2bl;            // minimum MT2bl
+      mt2wmin_       = mc.three_mt2w;             // minimum MT2w
+      mt2bmin_chi2_  = mc.four_chi2b;             // minimum chi2 consistent with mt2bmin
+      mt2blmin_chi2_ = mc.four_chi2bl;            // minimum chi2 consistent with mt2blmin
+      mt2wmin_chi2_  = mc.four_chi2w;             // minimum chi2 consistent with mt2wmin
 
-      // hadronic variables
-      nb_         = tree->nbtagscsvm_;
-      njets_      = tree->npfjets30_;
+      // weights
+      weight_     = evtweight;                    // event weight
+      sltrigeff_  = trigweight;                   // trigger weight (single lepton)
+      dltrigeff_  = trigweightdl;                 // trigger weight (dilepton)
+
+      // hadronic variables 
+      nb_         = tree->nbtagscsvm_;            // nbjets (pT > 30, CSVM)
+      njets_      = tree->npfjets30_;             // njets (pT > 30, eta < 2.5)
 
       // lepton variables
-      passisotrk_ = passIsoTrkVeto(tree) ? 1 : 0;
-      nlep_       = tree->ngoodlep_;
-
-      lep1pt_     = tree->lep1_.pt();
-      lep1eta_    = tree->lep1_.eta();
+      passisotrk_ = passIsoTrkVeto(tree) ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
+      nlep_       = tree->ngoodlep_;              // number of analysis selected leptons
+ 
+      lep1pt_     = tree->lep1_.pt();             // 1st lepton pt
+      lep1eta_    = tree->lep1_.eta();            // 1st lepton eta
 
       if( nlep_ > 1 ){
-	lep2pt_    = tree->lep1_.pt();
-	lep2eta_   = tree->lep1_.eta();
-	dilmass_   = tree->dilmass_;
+	lep2pt_    = tree->lep1_.pt();            // 2nd lepton pt
+	lep2eta_   = tree->lep1_.eta();           // 2nd lepton eta
+	dilmass_   = tree->dilmass_;              // dilepton mass
       }
       
+      // susy vars
+      mstop_       = tree->mg_;                   // stop mass
+      mlsp_        = tree->ml_;                   // LSP mass
+      x_           = tree->x_;                    // chargino mass parameter x
+
+      // event shapes (from jets only)
+      thrjet_    = thrust.thrust();
+      apljet_    = eventshape.aplanarity();
+      sphjet_    = eventshape.sphericity();
+      cirjet_    = eventshape.circularity();
+
+      // event shapes (from jets and lepton)
+      thrjetl_   = thrustl.thrust();
+      apljetl_   = eventshapel.aplanarity();
+      sphjetl_   = eventshapel.sphericity();
+      cirjetl_   = eventshapel.circularity();
+
+      // event shapes (from jets, lepton, and MET)
+      thrjetlm_   = thrustlm.thrust();
+      apljetlm_   = eventshapelm.aplanarity();
+      sphjetlm_   = eventshapelm.sphericity();
+      cirjetlm_   = eventshapelm.circularity();
+
+      // event shapes: HT in hemisphers
+      htssl_      = HT_SSL;
+      htosl_      = HT_OSL;
+      htratiol_   = HT_SSL / HT_OSL;
+
+      htssm_      = HT_SSM;
+      htosm_      = HT_OSM;
+      htratiom_   = HT_SSM / HT_OSM;
+
       // fill me up
+      nEventsPass++;
       outTree_->Fill();
 
     } // end event loop
@@ -757,6 +925,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   //-------------------------
   // finish and clean up
   //-------------------------
+
+  cout << "[StopTreeLooper::loop] saving mini-baby with total entries " << nEventsPass << endl;
 
   outFile_->cd();
   outTree_->Write();
@@ -783,31 +953,61 @@ void StopTreeLooper::makeTree(const char *prefix){
 
   outTree_ = new TTree("t","Tree");
 
-  outTree_->Branch("lep1pt"       ,        &lep1pt_      ,         "lep1pt/F"		);
-  outTree_->Branch("lep1eta"      ,        &lep1eta_     ,         "lep1eta/F"		);
-  outTree_->Branch("sig"          ,        &sig_         ,         "sig/I"		);
-  outTree_->Branch("cr1"          ,        &cr1_         ,         "cr1/I"		);
-  outTree_->Branch("cr4"          ,        &cr4_         ,         "cr4/I"		);
-  outTree_->Branch("cr5"          ,        &cr5_         ,         "cr5/I"		);
-  outTree_->Branch("met"          ,        &met_         ,         "met/F"		);
-  outTree_->Branch("mt"           ,        &mt_          ,         "mt/F"		);
-  outTree_->Branch("chi2"         ,        &chi2_        ,         "chi2/F"		);
-  outTree_->Branch("mt2w"         ,        &mt2w_        ,         "mt2w/F"		);
-  outTree_->Branch("mt2b"         ,        &mt2b_        ,         "mt2b/F"		);
-  outTree_->Branch("mt2bl"        ,        &mt2bl_       ,         "mt2bl/F"		);
-  outTree_->Branch("weight"       ,        &weight_      ,         "weight/F"		);
-  outTree_->Branch("sltrigeff"    ,        &sltrigeff_   ,         "sltrigeff/F"	);
-  outTree_->Branch("dltrigeff"    ,        &dltrigeff_   ,         "dltrigeff/F"	);
-  outTree_->Branch("nb"           ,        &nb_          ,         "nb/I"		);
-  outTree_->Branch("njets"        ,        &njets_       ,         "njets/I"		);
-  outTree_->Branch("passisotrk"   ,        &passisotrk_  ,         "passisotrk/I"	);
-  outTree_->Branch("nlep"         ,        &nlep_        ,         "nlep/I"		);
-  outTree_->Branch("lep1pt"       ,        &lep1pt_      ,         "lep1pt/F"		);
-  outTree_->Branch("lep1eta"      ,        &lep1eta_     ,         "lep1eta/F"		);
-  outTree_->Branch("lep2pt"       ,        &lep2pt_      ,         "lep2pt/F"		);
-  outTree_->Branch("lep2eta"      ,        &lep2eta_     ,         "lep2eta/F"		);
-  outTree_->Branch("dilmass"      ,        &dilmass_     ,         "dilmass/F"		);
-
+  outTree_->Branch("lep1pt"           ,        &lep1pt_          ,         "lep1pt/F"		);
+  outTree_->Branch("lep1eta"          ,        &lep1eta_         ,         "lep1eta/F"		);
+  outTree_->Branch("sig"              ,        &sig_             ,         "sig/I"		);
+  outTree_->Branch("cr1"              ,        &cr1_             ,         "cr1/I"		);
+  outTree_->Branch("cr4"              ,        &cr4_             ,         "cr4/I"		);
+  outTree_->Branch("cr5"              ,        &cr5_             ,         "cr5/I"		);
+  outTree_->Branch("met"              ,        &met_             ,         "met/F"		);
+  outTree_->Branch("mt"               ,        &mt_              ,         "mt/F"		);
+  outTree_->Branch("chi2"             ,        &chi2_            ,         "chi2/F"		);
+  outTree_->Branch("mt2w"             ,        &mt2w_            ,         "mt2w/F"		);
+  outTree_->Branch("mt2b"             ,        &mt2b_            ,         "mt2b/F"		);
+  outTree_->Branch("mt2bl"            ,        &mt2bl_           ,         "mt2bl/F"		);
+  outTree_->Branch("weight"           ,        &weight_          ,         "weight/F"		);
+  outTree_->Branch("sltrigeff"        ,        &sltrigeff_       ,         "sltrigeff/F"	);
+  outTree_->Branch("dltrigeff"        ,        &dltrigeff_       ,         "dltrigeff/F"	);
+  outTree_->Branch("nb"               ,        &nb_              ,         "nb/I"		);
+  outTree_->Branch("njets"            ,        &njets_           ,         "njets/I"		);
+  outTree_->Branch("passisotrk"       ,        &passisotrk_      ,         "passisotrk/I"	);
+  outTree_->Branch("nlep"             ,        &nlep_            ,         "nlep/I"		);
+  outTree_->Branch("lep1pt"           ,        &lep1pt_          ,         "lep1pt/F"		);
+  outTree_->Branch("lep1eta"          ,        &lep1eta_         ,         "lep1eta/F"		);
+  outTree_->Branch("lep2pt"           ,        &lep2pt_          ,         "lep2pt/F"		);
+  outTree_->Branch("lep2eta"          ,        &lep2eta_         ,         "lep2eta/F"		);
+  outTree_->Branch("dilmass"          ,        &dilmass_         ,         "dilmass/F"		);
+  outTree_->Branch("mstop"            ,        &mstop_           ,         "mstop/F"		);
+  outTree_->Branch("mlsp"             ,        &mlsp_            ,         "mlsp/F"		);
+  outTree_->Branch("x"                ,        &x_               ,         "x/F"		);
+  outTree_->Branch("chi2min"          ,        &chi2min_         ,         "chi2min/F"          );
+  outTree_->Branch("chi2min_mt2b"     ,        &chi2min_mt2b_    ,         "chi2min_mt2b/F"     );  
+  outTree_->Branch("chi2min_mt2bl"    ,        &chi2min_mt2bl_   ,         "chi2min_mt2bl/F"    );  
+  outTree_->Branch("chi2min_mt2w"     ,        &chi2min_mt2w_    ,         "chi2min_mt2w/F"     );  
+  outTree_->Branch("mt2bmin"          ,        &mt2bmin_         ,         "mt2bmin/F"          );       
+  outTree_->Branch("mt2blmin"         ,        &mt2blmin_        ,         "mt2blmin/F"         );       
+  outTree_->Branch("mt2wmin"          ,        &mt2wmin_         ,         "mt2wmin/F"          );       
+  outTree_->Branch("mt2bmin_chi2"     ,        &mt2bmin_chi2_    ,         "mt2bmin_chi2/F"     );       
+  outTree_->Branch("mt2blmin_chi2"    ,        &mt2blmin_chi2_   ,         "mt2blmin_chi2/F"    );       
+  outTree_->Branch("mt2wmin_chi2"     ,        &mt2wmin_chi2_    ,         "mt2wmin_chi2/F"     );       
+  outTree_->Branch("thrjet"           ,        &thrjet_          ,         "thrjet/F"           );
+  outTree_->Branch("sphjet"           ,        &sphjet_          ,         "sphjet/F"           );
+  outTree_->Branch("apljet"           ,        &apljet_          ,         "apljet/F"           );
+  outTree_->Branch("cirjet"           ,        &cirjet_          ,         "cirjet/F"           );
+  outTree_->Branch("thrjetl"          ,        &thrjetl_         ,         "thrjetl/F"          );
+  outTree_->Branch("sphjetl"          ,        &sphjetl_         ,         "sphjetl/F"          );
+  outTree_->Branch("apljetl"          ,        &apljetl_         ,         "apljetl/F"          );
+  outTree_->Branch("cirjetl"          ,        &cirjetl_         ,         "cirjetl/F"          );
+  outTree_->Branch("thrjetlm"         ,        &thrjetlm_        ,         "thrjetlm/F"         );
+  outTree_->Branch("sphjetlm"         ,        &sphjetlm_        ,         "sphjetlm/F"         );
+  outTree_->Branch("apljetlm"         ,        &apljetlm_        ,         "apljetlm/F"         );
+  outTree_->Branch("cirjetlm"         ,        &cirjetlm_        ,         "cirjetlm/F"         );
+  outTree_->Branch("htssl"            ,        &htssl_           ,         "htssl/F"            );
+  outTree_->Branch("htosl"            ,        &htosl_           ,         "htosl/F"            );
+  outTree_->Branch("htratiol"         ,        &htosl_           ,         "htraiol/F"          );
+  outTree_->Branch("htssm"            ,        &htssm_           ,         "htssm/F"            );
+  outTree_->Branch("htosm"            ,        &htosm_           ,         "htosm/F"            );
+  outTree_->Branch("htratiom"         ,        &htosm_           ,         "htraiom/F"          );
 
 }
 
@@ -831,6 +1031,41 @@ void StopTreeLooper::initBaby(){
   mt2b_       = -1.0;
   mt2bl_      = -1.0;
 
+  // "best" chi2 and MT2 variables
+  chi2min_        = -1.0;
+  chi2min_mt2b_   = -1.0;  
+  chi2min_mt2bl_  = -1.0; 
+  chi2min_mt2w_   = -1.0;  
+  mt2bmin_        = -1.0;       
+  mt2blmin_       = -1.0;      
+  mt2wmin_        = -1.0;       
+  mt2bmin_chi2_   = -1.0;  
+  mt2blmin_chi2_  = -1.0; 
+  mt2wmin_chi2_   = -1.0;  
+
+  // event shapes
+  thrjet_     = -1.0;
+  apljet_     = -1.0;
+  sphjet_     = -1.0;
+  cirjet_     = -1.0;
+
+  thrjetl_    = -1.0;
+  apljetl_    = -1.0;
+  sphjetl_    = -1.0;
+  cirjetl_    = -1.0;
+
+  thrjetlm_   = -1.0;
+  apljetlm_   = -1.0;
+  sphjetlm_   = -1.0;
+  cirjetlm_   = -1.0;
+
+  htssl_      = -1.0;
+  htosl_      = -1.0;
+  htratiol_   = -1.0;
+  htssm_      = -1.0;
+  htosm_      = -1.0;
+  htratiom_   = -1.0;
+
   // weights
   weight_     = -1.0;
   sltrigeff_  = -1.0;
@@ -848,6 +1083,11 @@ void StopTreeLooper::initBaby(){
   lep2pt_     = -1.0;
   lep2eta_    = -1.0;
   dilmass_    = -1.0;
+
+  // susy variables
+  mstop_      = -1.0;
+  mlsp_       = -1.0;
+  x_          = -1.0;
 
 }
 
