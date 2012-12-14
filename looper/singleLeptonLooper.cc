@@ -899,11 +899,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     pfUncertaintyFile = "jetCorrections/GR_P_V39_AN3_Uncertainty_AK5PF.txt";
   } 
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V13_L1FastJet_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V13_L2Relative_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V13_L3Absolute_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V15_L1FastJet_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V15_L2Relative_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V15_L3Absolute_AK5PF.txt");
     
-    pfUncertaintyFile = "jetCorrections/DESIGN53_V13_Uncertainty_AK5PF.txt";
+    pfUncertaintyFile = "jetCorrections/DESIGN53_V15_Uncertainty_AK5PF.txt";
   }
 
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
