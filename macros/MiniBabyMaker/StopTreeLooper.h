@@ -79,6 +79,7 @@ class StopTreeLooper {
 	Float_t mt2bmin_chi2_;  
 	Float_t mt2blmin_chi2_; 
 	Float_t mt2wmin_chi2_;  
+	Int_t   ncand_;
 
 	// event shapes
 	Float_t thrjet_;

@@ -860,6 +860,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       mt2bmin_chi2_  = mc.four_chi2b;             // minimum chi2 consistent with mt2bmin
       mt2blmin_chi2_ = mc.four_chi2bl;            // minimum chi2 consistent with mt2blmin
       mt2wmin_chi2_  = mc.four_chi2w;             // minimum chi2 consistent with mt2wmin
+      ncand_         = pc.b_candidates_.size();   // number of candidates consisting with btagging info
 
       // weights
       weight_     = evtweight;                    // event weight
@@ -993,6 +994,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("mt2bmin_chi2"     ,        &mt2bmin_chi2_    ,         "mt2bmin_chi2/F"     );       
   outTree_->Branch("mt2blmin_chi2"    ,        &mt2blmin_chi2_   ,         "mt2blmin_chi2/F"    );       
   outTree_->Branch("mt2wmin_chi2"     ,        &mt2wmin_chi2_    ,         "mt2wmin_chi2/F"     );       
+  outTree_->Branch("ncand"            ,        &ncand_           ,         "ncand/F"            );       
   outTree_->Branch("thrjet"           ,        &thrjet_          ,         "thrjet/F"           );
   outTree_->Branch("sphjet"           ,        &sphjet_          ,         "sphjet/F"           );
   outTree_->Branch("apljet"           ,        &apljet_          ,         "apljet/F"           );
