@@ -5,7 +5,7 @@
 #include "../Core/MT2Utility.h"
 #include "../Core/mt2bl_bisect.h"
 #include "../Core/mt2w_bisect.h"
-#include "PartonCombinatorics.h"
+#include "../Core/PartonCombinatorics.h"
 
 #include "../Core/stopUtils.h"
 
