@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-02-03_2012"
+TAG="V00-02-06_2012"
 
 #
 # DATA
@@ -15,6 +15,7 @@ TAG="V00-02-03_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleMu_Run2012B-13Jul2012-v1_AOD/merged/ ${TAG}_SingleMu2012B_13Jul2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleMu_Run2012C-24Aug2012-v1_AOD/merged/ ${TAG}_SingleMu2012C_24Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleMu_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_SingleMu2012C_PromptRecov2V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleMu_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_SingleMu2012D_PromptRecov1V532
 
 # --- SINGLE ELECTRON ---
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleElectron_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_SingleElectron2012A_recover06Aug2012V532
@@ -22,6 +23,7 @@ TAG="V00-02-03_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleElectron_Run2012B-13Jul2012-v1_AOD/merged/ ${TAG}_SingleElectron2012B_13Jul2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleElectron_Run2012C-24Aug2012-v1_AOD//merged/ ${TAG}_SingleElectron2012C_24Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleElectron_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_SingleElectron2012C_PromptRecov2V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/SingleElectron_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_SingleElectron2012D_PromptRecov1V532
 
 # --- DOUBLE MU ---
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleMu_Run2012A-recover-06Aug2012-v1_AOD/merged/  ${TAG}_DoubleMu2012A_recover06Aug2012v1V532
@@ -29,6 +31,7 @@ TAG="V00-02-03_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleMu_Run2012B-13Jul2012-v4_AOD/merged/  ${TAG}_DoubleMu2012B_13Jul2012v4V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleMu_Run2012C-24Aug2012-v1_AOD/merged/ ${TAG}_DoubleMu2012C_24Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleMu_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_DoubleMu2012C_PromptRecov2V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleMu_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_DoubleMu2012D_PromptRecov1V532
 
 # --- MUEG ---
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/MuEG_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_MuEG2012A_recover06Aug2012v1V532
@@ -36,6 +39,8 @@ TAG="V00-02-03_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/MuEG_Run2012B-13Jul2012-v1_AOD/merged/  ${TAG}_MuEG2012B_13Jul2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/MuEG_Run2012C-24Aug2012-v1_AOD/merged/ ${TAG}_MuEG2012C_24Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/MuEG_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_MuEG2012C_PromptRecov2V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/MuEG_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_MuEG2012D_PromptRecov1V532
+
 
 # --- DOUBLE ELECTRON ---
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleElectron_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_DoubleElectron2012A_recover06Aug2012v1V532
@@ -43,6 +48,7 @@ TAG="V00-02-03_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleElectron_Run2012B-13Jul2012-v1_AOD/merged/  ${TAG}_DoubleElectron2012B_13Jul2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleElectron_Run2012C-24Aug2012-v1_AOD/merged/ ${TAG}_DoubleElectron2012C_24Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleElectron_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_DoubleElectron2012C_PromptRecov2V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-18/DoubleElectron_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_DoubleElectron2012D_PromptRecov1V532
 
 #
 # TTBAR
