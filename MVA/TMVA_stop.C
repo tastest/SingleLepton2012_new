@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVA_stop.C,v 1.1 2012/12/14 08:59:44 benhoob Exp $
+// @(#)root/tmva $Id: TMVA_stop.C,v 1.2 2012/12/17 13:45:10 benhoob Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -73,11 +73,13 @@ void TMVA_stop( TString myMethodList = "" )
   //-----------------------------------------------------
 
   TCut njets4("njets>=4");
-  TCut met50("met>=50");
+  TCut met100("met>=100");
   TCut mt120("mt>=120");
   TCut nb1("nb>=1");
+  TCut isotrk("passisotrk==1");
+  TCut lep_pt30("nlep>=1 && lep1pt>30.0");
    
-  TCut  sel      = njets4 + met50 + mt120 + nb1;
+  TCut  sel      = lep_pt30 + isotrk + njets4 + met100 + mt120 + nb1;
   char* sigpoint = "T2tt_450_0";
 
   cout << "Using selection      : " << sel.GetTitle() << endl;
@@ -88,24 +90,43 @@ void TMVA_stop( TString myMethodList = "" )
   //-----------------------------------------------------
   
   std::map<std::string,int> mvaVar;
-  mvaVar[ "met" ]            = 1;
-  mvaVar[ "mt" ]             = 0;
-  mvaVar[ "mt2w" ]           = 0;
-  mvaVar[ "mt2bl" ]          = 0;
-  mvaVar[ "mt2b" ]           = 0;
-  mvaVar[ "chi2" ]           = 0;
-  mvaVar[ "lep1pt" ]         = 1;
-  mvaVar[ "lep1eta" ]        = 0;
+  mvaVar[ "met" ]			= 1;
+  mvaVar[ "mt" ]			= 0;
+  mvaVar[ "mt2w" ]			= 0;
+  mvaVar[ "mt2bl" ]			= 0;
+  mvaVar[ "mt2b" ]			= 0;
+  mvaVar[ "chi2" ]			= 0;
+  mvaVar[ "lep1pt" ]			= 1;
+  mvaVar[ "lep1eta" ]			= 1;
+  mvaVar[ "thrjetlm" ]			= 1;
+  mvaVar[ "apljetlm" ]			= 0;
+  mvaVar[ "sphjetlm" ]			= 1;
+  mvaVar[ "cirjetlm" ]			= 1;
+  mvaVar[ "chi2min" ]			= 1;
+  mvaVar[ "chi2min_mt2b" ]		= 1;
+  mvaVar[ "chi2min_mt2bl" ]		= 1;
+  mvaVar[ "chi2min_mt2w" ]		= 1;
+  mvaVar[ "mt2bmin" ]			= 1;
+  mvaVar[ "mt2blmin" ]			= 1;
+  mvaVar[ "mt2wmin" ]			= 1;
+  mvaVar[ "mt2wmin_chi2" ]		= 1;
+  mvaVar[ "mt2bmin_chi2" ]		= 1;
+  mvaVar[ "mt2blmin_chi2" ]		= 1;
+  mvaVar[ "htratiol" ]              	= 1;
+  mvaVar[ "htratiom" ]	                = 1;
+  mvaVar[ "dphimj1" ]			= 1;
+  mvaVar[ "dphimj2" ]			= 1;
+  mvaVar[ "rand" ]			= 0;
 
-  cout << "Variables for MVA    :" << endl;
-  if( mvaVar[ "met"     ]  == 1 ) cout << "met"     << endl;
-  if( mvaVar[ "mt"      ]  == 1 ) cout << "mt"      << endl;
-  if( mvaVar[ "mt2w"    ]  == 1 ) cout << "mt2w"    << endl;
-  if( mvaVar[ "mt2bl"   ]  == 1 ) cout << "mt2bl"   << endl;
-  if( mvaVar[ "mt2b"    ]  == 1 ) cout << "mt2b"    << endl;
-  if( mvaVar[ "chi2"    ]  == 1 ) cout << "chi2"    << endl;
-  if( mvaVar[ "lep1pt"  ]  == 1 ) cout << "lep1pt"  << endl;
-  if( mvaVar[ "lep1eta" ]  == 1 ) cout << "lep1eta" << endl;
+  // cout << "Variables for MVA    :" << endl;
+  // if( mvaVar[ "met"     ]  == 1 ) cout << "met"     << endl;
+  // if( mvaVar[ "mt"      ]  == 1 ) cout << "mt"      << endl;
+  // if( mvaVar[ "mt2w"    ]  == 1 ) cout << "mt2w"    << endl;
+  // if( mvaVar[ "mt2bl"   ]  == 1 ) cout << "mt2bl"   << endl;
+  // if( mvaVar[ "mt2b"    ]  == 1 ) cout << "mt2b"    << endl;
+  // if( mvaVar[ "chi2"    ]  == 1 ) cout << "chi2"    << endl;
+  // if( mvaVar[ "lep1pt"  ]  == 1 ) cout << "lep1pt"  << endl;
+  // if( mvaVar[ "lep1eta" ]  == 1 ) cout << "lep1eta" << endl;
   
   //---------------------------------
   //choose bkg samples to include
@@ -292,14 +313,33 @@ void TMVA_stop( TString myMethodList = "" )
    // choose which variables to include in training
    //--------------------------------------------------------
 
-   if( mvaVar[ "met"     ]  == 1 ) factory->AddVariable( "met"      ,           "ETmiss"      ,                "GeV", 'F' );
-   if( mvaVar[ "mt"      ]  == 1 ) factory->AddVariable( "mt"       ,           "mT"          ,                "GeV", 'F' );
-   if( mvaVar[ "mt2w"    ]  == 1 ) factory->AddVariable( "mt2w"     ,           "MT2W"        ,                "GeV", 'F' );
-   if( mvaVar[ "mt2bl"   ]  == 1 ) factory->AddVariable( "mt2bl"    ,           "MT2bl"       ,                "GeV", 'F' );
-   if( mvaVar[ "mt2b"    ]  == 1 ) factory->AddVariable( "mt2b"     ,           "MT2b"        ,                "GeV", 'F' );
-   if( mvaVar[ "chi2"    ]  == 1 ) factory->AddVariable( "min(chi2,100)"     ,           "chi2"        ,                ""   , 'F' );
-   if( mvaVar[ "lep1pt"  ]  == 1 ) factory->AddVariable( "lep1pt"   ,           "lepton pt"   ,                ""   , 'F' );
-   if( mvaVar[ "lep1eta" ]  == 1 ) factory->AddVariable( "lep1eta"  ,           "lepton eta"  ,                ""   , 'F' );
+   if( mvaVar[ "met"           ]  == 1 ) factory->AddVariable( "met"                    ,  "E_{T}^{miss}"               ,       "GeV", 'F' );
+   if( mvaVar[ "mt"            ]  == 1 ) factory->AddVariable( "mt"                     ,  "M_{T}"                      ,       "GeV", 'F' );
+   if( mvaVar[ "mt2w"          ]  == 1 ) factory->AddVariable( "mt2w"                   ,  "MT2W"                       ,       "GeV", 'F' );
+   if( mvaVar[ "mt2bl"         ]  == 1 ) factory->AddVariable( "mt2bl"                  ,  "MT2bl"                      ,       "GeV", 'F' );
+   if( mvaVar[ "mt2b"          ]  == 1 ) factory->AddVariable( "mt2b"                   ,  "MT2b"                       ,       "GeV", 'F' );
+   if( mvaVar[ "chi2"          ]  == 1 ) factory->AddVariable( "min(chi2,100)"          ,  "chi2"                       ,       ""   , 'F' );
+   if( mvaVar[ "lep1pt"        ]  == 1 ) factory->AddVariable( "lep1pt"                 ,  "lepton pt"                  ,       ""   , 'F' );
+   if( mvaVar[ "lep1eta"       ]  == 1 ) factory->AddVariable( "lep1eta"                ,  "lepton eta"                 ,       ""   , 'F' );
+   if( mvaVar[ "thrjetlm"      ]  == 1 ) factory->AddVariable( "thrjetlm"               ,  "thrust"                     ,       ""   , 'F' );
+   if( mvaVar[ "apljetlm"      ]  == 1 ) factory->AddVariable( "apljetlm"               ,  "aplanarity"                 ,       ""   , 'F' );
+   if( mvaVar[ "sphjetlm"      ]  == 1 ) factory->AddVariable( "sphjetlm"               ,  "sphericity"                 ,       ""   , 'F' );
+   if( mvaVar[ "cirjetlm"      ]  == 1 ) factory->AddVariable( "cirjetlm"               ,  "circularity"                ,       ""   , 'F' );
+   if( mvaVar[ "chi2min"       ]  == 1 ) factory->AddVariable( "min(chi2min,100)"       ,  "#chi^{2}_{min}"             ,       ""   , 'F' );
+   if( mvaVar[ "chi2min_mt2b"  ]  == 1 ) factory->AddVariable( "chi2min_mt2b"           ,  "MT2b(#chi^{2}_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "chi2min_mt2bl" ]  == 1 ) factory->AddVariable( "chi2min_mt2bl"          ,  "MT2bl(#chi^{2}_{min})"      ,       ""   , 'F' );
+   if( mvaVar[ "chi2min_mt2w"  ]  == 1 ) factory->AddVariable( "chi2min_mt2w"           ,  "MT2W(#chi^{2}_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "mt2bmin"       ]  == 1 ) factory->AddVariable( "mt2bmin"                ,  "MT2b_{min}"                 ,       ""   , 'F' );
+   if( mvaVar[ "mt2blmin"      ]  == 1 ) factory->AddVariable( "mt2blmin"               ,  "MT2bl_{min}"                ,       ""   , 'F' );
+   if( mvaVar[ "mt2wmin"       ]  == 1 ) factory->AddVariable( "mt2wmin"                ,  "MT2W_{min}"                 ,       ""   , 'F' );
+   if( mvaVar[ "mt2bmin_chi2"  ]  == 1 ) factory->AddVariable( "min(mt2bmin_chi2,100)"  ,  "#chi^{2}(MT2b_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "mt2blmin_chi2" ]  == 1 ) factory->AddVariable( "min(mt2blmin_chi2,100)" ,  "#chi^{2}(MT2bl_{min})"      ,       ""   , 'F' );
+   if( mvaVar[ "mt2wmin_chi2"  ]  == 1 ) factory->AddVariable( "min(mt2wmin_chi2,100)"  ,  "#chi^{2}(MT2W_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "htratiol"      ]  == 1 ) factory->AddVariable( "htssl/(htssl+htosl)"    ,  "lepton H_{T} ratio"         ,       ""   , 'F' );
+   if( mvaVar[ "htratiom"      ]  == 1 ) factory->AddVariable( "htssm/(htssm+htosm)"    ,  "E_{T}^{miss} H_{T} ratio"   ,       ""   , 'F' );
+   if( mvaVar[ "dphimj1"       ]  == 1 ) factory->AddVariable( "dphimj1"                ,  "#Delta#phi(j1,E_{T}^{miss})",       ""   , 'F' );
+   if( mvaVar[ "dphimj2"       ]  == 1 ) factory->AddVariable( "dphimj2"                ,  "#Delta#phi(j2,E_{T}^{miss})",       ""   , 'F' );
+   if( mvaVar[ "rand"          ]  == 1 ) factory->AddVariable( "rand"                   ,  "random(0,1)"                ,       ""   , 'F' );
    
    /*
    if( doMultipleOutputs ){
