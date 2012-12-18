@@ -105,6 +105,8 @@ class StopTree {
 	int           nbtagscsvmcorr_;
 	float         pfcandpt10_;
 	float         pfcandiso10_;
+	float         pfcandpt5_;
+	float         pfcandiso5_;
 	float         trkpt10loose_;
 	float         trkreliso10loose_;
 	int           nleps_;
@@ -269,6 +271,8 @@ class StopTree {
 	    tree_->Branch("t1metphicorrlepphi", &t1metphicorrlepphi_, 	"t1metphicorrlepphi/F");        
 	    tree_->Branch("pfcandpt10", 	&pfcandpt10_, 		"pfcandpt10/F");        
 	    tree_->Branch("pfcandiso10", 	&pfcandiso10_, 		"pfcandiso10/F");      
+	    tree_->Branch("pfcandpt5",  	&pfcandpt5_, 		"pfcandpt5/F");        
+	    tree_->Branch("pfcandiso5", 	&pfcandiso5_, 		"pfcandiso5/F");      
 	    tree_->Branch("trkpt10loose", 	&trkpt10loose_, 	"trkpt10loose/F");        
 	    tree_->Branch("trkreliso10loose", 	&trkreliso10loose_, 	"trkreliso10loose/F");      
 	    tree_->Branch("nleps", 		&nleps_, 		"nleps/I");
@@ -417,6 +421,8 @@ class StopTree {
 	    tree_->SetBranchAddress("nbtagscsvmcorr", 	  &nbtagscsvmcorr_);  
 	    tree_->SetBranchAddress("pfcandpt10", 	  &pfcandpt10_);        
 	    tree_->SetBranchAddress("pfcandiso10", 	  &pfcandiso10_);      
+	    tree_->SetBranchAddress("pfcandpt5", 	  &pfcandpt5_);        
+	    tree_->SetBranchAddress("pfcandiso5", 	  &pfcandiso5_);      
 	    tree_->SetBranchAddress("trkpt10loose", 	  &trkpt10loose_);        
 	    tree_->SetBranchAddress("trkreliso10loose",   &trkreliso10loose_);      
 	    tree_->SetBranchAddress("nleps", 		  &nleps_);
@@ -599,6 +605,8 @@ StopTree::InitVariables(){
 	variables_.push_back(string("nbtagscsvmcorr"	));
 	variables_.push_back(string("pfcandpt10"	));
 	variables_.push_back(string("pfcandiso10"	));
+	variables_.push_back(string("pfcandpt5" 	));
+	variables_.push_back(string("pfcandiso5"	));
 	variables_.push_back(string("trkpt10loose"	));
 	variables_.push_back(string("trkreliso10loose"	));
 	variables_.push_back(string("nleps"		));         
@@ -723,6 +731,8 @@ StopTree::InitVariables(){
     nbtagscsvmcorr_	= 999;
     pfcandpt10_		= -999.;
     pfcandiso10_	= -999.;
+    pfcandpt5_		= -999.;
+    pfcandiso5_ 	= -999.;
     trkpt10loose_	= -999.;
     trkreliso10loose_	= -999.;
     nleps_		= 999;
@@ -856,6 +866,8 @@ StopTree::Get(string value)
   if(value=="nbtagscsvmcorr" 	) { return this->nbtagscsvmcorr_;	}  
   if(value=="pfcandpt10" 	) { return this->pfcandpt10_;		}        
   if(value=="pfcandiso10" 	) { return this->pfcandiso10_;		}      
+  if(value=="pfcandpt5" 	) { return this->pfcandpt5_;		}        
+  if(value=="pfcandiso5" 	) { return this->pfcandiso5_;		}      
   if(value=="trkpt10loose" 	) { return this->trkpt10loose_;		}        
   if(value=="trkreliso10loose" 	) { return this->trkreliso10loose_;	}      
   if(value=="nleps" 		) { return this->nleps_;		}     
