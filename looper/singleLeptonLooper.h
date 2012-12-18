@@ -479,6 +479,7 @@ class singleLeptonLooper
         Int_t   npuMinusOne_;
         Int_t   npuPlusOne_;
         Int_t   nvtx_;
+        Int_t	indexfirstGoodVertex_;
         Float_t dilmass_;
         Float_t topmass_;
         Float_t tcmet_;

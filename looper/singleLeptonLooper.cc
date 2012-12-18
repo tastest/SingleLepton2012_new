@@ -2235,6 +2235,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if(isGoodVertex(v)) ++nvtx_;
       }
 
+      indexfirstGoodVertex_=firstGoodVertex();
+
       npu_ = 0;
       npuMinusOne_ = 0;
       npuPlusOne_ = 0;
@@ -3470,6 +3472,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("npuMinusOne",      &npuMinusOne_,      "npuMinusOne/I");
   outTree->Branch("npuPlusOne",       &npuPlusOne_,       "npuPlusOne/I");
   outTree->Branch("nvtx",             &nvtx_,             "nvtx/I");
+  outTree->Branch("indexfirstGoodVertex_",             &indexfirstGoodVertex_,             "indexfirstGoodVertex/I");
   outTree->Branch("nvtxweight",       &nvtxweight_,       "nvtxweight/F");
   outTree->Branch("n3dvtxweight",     &n3dvtxweight_,     "n3dvtxweight/F");
   outTree->Branch("pdfid1",           &pdfid1_,           "pdfid1/I");
