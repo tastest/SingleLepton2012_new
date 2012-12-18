@@ -19,6 +19,7 @@
 #include "TChain.h"
 #include "Riostream.h"
 #include "TFitter.h"
+#include "TRandom.h"
 
 #include <algorithm>
 #include <utility>
@@ -586,6 +587,8 @@ MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates,
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
+  TRandom r;
+
   printf("[StopTreeLooper::loop] %s\n", name.Data());
 
   load_badlaserevents  ();
@@ -850,17 +853,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       mt2bl_      = mr.mt2bl;
 
       // chi2 and MT2 variables
-      chi2min_       = mc.one_chi2;               // minimum chi2 
-      chi2min_mt2b_  = mc.two_mt2b;               // minimum MT2b consistent with chi2min
-      chi2min_mt2bl_ = mc.two_mt2bl;              // minimum MT2bl consistent with chi2min
-      chi2min_mt2w_  = mc.two_mt2w;               // minimum MT2w consistent with chi2min
-      mt2bmin_       = mc.three_mt2b;             // minimum MT2b
-      mt2blmin_      = mc.three_mt2bl;            // minimum MT2bl
-      mt2wmin_       = mc.three_mt2w;             // minimum MT2w
-      mt2bmin_chi2_  = mc.four_chi2b;             // minimum chi2 consistent with mt2bmin
-      mt2blmin_chi2_ = mc.four_chi2bl;            // minimum chi2 consistent with mt2blmin
-      mt2wmin_chi2_  = mc.four_chi2w;             // minimum chi2 consistent with mt2wmin
-      ncand_         = pc.b_candidates_.size();   // number of candidates consisting with btagging info
+      chi2min_			= mc.one_chi2;               // minimum chi2 
+      chi2minprob_		= TMath::Prob(chi2min_,1);   // probability of minimum chi2
+      chi2min_mt2b_		= mc.two_mt2b;               // minimum MT2b consistent with chi2min
+      chi2min_mt2bl_		= mc.two_mt2bl;              // minimum MT2bl consistent with chi2min
+      chi2min_mt2w_		= mc.two_mt2w;               // minimum MT2w consistent with chi2min
+      mt2bmin_			= mc.three_mt2b;             // minimum MT2b
+      mt2blmin_			= mc.three_mt2bl;            // minimum MT2bl
+      mt2wmin_			= mc.three_mt2w;             // minimum MT2w
+      mt2bmin_chi2_		= mc.four_chi2b;             // minimum chi2 consistent with mt2bmin
+      mt2blmin_chi2_		= mc.four_chi2bl;            // minimum chi2 consistent with mt2blmin
+      mt2wmin_chi2_		= mc.four_chi2w;             // minimum chi2 consistent with mt2wmin
+      mt2bmin_chi2prob_		= mc.four_chi2b;             // probability of minimum chi2 consistent with mt2bmin
+      mt2blmin_chi2prob_	= mc.four_chi2bl;            // probability of minimum chi2 consistent with mt2blmin
+      mt2wmin_chi2prob_		= mc.four_chi2w;             // probability of minimum chi2 consistent with mt2wmin
+      ncand_			= pc.b_candidates_.size();   // number of candidates consisting with btagging info
 
       // weights
       weight_     = evtweight;                    // event weight
@@ -872,11 +879,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       njets_      = tree->npfjets30_;             // njets (pT > 30, eta < 2.5)
 
       // lepton variables
-      passisotrk_ = passIsoTrkVeto(tree) ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
+      passisotrk_   = passIsoTrkVeto(tree) ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
+      passisotrkv2_ = passIsoTrkVeto_v2(tree) ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
       nlep_       = tree->ngoodlep_;              // number of analysis selected leptons
  
       lep1pt_     = tree->lep1_.pt();             // 1st lepton pt
-      lep1eta_    = tree->lep1_.eta();            // 1st lepton eta
+      lep1eta_    = fabs( tree->lep1_.eta() );    // 1st lepton eta
 
       if( nlep_ > 1 ){
 	lep2pt_    = tree->lep1_.pt();            // 2nd lepton pt
@@ -910,14 +918,17 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // event shapes: HT in hemisphers
       htssl_      = HT_SSL;
       htosl_      = HT_OSL;
-      htratiol_   = HT_SSL / HT_OSL;
+      htratiol_   = HT_SSL / (HT_OSL + HT_SSL);
 
       htssm_      = HT_SSM;
       htosm_      = HT_OSM;
-      htratiom_   = HT_SSM / HT_OSM;
+      htratiom_   = HT_SSM / (HT_OSM + HT_SSM);
 
       dphimj1_    = getdphi(tree->t1metphicorrphi_, jetVector.at(0).phi() );
       dphimj2_    = getdphi(tree->t1metphicorrphi_, jetVector.at(1).phi() );
+      dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
+
+      rand_       = r.Uniform(0.0,1.0);
 
       // fill me up
       nEventsPass++;
@@ -975,6 +986,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("nb"               ,        &nb_              ,         "nb/I"		);
   outTree_->Branch("njets"            ,        &njets_           ,         "njets/I"		);
   outTree_->Branch("passisotrk"       ,        &passisotrk_      ,         "passisotrk/I"	);
+  outTree_->Branch("passisotrkv2"     ,        &passisotrkv2_    ,         "passisotrkv2/I"	);
   outTree_->Branch("nlep"             ,        &nlep_            ,         "nlep/I"		);
   outTree_->Branch("lep1pt"           ,        &lep1pt_          ,         "lep1pt/F"		);
   outTree_->Branch("lep1eta"          ,        &lep1eta_         ,         "lep1eta/F"		);
@@ -985,6 +997,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("mlsp"             ,        &mlsp_            ,         "mlsp/F"		);
   outTree_->Branch("x"                ,        &x_               ,         "x/F"		);
   outTree_->Branch("chi2min"          ,        &chi2min_         ,         "chi2min/F"          );
+  outTree_->Branch("chi2minprob"      ,        &chi2minprob_     ,         "chi2minprob/F"      );
   outTree_->Branch("chi2min_mt2b"     ,        &chi2min_mt2b_    ,         "chi2min_mt2b/F"     );  
   outTree_->Branch("chi2min_mt2bl"    ,        &chi2min_mt2bl_   ,         "chi2min_mt2bl/F"    );  
   outTree_->Branch("chi2min_mt2w"     ,        &chi2min_mt2w_    ,         "chi2min_mt2w/F"     );  
@@ -994,6 +1007,9 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("mt2bmin_chi2"     ,        &mt2bmin_chi2_    ,         "mt2bmin_chi2/F"     );       
   outTree_->Branch("mt2blmin_chi2"    ,        &mt2blmin_chi2_   ,         "mt2blmin_chi2/F"    );       
   outTree_->Branch("mt2wmin_chi2"     ,        &mt2wmin_chi2_    ,         "mt2wmin_chi2/F"     );       
+  outTree_->Branch("mt2bmin_chi2prob" ,        &mt2bmin_chi2prob_    ,         "mt2bmin_chi2prob/F"     );       
+  outTree_->Branch("mt2blmin_chi2prob",        &mt2blmin_chi2prob_   ,         "mt2blmin_chi2prob/F"    );       
+  outTree_->Branch("mt2wmin_chi2prob" ,        &mt2wmin_chi2prob_    ,         "mt2wmin_chi2prob/F"     );       
   outTree_->Branch("ncand"            ,        &ncand_           ,         "ncand/F"            );       
   outTree_->Branch("thrjet"           ,        &thrjet_          ,         "thrjet/F"           );
   outTree_->Branch("sphjet"           ,        &sphjet_          ,         "sphjet/F"           );
@@ -1015,6 +1031,8 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("htratiom"         ,        &htosm_           ,         "htraiom/F"          );
   outTree_->Branch("dphimj1"          ,        &dphimj1_         ,         "dphimj1/F"          );
   outTree_->Branch("dphimj2"          ,        &dphimj2_         ,         "dphimj2/F"          );
+  outTree_->Branch("dphimjmin"        ,        &dphimjmin_       ,         "dphimjmin/F"        );
+  outTree_->Branch("rand"             ,        &rand_            ,         "rand/F"             );
 
 }
 
@@ -1096,5 +1114,6 @@ void StopTreeLooper::initBaby(){
   mlsp_       = -1.0;
   x_          = -1.0;
 
+  rand_       = -1.0;
 }
 

@@ -70,6 +70,7 @@ class StopTreeLooper {
 
 	// "best" chi2 and MT2 variables
 	Float_t chi2min_;
+	Float_t chi2minprob_;
 	Float_t chi2min_mt2b_;  
 	Float_t chi2min_mt2bl_; 
 	Float_t chi2min_mt2w_;  
@@ -79,6 +80,9 @@ class StopTreeLooper {
 	Float_t mt2bmin_chi2_;  
 	Float_t mt2blmin_chi2_; 
 	Float_t mt2wmin_chi2_;  
+	Float_t mt2bmin_chi2prob_;  
+	Float_t mt2blmin_chi2prob_; 
+	Float_t mt2wmin_chi2prob_;  
 	Int_t   ncand_;
 
 	// event shapes
@@ -106,6 +110,7 @@ class StopTreeLooper {
 
 	Float_t dphimj1_;
 	Float_t dphimj2_;
+	Float_t dphimjmin_;
 
 	// weights
 	Float_t weight_;
@@ -118,6 +123,7 @@ class StopTreeLooper {
 
 	// lepton variables
 	Int_t passisotrk_;
+	Int_t passisotrkv2_;
 	Int_t nlep_;
 
 	Float_t lep1pt_;
@@ -131,6 +137,8 @@ class StopTreeLooper {
 	Float_t mstop_;
 	Float_t mlsp_;
 	Float_t x_;
+
+	Float_t rand_;
 
     private:
 
