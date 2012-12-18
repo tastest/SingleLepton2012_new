@@ -32,6 +32,7 @@ bool passEvtSelection(const StopTree *sTree, TString name);
 bool passOneLeptonSelection(const StopTree *sTree, bool isData);
 bool passTwoLeptonSelection(const StopTree *sTree, bool isData);
 bool passIsoTrkVeto(const StopTree *sTree);
+bool passIsoTrkVeto_v2(const StopTree *sTree);
 bool passSingleLeptonSelection(const StopTree *sTree, bool isData);
 bool passDileptonSelection(const StopTree *sTree, bool isData);
 bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);

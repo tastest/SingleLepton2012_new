@@ -612,6 +612,23 @@ bool passIsoTrkVeto(const StopTree *sTree)
 }
 
 //-------------------------------------------
+// the isolated track veto
+//-------------------------------------------
+
+bool passIsoTrkVeto_v2(const StopTree *sTree) 
+{
+
+  //pass isolated track veto
+  //unfortunately changed default value to 9999.
+  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
+  if ( sTree->pfcandpt5_  <9998. && abs(sTree->pfcandid5_)==13 && sTree->pfcandiso5_ < 0.2) return false;
+  if ( sTree->pfcandpt5_  <9998. && abs(sTree->pfcandid5_)==11 && sTree->pfcandiso5_ < 0.2) return false;
+
+  return true;
+
+}
+
+//-------------------------------------------
 // >=1 selected lepton and trigger
 //-------------------------------------------
 
