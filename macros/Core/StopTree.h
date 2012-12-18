@@ -146,6 +146,10 @@ class StopTree {
 	Float_t         iso2_;
 	Float_t         isont2_;
 	         
+	Float_t         mg_;
+	Float_t         ml_;
+	Float_t         x_;
+
 	LorentzVector lep1_;
 	LorentzVector lep2_;
 	LorentzVector t_;
@@ -306,6 +310,10 @@ class StopTree {
 	    tree_->Branch("isont1", &isont1_, "isont1/F");
 	    tree_->Branch("iso2", &iso2_, "iso2/F");
 	    tree_->Branch("isont2", &isont2_, "isont2/F");
+
+	    tree_->Branch("mg"  , &mg_  , "mg/F");
+	    tree_->Branch("ml"  , &ml_  , "ml/F");
+	    tree_->Branch("x"   , &x_   , "x/F");
 	    
             tree_->Branch("lep1",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep1Ptr_);
             tree_->Branch("lep2",    "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >", &lep2Ptr_);
@@ -415,6 +423,9 @@ class StopTree {
 	    tree_->SetBranchAddress("nmus",               &nmus_);       
 	    tree_->SetBranchAddress("nels",               &nels_);       
 	    tree_->SetBranchAddress("ntaus",              &ntaus_);       
+	    tree_->SetBranchAddress("mg",                 &mg_);       
+	    tree_->SetBranchAddress("ml",                 &ml_);       
+	    tree_->SetBranchAddress("x",                  &x_);       
 
 	    
 	    tree_->SetBranchAddress("mcmtlns",   &mcmtln_);
@@ -594,6 +605,9 @@ StopTree::InitVariables(){
 	variables_.push_back(string("nmus"		));         
 	variables_.push_back(string("nels"		));         
 	variables_.push_back(string("ntaus"		));         
+	variables_.push_back(string("mg"		));         
+	variables_.push_back(string("ml"		));         
+	variables_.push_back(string("x"	        	));         
 	
 	variables_.push_back(string("mcmtln"));
 	variables_.push_back(string("nwzpartons"));
@@ -715,6 +729,9 @@ StopTree::InitVariables(){
     nmus_		= 999;
     nels_		= 999;
     ntaus_		= 999;
+    mg_  		= -999.;
+    ml_  		= -999.;
+    x_  		= -999.;
     
     mcmtln_= -999;
     nwzpartons_= -999;
@@ -879,6 +896,9 @@ StopTree::Get(string value)
   if(value=="isont1" ) { return this->isont1_; }
   if(value=="iso2" ) { return this->iso2_; }
   if(value=="isont2" ) { return this->isont2_; }
+  if(value=="mg"     ) { return this->mg_; }
+  if(value=="ml"     ) { return this->ml_; }
+  if(value=="x"      ) { return this->x_; }
     
   /* if(value=="lep1"   		) { return this->lep1_;		} */
   /* if(value=="lep2"   		) { return this->lep2_;		} */
