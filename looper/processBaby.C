@@ -132,30 +132,35 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   else if (infile.Contains("SingleMu_Run2012B-13Jul2012-v1_AOD"))       	sample =  Form("SingleMu2012B_13Jul2012v1V532_%s",            outfileid.Data());
   else if (infile.Contains("SingleMu_Run2012C-24Aug2012-v1_AOD"))      		sample =  Form("SingleMu2012C_24Aug2012v1V532_%s",            outfileid.Data());
   else if (infile.Contains("SingleMu_Run2012C-PromptReco-v2_AOD"))      	sample =  Form("SingleMu2012C_PromptRecov2V532_%s",           outfileid.Data());
+  else if (infile.Contains("SingleMu_Run2012D-PromptReco-v1_AOD"))      	sample =  Form("SingleMu2012D_PromptRecov1V532_%s",           outfileid.Data());
   //single electron
   else if (infile.Contains("SingleElectron_Run2012A-recover-06Aug2012-v1_AOD")) sample =  Form("SingleElectron2012A_recover06Aug2012V532_%s", outfileid.Data());
   else if (infile.Contains("SingleElectron_Run2012A-13Jul2012-v1_AOD"))       	sample =  Form("SingleElectron2012A_13Jul2012v1V532_%s",      outfileid.Data());
   else if (infile.Contains("SingleElectron_Run2012B-13Jul2012-v1_AOD"))       	sample =  Form("SingleElectron2012B_13Jul2012v1V532_%s",      outfileid.Data());
   else if (infile.Contains("SingleElectron_Run2012C-24Aug2012-v1_AOD"))      	sample =  Form("SingleElectron2012C_24Aug2012v1V532_%s",      outfileid.Data());
   else if (infile.Contains("SingleElectron_Run2012C-PromptReco-v2_AOD"))      	sample =  Form("SingleElectron2012C_PromptRecov2V532_%s",     outfileid.Data());
+  else if (infile.Contains("SingleElectron_Run2012D-PromptReco-v1_AOD"))      	sample =  Form("SingleElectron2012D_PromptRecov1V532_%s",     outfileid.Data());
   //dimuon 
   else if (infile.Contains("DoubleMu_Run2012A-recover-06Aug2012-v1_AOD")) 	sample =  Form("DoubleMu2012A_recover06Aug2012V532_%s", outfileid.Data());
   else if (infile.Contains("DoubleMu_Run2012A-13Jul2012-v1_AOD"))     		sample =  Form("DoubleMu2012A_13Jul2012v1V532_%s",            outfileid.Data());
   else if (infile.Contains("DoubleMu_Run2012B-13Jul2012-v4_AOD"))     		sample =  Form("DoubleMu2012B_13Jul2012v4V532_%s",            outfileid.Data());
   else if (infile.Contains("DoubleMu_Run2012C-24Aug2012-v1_AOD"))    		sample =  Form("DoubleMu2012C_24Aug2012v1V532_%s",            outfileid.Data());
   else if (infile.Contains("DoubleMu_Run2012C-PromptReco-v2_AOD"))    		sample =  Form("DoubleMu2012C_PromptRecov2V532_%s",           outfileid.Data());
+  else if (infile.Contains("DoubleMu_Run2012D-PromptReco-v1_AOD"))    		sample =  Form("DoubleMu2012D_PromptRecov1V532_%s",           outfileid.Data());
   //electron+muon
   else if (infile.Contains("MuEG_Run2012A-recover-06Aug2012-v1_AOD"))      	sample =  Form("MuEG2012A_recover06Aug2012V532_%s",           outfileid.Data());
   else if (infile.Contains("MuEG_Run2012A-13Jul2012-v1_AOD"))      		sample =  Form("MuEG2012A_13Jul2012v1V532_%s",      	      outfileid.Data());
   else if (infile.Contains("MuEG_Run2012B-13Jul2012-v1_AOD"))      		sample =  Form("MuEG2012B_13Jul2012v1V532_%s",      	      outfileid.Data());
   else if (infile.Contains("MuEG_Run2012C-24Aug2012-v1_AOD"))     		sample =  Form("MuEG2012C_24Aug2012v1V532_%s",     	      outfileid.Data());
   else if (infile.Contains("MuEG_Run2012C-PromptReco-v2_AOD"))     		sample =  Form("MuEG2012C_PromptRecov2V532_%s",     	      outfileid.Data());
+  else if (infile.Contains("MuEG_Run2012D-PromptReco-v1_AOD"))     		sample =  Form("MuEG2012D_PromptRecov1V532_%s",     	      outfileid.Data());
   //dielectron
   else if (infile.Contains("DoubleElectron_Run2012A-recover-06Aug2012-v1_AOD")) sample =  Form("DoubleElectron2012A_recover06Aug2012V532_%s", outfileid.Data());
   else if (infile.Contains("DoubleElectron_Run2012A-13Jul2012-v1_AOD"))      	sample =  Form("DoubleElectron2012A_13Jul2012v1V532_%s",      outfileid.Data());
   else if (infile.Contains("DoubleElectron_Run2012B-13Jul2012-v1_AOD"))      	sample =  Form("DoubleElectron2012B_13Jul2012v1V532_%s",      outfileid.Data());
   else if (infile.Contains("DoubleElectron_Run2012C-24Aug2012-v1_AOD"))     	sample =  Form("DoubleElectron2012C_24Aug2012v1V532_%s",      outfileid.Data());
   else if (infile.Contains("DoubleElectron_Run2012C-PromptReco-v2_AOD"))     	sample =  Form("DoubleElectron2012C_PromptRecov2V532_%s",     outfileid.Data());
+  else if (infile.Contains("DoubleElectron_Run2012D-PromptReco-v1_AOD"))     	sample =  Form("DoubleElectron2012C_PromptRecov1V532_%s",     outfileid.Data());
   //otherwise
   else sample = Form("boiade_%s", outfileid.Data());
 
