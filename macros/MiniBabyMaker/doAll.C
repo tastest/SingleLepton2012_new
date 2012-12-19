@@ -21,15 +21,17 @@
  
   char* path = "/nfs-3/userdata/stop/output_V00-02-04_2012_4jskim";
 
-  const int NSAMPLES = 7;
+  const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
-    "T2tt_250_0",
-    "T2tt_350_0",
-    "T2tt_450_0",
-    "T2tt_300_50",
-    "T2tt_300_100",
-    "ttdl_powheg",
-    "ttsl_powheg",
+    // "T2tt_250_0",
+    // "T2tt_350_0",
+    // "T2tt_450_0",
+    // "T2tt_300_50",
+    // "T2tt_300_100",
+    // "ttdl_powheg",
+    // "ttsl_powheg",
+
+    "T2bw_scan",
     // "w1to4jets",
     // "data_muo",
     // "data_ele",
@@ -51,7 +53,15 @@
     
   for (int i=0; i<NSAMPLES; ++i) {
     ch[i] = new TChain("t");
-    ch[i]->Add(Form("%s/%s*.root", path, sampletag[i]));
+
+    if( TString(sampletag[i]).Contains("scan") ){
+      ch[i]->Add(Form("signal/baby_60_1_8gs.root"));
+    }
+
+    else{
+      ch[i]->Add(Form("%s/%s*.root", path, sampletag[i]));
+    }
+
     looper->setOutFileName(Form("output/%s_histos.root", sampletag[i]));
     looper->loop(ch[i], sampletag[i]);
   }
