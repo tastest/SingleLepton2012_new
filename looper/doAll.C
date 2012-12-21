@@ -42,7 +42,7 @@ void doAll(bool skipFWLite = true)
   //---------------------------------------------------------------
   
   const char* version    = "V00-01-01";
-  const char* jsonfile   = "jsons/Cert_190456-201678_8TeV_PromptReco_Collisions12_JSON_goodruns.txt"; // 5.10/fb
+  const char* jsonfile   = "jsons/Cert_190456-208686_8TeV_PromptReco_Collisions12_JSON_goodruns.txt";
   const bool  useMCSkims = true;
 
   cout << "Version : " << version     << endl;
