@@ -249,18 +249,23 @@ void singleLeptonLooper::InitBaby(){
   pfcand5_        = 0;
   pfcand10_       = 0;
   pfcanddir10_       = 0;
+  pfcandveto10_       = 0;
   pfcandid5_       =-1; 
   pfcandid10_      =-1;
   pfcanddirid10_      =-1;
+  pfcandvetoid10_      =-1;
   pfcandiso5_     = 9999.;     
   pfcandiso10_    = 9999.;     
   pfcanddiriso10_    = 9999.;     
+  pfcandvetoiso10_    = 9999.;     
   pfcandpt5_      = 9999.;
   pfcandpt10_     = 9999.;
   pfcanddirpt10_     = 9999.;
+  pfcandvetopt10_     = 9999.;
   pfcandmindrj5_  = 9999.;
   pfcandmindrj10_ = 9999.;
   pfcanddirmindrj10_ = 9999.;
+  pfcandvetomindrj10_ = 9999.;
 
   trkpt10pt0p1_	    = 9999.;
   trkreliso10pt0p1_ = 9999.;
@@ -2082,6 +2087,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	}
 
+	// with veto cone
+	iso = myTrackIso.iso_dr00503_dz005_pt00 / pfcands_p4().at(ipf).pt();
+
+	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandvetoiso10_ && !isLeadLepton ){
+
+	  pfcandvetoiso10_ = iso;
+          pfcandvetopt10_ = pfcands_p4().at(ipf).pt();
+          pfcandveto10_ = &pfcands_p4().at(ipf);
+          pfcandvetoid10_ =  pfcands_particleId().at(ipf);
+
+	}
+
+
 	//recalculated definition of the isolation with the default values
 	iso = myTrackIso.iso_dr03_dz005_pt00 / pfcands_p4().at(ipf).pt();
 
@@ -3620,6 +3638,11 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcanddirpt10",       &pfcanddirpt10_,       "pfcanddirpt10/F");  
   outTree->Branch("pfcanddirmindrj10",   &pfcanddirmindrj10_,   "pfcanddirmindrj10/F");  
 
+  outTree->Branch("pfcandvetoid10",       &pfcandvetoid10_,       "pfcandvetoid10/I");
+  outTree->Branch("pfcandvetoiso10",      &pfcandvetoiso10_,      "pfcandvetoiso10/F");  
+  outTree->Branch("pfcandvetopt10",       &pfcandvetopt10_,       "pfcandvetopt10/F");  
+  outTree->Branch("pfcandvetomindrj10",   &pfcandvetomindrj10_,   "pfcandvetomindrj10/F");  
+
   outTree->Branch("emjet10",          &emjet10_,          "emjet10/F");  
   outTree->Branch("mjj",              &mjj_,              "mjj/F");  
   outTree->Branch("emjet20",          &emjet20_,          "emjet20/F");  
@@ -3709,6 +3732,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcand5"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand5_	);
   outTree->Branch("pfcand10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand10_	);
   outTree->Branch("pfcanddir10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcanddir10_	);
+  outTree->Branch("pfcandveto10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandveto10_	);
   outTree->Branch("jet"	      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &jet_	);
 
   outTree->Branch("nonisoel"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &nonisoel_	);

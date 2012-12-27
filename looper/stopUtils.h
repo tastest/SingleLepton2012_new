@@ -91,8 +91,10 @@ struct myTrackIso {
   // iso sum options
   float isoDir_dr03_dz005_pt00;
 
-  // r cone option
+  // r04 cone option
   float iso_dr04_dz005_pt00;
+  // veto cone
+  float iso_dr00503_dz005_pt00;
 
   // dz variation
   float iso_dr03_dz000_pt00;

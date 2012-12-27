@@ -259,8 +259,11 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
   // isolation sum option
   iso.isoDir_dr03_dz005_pt00=0.;
 
-  // ceon04
-  iso.iso_dr04_dz005_pt00=0.; // this one will be the default
+  // cone04
+  iso.iso_dr04_dz005_pt00=0.;
+
+  // veto cone
+  iso.iso_dr00503_dz005_pt00=0.; 
 
   //pt Variation                                                                                                                      
   iso.iso_dr03_dz005_pt01=0.;
@@ -348,6 +351,9 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
 
     // cone 04
     //    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
+
+    // veto Cone 0.05
+    if(pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 && dr >= 0.005) iso.iso_dr00503_dz005_pt00 += pfcands_p4().at(ipf).pt();
 
     // this is the iso-sum option
     if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.isoDir_dr03_dz005_pt00 +=pfcands_p4().at(ipf).pt()*(1-3*dr);
