@@ -15,6 +15,7 @@
 
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
 #include "../CORE/QuarkGluonTagger/QuarkGluonTagger.h"
+#include "../CORE/metSelections.h"
 
 //#include "../CORE/topmass/ttdilepsolve.h" REPLACETOPMASS
 
@@ -321,6 +322,14 @@ class singleLeptonLooper
 	Float_t t1metphicorrdn_;
 	Float_t t1metphicorrmtup_;
 	Float_t t1metphicorrmtdn_;
+
+	//official prescription
+	Float_t t1met_off_;
+	Float_t t1metphi_off_;
+	Float_t t1metmt_off_;
+	Float_t t1metphicorr_off_;
+	Float_t t1metphicorrphi_off_;
+	Float_t t1metphicorrmt_off_;
 
 	// assorted p4's
 	LorentzVector*  t_;   

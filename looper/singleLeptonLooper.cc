@@ -130,6 +130,13 @@ void singleLeptonLooper::InitBaby(){
   t1met10sphi_	=-999.;
   t1met10smt_	=-999.;
 
+  t1met_off_		= -999.;
+  t1metphi_off_		= -999.;
+  t1metmt_off_		= -999.;
+  t1metphicorr_off_	= -999.;
+  t1metphicorrphi_off_	= -999.;
+  t1metphicorrmt_off_	= -999.;
+
   //trkmet
   trkmet_              =-999.;
   trkmetphi_           =-999.;
@@ -914,6 +921,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
 
   JetCorrectionUncertainty *pfUncertainty   = new JetCorrectionUncertainty( pfUncertaintyFile   );
+
+  MetCorrector *met_corrector_pfL1FastJetL2L3 = new MetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
 
   /*
    *  Jet Smearer Object to obtain the jet pt uncertainty.
@@ -2592,12 +2601,30 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       t1met30phi_     = p_t1met30.second;	  
 
       //phi-corrected type1 met
-      pair<float, float> p_t1metphicorr = getPhiCorrMET( t1met10_, t1met10phi_, nvtx_, !isData);
+      pair<float, float> p_t1metphicorr = 
+	getPhiCorrMET( t1met10_, t1met10phi_, nvtx_, !isData);
       t1metphicorr_    = p_t1metphicorr.first;
       t1metphicorrphi_ = p_t1metphicorr.second;
 
+      //official prescription
+      std::pair<float, float> p_t1met_off = 
+	met_corrector_pfL1FastJetL2L3->getCorrectedMET();
+      t1met_off_	= p_t1met_off.first;
+      t1metphi_off_	= p_t1met_off.second;
+      t1metmt_off_ =
+	getMT( lep1_->pt() , lep1_->phi() , t1met_off_ , t1metphi_off_ );
+
+      std::pair<float, float> p_t1metphicorr_off = 
+	getPhiCorrMET( t1met_off_, t1metphi_off_, nvtx_, !isData);	
+      
+      t1metphicorr_off_		= p_t1metphicorr_off.first;
+      t1metphicorrphi_off_     	= p_t1metphicorr_off.second;
+      t1metphicorrmt_off_ = 
+	getMT( lep1_->pt() , lep1_->phi() , t1metphicorr_off_ , t1metphicorrphi_off_ );
+
       // MET after Jet PT smearing.
-      pair<float, float> p_t1met10Smear = Type1PFMETSmear(jetSmearer, isData, vpfrawjets_p4 , t1met10_, t1met10phi_);
+      pair<float, float> p_t1met10Smear = 
+	Type1PFMETSmear(jetSmearer, isData, vpfrawjets_p4 , t1met10_, t1met10phi_);
       t1met10s_ = p_t1met10Smear.first;
       t1met10sphi_ = p_t1met10Smear.second;
 
@@ -3468,6 +3495,14 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t1metphicorrmtup"   , &t1metphicorrmtup_   , "t1metphicorrmtup/F");
   outTree->Branch("t1metphicorrmtdn"   , &t1metphicorrmtdn_   , "t1metphicorrmtdn/F");
   outTree->Branch("t1metphicorrlepmt"  , &t1metphicorrlepmt_  , "t1metphicorrlepmt/F");
+
+  //official prescription
+  outTree->Branch("t1met_off"           , &t1met_off_           , "t1met_off/F");
+  outTree->Branch("t1metphi_off"        , &t1metphi_off_        , "t1metphi_off/F");
+  outTree->Branch("t1metmt_off"         , &t1metmt_off_         , "t1metmt_off/F");
+  outTree->Branch("t1metphicorr_off"    , &t1metphicorr_off_    , "t1metphicorr_off/F");
+  outTree->Branch("t1metphicorrphi_off" , &t1metphicorrphi_off_ , "t1metphicorrphi_off/F");
+  outTree->Branch("t1metphicorrmt_off"  , &t1metphicorrmt_off_  , "t1metphicorrmt_off/F");
 
   // btag variables		      
   outTree->Branch("nbtagsssv",        &nbtagsssv_,        "nbtagsssv/I");
