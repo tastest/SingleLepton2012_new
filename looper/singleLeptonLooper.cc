@@ -2909,10 +2909,21 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         mL_ = -999; //sparm_mL();
         x_  = -999; //sparm_mf();
 
-        for (int i=0; i<(int)sparm_values().size(); ++i) {
-	  if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
-	  if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	if( TString(prefix).Contains("T2tt") ){
+	  for (int i=0; i<(int)sparm_values().size(); ++i) {
+	    if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
+	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	  }
 	}
+	
+	if( TString(prefix).Contains("T2bw") ){
+	  for (int i=0; i<(int)sparm_values().size(); ++i) {
+	    if (sparm_names().at(i).Contains("x")) x_ = sparm_values().at(i);
+	    if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
+	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	  }
+        }
+	
         xsecsusy_  = mG_ > 0. ? stopPairCrossSection(mG_) : -999;
         weight_ = xsecsusy_ > 0. ? lumi * xsecsusy_ * (1000./50000.) : -999.;
 
@@ -3327,7 +3338,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
   outFile   = new TFile(Form("output/%s_smallTree%s%s.root",prefix,frsuffix,tpsuffix), "RECREATE");
   //  outFile   = new TFile(Form("output/%s/%s_smallTree%s%s.root",g_version,prefix,frsuffix,tpsuffix), "RECREATE");
-  //outFile   = new TFile("temp.root","RECREATE");
+  //  outFile   = new TFile("baby.root","RECREATE");
   outFile->cd();
   outTree = new TTree("t","Tree");
 
