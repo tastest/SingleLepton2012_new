@@ -27,15 +27,6 @@ class StopTreeLooper {
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
 
-	//selection
-	bool passEvtSelection(const StopTree *sTree, TString name);
-	bool passOneLeptonSelection(const StopTree *sTree, bool isData);
-	bool passTwoLeptonSelection(const StopTree *sTree, bool isData);
-	bool passSingleLeptonSelection(const StopTree *sTree, bool isData);
-	bool passDileptonSelection(const StopTree *sTree, bool isData);
-	bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);
-	bool passIsoTrkVeto(const StopTree *sTree);
-
 	//plotting
 	void makeSIGPlots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
 			   string tag_selection, string tag_kbin, string flav_tag, float mtcut ); 
@@ -52,14 +43,7 @@ class StopTreeLooper {
 	void makeZPlots(   const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
 			   string tag_selection, string tag_njets, string flav_tag );
 
-	//helper
-	float getdltrigweight(int id1, int id2);
-	float getsltrigweight(int id1, float pt, float eta);
-	float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
-	float dRbetweenVectors(LorentzVector vec1, LorentzVector vec2 );
-	float getdphi( float phi1 , float phi2 );
 	float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
-	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 
 
     private:
