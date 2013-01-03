@@ -606,19 +606,17 @@ void minuitFunction(int&, double* , double &result, double par[], int){
 
 
 
-list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
+list<Candidate> recoHadronicTop(std::vector<float> sigma_jets, bool isData,
                                  LorentzVector* lep, double met, double metphi,
                                  VofP4 jets, std::vector<float> btag){
 
   assert( jets.size() == btag.size() );
+  assert( jets.size() == sigma_jets.size() );
 
   float metx = met * cos( metphi );
   float mety = met * sin( metphi );
 
   int n_jets = jets.size();
-  double sigma_jets[n_jets];
-  for (int i=0; i<n_jets; ++i)
-    sigma_jets[i] = getJetResolution(jets[i], jetSmearer);
 
   if ( isData )
     for (int i=0; i<n_jets; ++i)
@@ -650,15 +648,14 @@ list<Candidate> recoHadronicTop(JetSmearer* jetSmearer, bool isData,
           for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
             if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
                  (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
-                    ibl[match] = jbl;
-                    iw1[match] = jw1;
-                    iw2[match] = jw2;
-                    ib[match] = jb;
-                    match++;
+	      if ( match == 5 ) break;
+	      ibl[match] = jbl;
+	      iw1[match] = jw1;
+	      iw2[match] = jw2;
+	      ib[match] = jb;
+	      match++;
             }
   }
-
-
   
 ////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
   
@@ -1885,9 +1882,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  
 	}
 
+	/*
 	else if( nleps_ < 0 || nleps_ > 2 ){
 	  cout << "ERROR nleptons = " << nleps_ << endl;
 	}
+*/
 
       }
 
@@ -2308,6 +2307,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       vipfjets_p4.clear();
       
       vector<float> vpfjets_csv;
+      vector<float> vpfjets_sigma;
       vector<float> fullcors;
       vector<float> l2l3cors;
       vector<float> rescors;
@@ -2317,6 +2317,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       rescors.clear();
       l1cors.clear();
       vpfjets_csv.clear();
+      vpfjets_sigma.clear();
 
       rhovor_ = evt_ww_rho_vor();
 
@@ -2440,6 +2441,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  // the following 2 vectors are passed to the recoHadronicTop function
 	  vpfjets_p4.push_back(vjet); 
 	  vpfjets_csv.push_back(pfjets_combinedSecondaryVertexBJetTag().at(ijet));
+	  vpfjets_sigma.push_back(getJetResolution(pfjets_p4().at(ijet), jetSmearer ));
+
 	}
 
 	// njets JEC up
@@ -3236,7 +3239,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       //                   vpfrawjets_p4, pfjets_combinedSecondaryVertexBJetTag());
 
       // NEW: use corrected jets and corresponding CSV values
-      list<Candidate> candidates = recoHadronicTop(jetSmearer, isData, lep1_,
+      list<Candidate> candidates = recoHadronicTop(vpfjets_sigma, isData, lep1_,
                         t1metphicorr_, t1metphicorrphi_,
                         vpfjets_p4, vpfjets_csv);
 
