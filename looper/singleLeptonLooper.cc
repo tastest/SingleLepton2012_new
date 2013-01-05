@@ -697,6 +697,20 @@ list<Candidate> recoHadronicTop(std::vector<float> sigma_jets, bool isData,
       minimizer->ExecuteCommand("MIGRAD", 0, 0);
 
       double c1 = minimizer->GetParameter(0);
+      if (c1!=c1) {
+	cout<<"[recoHadronicTop] ERROR: c1 parameter is NAN! Skipping this parton combination: "
+	    <<"run: "<<evt_run()
+	    <<" lumi: "<<evt_lumiBlock()
+	    <<" event: "<<evt_event();  
+	for (int i=0; i<(int)jets.size(); ++i) 
+	  if (jets[i].mass2()<0.001) 
+	    cout<<". Found jet "<<i
+		<<" with mass2 "<<jets[i].mass2()
+		<<"!!!"
+		<<endl;
+	continue;
+      }
+
       double c2 = fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2());
                 
       delete minimizer;
