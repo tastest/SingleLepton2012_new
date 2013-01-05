@@ -309,6 +309,11 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
       minimizer->ExecuteCommand("MIGRAD", 0, 0);
 
       double c1 = minimizer->GetParameter(0);
+      if (c1!=c1) {
+        cout<<"[StopTreeLooper::recoHadronicTop] ERROR: c1 parameter is NAN! Skipping this parton combination"
+	    <<endl;
+        continue;
+      }
       double c2 = fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2());
                 
       delete minimizer;

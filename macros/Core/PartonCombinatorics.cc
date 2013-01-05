@@ -203,6 +203,11 @@ void PartonCombinatorics::recoHadronicTop(){
       minimizer->ExecuteCommand("MIGRAD", 0, 0);
 
       double c1 = minimizer->GetParameter(0);
+      if (c1!=c1) {
+        cout<<"[PartonCombinatorics::recoHadronicTop] ERROR: c1 parameter is NAN! Skipping this parton combination"
+	    <<endl;
+        continue;
+      }
       double c2 = fc2(c1, jets_[i].mass2(), jets_[j].mass2(), hadW.mass2());
 
       delete minimizer;
