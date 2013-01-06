@@ -82,9 +82,10 @@ class StopTree {
 	int           mcid1_;
 	int           mcid2_;
 	int           mcdecay2_;
-	int           mcndec2_;
+	int           mcndec2_; 
 	int           npfjets30_;
 	int           npfjets40_;
+	int 	      npfjets30lepcorr_;
 	float 	      mctaudpt2_;	
 	float 	      lep1chi2ndf_;	
 	float 	      lep1dpt_;	
@@ -245,13 +246,14 @@ class StopTree {
 	    tree_->Branch("id1", 		&id1_, 			"id1/I");	      	      
 	    tree_->Branch("id2", 		&id2_, 			"id2/I");	      	      
 	    tree_->Branch("lep_t_id", 		&lep_t_id_, 		"lep_t_id/I");	      	      
-	    tree_->Branch("lep_tbar_id", 		&lep_tbar_id_, 		"lep_tbar_id/I");	      	      
+	    tree_->Branch("lep_tbar_id", 	&lep_tbar_id_, 		"lep_tbar_id/I");	      	      
 	    tree_->Branch("mcid1", 		&mcid1_, 		"mcid1/I");	      	      
 	    tree_->Branch("mcid2", 		&mcid2_, 		"mcid2/I");	      	      
 	    tree_->Branch("mcdecay2", 		&mcdecay2_, 		"mcdecay2/I");	      	      
 	    tree_->Branch("mcndec2", 		&mcndec2_, 		"mcndec2/I");	      	      
 	    tree_->Branch("npfjets30", 		&npfjets30_, 		"npfjets30/I");        
-	    tree_->Branch("npfjets40", 		&npfjets40_, 		"npfjets40/I");            
+	    tree_->Branch("npfjets40", 		&npfjets40_, 		"npfjets40/I");        
+	    tree_->Branch("npfjets30lepcorr", 	&npfjets30lepcorr_, 	"npfjets30lepcorr/I");        
 	    tree_->Branch("mctaudpt2", 		&mctaudpt2_, 		"mctaudpt2/F");	      	      
 	    tree_->Branch("lep1chi2ndf", 	&lep1chi2ndf_, 		"lep1chi2ndf/F");	      	      
 	    tree_->Branch("lep1dpt", 		&lep1dpt_, 		"lep1dpt/F");
@@ -403,6 +405,7 @@ class StopTree {
 	    tree_->SetBranchAddress("mcndec2", 		  &mcndec2_);	      	      
 	    tree_->SetBranchAddress("npfjets30", 	  &npfjets30_);          
 	    tree_->SetBranchAddress("npfjets40", 	  &npfjets40_);          
+	    tree_->SetBranchAddress("npfjets30lepcorr",   &npfjets30lepcorr_);          
 	    tree_->SetBranchAddress("mctaudpt2", 	  &mctaudpt2_);	      	      
 	    tree_->SetBranchAddress("lep1chi2ndf", 	  &lep1chi2ndf_);	      	      
 	    tree_->SetBranchAddress("lep1dpt", 		  &lep1dpt_);	      	      
@@ -581,13 +584,14 @@ StopTree::InitVariables(){
 	variables_.push_back(string("id1"		));
 	variables_.push_back(string("id2"		));
 	variables_.push_back(string("lep_t_id"		));
-	variables_.push_back(string("lep_tbar_id"		));
+	variables_.push_back(string("lep_tbar_id"	));
 	variables_.push_back(string("mcid1"		));
 	variables_.push_back(string("mcid2"		));
 	variables_.push_back(string("mcdecay2"		));
 	variables_.push_back(string("mcndec2"		));
 	variables_.push_back(string("npfjets30"		));
 	variables_.push_back(string("npfjets40"		));
+	variables_.push_back(string("npfjets30lepcorr"  ));
 	variables_.push_back(string("mctaudpt2"		));
 	variables_.push_back(string("lep1chi2ndf"	));
 	variables_.push_back(string("lep1dpt"		));
@@ -715,6 +719,7 @@ StopTree::InitVariables(){
     mcndec2_		= 999;
     npfjets30_		= 999;
     npfjets40_		= 999;
+    npfjets30lepcorr_	= 999;
     mctaudpt2_		= -999.;
     lep1chi2ndf_	= -999.;
     lep1dpt_		= -999.;
@@ -851,6 +856,7 @@ StopTree::Get(string value)
   if(value=="mcndec2" 		) { return this->mcndec2_;		}	      	      
   if(value=="npfjets30" 	) { return this->npfjets30_;		}          
   if(value=="npfjets40" 	) { return this->npfjets40_;		}          
+  if(value=="npfjets30lepcorr" 	) { return this->npfjets30lepcorr_;	}          
   if(value=="mctaudpt2" 	) { return this->mctaudpt2_;		}	      	      
   if(value=="lep1chi2ndf" 	) { return this->lep1chi2ndf_;		}	      	      
   if(value=="lep1dpt" 		) { return this->lep1dpt_;		}	      	      
