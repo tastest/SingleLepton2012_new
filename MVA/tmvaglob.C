@@ -266,6 +266,7 @@ namespace TMVAGlob {
          gSystem->mkdir( dir );
 
          TString pngName = fname + ".png";
+         TString pdfName = fname + ".pdf";
          TString gifName = fname + ".gif";
          TString epsName = fname + ".eps";
          c->cd();
@@ -274,21 +275,22 @@ namespace TMVAGlob {
          if (UsePaperStyle) {
             c->Print(epsName);
          } 
-//          else {
-//             cout << "--- --------------------------------------------------------------------" << endl;
-//             cout << "--- If you want to save the image as eps, gif or png, please comment out " << endl;
-//             cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
-//             cout << "--- --------------------------------------------------------------------" << endl;
-//             c->Print(epsName);
-//             c->Print(pngName);
-//             // c->Print(gifName);
-//          }
-         else {
-           cout << "--- --------------------------------------------------------------------" << endl;
-           cout << "--- Currently not printing files by default, see " << endl;
-           cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
-           cout << "--- --------------------------------------------------------------------" << endl;
-         }
+	 else {
+	   cout << "--- --------------------------------------------------------------------" << endl;
+	   cout << "--- If you want to save the image as eps, gif or png, please comment out " << endl;
+	   cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
+	   cout << "--- --------------------------------------------------------------------" << endl;
+	   // c->Print(epsName);
+	   // c->Print(pngName);
+	   c->Print(pdfName);
+	   // c->Print(gifName);
+	 }
+         // else {
+         //   cout << "--- --------------------------------------------------------------------" << endl;
+         //   cout << "--- Currently not printing files by default, see " << endl;
+         //   cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
+         //   cout << "--- --------------------------------------------------------------------" << endl;
+         // }
       }
    }
 
