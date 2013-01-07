@@ -276,9 +276,13 @@ namespace TMVAGlob {
             c->Print(epsName);
          } 
 	 else {
+	   // cout << "--- --------------------------------------------------------------------" << endl;
+	   // cout << "--- If you want to save the image as eps, gif or png, please comment out " << endl;
+	   // cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
+	   // cout << "--- --------------------------------------------------------------------" << endl;
+
 	   cout << "--- --------------------------------------------------------------------" << endl;
-	   cout << "--- If you want to save the image as eps, gif or png, please comment out " << endl;
-	   cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
+	   cout << "--- printing all files as pdf's, to turn off go to tmvaglob.C L285"       << endl;
 	   cout << "--- --------------------------------------------------------------------" << endl;
 	   // c->Print(epsName);
 	   // c->Print(pngName);
