@@ -940,6 +940,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       outTree_->Fill();
 
     } // end event loop
+
+    delete tree;
   } // end file loop
   
   //-------------------------
