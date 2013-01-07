@@ -6,6 +6,30 @@
 // input: - Input file (result from TMVA),
 //        - normal/decorrelated/PCA
 //        - use of TMVA plotting TStyle
+
+
+float computeOverlap( TH1* h1in , TH1* h2in ){
+
+  TH1* h1 = (TH1*) h1in->Clone(Form("%s_clone",h1in->GetName()));
+  TH1* h2 = (TH1*) h2in->Clone(Form("%s_clone",h2in->GetName()));
+
+  float n1 = h1->Integral();
+  float n2 = h2->Integral();
+
+  h1->Scale(1.0/n1);
+  h2->Scale(1.0/n2);
+
+  float overlap = 0.0;
+
+  for(int ibin = 1 ; ibin <= h1->GetXaxis()->GetNbins() ; ibin++ ){
+    overlap += TMath::Min( h1->GetBinContent(ibin) , h2->GetBinContent(ibin) );
+
+  }
+
+  return overlap;
+}
+
+
 void variables( TString fin = "TMVA.root", TString dirName = "InputVariables_Id", TString title = "TMVA Input Variables",
                 Bool_t isRegression = kFALSE, Bool_t useTMVAStyle = kTRUE )
 {
@@ -127,6 +151,12 @@ void variables( TString fin = "TMVA.root", TString dirName = "InputVariables_Id"
          TString ytit = TString("(1/N) ") + sig->GetYaxis()->GetTitle();
          sig->GetYaxis()->SetTitle( ytit ); // histograms are normalised
       }
+
+      TLatex *text = new TLatex();
+      text->SetNDC();
+      text->SetTextSize(0.06);
+      float overlap = computeOverlap(sig,bgd);
+      text->DrawLatex(0.8,0.8,Form("%.2f",overlap));
 
       // Draw legend
       if (countPad == 1 && !isRegression) {
