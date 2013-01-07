@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVA_stop.C,v 1.2 2012/12/17 13:45:10 benhoob Exp $
+// @(#)root/tmva $Id: TMVA_stop.C,v 1.3 2013/01/07 23:54:23 benhoob Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -76,7 +76,8 @@ void TMVA_stop( TString myMethodList = "" )
   TCut met100("met>=100");
   TCut mt120("mt>=120");
   TCut nb1("nb>=1");
-  TCut isotrk("passisotrk==1");
+  //TCut isotrk("passisotrk==1");
+  TCut isotrk("passisotrkv2==1");
   TCut lep_pt30("nlep>=1 && lep1pt>30.0");
    
   TCut  sel      = lep_pt30 + isotrk + njets4 + met100 + mt120 + nb1;
@@ -90,33 +91,41 @@ void TMVA_stop( TString myMethodList = "" )
   //-----------------------------------------------------
   
   std::map<std::string,int> mvaVar;
-  mvaVar[ "met" ]			= 1;
+  mvaVar[ "met" ]			= 0;
+  mvaVar[ "lep1pt" ]			= 1;
+  mvaVar[ "mt2wmin" ]			= 1;
+  mvaVar[ "htratiom" ]	                = 1;
+  mvaVar[ "chi2minprob" ]		= 1;
+  mvaVar[ "dphimjmin" ]			= 1;
+  mvaVar[ "rand" ]			= 0;
+
   mvaVar[ "mt" ]			= 0;
   mvaVar[ "mt2w" ]			= 0;
   mvaVar[ "mt2bl" ]			= 0;
   mvaVar[ "mt2b" ]			= 0;
   mvaVar[ "chi2" ]			= 0;
-  mvaVar[ "lep1pt" ]			= 1;
-  mvaVar[ "lep1eta" ]			= 1;
-  mvaVar[ "thrjetlm" ]			= 1;
+  mvaVar[ "lep1eta" ]			= 0;
+  mvaVar[ "thrjetlm" ]			= 0;
   mvaVar[ "apljetlm" ]			= 0;
-  mvaVar[ "sphjetlm" ]			= 1;
-  mvaVar[ "cirjetlm" ]			= 1;
-  mvaVar[ "chi2min" ]			= 1;
-  mvaVar[ "chi2min_mt2b" ]		= 1;
-  mvaVar[ "chi2min_mt2bl" ]		= 1;
-  mvaVar[ "chi2min_mt2w" ]		= 1;
-  mvaVar[ "mt2bmin" ]			= 1;
-  mvaVar[ "mt2blmin" ]			= 1;
-  mvaVar[ "mt2wmin" ]			= 1;
-  mvaVar[ "mt2wmin_chi2" ]		= 1;
-  mvaVar[ "mt2bmin_chi2" ]		= 1;
-  mvaVar[ "mt2blmin_chi2" ]		= 1;
-  mvaVar[ "htratiol" ]              	= 1;
-  mvaVar[ "htratiom" ]	                = 1;
-  mvaVar[ "dphimj1" ]			= 1;
-  mvaVar[ "dphimj2" ]			= 1;
-  mvaVar[ "rand" ]			= 0;
+  mvaVar[ "sphjetlm" ]			= 0;
+  mvaVar[ "cirjetlm" ]			= 0;
+  mvaVar[ "chi2min" ]			= 0;
+  mvaVar[ "chi2min_mt2b" ]		= 0;
+  mvaVar[ "chi2min_mt2bl" ]		= 0;
+  mvaVar[ "chi2min_mt2w" ]		= 0;
+  mvaVar[ "mt2bmin" ]			= 0;
+  mvaVar[ "mt2blmin" ]			= 0;
+  mvaVar[ "mt2wmin_chi2" ]		= 0;
+  mvaVar[ "mt2bmin_chi2" ]		= 0;
+  mvaVar[ "mt2blmin_chi2" ]		= 0;
+  mvaVar[ "mt2wmin_chi2prob" ]		= 0;
+  mvaVar[ "mt2bmin_chi2prob" ]		= 0;
+  mvaVar[ "mt2blmin_chi2prob" ]		= 0;
+  mvaVar[ "htratiol" ]              	= 0;
+  mvaVar[ "dphimj1" ]			= 0;
+  mvaVar[ "dphimj2" ]			= 0;
+  mvaVar[ "metsig" ]			= 0;
+
 
   // cout << "Variables for MVA    :" << endl;
   // if( mvaVar[ "met"     ]  == 1 ) cout << "met"     << endl;
@@ -132,7 +141,7 @@ void TMVA_stop( TString myMethodList = "" )
   //choose bkg samples to include
   //---------------------------------
   
-  const char* babyPath = "/tas/benhoob/StopBabies/output_V00-02-04_2012_4jskim/MiniBabies/V00-00-00";
+  const char* babyPath = "/tas/benhoob/StopBabies/output_V00-02-04_2012_4jskim/MiniBabies/V00-00-01";
   
   cout << "Adding backgrounds from path " << babyPath << endl;
 
@@ -326,6 +335,7 @@ void TMVA_stop( TString myMethodList = "" )
    if( mvaVar[ "sphjetlm"      ]  == 1 ) factory->AddVariable( "sphjetlm"               ,  "sphericity"                 ,       ""   , 'F' );
    if( mvaVar[ "cirjetlm"      ]  == 1 ) factory->AddVariable( "cirjetlm"               ,  "circularity"                ,       ""   , 'F' );
    if( mvaVar[ "chi2min"       ]  == 1 ) factory->AddVariable( "min(chi2min,100)"       ,  "#chi^{2}_{min}"             ,       ""   , 'F' );
+   if( mvaVar[ "chi2minprob"   ]  == 1 ) factory->AddVariable( "chi2minprob"            ,  "Prob(#chi^{2}_{min})"       ,       ""   , 'F' );
    if( mvaVar[ "chi2min_mt2b"  ]  == 1 ) factory->AddVariable( "chi2min_mt2b"           ,  "MT2b(#chi^{2}_{min})"       ,       ""   , 'F' );
    if( mvaVar[ "chi2min_mt2bl" ]  == 1 ) factory->AddVariable( "chi2min_mt2bl"          ,  "MT2bl(#chi^{2}_{min})"      ,       ""   , 'F' );
    if( mvaVar[ "chi2min_mt2w"  ]  == 1 ) factory->AddVariable( "chi2min_mt2w"           ,  "MT2W(#chi^{2}_{min})"       ,       ""   , 'F' );
@@ -335,11 +345,16 @@ void TMVA_stop( TString myMethodList = "" )
    if( mvaVar[ "mt2bmin_chi2"  ]  == 1 ) factory->AddVariable( "min(mt2bmin_chi2,100)"  ,  "#chi^{2}(MT2b_{min})"       ,       ""   , 'F' );
    if( mvaVar[ "mt2blmin_chi2" ]  == 1 ) factory->AddVariable( "min(mt2blmin_chi2,100)" ,  "#chi^{2}(MT2bl_{min})"      ,       ""   , 'F' );
    if( mvaVar[ "mt2wmin_chi2"  ]  == 1 ) factory->AddVariable( "min(mt2wmin_chi2,100)"  ,  "#chi^{2}(MT2W_{min})"       ,       ""   , 'F' );
-   if( mvaVar[ "htratiol"      ]  == 1 ) factory->AddVariable( "htssl/(htssl+htosl)"    ,  "lepton H_{T} ratio"         ,       ""   , 'F' );
-   if( mvaVar[ "htratiom"      ]  == 1 ) factory->AddVariable( "htssm/(htssm+htosm)"    ,  "E_{T}^{miss} H_{T} ratio"   ,       ""   , 'F' );
+   if( mvaVar[ "mt2bmin_chi2prob"  ]  == 1 ) factory->AddVariable( "mt2bmin_chi2prob"   ,  "Prob(#chi^{2}(MT2b_{min}))"       ,       ""   , 'F' );
+   if( mvaVar[ "mt2blmin_chi2prob" ]  == 1 ) factory->AddVariable( "mt2blmin_chi2prob"  ,  "Prob(#chi^{2}(MT2bl_{min}))"      ,       ""   , 'F' );
+   if( mvaVar[ "mt2wmin_chi2prob"  ]  == 1 ) factory->AddVariable( "mt2wmin_chi2prob"   ,  "Prob(#chi^{2}(MT2W_{min}))"       ,       ""   , 'F' );
+   if( mvaVar[ "htratiol"      ]  == 1 ) factory->AddVariable( "htssl/(htosl+htssl)"    ,  "H_{T}^{SSL}/H_{T}"          ,       ""   , 'F' );
+   if( mvaVar[ "htratiom"      ]  == 1 ) factory->AddVariable( "htssm/(htosm+htssm)"    ,  "H_{T}^{SSM}/H_{T}"          ,       ""   , 'F' );
    if( mvaVar[ "dphimj1"       ]  == 1 ) factory->AddVariable( "dphimj1"                ,  "#Delta#phi(j1,E_{T}^{miss})",       ""   , 'F' );
    if( mvaVar[ "dphimj2"       ]  == 1 ) factory->AddVariable( "dphimj2"                ,  "#Delta#phi(j2,E_{T}^{miss})",       ""   , 'F' );
+   if( mvaVar[ "dphimjmin"     ]  == 1 ) factory->AddVariable( "dphimjmin"              ,  "min(#Delta#phi(j_{1,2},E_{T}^{miss}))",       ""   , 'F' );
    if( mvaVar[ "rand"          ]  == 1 ) factory->AddVariable( "rand"                   ,  "random(0,1)"                ,       ""   , 'F' );
+   if( mvaVar[ "metsig"        ]  == 1 ) factory->AddVariable( "met/sqrt(htosl+htssl)"  ,  "E_{T}^{miss}/#sqrt{H_{T}}"  ,       "#sqrt{GeV}"   , 'F' );
    
    /*
    if( doMultipleOutputs ){
@@ -652,6 +667,7 @@ void TMVA_stop( TString myMethodList = "" )
    if (Use["BDT"])  // Adaptive Boost
       factory->BookMethod( TMVA::Types::kBDT, "BDT",
                            "!H:!V:NTrees=850:nEventsMin=150:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" );
+                           //"!H:!V:NTrees=850:nEventsMin=150:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" );
 
    if (Use["BDTB"]) // Bagging
       factory->BookMethod( TMVA::Types::kBDT, "BDTB",
