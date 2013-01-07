@@ -62,6 +62,11 @@ void compareHisto( TCut sel, TChain* chdl, TChain* chsl, TChain* chsig , char* v
   hsl->Draw("samehist");
   hsig->Draw("samehist");
 
+  cout << endl;
+  cout << "Variable       : " << var << endl;
+  cout << "tt->ll         : " << hdl->GetBinContent(2) << endl;
+  cout << "tt->l+jets     : " << hsl->GetBinContent(2) << endl;
+  cout << "T2tt (450,0)   : " << hsig->GetBinContent(2) << endl;
 
 }
 
@@ -96,7 +101,7 @@ void compareVariables(){
   vector<float> xmin;
   vector<float> xmax;
 
-  variables.push_back("met");                   names.push_back("E_{T}^{miss} [GeV]"); nbins.push_back(50); xmin.push_back(0.0); xmax.push_back(500.0);
+  //variables.push_back("met");                   names.push_back("E_{T}^{miss} [GeV]"); nbins.push_back(50); xmin.push_back(0.0); xmax.push_back(500.0);
   variables.push_back("passisotrk");            names.push_back("iso-track (old)");    nbins.push_back(2);  xmin.push_back(0);   xmax.push_back(2);
   variables.push_back("passisotrkv2");          names.push_back("iso-track (new)");    nbins.push_back(2);  xmin.push_back(0);   xmax.push_back(2);
   // variables.push_back("passisotrk");                    
