@@ -617,6 +617,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   makeTree(name.Data());
 
+  TH2F* h_nsig = new TH2F();
+  
+  if( name.Contains("T2") ){
+    char* h_nsig_filename = "";
+
+    if( name.Contains("T2tt") ){
+      h_nsig_filename = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3/myMassDB_T2tt.root";
+    }
+
+    cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
+
+    h_nsig->Open(filename);
+  }
+
+
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
   //   cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
@@ -698,8 +713,15 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //------------------------------------------ 
 
       float evtweight    = isData ? 1. : ( tree->weight_ * tree->nvtxweight_ * tree->mgcor_ );
-      // TO BE FIXED (NOT ALL POINTS HAVE 50K EVENTS)
-      if( name.Contains("T2") ) evtweight = tree->xsecsusy_ * 1000.0 / 50000.0; 
+
+      if( name.Contains("T2") ) {
+	int bin = h_nsig->FindBin(tree->mg_,tree->ml_);
+	float nevents = h_nsig->GetBinContent(bin);
+	evtweight = tree->xsecsusy_ * 1000.0 / nevents; 
+
+	cout << "mg " << tree->mg_ << " ml " << tree->ml_ << " bin " << bin << " nevents " << nevents << " xsec " << tree->xsecsusy_ << " weight " << evtweight << endl;
+      }
+
 
       float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
       float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
