@@ -66,7 +66,8 @@
     if( TString(sampletag[i]).Contains("scan") ){
 
       if( TString(sampletag[i]).Contains("T2tt") ){
-	ch[i]->Add(Form("%s/merged_T2tt_10.root",path_T2tt));
+	//ch[i]->Add(Form("%s/merged_T2tt_10.root",path_T2tt));
+	ch[i]->Add(Form("%s/merged*root",path_T2tt));
 	cout << "Added " << Form("%s/merged*root",path_T2tt) << endl;
       }
 
