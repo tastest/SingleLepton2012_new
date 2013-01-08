@@ -723,7 +723,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	float nevents = h_nsig->GetBinContent(bin);
 	evtweight = tree->xsecsusy_ * 1000.0 / nevents; 
 
-	cout << "mg " << tree->mg_ << " ml " << tree->ml_ << " bin " << bin << " nevents " << nevents << " xsec " << tree->xsecsusy_ << " weight " << evtweight << endl;
+	//cout << "mg " << tree->mg_ << " ml " << tree->ml_ << " bin " << bin << " nevents " << nevents << " xsec " << tree->xsecsusy_ << " weight " << evtweight << endl;
       }
 
 
