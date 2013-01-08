@@ -21,11 +21,13 @@
  
   char* path = "/nfs-3/userdata/stop/output_V00-02-04_2012_4jskim";
 
-  char* path_T2tt        = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2tt/res";
-  char* path_T2bw_fine   = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_1/res";
-  char* path_T2bw_coarse = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse/res";
+  char* path_T2tt        = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3/";
+  char* path_T2bw_fine   = "/tas/benhoob/StopBabies/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_1/res";
+  //char* path_T2bw_coarse = "/tas/benhoob/StopBabies/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse/res";
+  char* path_T2bw_coarse = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse_3/res/";
 
-  const int NSAMPLES = 3;
+
+  const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
     // "T2tt_250_0",
     // "T2tt_350_0",
@@ -35,8 +37,8 @@
     // "ttdl_powheg",
     // "ttsl_powheg",
 
-    "T2bw_fine_scan",
-    "T2bw_coarse_scan",
+    //"T2bw_fine_scan",
+    //"T2bw_coarse_scan",
     "T2tt_scan",
 
     // "w1to4jets",
@@ -64,18 +66,19 @@
     if( TString(sampletag[i]).Contains("scan") ){
 
       if( TString(sampletag[i]).Contains("T2tt") ){
-	ch[i]->Add(Form("%s/baby_1_*.root",path_T2tt));
-	cout << "Added " << Form("%s/baby_1_*.root",path_T2tt) << endl;
+	ch[i]->Add(Form("%s/merged_T2tt_10.root",path_T2tt));
+	cout << "Added " << Form("%s/merged*root",path_T2tt) << endl;
       }
 
       if( TString(sampletag[i]).Contains("T2bw_fine_scan") ){
-	ch[i]->Add(Form("%s/baby_1_*.root",path_T2bw_fine));
-	cout << "Added " << Form("%s/baby_1_*.root",path_T2bw_fine) << endl;
+	ch[i]->Add(Form("%s/baby_1_*root",path_T2bw_fine));
+	//ch[i]->Add(Form("%s/baby*root",path_T2bw_fine));
+	cout << "Added " << Form("%s/baby*root",path_T2bw_fine) << endl;
       }
 
       if( TString(sampletag[i]).Contains("T2bw_coarse_scan") ){
-	ch[i]->Add(Form("%s/baby_1_*.root",path_T2bw_coarse));
-	cout << "Added " << Form("%s/baby_1_*.root",path_T2bw_coarse) << endl;
+	ch[i]->Add(Form("%s/baby*root",path_T2bw_coarse));
+	cout << "Added " << Form("%s/baby*root",path_T2bw_coarse) << endl;
       }
 
     }
