@@ -628,7 +628,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
 
-    h_nsig->Open(filename);
+    TFile *f_nsig = TFile::Open(h_nsig_filename);
+
+    if( f_nsig == 0 ) cout << "ERROR! didn't find file " << h_nsig_filename << endl;
+
+    h_nsig = (TH2F*) f_nsig->Get("masses");
   }
 
 
