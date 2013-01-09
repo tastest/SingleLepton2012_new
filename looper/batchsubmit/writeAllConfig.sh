@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-02-06_2012"
+TAG="V00-02-11_2012"
 
 #
 # DATA
