@@ -5,6 +5,7 @@
 #include "TFile.h"
 #include "TString.h"
 #include "TH1F.h"
+#include "TH2F.h"
 
 #include <iostream>
 #include "Math/LorentzVector.h"
@@ -57,7 +58,7 @@ class StopTreeLooper {
 	float min_mtpeak;
 	float max_mtpeak; 
 
-	std::vector<LorentzVector> * myPfJets
+	std::vector<LorentzVector> * myPfJets;
 
 };
 
