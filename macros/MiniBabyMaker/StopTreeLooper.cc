@@ -121,57 +121,6 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id) {
 }
 
 
-
-bool compare_candidates( Candidate x, Candidate y ){
-  return x.chi2 < y.chi2;
-}
-
-double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
-{
-  if (verbose) {
-    printf("c1: %4.2f\n", c1);
-    printf("m12: %4.2f\n", m12);
-    printf("m22: %4.2f\n", m22);
-    printf("m02: %4.2f\n", m02);
-  }
-
-  double a = m22;
-  double b = (m02 - m12 - m22) * c1;
-  double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
-
-  if (verbose) {
-    printf("a: %4.2f\n", a);
-    printf("b: %4.2f\n", b);
-    printf("c: %4.2f\n", c);
-  }
-
-  double num = -1. * b + sqrt(b * b - 4 * a * c);
-  double den = 2 * a;
-
-  if (verbose) {
-    printf("num: %4.2f\n", num);
-    printf("den: %4.2f\n", den);
-    printf("num/den: %4.2f\n", num/den);
-  }
-
-  return (num/den);
-}
-
-
-double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
-              double m12, double m22, double m02){
-  double rat1 = pt1 * (1 - c1) / sigma1;
-  double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
-
-  return ( rat1 * rat1 + rat2 * rat2);
-}
-
-//void StopSelector::minuitFunction(int& npar, double *gout, double &result, double par[], int flg)
-void minuitFunction(int&, double* , double &result, double par[], int){
-  result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
-}
-
-
 /* Reconstruct the hadronic top candidates, select the best candidate and
  * store the chi2 =  (m_jj - m_W)^2/sigma_m_jj + (m_jjj - m_t)^2/sigma_m_jjj
  * return the number of candidates found.
@@ -188,17 +137,6 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
 
   assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
   assert( tree->pfjets_->size() == tree->pfjets_sigma_.size() );
-
-  /*
-  static JetSmearer* jetSmearer = 0;
-  if (jetSmearer == 0 ){
-    std::vector<std::string> list_of_file_names;
-    list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PtResolution_AK5PF.txt");
-    list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PhiResolution_AK5PF.txt");
-    list_of_file_names.push_back("../../CORE/jetsmear/data/jet_resolutions.txt");
-    jetSmearer = makeJetSmearer(list_of_file_names);
-  }
-  */
 
   LorentzVector* lep = &tree->lep1_;
   double met = tree->t1metphicorr_;
@@ -288,7 +226,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
       double p1 = -1;
 
       minimizer->ExecuteCommand("SET PRINTOUT", &p1, 1);
-      minimizer->SetFCN(minuitFunction);
+      minimizer->SetFCN(PartonCombinatorics::minuitFunction);
       minimizer->SetParameter(0 , "c1"     , 1.1             , 1 , 0 , 0);
       minimizer->SetParameter(1 , "pt1"    , 1.0             , 1 , 0 , 0);
       minimizer->SetParameter(2 , "sigma1" , sigma_jets[i]   , 1 , 0 , 0);
@@ -310,7 +248,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
 	    <<endl;
         continue;
       }
-      double c2 = fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2());
+      double c2 = PartonCombinatorics::fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2(),false);
                 
       delete minimizer;
 
@@ -447,7 +385,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
     }
 
   if (__SORT) 
-    chi2candidates.sort(compare_candidates);
+    chi2candidates.sort(PartonCombinatorics::compare_in_chi2);
 
   return chi2candidates;
 }
@@ -743,6 +681,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       btag.clear();
       mc.clear();
 
+      vector<float> sigma_jets;
+
       for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
 
 	if ( i > (N_JETS_TO_CONSIDER-1) ) break;
@@ -752,34 +692,28 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	n_jets++;
 	jets.push_back( tree->pfjets_->at(i)    );
 	btag.push_back( tree->pfjets_csv_.at(i) );
+
 	if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
+	else mc.push_back  ( 0 );
+
+	float sigma = tree->pfjets_sigma_.at(i) ;
+	if ( isData) sigma *= getDataMCRatio(jets[i].eta());
+	sigma_jets.push_back(sigma);
+
       }
+
+      for (int i=0; i<n_jets; ++i){
+      }
+
+
 
       //------------------------------------------ 
       // get list of candidates
       //------------------------------------------ 
       
-      /*
-      static JetSmearer* jetSmearer = 0;
-      if (jetSmearer == 0 ){
-	std::vector<std::string> list_of_file_names;
-	list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PtResolution_AK5PF.txt");
-	list_of_file_names.push_back("../../CORE/jetsmear/data/Spring10_PhiResolution_AK5PF.txt");
-	list_of_file_names.push_back("../../CORE/jetsmear/data/jet_resolutions.txt");
-	jetSmearer = makeJetSmearer(list_of_file_names);
-      }
-      */
-
       LorentzVector* lep = &tree->lep1_;
       float met = tree->t1metphicorr_;
       float metphi = tree->t1metphicorrphi_;
-
-      vector<float> sigma_jets;
-      for (int i=0; i<n_jets; ++i){
-	float sigma = tree->pfjets_sigma_.at(i) ;
-	if ( isData) sigma *= getDataMCRatio(jets[i].eta());
-	sigma_jets.push_back(sigma);
-      }
 
       // get list of candidates
       PartonCombinatorics pc (jets, btag, sigma_jets, mc, *lep, met, metphi, isData);
