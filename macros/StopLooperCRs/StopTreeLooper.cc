@@ -43,6 +43,7 @@ StopTreeLooper::StopTreeLooper()
   t1metphicorrmt = -9999.;
   min_mtpeak = -9999.;
   max_mtpeak = -9999.; 
+
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -282,6 +283,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       t1metphicorrphi = p_t1metphicorr.second;
       t1metphicorrmt  = getMT( tree->lep1_.Pt() , tree->lep1_.Phi() , t1metphicorr , t1metphicorrphi );  
 
+      //----------------------------------------------------------------------------
+      // import jet vector
+      //----------------------------------------------------------------------------
+
+      myPfJets=tree->pfjets_;
+      
       //----------------------------------------------------------------------------
       // tags used for histograms
       //----------------------------------------------------------------------------
@@ -1091,6 +1098,11 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
   float dphi_metlep = getdphi( sTree->lep1_.Phi() , t1metphicorrphi );
   plot1D("h_sig_dphi_metlep"+tag_selection         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_sig_dphi_metlep"+tag_selection+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  //min dphi leading two jets - this should cut most of the ttbar single leptons
+  float minDphi_J12=getMinDphi(t1metphicorrphi, myPfJets->at(0),myPfJets->at(1));
+  plot1D("h_sig_minDphi_j1j2"+tag_selection         +flav_tag, minDphi_J12, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_sig_minDphi_j1j2"+tag_selection+tag_kbin+flav_tag, minDphi_J12, evtweight, h_1d, 15, 0., TMath::Pi());
+
   //MT
   //binning for mT plots
   nbins = 30;
@@ -1101,6 +1113,16 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
   plot1D("h_sig_mt"+tag_selection+tag_kbin+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_mt_count"+tag_selection         +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
   plot1D("h_sig_mt_count"+tag_selection+tag_kbin+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+
+  if(minDphi_J12>0.8) {
+
+    plot1D("h_sig_mt_mindPhiJ12"+tag_selection         +flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+    plot1D("h_sig_mt_mindPhiJ12"+tag_selection+tag_kbin+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+    plot1D("h_sig_mt_count_mindPhiJ12"+tag_selection         +flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+    plot1D("h_sig_mt_count_mindPhiJ12"+tag_selection+tag_kbin+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+    
+  }
+
 
 }
 

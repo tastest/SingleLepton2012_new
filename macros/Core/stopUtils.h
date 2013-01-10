@@ -41,5 +41,6 @@ pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
 float getdphi( float phi1 , float phi2 );
 float dRbetweenVectors(StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 );
+float getMinDphi(float metPhi, StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 );
 
 #endif

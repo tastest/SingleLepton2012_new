@@ -793,8 +793,19 @@ float getMT( float pt1 , float phi1 , float pt2 , float phi2 ){
 }
 
 float dRbetweenVectors(StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 ){ 
+
   float dphi = std::min(::fabs(vec1.Phi() - vec2.Phi()), 2 * M_PI - fabs(vec1.Phi() - vec2.Phi()));
   float deta = vec1.Eta() - vec2.Eta();
 
   return sqrt(dphi*dphi + deta*deta);
+}
+
+float getMinDphi(float metPhi, StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 ) {
+  
+  float dphimj1_    = getdphi(metPhi, vec1.phi() );
+  float dphimj2_    = getdphi(metPhi, vec2.phi() );
+  float dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
+
+  return dphimjmin_;
+  
 }
