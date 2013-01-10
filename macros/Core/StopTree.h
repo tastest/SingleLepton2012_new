@@ -114,6 +114,9 @@ class StopTree {
 	float         pfcandpt10_;
 	float         pfcandiso10_;
         int           pfcandid10_;
+	float         pfcandvetopt10_;
+	float         pfcandvetoiso10_;
+        int           pfcandvetoid10_;
 	float         pfcandpt5_;
 	float         pfcandiso5_;
 	int           pfcandid5_;
@@ -182,6 +185,7 @@ class StopTree {
 	//        vector<LorentzVector>* jets_;
         vector<LorentzVector>* pfjets_;
 	vector<float> pfjets_csv_;
+	vector<float> pfjets_sigma_;
 	vector<float> pfjets_qgtag_;
 	vector<int> pfjets_mc3_;
 	vector<float> pfjets_beta2_;
@@ -197,7 +201,7 @@ class StopTree {
         vector<string> variables_;
 	
         /// default constructor  
-	StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pfcand5Ptr_(&pfcand5_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_), pfjets_csv_Ptr_(&pfjets_csv_), pfjets_qgtag_Ptr_(&pfjets_qgtag_), pfjets_mc3_Ptr_(&pfjets_mc3_), pfjets_beta_Ptr_(&pfjets_beta_), pfjets_beta2_Ptr_(&pfjets_beta2_), pfjets_lepjet_Ptr_(&pfjets_lepjet_)  {}
+	StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), tPtr_(&t_), tbarPtr_(&tbar_), stop_tPtr_(&stop_t_), stop_tbarPtr_(&stop_tbar_), lep_tPtr_(&lep_t_), lep_tbarPtr_(&lep_tbar_), mclep1Ptr_(&mclep1_), mclep2Ptr_(&mclep2_), pfcand10Ptr_(&pfcand10_), pfcand5Ptr_(&pfcand5_), pflep1Ptr_(&pflep1_), pflep2Ptr_(&pflep2_), pfjets_csv_Ptr_(&pfjets_csv_), pfjets_sigma_Ptr_(&pfjets_sigma_), pfjets_qgtag_Ptr_(&pfjets_qgtag_), pfjets_mc3_Ptr_(&pfjets_mc3_), pfjets_beta_Ptr_(&pfjets_beta_), pfjets_beta2_Ptr_(&pfjets_beta2_), pfjets_lepjet_Ptr_(&pfjets_lepjet_)  {}
  //StopTree() :  lep1Ptr_(&lep1_), lep2Ptr_(&lep2_), pfcand10Ptr_(&pfcand10_), jet1Ptr_(&pfjet1_), jet2Ptr_(&pfjet2_), jet3Ptr_(&pfjet3_), jet4Ptr_(&pfjet4_), jet5Ptr_(&pfjet5_), jet6Ptr_(&pfjet6_) {}
         /// default destructor
         ~StopTree(){ 
@@ -229,7 +233,7 @@ class StopTree {
 	    tree_->Branch("lumi", 	        &lumi_, 		"lumi/I");
 	    tree_->Branch("event", 	        &event_, 		"event/I");
 	    tree_->Branch("nvtx", 		&nvtx_, 		"nvtx/I");
-            tree_->Branch("indexfirstGoodVertex",               &indexfirstGoodVertex_,                 "indexfirstGoodVertex/I");
+            tree_->Branch("indexfirstGoodVertex_",               &indexfirstGoodVertex_,                 "indexfirstGoodVertex_/I");
 	    tree_->Branch("nvtxweight", 	&nvtxweight_, 		"nvtxweight/F");    
 	    tree_->Branch("weight", 		&weight_, 		"weight/F");	      	      
 	    tree_->Branch("xsecsusy", 		&xsecsusy_, 		"xsecsusy/F");	      	      
@@ -287,10 +291,13 @@ class StopTree {
 	    tree_->Branch("t1metphicorrlepphi", &t1metphicorrlepphi_, 	"t1metphicorrlepphi/F");        
 	    tree_->Branch("pfcandpt10", 	&pfcandpt10_, 		"pfcandpt10/F");        
 	    tree_->Branch("pfcandiso10", 	&pfcandiso10_, 		"pfcandiso10/F");      
+	    tree_->Branch("pfcandid10",  	&pfcandid10_, 		"pfcandid10/F");      
+	    tree_->Branch("pfcandvetopt10", 	&pfcandvetopt10_, 		"pfcandvetopt10/F");        
+	    tree_->Branch("pfcandvetoiso10", 	&pfcandvetoiso10_, 		"pfcandvetoiso10/F");      
+	    tree_->Branch("pfcandvetoid10",  	&pfcandvetoid10_, 		"pfcandvetoid10/F");      
 	    tree_->Branch("pfcandpt5",  	&pfcandpt5_, 		"pfcandpt5/F");        
 	    tree_->Branch("pfcandiso5", 	&pfcandiso5_, 		"pfcandiso5/F");      
 	    tree_->Branch("pfcandid5",  	&pfcandid5_, 		"pfcandid5/F");      
-	    tree_->Branch("pfcandid10",  	&pfcandid10_, 		"pfcandid10/F");      
 	    tree_->Branch("trkpt10loose", 	&trkpt10loose_, 	"trkpt10loose/F");        
 	    tree_->Branch("trkreliso10loose", 	&trkreliso10loose_, 	"trkreliso10loose/F");      
 	    tree_->Branch("nleps", 		&nleps_, 		"nleps/I");
@@ -364,6 +371,7 @@ class StopTree {
 	    //            tree_->Branch("jets", "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &jets_);
             tree_->Branch("pfjets"       , "vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", &pfjets_);
             tree_->Branch("pfjets_csv"   , "std::vector<float>" , &pfjets_csv_Ptr_    );
+            tree_->Branch("pfjets_sigma"   , "std::vector<float>" , &pfjets_sigma_Ptr_    );
             tree_->Branch("pfjets_qgtag" , "std::vector<float>" , &pfjets_qgtag_Ptr_  );
             tree_->Branch("pfjets_mc3"   , "std::vector<int>" , &pfjets_mc3_Ptr_    );
             tree_->Branch("pfjets_beta"  , "std::vector<float>" , &pfjets_beta_Ptr_   );
@@ -387,7 +395,7 @@ class StopTree {
 	    tree_->SetBranchAddress("lumi", 		  &lumi_);	      	      
 	    tree_->SetBranchAddress("event", 		  &event_);	      	      
 	    tree_->SetBranchAddress("nvtx", 		  &nvtx_);	      	      
-	    tree_->SetBranchAddress("indexfirstGoodVertex",               &indexfirstGoodVertex_);
+	    tree_->SetBranchAddress("indexfirstGoodVertex_",               &indexfirstGoodVertex_);
 	    tree_->SetBranchAddress("nvtxweight", 	  &nvtxweight_);    
 	    tree_->SetBranchAddress("weight", 		  &weight_);	      	      
 	    tree_->SetBranchAddress("xsecsusy",		  &xsecsusy_);	      	      
@@ -443,12 +451,17 @@ class StopTree {
 	    tree_->SetBranchAddress("t1metphicorrlepphi", &t1metphicorrlepphi_);        
 	    tree_->SetBranchAddress("nbtagscsvm", 	  &nbtagscsvm_);          
 	    tree_->SetBranchAddress("nbtagscsvmcorr", 	  &nbtagscsvmcorr_);  
+
 	    tree_->SetBranchAddress("pfcandpt10", 	  &pfcandpt10_);        
 	    tree_->SetBranchAddress("pfcandiso10", 	  &pfcandiso10_);      
+	    tree_->SetBranchAddress("pfcandid10", 	  &pfcandid10_);      
+	    tree_->SetBranchAddress("pfcandvetopt10", 	  &pfcandvetopt10_);        
+	    tree_->SetBranchAddress("pfcandvetoiso10", 	  &pfcandvetoiso10_);      
+	    tree_->SetBranchAddress("pfcandvetoid10", 	  &pfcandvetoid10_);      
+
 	    tree_->SetBranchAddress("pfcandpt5", 	  &pfcandpt5_);        
 	    tree_->SetBranchAddress("pfcandiso5", 	  &pfcandiso5_);      
 	    tree_->SetBranchAddress("pfcandid5", 	  &pfcandid5_);      
-	    tree_->SetBranchAddress("pfcandid10", 	  &pfcandid10_);      
 	    tree_->SetBranchAddress("trkpt10loose", 	  &trkpt10loose_);        
 	    tree_->SetBranchAddress("trkreliso10loose",   &trkreliso10loose_);      
 	    tree_->SetBranchAddress("nleps", 		  &nleps_);
@@ -521,6 +534,7 @@ class StopTree {
 	    //            tree_->SetBranchAddress("jets",  &jets_);
             tree_->SetBranchAddress("pfjets"        ,  &pfjets_            );
             tree_->SetBranchAddress("pfjets_csv"    ,  &pfjets_csv_Ptr_    );
+            tree_->SetBranchAddress("pfjets_sigma"    ,  &pfjets_sigma_Ptr_    );
             tree_->SetBranchAddress("pfjets_qgtag"  ,  &pfjets_qgtag_Ptr_  );
             tree_->SetBranchAddress("pfjets_mc3"    ,  &pfjets_mc3_Ptr_    );
             tree_->SetBranchAddress("pfjets_beta"   ,  &pfjets_beta_Ptr_   );
@@ -562,6 +576,7 @@ class StopTree {
         LorentzVector *pflep2Ptr_;
 
 	vector<float>* pfjets_csv_Ptr_;
+	vector<float>* pfjets_sigma_Ptr_;
 	vector<float>* pfjets_qgtag_Ptr_;
 	vector<int>* pfjets_mc3_Ptr_;
 	vector<float>* pfjets_beta_Ptr_;
@@ -580,7 +595,7 @@ StopTree::InitVariables(){
 	variables_.push_back(string("lumi"		));
 	variables_.push_back(string("event"		));
 	variables_.push_back(string("nvtx"		));
-        variables_.push_back(string("indexfirstGoodVertex"              ));
+        variables_.push_back(string("indexfirstGoodVertex_"              ));
 	variables_.push_back(string("nvtxweight"	));
 	variables_.push_back(string("weight"		));
 	variables_.push_back(string("xsecsusy"		));
@@ -638,10 +653,13 @@ StopTree::InitVariables(){
 	variables_.push_back(string("nbtagscsvmcorr"	));
 	variables_.push_back(string("pfcandpt10"	));
 	variables_.push_back(string("pfcandiso10"	));
+	variables_.push_back(string("pfcandid10" 	));
+	variables_.push_back(string("pfcandvetopt10"	));
+	variables_.push_back(string("pfcandvetoiso10"	));
+	variables_.push_back(string("pfcandvetoid10" 	));
 	variables_.push_back(string("pfcandpt5" 	));
 	variables_.push_back(string("pfcandiso5"	));
 	variables_.push_back(string("pfcandid5" 	));
-	variables_.push_back(string("pfcandid10" 	));
 	variables_.push_back(string("trkpt10loose"	));
 	variables_.push_back(string("trkreliso10loose"	));
 	variables_.push_back(string("nleps"		));         
@@ -774,10 +792,13 @@ StopTree::InitVariables(){
     nbtagscsvmcorr_	= 999;
     pfcandpt10_		= -999.;
     pfcandiso10_	= -999.;
+    pfcandid10_  	= -999;
+    pfcandvetopt10_		= -999.;
+    pfcandvetoiso10_	= -999.;
+    pfcandvetoid10_  	= -999;
     pfcandpt5_		= -999.;
     pfcandiso5_ 	= -999.;
     pfcandid5_  	= -999;
-    pfcandid10_  	= -999;
     trkpt10loose_	= -999.;
     trkreliso10loose_	= -999.;
     nleps_		= 999;
@@ -841,6 +862,7 @@ StopTree::InitVariables(){
     //    jets_ = 0;
     pfjets_ = 0;
     pfjets_csv_.clear();
+    pfjets_sigma_.clear();
     pfjets_qgtag_.clear();
     pfjets_mc3_.clear();
     pfjets_beta_.clear();
@@ -858,7 +880,7 @@ StopTree::Get(string value)
   if(value=="lumi" 		) { return this->lumi_;			}	      	      
   if(value=="event" 		) { return this->event_;		}	      	      
   if(value=="nvtx" 		) { return this->nvtx_;			}	      	      
-  if(value=="indexfirstGoodVertex"              ) { return this->indexfirstGoodVertex_; }
+  if(value=="indexfirstGoodVertex_"              ) { return this->indexfirstGoodVertex_; }
   if(value=="nvtxweight" 	) { return this->nvtxweight_;		}    
   if(value=="weight" 		) { return this->weight_;		}	      	      
   if(value=="xsecsusy" 		) { return this->xsecsusy_;		}	      	      
@@ -916,10 +938,13 @@ StopTree::Get(string value)
   if(value=="nbtagscsvmcorr" 	) { return this->nbtagscsvmcorr_;	}  
   if(value=="pfcandpt10" 	) { return this->pfcandpt10_;		}        
   if(value=="pfcandiso10" 	) { return this->pfcandiso10_;		}      
+  if(value=="pfcandid10" 	) { return this->pfcandid10_;		}      
+  if(value=="pfcandvetopt10" 	) { return this->pfcandvetopt10_;		}        
+  if(value=="pfcandvetoiso10" 	) { return this->pfcandvetoiso10_;		}      
+  if(value=="pfcandvetoid10" 	) { return this->pfcandvetoid10_;		}      
   if(value=="pfcandpt5" 	) { return this->pfcandpt5_;		}        
   if(value=="pfcandiso5" 	) { return this->pfcandiso5_;		}      
   if(value=="pfcandid5" 	) { return this->pfcandid5_;		}      
-  if(value=="pfcandid10" 	) { return this->pfcandid10_;		}      
   if(value=="trkpt10loose" 	) { return this->trkpt10loose_;		}        
   if(value=="trkreliso10loose" 	) { return this->trkreliso10loose_;	}      
   if(value=="nleps" 		) { return this->nleps_;		}     
