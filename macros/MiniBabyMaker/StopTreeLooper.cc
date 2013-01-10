@@ -1,8 +1,9 @@
-#include "../../CORE/jetSmearingTools.h"
+//#include "../../CORE/jetSmearingTools.h"
 #include "../../CORE/Thrust.h"
 #include "../../CORE/EventShape.h"
 
 #include "StopTreeLooper.h"
+
 #include "../Plotting/PlotUtilities.h"
 #include "../Core/MT2Utility.h"
 #include "../Core/mt2bl_bisect.h"
@@ -195,7 +196,9 @@ float getDataMCRatio(float eta){
 list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, bool wbtag){
 
   assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
+  assert( tree->pfjets_->size() == tree->pfjets_sigma_.size() );
 
+  /*
   static JetSmearer* jetSmearer = 0;
   if (jetSmearer == 0 ){
     std::vector<std::string> list_of_file_names;
@@ -204,6 +207,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
     list_of_file_names.push_back("../../CORE/jetsmear/data/jet_resolutions.txt");
     jetSmearer = makeJetSmearer(list_of_file_names);
   }
+  */
 
   LorentzVector* lep = &tree->lep1_;
   double met = tree->t1metphicorr_;
@@ -233,14 +237,14 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
   float mety = met * sin( metphi );
 
   int n_jets = jets.size();
+
   double sigma_jets[n_jets];
   for (int i=0; i<n_jets; ++i)
-    sigma_jets[i] = getJetResolution(jets[i], jetSmearer);
-
+    sigma_jets[i] = tree->pfjets_sigma_.at(i);
+  
   if ( isData )
     for (int i=0; i<n_jets; ++i)
       sigma_jets[i] *= getDataMCRatio(jets[i].eta());
-
 
   int ibl[5];
   int iw1[5];
@@ -260,6 +264,7 @@ list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, boo
           for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
             if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
                  (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
+	      if ( match == 5 ) break; // this avoid the crash in events like ttW
 	      ibl[match] = jbl;
 	      iw1[match] = jw1;
 	      iw2[match] = jw2;
@@ -653,8 +658,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   unsigned int nEventsChain=0;
   unsigned int nEvents = chain->GetEntries();
   nEventsChain = nEvents;
-  unsigned int nEventsTotal = 0;
-  int i_permille_old = 0;
+  ULong64_t nEventsTotal = 0;
+  //  int i_permille_old = 0;
 
   bool isData = name.Contains("data") ? true : false;
 
@@ -686,7 +691,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       ++nEventsTotal;
       if (nEventsTotal%10000==0) {
-	int i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
+	ULong64_t i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
 	//if (i_permille != i_permille_old) {//this prints too often!
 	// xterm magic from L. Vacavant and A. Cerri
 	if (isatty(1)) {
@@ -694,7 +699,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		 "\033[0m\033[32m <---\033[0m\015", i_permille/10.);
 	  fflush(stdout);
 	}
-	i_permille_old = i_permille;
+	//	i_permille_old = i_permille;
       }
 
       //------------------------------------------ 
@@ -763,6 +768,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // get list of candidates
       //------------------------------------------ 
       
+      /*
       static JetSmearer* jetSmearer = 0;
       if (jetSmearer == 0 ){
 	std::vector<std::string> list_of_file_names;
@@ -771,6 +777,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	list_of_file_names.push_back("../../CORE/jetsmear/data/jet_resolutions.txt");
 	jetSmearer = makeJetSmearer(list_of_file_names);
       }
+      */
 
       LorentzVector* lep = &tree->lep1_;
       float met = tree->t1metphicorr_;
@@ -778,7 +785,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       vector<float> sigma_jets;
       for (int i=0; i<n_jets; ++i){
-	float sigma = getJetResolution(jets[i], jetSmearer);
+	float sigma = tree->pfjets_sigma_.at(i) ;
 	if ( isData) sigma *= getDataMCRatio(jets[i].eta());
 	sigma_jets.push_back(sigma);
       }
