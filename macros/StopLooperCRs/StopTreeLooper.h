@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "Math/LorentzVector.h"
+#include "../Core/StopTree.h"
  
 #include <cmath>
 #include <map>
@@ -57,7 +58,20 @@ class StopTreeLooper {
 	float min_mtpeak;
 	float max_mtpeak; 
 
+	float chi2min_;
+	float chi2minprob_;
+
+	float mt2bmin_;
+	float mt2blmin_;
+	float mt2wmin_;
+
 	std::vector<LorentzVector> * myPfJets;
+	int n_jets;
+	vector<LorentzVector> jets;
+	vector<float> btag;
+	vector<float> sigma_jets;
+	vector<int> mc;
+
 
 
 };

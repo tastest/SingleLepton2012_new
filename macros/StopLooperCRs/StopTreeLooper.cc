@@ -20,6 +20,8 @@
 #include "TMath.h"  
 #include "TChain.h"
 #include "Riostream.h"
+#include "TFitter.h"
+#include "TRandom.h"
 
 #include <algorithm>
 #include <utility>
@@ -284,11 +286,44 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       t1metphicorrmt  = getMT( tree->lep1_.Pt() , tree->lep1_.Phi() , t1metphicorr , t1metphicorrphi );  
 
       //----------------------------------------------------------------------------
-      // import jet vector
+      // import jet vector and MT2X - chi2 combination
       //----------------------------------------------------------------------------
 
       myPfJets=tree->pfjets_;
-      
+    
+      LorentzVector* lep = &tree->lep1_;
+      vector<LorentzVector> jets;
+
+      int n_jets = jets.size();
+      double sigma[n_jets];
+
+      for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
+
+	jets.push_back( tree->pfjets_->at(i)    );
+	btag.push_back( tree->pfjets_csv_.at(i) );
+
+	if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
+	else mc.push_back  ( 0 );
+
+	sigma[i] = tree->pfjets_sigma_.at(i);
+        if ( isData ) sigma[i] *= getDataMCRatio(jets[i].eta());
+	sigma_jets.push_back(sigma[i]);
+
+      } 
+
+
+      // get list of candidates
+      PartonCombinatorics pc (jets, btag, sigma_jets, mc, *lep, t1metphicorr, t1metphicorrphi, isData);
+      MT2CHI2 mc = pc.getMt2Chi2();
+
+      // chi2 and MT2 variables
+      chi2min_= mc.one_chi2;               // minimum chi2 
+      chi2minprob_= TMath::Prob(chi2min_,1);   // probability of minimum chi2
+
+      mt2bmin_= mc.three_mt2b;             // minimum MT2b
+      mt2blmin_= mc.three_mt2bl;            // minimum MT2bl
+      mt2wmin_= mc.three_mt2w;             // minimum MT2w
+
       //----------------------------------------------------------------------------
       // tags used for histograms
       //----------------------------------------------------------------------------
@@ -300,6 +335,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       string tag_btag = (tree->nbtagscsvm_<1) ? "_bveto" : "";
       //iso-trk-veto
       string tag_isotrk = passIsoTrkVeto(tree) ? "" : "_wisotrk";
+      // tag_mt2w
+      string tag_mt2w = (mt2wmin_>175) ? "" : "_mt2w";
+      // tag_chi2
+      string tag_chi2 = (chi2minprob_>0.1) ? "" : "_chi2";
       //z-peak/veto
       string tag_zcut;
       if ( fabs( tree->dilmass_ - 91.) > 15. ) tag_zcut = "_zveto";
@@ -353,54 +392,86 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag", 	    tag_kbin, flav_tag_sl, 150. );
 	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag,   	    tag_kbin, flav_tag_sl, 150. );
 	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_mt2w,   	    tag_kbin, flav_tag_sl, 150. );
+	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_chi2,   	    tag_kbin, flav_tag_sl, 150. );
+	  makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_chi2+tag_mt2w,   	    tag_kbin, flav_tag_sl, 150. );
 
 	  //met > 50 GeV requirement 
 	  if ( t1metphicorr > 50. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met50",  	       tag_kbin, flav_tag_sl, 150. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50", 	       tag_kbin, flav_tag_sl, 150. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_mt2w, 		tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_chi2, 		tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 150. );
+
 	  }
 	  //met > 100 GeV requirement 
 	  if ( t1metphicorr > 100. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met100",  		tag_kbin, flav_tag_sl, 150. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100", 		tag_kbin, flav_tag_sl, 150. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_mt2w, 		tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_chi2, 		tag_kbin, flav_tag_sl, 150. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 150. );
+
 	  }
 	  //met > 150 GeV requirement 
 	  if ( t1metphicorr > 150. ) { 
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met150",  		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_chi2, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+
 	  }
 	  //met > 200 GeV requirement 
 	  if ( t1metphicorr > 200. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met200",  		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_chi2, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
 	  }
+
 	  //met > 250 GeV requirement 
 	  if ( t1metphicorr > 250. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met250",  		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_chi2, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
 	  }
 	  //met > 300 GeV requirement 
 	  if ( t1metphicorr > 300. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met300",  		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_chi2, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
 	  }
 	  //met > 350 GeV requirement 
 	  if ( t1metphicorr > 350. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met350",  		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_chi2, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+
 	  }
 	  //met > 400 GeV requirement 
 	  if ( t1metphicorr > 400. ) {
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met400",  		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400", 		tag_kbin, flav_tag_sl, 120. );
 	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_chi2, 		tag_kbin, flav_tag_sl, 120. );
+	    makeSIGPlots( tree, evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_chi2+tag_mt2w, 		tag_kbin, flav_tag_sl, 120. );
 	  }
 
 	}
@@ -989,6 +1060,11 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr4_dphi_metlep"+tag_selection                   +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets         +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  /// MT2 and chi2                                                                                                                                                       plot1D("h_sig_mt2wmin_"+tag_selection         +flav_tag_dl, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2bmin_"+tag_selection         +flav_tag_dl, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2blmin_"+tag_selection         +flav_tag_dl, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_chi2minprob_"+tag_selection        +flav_tag_dl, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+
   //MT
   //binning for mT plots
   nbins = 30;
@@ -1047,6 +1123,11 @@ void StopTreeLooper::makeCR5Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr5_dphi_metlep"+tag_selection                   +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  /// MT2 and chi2                                                                                                                                                       plot1D("h_cr5_mt2wmin_"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2bmin_"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2blmin_"+tag_selection         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_chi2minprob_"+tag_selection        +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+
   //MT
   //binning for mT plots
   nbins = 30;
@@ -1100,8 +1181,12 @@ void StopTreeLooper::makeSIGPlots( const StopTree *sTree, float evtweight, std::
   plot1D("h_sig_dphi_metlep"+tag_selection+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //min dphi leading two jets - this should cut most of the ttbar single leptons
   float minDphi_J12=getMinDphi(t1metphicorrphi, myPfJets->at(0),myPfJets->at(1));
-  plot1D("h_sig_minDphi_j1j2"+tag_selection         +flav_tag, minDphi_J12, evtweight, h_1d, 15, 0., TMath::Pi());
-  plot1D("h_sig_minDphi_j1j2"+tag_selection+tag_kbin+flav_tag, minDphi_J12, evtweight, h_1d, 15, 0., TMath::Pi());
+  plot1D("h_sig_mindPhiJ12"+tag_selection         +flav_tag, minDphi_J12, evtweight, h_1d, 15, 0., TMath::Pi());
+  /// MT2 and chi2
+  plot1D("h_sig_mt2wmin_"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_sig_mt2bmin_"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_sig_mt2blmin_"+tag_selection         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_sig_chi2minprob_"+tag_selection        +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
 
   //MT
   //binning for mT plots
@@ -1163,6 +1248,14 @@ void StopTreeLooper::makeCR1Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr1_dphi_metlep"+tag_selection                   +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
+  /// MT2 and chi2
+  plot1D("h_cr1_mt2wmin_"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2bmin_"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2blmin_"+tag_selection         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_chi2minprob_"+tag_selection        +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+
+
+
   //MT
   //binning for mT plots
   nbins = 30;
