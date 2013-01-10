@@ -171,15 +171,6 @@ void minuitFunction(int&, double* , double &result, double par[], int){
   result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
 }
 
-float getDataMCRatio(float eta){
-  if (eta >=0.0 && eta < 0.5) return 1.052;
-  if (eta >=0.5 && eta < 1.1) return 1.057;
-  if (eta >=1.1 && eta < 1.7) return 1.096;
-  if (eta >=1.7 && eta < 2.3) return 1.134;
-  if (eta >=2.3 && eta < 5.0) return 1.288;
-  return 1.0;
-}
-
 
 /* Reconstruct the hadronic top candidates, select the best candidate and
  * store the chi2 =  (m_jj - m_W)^2/sigma_m_jj + (m_jjj - m_t)^2/sigma_m_jjj
@@ -877,8 +868,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // which selections are passed
       sig_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_>=1 ) ? 1 : 0; // pass signal region preselection
       cr1_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
-      cr4_        = ( passDileptonSelection(tree, isData) )                          ? 1 : 0; // pass CR4 (dilepton) control region preselection
-      cr5_        = ( passLepPlusIsoTrkSelection(tree, isData) )                     ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
+      cr4_        = ( passDileptonSelection(tree, isData) && tree->nbtagscsvm_>=1) ? 1 : 0; // pass CR4 (dilepton) control region preselection
+      cr5_        = ( passLepPlusIsoTrkSelection(tree, isData) && tree->nbtagscsvm_>=1) ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
 
       // kinematic variables
       met_        = tree->t1metphicorr_;       // MET (type1, MET-phi corrections)
