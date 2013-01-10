@@ -57,6 +57,8 @@ class StopTreeLooper {
 	float min_mtpeak;
 	float max_mtpeak; 
 
+	std::vector<LorentzVector> * myPfJets
+
 };
 
 #endif
