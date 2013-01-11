@@ -45,7 +45,6 @@ StopTreeLooper::StopTreeLooper()
   t1metphicorrmt = -9999.;
   min_mtpeak = -9999.;
   max_mtpeak = -9999.; 
-
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -1089,6 +1088,10 @@ void StopTreeLooper::makeCR4Plots( const StopTree *sTree, float evtweight, std::
   plot1D("h_cr4_dR_dilep"+tag_selection                   +flav_tag_dl, min(dR_dilep, (float)4.999), evtweight, h_1d, 15, 0., 5.);
   plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets         +flav_tag_dl, min(dR_dilep, (float)4.999), evtweight, h_1d, 15, 0., 5.);
   plot1D("h_cr4_dR_dilep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(dR_dilep, (float)4.999), evtweight, h_1d, 15, 0., 5.);
+  //boson pt
+  float pt_boson = (sTree->lep1_+sTree->lep2_).pt();
+  plot1D("h_cr4_pt_dilep"+tag_selection                   +flav_tag_dl, pt_boson, evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_pt_dilep"+tag_selection+tag_njets         +flav_tag_dl, pt_boson, evtweight, h_1d, 100, 0., 500);
 
 }
 
