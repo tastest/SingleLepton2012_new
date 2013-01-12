@@ -120,409 +120,6 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id) {
   return false;
 }
 
-
-/* Reconstruct the hadronic top candidates, select the best candidate and
- * store the chi2 =  (m_jj - m_W)^2/sigma_m_jj + (m_jjj - m_t)^2/sigma_m_jjj
- * return the number of candidates found.
- *
- * n_jets - number of jets.
- * jets - jets
- * btag - b-tagging information of the jets
- * mc - qgjet montecarlo match number for the jets
- * 
- * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
- */ 
-
-list<Candidate> StopTreeLooper::recoHadronicTop(StopTree* tree, bool isData, bool wbtag){
-
-  assert( tree->pfjets_->size() == tree->pfjets_csv_.size() );
-  assert( tree->pfjets_->size() == tree->pfjets_sigma_.size() );
-
-  LorentzVector* lep = &tree->lep1_;
-  double met = tree->t1metphicorr_;
-  double metphi = tree->t1metphicorrphi_;
-
-  vector<LorentzVector> jets;
-  vector<float>         btag;
-  vector<int>           mc;
-
-  //cout << endl << "baby branches:" << endl;
-  for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
-    //cout << i << " pt csv " << tree->pfjets_->at(i).pt() << " " << tree->pfjets_csv_.at(i) << endl;
-    jets.push_back( tree->pfjets_->at(i)    );
-    btag.push_back( tree->pfjets_csv_.at(i) );
-    if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
-    else mc.push_back  ( 0 );
-  } 
-
-  // cout << endl << "stored:" << endl;
-  // for( unsigned int i = 0 ; i < jets.size() ; ++i ){
-  //   cout << i << " pt csv " << jets.at(i).pt() << " " << btag.at(i) << endl;
-  // } 
-
-  assert( jets.size() == btag.size() );
-
-  float metx = met * cos( metphi );
-  float mety = met * sin( metphi );
-
-  int n_jets = jets.size();
-
-  double sigma_jets[n_jets];
-  for (int i=0; i<n_jets; ++i)
-    sigma_jets[i] = tree->pfjets_sigma_.at(i);
-  
-  if ( isData )
-    for (int i=0; i<n_jets; ++i)
-      sigma_jets[i] *= getDataMCRatio(jets[i].eta());
-
-  int ibl[5];
-  int iw1[5];
-  int iw2[5];
-  int ib[5];
-
-  if ( !isData ){
-     
-    // Matching MC algoritm search over all conbinations  until the 
-    // right combination is found. More than one candidate is suported 
-    //  but later only the first is used.
-    // 
-    int match = 0;
-    for (int jbl=0; jbl<n_jets; ++jbl )
-      for (int jb=0; jb<n_jets; ++jb )
-        for (int jw1=0; jw1<n_jets; ++jw1 )
-          for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
-            if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
-                 (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
-	      if ( match == 5 ) break; // this avoid the crash in events like ttW
-	      ibl[match] = jbl;
-	      iw1[match] = jw1;
-	      iw2[match] = jw2;
-	      ib[match] = jb;
-	      match++;
-            }
-  }
-
-  
-  ////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
-  
-  vector<int> v_i, v_j;
-  vector<double> v_k1, v_k2;
-  for ( int i=0; i<n_jets; ++i )
-    for ( int j=i+1; j<n_jets; ++j ){
-      double pt_w1 = jets[i].Pt();
-      double pt_w2 = jets[j].Pt();
-      if (pt_w1 < PTMIN_J1  || pt_w2 < PTMIN_J2)
-        continue;
-
-      //
-      //  W
-      //
-      LorentzVector hadW = jets[i] + jets[j];
-
-      //
-      //  W Mass Constraint.
-      //
-      TFitter *minimizer = new TFitter();
-      double p1 = -1;
-
-      minimizer->ExecuteCommand("SET PRINTOUT", &p1, 1);
-      minimizer->SetFCN(PartonCombinatorics::minuitFunction);
-      minimizer->SetParameter(0 , "c1"     , 1.1             , 1 , 0 , 0);
-      minimizer->SetParameter(1 , "pt1"    , 1.0             , 1 , 0 , 0);
-      minimizer->SetParameter(2 , "sigma1" , sigma_jets[i]   , 1 , 0 , 0);
-      minimizer->SetParameter(3 , "pt2"    , 1.0             , 1 , 0 , 0);
-      minimizer->SetParameter(4 , "sigma2" , sigma_jets[j]   , 1 , 0 , 0);
-      minimizer->SetParameter(5 , "m12"    , jets[i].mass2() , 1 , 0 , 0);
-      minimizer->SetParameter(6 , "m22"    , jets[j].mass2() , 1 , 0 , 0);
-      minimizer->SetParameter(7 , "m02"    , hadW.mass2()    , 1 , 0 , 0);
-
-      for (unsigned int k = 1; k < 8; k++)
-        minimizer->FixParameter(k);
-
-      minimizer->ExecuteCommand("SIMPLEX", 0, 0);
-      minimizer->ExecuteCommand("MIGRAD", 0, 0);
-
-      double c1 = minimizer->GetParameter(0);
-      if (c1!=c1) {
-        cout<<"[StopTreeLooper::recoHadronicTop] ERROR: c1 parameter is NAN! Skipping this parton combination"
-	    <<endl;
-        continue;
-      }
-      double c2 = PartonCombinatorics::fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2(),false);
-                
-      delete minimizer;
-
-     
-      //     * W Mass check :)
-      //     *  Never trust a computer you can't throw out a window. 
-      //      *  - Steve Wozniak 
-
-      //      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
-      //           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
-      
-      v_i.push_back(i);
-      v_j.push_back(j);
-      v_k1.push_back(c1);
-      v_k2.push_back(c2);
-    }
-
-
-  list<Candidate> chi2candidates;
-        
-  mt2_bisect::mt2 mt2_event;
-  mt2bl_bisect::mt2bl mt2bl_event;
-  mt2w_bisect::mt2w mt2w_event;
-  
-  for ( int b=0; b<n_jets; ++b )
-    for (int o=0; o<n_jets; ++o){
-      if ( b == o )
-        continue;
-
-      if ( wbtag && btag[b] < BTAG_MIN && btag[o] < BTAG_MIN )
-        continue;
-
-      double pt_b = jets[b].Pt();
-      if ( wbtag && btag[b] >= BTAG_MIN && pt_b < PTMIN_BTAG )
-        continue;
-
-      if ( btag[b] < BTAG_MIN && pt_b < PTMIN_B )
-        continue;
-
-      double pt_o = jets[o].Pt();
-      if ( wbtag && btag[o] >= BTAG_MIN && pt_o < PTMIN_OTAG )
-        continue;
-
-      if ( wbtag && btag[o] < BTAG_MIN && pt_o < PTMIN_O)
-        continue;
-
-      ///
-      //  MT2 Variables
-      ///
-
-      double pl[4];     // Visible lepton
-      double pb1[4];    // bottom on the same side as the visible lepton
-      double pb2[4];    // other bottom, paired with the invisible W
-      double pmiss[3];  // <unused>, pmx, pmy   missing pT
-      pl[0]= lep->E(); pl[1]= lep->Px(); pl[2]= lep->Py(); pl[3]= lep->Pz();
-      pb1[1] = jets[o].Px();  pb1[2] = jets[o].Py();   pb1[3] = jets[o].Pz();
-      pb2[1] = jets[b].Px();  pb2[2] = jets[b].Py();   pb2[3] = jets[b].Pz();
-      pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
-
-      double pmiss_lep[3];
-      pmiss_lep[0] = 0.;
-      pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
-
-      pb1[0] = jets[o].mass();
-      pb2[0] = jets[b].mass();
-      mt2_event.set_momenta( pb1, pb2, pmiss_lep );
-      mt2_event.set_mn( 80.385 );   // Invisible particle mass
-      double c_mt2b = mt2_event.get_mt2();
-
-      pb1[0] = jets[o].E();
-      pb2[0] = jets[b].E();
-      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
-      double c_mt2bl = mt2bl_event.get_mt2bl();
-
-      mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
-      double c_mt2w = mt2w_event.get_mt2w();
-
-      //      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
-
-      for (unsigned int w = 0; w < v_i.size() ; ++w ){
-        int i = v_i[w];
-        int j = v_j[w];
-        if ( i==o || i==b || j==o || j==b )
-	  continue;
-
-        double pt_w1 = jets[i].Pt();
-        double pt_w2 = jets[j].Pt();
-
-	///
-	//  W Mass.
-	///
-	LorentzVector hadW = jets[i] + jets[j];
-	double massW = hadW.mass();
-
-	double c1 = v_k1[w];
-	double c2 = v_k2[w];
-
-	///
-	// Top Mass.
-	///
-        LorentzVector hadT = (jets[i] * c1) + (jets[j] * c2) + jets[b];
-        double massT = hadT.mass();
-
-        double pt_w = hadW.Pt();
-        double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
-	  + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
-        double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
-        double pt_t = hadT.Pt();
-        double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
-	  + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
-	  + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
-        double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
-
-        double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
-	  + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
-
-        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
-  
-        Candidate c;
-        c.chi2  = c_chi2;
-        c.mt2b  = c_mt2b;
-        c.mt2w  = c_mt2w;
-        c.mt2bl = c_mt2bl;
-        c.j1 = i;
-        c.j2 = j;
-        c.bi = b;
-        c.oi = o;
-        c.k1 = c1;
-        c.k2 = c2;
-        c.match = c_match;
-
-        chi2candidates.push_back(c);
-      }
-    }
-
-  if (__SORT) 
-    chi2candidates.sort(PartonCombinatorics::compare_in_chi2);
-
-  return chi2candidates;
-}
-
-//--------------------------------------------------------------------
-
-// removes candidates without b-tagging requirement
-list<Candidate> StopTreeLooper::getBTaggedCands(list<Candidate> &candidates, StopTree* tree) 
-{
-
-  list<Candidate> bcands; 
-
-  list<Candidate>::iterator candIter;
-
-  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
-
-    if( tree->pfjets_csv_.at(candIter->bi) < BTAG_MIN && tree->pfjets_csv_.at(candIter->oi) < BTAG_MIN ) continue;
-    bcands.push_back(*candIter);
-
-  }
-
-  return bcands;
-
-}
-
-//--------------------------------------------------------------------
-
-MT2struct StopTreeLooper::Best_MT2Calculator_Ricardo(list<Candidate> candidates, StopTree* tree, bool isData){
-
-  if (candidates.size() == 0){
-    MT2struct mfail;
-    mfail.mt2w  = -0.999;
-    mfail.mt2b  = -0.999;
-    mfail.mt2bl = -0.999;
-    mfail.chi2  = -0.999;
-    return mfail;
-  }
-
-  double chi2_min  = 9999;
-  double mt2b_min  = 9999;
-  double mt2bl_min = 9999;
-  double mt2w_min  = 9999;
-
-  // count btags among leading 4 jets
-  int n_btag = 0;
-
-  for( int i = 0 ; i < 4 ; i++ ){
-    if( tree->pfjets_csv_.at(i) < 0.679 ) n_btag++;
-  }
-
-  list<Candidate>::iterator candIter;
-
-  for(candIter = candidates.begin() ; candIter != candidates.end() ; candIter++ ){
-
-    // loop over all candidiates
-    //for (unsigned int i=0; i<candidates.size(); ++i) {
-
-    //if ( ! candidates_->at(i).match ) continue;
-
-    // get indices of 4 jets used for hadronic top reconstruction
-    // int b  = candidates.at(i).bi;
-    // int o  = candidates.at(i).oi;
-    // int j1 = candidates.at(i).j1;
-    // int j2 = candidates.at(i).j2;
-
-    int b  = (*candIter).bi;
-    int o  = (*candIter).oi;
-    int j1 = (*candIter).j1;
-    int j2 = (*candIter).j2;
-
-    // require the 4 jets used for the hadronic top mass are the 4 leading jets
-    if (b>3 || o > 3 || j1 > 3 || j2 > 3) continue;
-
-    // store whether the 2 jets used for MT2 calculation are btagged
-    bool b_btag  = (tree->pfjets_csv_.at(b)  > 0.679);
-    bool o_btag  = (tree->pfjets_csv_.at(o)  > 0.679);
-    //bool j1_btag = (btag_->at(j1) > 0.679);
-    //bool j2_btag = (btag_->at(j2) > 0.679);
-
-    // 2 btags: require jets used for MT2 are the 2 b-jets
-    if ( n_btag == 2 ){ 
-      if ( !b_btag || !o_btag ) continue;
-    } 
-
-    // 1 btag: require the bjet and one of the 2 leading non bjets is used for MT2
-    else if ( n_btag == 1) {
-
-      if( b_btag ){
-	if( b == 3  && o > 1 ) continue;
-	if( b <   3 && o > 2 ) continue;
-      }
-
-      if( o_btag ){
-	if( o == 3  && b > 1 ) continue;
-	if( o <   3 && b > 2 ) continue;
-      }
-
-      //if (b>1 || o>1) continue;
-    } 
-
-    // 0 or >=3 btags: require jets used for MT2 are among 3 leading jets
-    else {
-      if (b>2 || o>2) continue;
-    }
-
-    // double chi2  = candidates.at(i).chi2;
-    // double mt2b  = candidates.at(i).mt2b;
-    // double mt2bl = candidates.at(i).mt2bl;
-    // double mt2w  = candidates.at(i).mt2w;
-
-    double chi2  = (*candIter).chi2;
-    double mt2b  = (*candIter).mt2b;
-    double mt2bl = (*candIter).mt2bl;
-    double mt2w  = (*candIter).mt2w;
- 
-    //    cout << " " << b << ":" << b_btag  << " " << o << ":" << o_btag << " " << j1 << " " << j2 << " = " << mt2w  << "  " << chi2 <<endl;
-    if (chi2  < chi2_min  ) chi2_min  = chi2;
-    if (mt2b  < mt2b_min  ) mt2b_min  = mt2b;
-    if (mt2bl < mt2bl_min ) mt2bl_min = mt2bl;
-    if (mt2w  < mt2w_min  ) mt2w_min  = mt2w;
-  }
-
-  if( mt2w_min  > 9000 ) mt2w_min  = -0.999;
-  if( mt2b_min  > 9000 ) mt2b_min  = -0.999;
-  if( mt2bl_min > 9000 ) mt2bl_min = -0.999;
-  if( chi2_min  > 9000 ) chi2_min  = -0.999;
-
-  MT2struct m;
-  m.mt2w  = mt2w_min;
-  m.mt2b  = mt2b_min;
-  m.mt2bl = mt2bl_min;
-  m.chi2  = chi2_min;
-
-  return m;
-
-}
-
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
 
@@ -673,50 +270,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       if ( tree->t1metphicorr_ < 50.0    ) continue; // MET > 50 GeV
 
       //------------------------------------------ 
-      // get list of jets
-      //------------------------------------------ 
-
-      n_jets = 0;
-      jets.clear();
-      btag.clear();
-      mc.clear();
-
-      vector<float> sigma_jets;
-
-      for( unsigned int i = 0 ; i < tree->pfjets_->size() ; ++i ){
-
-	if ( i > (N_JETS_TO_CONSIDER-1) ) break;
-	if ( tree->pfjets_->at(i).Pt() < JET_PT ) continue;
-	if ( fabs(tree->pfjets_->at(i).Eta()) > JET_ETA ) continue;
-
-	n_jets++;
-	jets.push_back( tree->pfjets_->at(i)    );
-	btag.push_back( tree->pfjets_csv_.at(i) );
-
-	if ( !isData ) mc.push_back  ( tree->pfjets_mc3_.at(i) );
-	else mc.push_back  ( 0 );
-
-	float sigma = tree->pfjets_sigma_.at(i) ;
-	if ( isData) sigma *= getDataMCRatio(jets[i].eta());
-	sigma_jets.push_back(sigma);
-
-      }
-
-      for (int i=0; i<n_jets; ++i){
-      }
-
-
-
-      //------------------------------------------ 
       // get list of candidates
       //------------------------------------------ 
       
-      LorentzVector* lep = &tree->lep1_;
       float met = tree->t1metphicorr_;
       float metphi = tree->t1metphicorrphi_;
 
       // get list of candidates
-      PartonCombinatorics pc (jets, btag, sigma_jets, mc, *lep, met, metphi, isData);
+      PartonCombinatorics pc (*(tree->pfjets_), tree->pfjets_csv_, tree->pfjets_sigma_, tree->pfjets_mc3_, tree->lep1_, met, metphi, isData);
       MT2CHI2 mc = pc.getMt2Chi2();
 
       //------------------------------------------ 
@@ -796,9 +357,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       
       initBaby(); // set all branches to -1
 
-      list<Candidate> allcandidates = recoHadronicTop(tree, isData , false);
-      MT2struct mr                  = Best_MT2Calculator_Ricardo(allcandidates, tree, isData);
-
       // which selections are passed
       sig_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_>=1 ) ? 1 : 0; // pass signal region preselection
       cr1_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
@@ -808,12 +366,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // kinematic variables
       met_        = tree->t1metphicorr_;       // MET (type1, MET-phi corrections)
       mt_         = tree->t1metphicorrmt_;     // MT (type1, MET-phi corrections)
-
-      // the following variables are obsolete, to be updated
-      chi2_       = mr.chi2;                   
-      mt2w_       = mr.mt2w;                   
-      mt2b_       = mr.mt2b;
-      mt2bl_      = mr.mt2bl;
 
       // chi2 and MT2 variables
       chi2min_			= mc.one_chi2;               // minimum chi2 
@@ -928,7 +480,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  outFile_   = new TFile(Form("output/%s_mini.root",prefix), "RECREATE");
+  outFile_   = new TFile(Form("output/%s_mini_$Revision: 1.17 $.root",prefix), "RECREATE");
   outFile_->cd();
 
   outTree_ = new TTree("t","Tree");
@@ -941,10 +493,6 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("cr5"              ,        &cr5_             ,         "cr5/I"		);
   outTree_->Branch("met"              ,        &met_             ,         "met/F"		);
   outTree_->Branch("mt"               ,        &mt_              ,         "mt/F"		);
-  outTree_->Branch("chi2"             ,        &chi2_            ,         "chi2/F"		);
-  outTree_->Branch("mt2w"             ,        &mt2w_            ,         "mt2w/F"		);
-  outTree_->Branch("mt2b"             ,        &mt2b_            ,         "mt2b/F"		);
-  outTree_->Branch("mt2bl"            ,        &mt2bl_           ,         "mt2bl/F"		);
   outTree_->Branch("weight"           ,        &weight_          ,         "weight/F"		);
   outTree_->Branch("sltrigeff"        ,        &sltrigeff_       ,         "sltrigeff/F"	);
   outTree_->Branch("dltrigeff"        ,        &dltrigeff_       ,         "dltrigeff/F"	);
