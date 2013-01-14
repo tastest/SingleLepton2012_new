@@ -13,6 +13,31 @@
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 using namespace std; 
+
+//
+// Ntuple structure:
+//
+// Ntuple content:
+
+struct MT2struct {
+  float mt2w;
+  float mt2b;
+  float mt2bl;
+  float chi2;
+};
+
+class Candidate : public TObject {
+public:
+ float chi2, mt2w, mt2bl, mt2b;
+ int j1, j2, bi, oi;
+ float k1, k2;
+ bool match;
+
+ ClassDef(Candidate, 2)
+};
+
+typedef vector<Candidate> CANDIDATES;
+
 class STOPT {
 private: 
 protected: 

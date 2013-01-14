@@ -16,15 +16,18 @@
 #include "mt2bl_bisect.h"
 #include "mt2w_bisect.h"
 
+using namespace Stop;
 
-int leadingJetIndex(vector<StopTree::LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+
+int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
 
   int imaxpt  = -1;
   float maxpt = -1.0;
 
   // loop over jets
   for ( int i = 0 ; i < (int) jets.size() ; ++i ){      
-      
+   
     // skip these indices
     if( i == iskip1 ) continue;
     if( i == iskip2 ) continue;
@@ -179,29 +182,29 @@ float getsltrigweight(int id1, float pt, float eta){
 // >=1 good lepton, rho cut, MET filters, remove 2 nearby lepton events
 //-----------------------------------------------------------------------
 
-bool passEvtSelection(const StopTree *sTree, TString name) 
+bool passEvtSelection(TString name) 
 {
 
   //rho requirement
-  if ( sTree->rhovor_<0. || sTree->rhovor_>=40. ) return false;
+  if ( stopt.rhovor()<0. || stopt.rhovor()>=40. ) return false;
 
   if (!name.Contains("T2")) {
     //met filters
-    if ( sTree->csc_      != 0 ) return false;
-    if ( sTree->hbhe_     != 1 ) return false;
-    if ( sTree->hcallaser_!= 1 ) return false;
-    if ( sTree->ecaltp_   != 1 ) return false;
-    if ( sTree->trkfail_  != 1 ) return false;
-    if ( sTree->eebadsc_  != 1 ) return false;
-    if ( sTree->hbhenew_  != 1 ) return false;
+    if ( stopt.csc()      != 0 ) return false;
+    if ( stopt.hbhe()     != 1 ) return false;
+    if ( stopt.hcallaser()!= 1 ) return false;
+    if ( stopt.ecaltp()   != 1 ) return false;
+    if ( stopt.trkfail()  != 1 ) return false;
+    if ( stopt.eebadsc()  != 1 ) return false;
+    if ( stopt.hbhenew()  != 1 ) return false;
   }
 
   //at least 1 lepton
-  if ( sTree->ngoodlep_ < 1 ) return false;
+  if ( stopt.ngoodlep() < 1 ) return false;
 
   //if have more than 1 lepton, remove cases where have 2 close together
-  if ( sTree->ngoodlep_ > 1 && 
-       dRbetweenVectors( sTree->lep1_ ,  sTree->lep2_ )<0.1 ) return false;
+  if ( stopt.ngoodlep() > 1 && 
+       dRbetweenVectors( stopt.lep1() ,  stopt.lep2() )<0.1 ) return false;
 
   return true;
 
@@ -211,14 +214,14 @@ bool passEvtSelection(const StopTree *sTree, TString name)
 // good lepton + veto isolated track
 //-------------------------------------------
 
-bool passOneLeptonSelection(const StopTree *sTree, bool isData) 
+bool passOneLeptonSelection( bool isData) 
 {
   //single lepton selection for 8 TeV 53 analysis
-  if ( !passSingleLeptonSelection(sTree, isData) ) return false;
+  if ( !passSingleLeptonSelection(isData) ) return false;
 
   //pass isolated track veto
   //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
+  if ( stopt.pfcandpt10() <9998. && stopt.pfcandiso10() < 0.1 ) return false;
 
   return true;
 
@@ -228,14 +231,14 @@ bool passOneLeptonSelection(const StopTree *sTree, bool isData)
 // dilepton selection
 //-------------------------------------------
 
-bool passTwoLeptonSelection(const StopTree *sTree, bool isData) 
+bool passTwoLeptonSelection(bool isData) 
 {
   //single lepton selection for 8 TeV 53 analysis
-  if ( !passDileptonSelection(sTree, isData) ) return false;
+  if ( !passDileptonSelection(isData) ) return false;
 
   //apply isolated track veto in addition to 2 leptons
   //default value for this one is -999
-  if ( sTree->trkpt10loose_ >0. && sTree->trkreliso10loose_ < 0.1 ) return false;
+  if ( stopt.trkpt10loose() >0. && stopt.trkreliso10loose() < 0.1 ) return false;
 
   return true;
 
@@ -245,12 +248,12 @@ bool passTwoLeptonSelection(const StopTree *sTree, bool isData)
 // the isolated track veto
 //-------------------------------------------
 
-bool passIsoTrkVeto(const StopTree *sTree) 
+bool passIsoTrkVeto() 
 {
 
   //pass isolated track veto
   //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
+  if ( stopt.pfcandpt10() <9998. && stopt.pfcandiso10() < 0.1 ) return false;
 
   return true;
 
@@ -260,14 +263,14 @@ bool passIsoTrkVeto(const StopTree *sTree)
 // the isolated track veto
 //-------------------------------------------
 
-bool passIsoTrkVeto_v2(const StopTree *sTree) 
+bool passIsoTrkVeto_v2() 
 {
 
   //pass isolated track veto
   //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ <9998. && sTree->pfcandiso10_ < 0.1 ) return false;
-  if ( sTree->pfcandpt5_  <9998. && abs(sTree->pfcandid5_)==13 && sTree->pfcandiso5_ < 0.2) return false;
-  if ( sTree->pfcandpt5_  <9998. && abs(sTree->pfcandid5_)==11 && sTree->pfcandiso5_ < 0.2) return false;
+  if ( stopt.pfcandpt10() <9998. && stopt.pfcandiso10() < 0.1 ) return false;
+  if ( stopt.pfcandpt5()  <9998. && abs(stopt.pfcandid5())==13 && stopt.pfcandiso5() < 0.2) return false;
+  if ( stopt.pfcandpt5()  <9998. && abs(stopt.pfcandid5())==11 && stopt.pfcandiso5() < 0.2) return false;
 
   return true;
 
@@ -277,36 +280,36 @@ bool passIsoTrkVeto_v2(const StopTree *sTree)
 // >=1 selected lepton and trigger
 //-------------------------------------------
 
-bool passSingleLeptonSelection(const StopTree *sTree, bool isData) 
+bool passSingleLeptonSelection(bool isData) 
 {
   //single lepton selection for 8 TeV 53 analysis
 
   //at least one lepton
-  if ( sTree->ngoodlep_ < 1 ) return false;
+  if ( stopt.ngoodlep() < 1 ) return false;
 
   //lepton flavor - trigger, pt and eta requirements
-  if ( sTree->lep1_.Pt() < 30 )          return false;
-  if ( fabs( sTree->pflep1_.Pt() - sTree->lep1_.Pt() ) > 10. )  return false;
-  if ( ( sTree->isopf1_ * sTree->lep1_.Pt() ) > 5. )  return false; 
-  
-  if ( sTree->leptype_ == 0 ) {
+  if ( stopt.lep1().Pt() < 30 )          return false;
+  if ( fabs( stopt.pflep1().Pt() - stopt.lep1().Pt() ) > 10. )  return false;
+  if ( ( stopt.isopf1() * stopt.lep1().Pt() ) > 5. )  return false; 
+
+  if ( stopt.leptype() == 0 ) {
 
     //pass trigger if data - single electron
-    if ( isData && sTree->ele27wp80_ != 1 ) return false;
-    //    if ( isData && sTree->trgel1_ != 1 )  return false;
-    
+    if ( isData && stopt.ele27wp80() != 1 ) return false;
+    //    if ( isData && stopt.trgel1() != 1 )  return false;
+ 
     //barrel only electrons
-    if ( fabs(sTree->lep1_.Eta() ) > 1.4442) return false;
-    if ( sTree->eoverpin_ > 4. ) return false;
-    
+    if ( fabs(stopt.lep1().Eta() ) > 1.4442) return false;
+    if ( stopt.eoverpin() > 4. ) return false;
+ 
 
-  } else if ( sTree->leptype_ == 1 ) {
+  } else if ( stopt.leptype() == 1 ) {
 
     //pass trigger if data - single muon
-    if ( isData && sTree->isomu24_ != 1 ) return false;
-    //    if ( isData && sTree->trgmu1_ != 1 )  return false;
-    
-    if ( fabs(sTree->lep1_.Eta() ) > 2.1)  return false;
+    if ( isData && stopt.isomu24() != 1 ) return false;
+    //    if ( isData && stopt.trgmu1() != 1 )  return false;
+ 
+    if ( fabs(stopt.lep1().Eta() ) > 2.1)  return false;
 
   }
 
@@ -318,38 +321,38 @@ bool passSingleLeptonSelection(const StopTree *sTree, bool isData)
 // the dilepton selection
 //-------------------------------------------
 
-bool passDileptonSelection(const StopTree *sTree, bool isData) 
+bool passDileptonSelection(bool isData) 
 {
   //two lepton selection for 8 TeV 53 analysis
 
   //exactly 2 leptons
-  if ( sTree->ngoodlep_ != 2 ) return false;
+  if ( stopt.ngoodlep() != 2 ) return false;
 
   //opposite sign
-  if ( sTree->id1_*sTree->id2_>0 ) return false;
+  if ( stopt.id1()*stopt.id2()>0 ) return false;
 
   //pass trigger if data - dilepton
-  if ( isData && sTree->mm_ != 1 && sTree->me_ != 1 
-       && sTree->em_ != 1 && sTree->ee_ != 1 ) return false;
+  if ( isData && stopt.mm() != 1 && stopt.me() != 1 
+       && stopt.em() != 1 && stopt.ee() != 1 ) return false;
 
   //passes pt and eta requirements
-  if ( sTree->lep1_.Pt() < 20 )          return false;
-  if ( sTree->lep2_.Pt() < 20 )          return false;
-  if ( fabs(sTree->lep1_.Eta() ) > 2.4)  return false;
-  if ( fabs(sTree->lep2_.Eta() ) > 2.4)  return false;
+  if ( stopt.lep1().Pt() < 20 )          return false;
+  if ( stopt.lep2().Pt() < 20 )          return false;
+  if ( fabs(stopt.lep1().Eta() ) > 2.4)  return false;
+  if ( fabs(stopt.lep2().Eta() ) > 2.4)  return false;
 
   //consistency with pf leptons
-  if ( fabs( sTree->pflep1_.Pt() - sTree->lep1_.Pt() ) > 10. )  return false;
-  if ( fabs( sTree->pflep2_.Pt() - sTree->lep2_.Pt() ) > 10. )  return false;
+  if ( fabs( stopt.pflep1().Pt() - stopt.lep1().Pt() ) > 10. )  return false;
+  if ( fabs( stopt.pflep2().Pt() - stopt.lep2().Pt() ) > 10. )  return false;
 
   //information is only stored for leading lepton
-  if ( ( sTree->isopf1_ * sTree->lep1_.Pt() ) > 5. )  return false; 
-  if ( fabs(sTree->id1_)==11 && sTree->eoverpin_ > 4. ) return false;
+  if ( ( stopt.isopf1() * stopt.lep1().Pt() ) > 5. )  return false; 
+  if ( fabs(stopt.id1())==11 && stopt.eoverpin() > 4. ) return false;
 
   //barrel only electrons
-  if (fabs(sTree->id1_)==11 && fabs(sTree->lep1_.Eta() ) > 1.4442) return false;
-  if (fabs(sTree->id2_)==11 && fabs(sTree->lep2_.Eta() ) > 1.4442) return false;
-  
+  if (fabs(stopt.id1())==11 && fabs(stopt.lep1().Eta() ) > 1.4442) return false;
+  if (fabs(stopt.id2())==11 && fabs(stopt.lep2().Eta() ) > 1.4442) return false;
+
   return true;
 
 }
@@ -358,16 +361,16 @@ bool passDileptonSelection(const StopTree *sTree, bool isData)
 // lepton + isolated track selection CR5
 //-------------------------------------------
 
-bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData) 
+bool passLepPlusIsoTrkSelection(bool isData) 
 {
   //single lepton plus iso trk selection for 8 TeV 53 analysis
 
   //at least one lepton
-  if ( !passSingleLeptonSelection(sTree, isData) ) return false;
+  if ( !passSingleLeptonSelection(isData) ) return false;
 
   //pass isolated track requirement
   //unfortunately changed default value to 9999.
-  if ( sTree->pfcandpt10_ > 9990. || sTree->pfcandiso10_ > 0.1 ) return false;
+  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
 
   return true;
 
@@ -437,7 +440,7 @@ float getMT( float pt1 , float phi1 , float pt2 , float phi2 ){
 
 }
 
-float dRbetweenVectors(StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 ){ 
+float dRbetweenVectors(LorentzVector vec1,LorentzVector vec2 ){ 
 
   float dphi = std::min(::fabs(vec1.Phi() - vec2.Phi()), 2 * M_PI - fabs(vec1.Phi() - vec2.Phi()));
   float deta = vec1.Eta() - vec2.Eta();
@@ -445,12 +448,12 @@ float dRbetweenVectors(StopTree::LorentzVector vec1,StopTree::LorentzVector vec2
   return sqrt(dphi*dphi + deta*deta);
 }
 
-float getMinDphi(float metPhi, StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 ) {
-  
+float getMinDphi(float metPhi, LorentzVector vec1, LorentzVector vec2 ) {
+
   float dphimj1_    = getdphi(metPhi, vec1.phi() );
   float dphimj2_    = getdphi(metPhi, vec2.phi() );
   float dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
 
   return dphimjmin_;
-  
+
 }

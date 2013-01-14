@@ -253,7 +253,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // rho 0-40 GeV, MET filters, >=1 good lepton, veto 2 leptons dR < 0.1
       //----------------------------------------------------------------------------
 
-      //if ( !passEvtSelection(tree, name) ) continue;
+      if ( !passEvtSelection(name) ) continue;
 
       //----------------------------------------------------------------------------
       // Function to perform MET phi corrections on-the-fly
@@ -261,10 +261,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //----------------------------------------------------------------------------
 
       // pair<float, float> p_t1metphicorr = 
-      // 	getPhiCorrMET( tree->t1met10_, tree->t1met10phi_, tree->nvtx_, !isData);
+      // 	getPhiCorrMET( stopt.t1met10(), stopt.t1met10phi(), stopt.nvtx(), !isData);
       // t1metphicorr    = p_t1metphicorr.first;
       // t1metphicorrphi = p_t1metphicorr.second;
-      // t1metphicorrmt  = getMT( tree->lep1_.Pt() , tree->lep1_.Phi() , t1metphicorr , t1metphicorrphi );  
+      // t1metphicorrmt  = getMT( stopt.lep1().Pt() , stopt.lep1().Phi() , t1metphicorr , t1metphicorrphi );  
 
 
       //----------------------------------------------------------------------------

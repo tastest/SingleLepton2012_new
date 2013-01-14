@@ -9,7 +9,7 @@
 #include <list>
 #include <sstream>
 
-#include "StopTree.h"
+#include "STOPT.h"
 
 #include "Math/LorentzVector.h"
 #include "Math/Point3D.h"
@@ -25,22 +25,22 @@ using namespace std;
 float getdltrigweight(int id1, int id2);
 float getsltrigweight(int id1, float pt, float eta);
 
-bool passEvtSelection(const StopTree *sTree, TString name);
-bool passOneLeptonSelection(const StopTree *sTree, bool isData);
-bool passTwoLeptonSelection(const StopTree *sTree, bool isData);
-bool passIsoTrkVeto(const StopTree *sTree);
-bool passIsoTrkVeto_v2(const StopTree *sTree);
-bool passSingleLeptonSelection(const StopTree *sTree, bool isData);
-bool passDileptonSelection(const StopTree *sTree, bool isData);
-bool passLepPlusIsoTrkSelection(const StopTree *sTree, bool isData);
+bool passEvtSelection(TString name);
+bool passOneLeptonSelection(bool isData);
+bool passTwoLeptonSelection(bool isData);
+bool passIsoTrkVeto();
+bool passIsoTrkVeto_v2();
+bool passSingleLeptonSelection(bool isData);
+bool passDileptonSelection(bool isData);
+bool passLepPlusIsoTrkSelection(bool isData);
 pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 
 float getDataMCRatio(float eta);
 
 float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
 float getdphi( float phi1 , float phi2 );
-float dRbetweenVectors(StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 );
-float getMinDphi(float metPhi, StopTree::LorentzVector vec1,StopTree::LorentzVector vec2 );
+float dRbetweenVectors(LorentzVector vec1,LorentzVector vec2 );
+float getMinDphi(float metPhi, LorentzVector vec1, LorentzVector vec2 );
 
 
 #endif
