@@ -20,6 +20,26 @@ using namespace Stop;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
+
+unsigned int getNJets(){
+
+  unsigned int njets=0;
+
+  for ( unsigned int i=0; i<stopt.pfjets().size() ; i++) {
+    
+    if( stopt.pfjets().at(i).pt()<30 )  continue;
+    if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
+    //    if(stopt.pfjets_beta2().at(i)<=0.01) continue;
+
+    njets++;
+
+  }
+
+  return njets;
+
+}
+
+
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
 
   int imaxpt  = -1;

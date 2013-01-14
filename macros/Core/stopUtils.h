@@ -22,6 +22,9 @@
 
 using namespace std;
 
+int leadingJetIndex(vector<LorentzVector> jets, int iskip1, int iskip2);
+unsigned int getNJets();
+
 float getdltrigweight(int id1, int id2);
 float getsltrigweight(int id1, float pt, float eta);
 
