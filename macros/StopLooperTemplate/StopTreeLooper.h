@@ -15,8 +15,6 @@
 
 using namespace std;
 
-class StopTree;
-
 class StopTreeLooper {
 
     public:
@@ -27,22 +25,6 @@ class StopTreeLooper {
 
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
-
-	//plotting
-	void makeSIGPlots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_kbin, string flav_tag, float mtcut ); 
-	void makeCR1Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ); 
-	void makeCR2Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
-	void makeCR4Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
-	void makeCR5Plots( const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
-	void makeNJPlots(  const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag ); 
-	void makeZPlots(   const StopTree *sTree, float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string flav_tag );
 
 	float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
 

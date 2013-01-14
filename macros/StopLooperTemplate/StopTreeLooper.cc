@@ -4,7 +4,7 @@
 //#include "../../CORE/Thrust.h"
 //#include "../../CORE/EventShape.h"
 
-#include "../Core/StopTree.h"
+#include "../Core/STOPT.h"
 #include "../Core/stopUtils.h"
 #include "../Plotting/PlotUtilities.h"
 #include "../Core/MT2Utility.h"
@@ -26,6 +26,8 @@
 #include <map>
 #include <set>
 #include <list>
+
+using namespace Stop;
 
 float StopTreeLooper::getMT( float pt1 , float phi1 , float pt2 , float phi2 ) 
 {
@@ -190,17 +192,17 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     // load the stop baby tree
     //----------------------------
 
-    StopTree *tree = new StopTree();
-    tree->LoadTree(currentFile->GetTitle());
-    tree->InitTree();
+    TFile *file = new TFile( currentFile->GetTitle() );
+    TTree *tree = (TTree*)file->Get("t");
+    stopt.Init(tree);
 
     //----------------------------
     // event loop
     //----------------------------
 
-    ULong64_t nEvents = tree->tree_->GetEntries();
+    ULong64_t nEvents = tree->GetEntriesFast();
     for(ULong64_t event = 0; event < nEvents; ++event) {
-      tree->tree_->GetEntry(event);
+      stopt.GetEntry(event);
 
       //----------------------------
       // increment counters
@@ -224,12 +226,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //---------------------
 
       if( isData ) {
-        DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
+        DorkyEventIdentifier id = {stopt.run(), stopt.event(), stopt.lumi() };
         if (is_duplicate(id) ){
           continue;
         }
 	if (is_badLaserEvent(id) ){
-	  //std::cout<<"Removed bad laser calibration event:" <<tree->run_<<"   "<<tree->event_<<"\n";
+	  //std::cout<< "Removed bad laser calibration event:" << run << "   " << event<<"\n";
 	  continue;
 	}
       }
@@ -239,19 +241,19 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // make 2 example histograms of nvtx and corresponding weight
       //---------------------------------------------------------------------------- 
 
-      float evtweight = isData ? 1. : ( tree->weight_ * 9.708 * tree->nvtxweight_ * tree->mgcor_ );
+      float evtweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
       // to reweight from file - also need to comment stuff before
-      //      float vtxweight = vtxweight_n( tree->nvtx_, h_vtx_wgt, isData );
+      //      float vtxweight = vtxweight_n( nvtx, h_vtx_wgt, isData );
 
-      plot1D("h_vtx",       tree->nvtx_,       evtweight, h_1d, 40, 0, 40);
-      plot1D("h_vtxweight", tree->nvtxweight_, evtweight, h_1d, 41, -4., 4.);
+      plot1D("h_vtx",       stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
+      plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
 
       //----------------------------------------------------------------------------
       // apply preselection:
       // rho 0-40 GeV, MET filters, >=1 good lepton, veto 2 leptons dR < 0.1
       //----------------------------------------------------------------------------
 
-      if ( !passEvtSelection(tree, name) ) continue;
+      //if ( !passEvtSelection(tree, name) ) continue;
 
       //----------------------------------------------------------------------------
       // Function to perform MET phi corrections on-the-fly
