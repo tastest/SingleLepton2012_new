@@ -5,24 +5,23 @@ INCLUDE = -I../ -I./ $(ROOFITINCLUDE)
 CFLAGS = -Wall -g -fPIC $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS) -DTOOLSLIB
 LINKER = g++
 
-LINKERFLAGS = $(shell root-config --ldflags) $(shell root-config --libs) -lMinuit
+LINKERFLAGS = $(shell root-config --ldflags)
 ifeq ($(shell root-config --platform),macosx)
 	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector
 endif
 
-SOURCES = singleLeptonLooper.cc mt2w_bisect.cc mt2bl_bisect.cc ../CORE/MT2/MT2Utility.cc stopUtils.cc
+SOURCES = singleLeptonLooper.cc
 OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libsingleLeptonLooper.so
 
-CORESOURCES = ../CORE/CMS2.cc ../CORE/utilities.cc ../CORE/ssSelections.cc ../CORE/electronSelections.cc ../CORE/electronSelectionsParameters.cc ../CORE/MITConversionUtilities.cc ../CORE/muonSelections.cc ../CORE/eventSelections.cc ../CORE/trackSelections.cc ../CORE/metSelections.cc ../CORE/jetSelections.cc ../CORE/photonSelections.cc ../CORE/triggerUtils.cc ../CORE/triggerSuperModel.cc ../CORE/mcSelections.cc ../CORE/susySelections.cc ../CORE/mcSUSYkfactor.cc ../CORE/SimpleFakeRate.cc ../Tools/goodrun.cc ../Tools/vtxreweight.cc ../Tools/msugraCrossSection.cc  ../CORE/jetsmear/JetSmearer.cc ../CORE/jetsmear/JetResolution.cc ../CORE/jetsmear/SigInputObj.cc ../CORE/jetSmearingTools.cc ../CORE/QuarkGluonTagger/QGLikelihoodCalculator.cc ../CORE/QuarkGluonTagger/QuarkGluonTagger.cc 
-
+CORESOURCES = ../CORE/CMS2.cc ../CORE/utilities.cc ../CORE/ssSelections.cc ../CORE/electronSelections.cc ../CORE/electronSelectionsParameters.cc ../CORE/MITConversionUtilities.cc ../CORE/muonSelections.cc ../CORE/eventSelections.cc ../CORE/trackSelections.cc ../CORE/metSelections.cc ../CORE/jetSelections.cc ../CORE/photonSelections.cc ../CORE/triggerUtils.cc ../CORE/triggerSuperModel.cc ../CORE/mcSelections.cc ../CORE/susySelections.cc ../CORE/mcSUSYkfactor.cc ../CORE/SimpleFakeRate.cc ../Tools/goodrun.cc ../Tools/vtxreweight.cc ../Tools/msugraCrossSection.cc
 COREOBJECTS = $(CORESOURCES:.cc=.o) 
 CORELIB = libsingleLeptonCORE.so
 
 #FWLIB = libMiniFWLite.so
 FWLIB = ../Tools/MiniFWLite/libMiniFWLite.so
 
-LIBS = $(LIB) $(CORELIB) $(FWLIB) 
+LIBS = $(LIB) $(CORELIB) $(FWLIB)
 
 .PHONY: all help compile clean cms2env
 
@@ -73,7 +72,6 @@ clean:
         ../Tools/MiniFWLite/*.o \
 	../Tools/MiniFWLite/*.d \
         $(CORELIB) $(LIB) $(FWLIB) \
-        LinkDef_out.cxx  LinkDef_out.h \
         *.o *.d *.so; echo "Done"
 
 test: 
