@@ -39,6 +39,25 @@ unsigned int getNJets(){
 
 }
 
+vector<int> getBJetIndex(double discr)
+{
+
+  vector<int> btagJets;
+
+  for ( unsigned int i=0; i<stopt.pfjets().size() ; i++) {
+
+    if( stopt.pfjets().at(i).pt()<30 )  continue;
+    if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
+    if( stopt.pfjets_csv().at(i)      < discr   ) continue;
+    //    nbtags++;                                                                                                                                                        
+    btagJets.push_back(i);
+  }
+
+  return btagJets;
+
+}
+
+
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
 
