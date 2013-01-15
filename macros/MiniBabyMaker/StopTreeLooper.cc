@@ -158,7 +158,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     }
 
     if( name.Contains("T2bw") ){
-      h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3/myMassDB_T2tt.root";
+      h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_3/myMassDB_T2bw_fine.root";
     }
 
     cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
@@ -484,7 +484,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.19 $";
+  string revision = "$Revision: 1.20 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
