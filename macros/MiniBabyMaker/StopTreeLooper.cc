@@ -21,7 +21,7 @@
 #include "TChain.h"
 #include "Riostream.h"
 #include "TFitter.h"
-#include "TRandom.h"
+#include "TRandom3.h"
 
 #include <algorithm>
 #include <utility>
@@ -125,8 +125,7 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id) {
 
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
-
-  TRandom r;
+  TRandom3 r;
 
   printf("[StopTreeLooper::loop] %s\n", name.Data());
 
@@ -203,11 +202,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //---------------------------------
     // load the stop baby tree
     //---------------------------------
-
     TFile *file = new TFile( currentFile->GetTitle() );
     TTree *tree = (TTree*)file->Get("t");
     stopt.Init(tree);
-
 
     //---------------------------------
     // event loop
@@ -285,6 +282,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       float metphi = stopt.t1metphicorrphi();
 
       // get list of candidates
+//       vector<LorentzVector> pc_jets = stopt.pfjets();
+//       vector<float> pc_btag = stopt.pfjets_csv();
+//       vector<float> pc_sigma = stopt.pfjets_sigma();
+//       vector<float> pc_mc3 = stopt.pfjets_sigma();
+//       vector<LorentzVector> pc_jets = stopt.pfjets();
       PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), stopt.lep1(), met, metphi, isData);
       MT2CHI2 mc = pc.getMt2Chi2();
 
@@ -496,7 +498,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.21 $";
+  string revision = "$Revision: 1.22 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();

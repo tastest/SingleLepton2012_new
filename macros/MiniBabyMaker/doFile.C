@@ -9,7 +9,7 @@ doFile(const char* pth, const char* tg) {
   gSystem->Load("libEG.so");
   gSystem->Load("libMathCore.so");
 
-  gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
+  //gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
   gROOT->ProcessLine(".L ../Core/StopTree.h+");
 
