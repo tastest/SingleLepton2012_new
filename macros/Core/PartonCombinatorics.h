@@ -24,6 +24,8 @@ class PartonCombinatorics {
 
 public:
 	PartonCombinatorics(vector<LorentzVector> jets, vector<float> btag, vector<float> sigma_jets,
+			vector<float> mc, LorentzVector lep, float met, float metphi, bool isData);
+	PartonCombinatorics(vector<LorentzVector> jets, vector<float> btag, vector<float> sigma_jets,
 			vector<int> mc, LorentzVector lep, float met, float metphi, bool isData);
 
 	MT2CHI2 getMt2Chi2();
@@ -75,6 +77,7 @@ public:
 	static const int NUM_LEAD_JETS_1B = 3;
 
 	static const bool __SORT = true;
+	static const bool __debug = false;
 
 };
 

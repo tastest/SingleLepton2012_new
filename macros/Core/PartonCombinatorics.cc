@@ -6,7 +6,17 @@
 #include "../Core/mt2w_bisect.h"
 
 PartonCombinatorics::PartonCombinatorics(vector<LorentzVector> jets, vector<float> btag, vector<float> sigma_jets,
+		vector<float> mc, LorentzVector lep, float met, float metphi, bool isData){
+        vector<int> new_mc;
+        for (unsigned int i =0; i < mc.size(); ++i)
+           new_mc.push_back((int) mc.at(i));
+
+        PartonCombinatorics(jets, btag, sigma_jets, new_mc, lep, met, metphi, isData);
+}
+
+PartonCombinatorics::PartonCombinatorics(vector<LorentzVector> jets, vector<float> btag, vector<float> sigma_jets,
 		vector<int> mc, LorentzVector lep, float met, float metphi, bool isData){
+        if ( __debug ) cout << "PartonCombinatorics::Constructor " << endl;
 	isData_ = isData;
 	jets_ = jets;
 	btag_ = btag;
@@ -16,6 +26,12 @@ PartonCombinatorics::PartonCombinatorics(vector<LorentzVector> jets, vector<floa
 	met_ = met;
 	metphi_ = metphi;
         n_jets_ = jets.size();
+
+        assert( jets_.size() == btag_.size() );
+        assert( jets_.size() == mc_.size() );
+        assert( jets_.size() == sigma_jets_.size() );
+
+        if ( __debug ) cout << "PartonCombinatorics::Constructor isData = " << isData << endl;
 
 	recoHadronicTop();
 	applyBConsistency(BTAG_MED);
@@ -133,6 +149,7 @@ void PartonCombinatorics::minuitFunction(int&, double* , double &result, double 
  * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
  */
 void PartonCombinatorics::recoHadronicTop(){
+  if ( __debug ) cout << "PartonCombinatorics::recoHadronicTop " << endl;
 
   float metx = met_ * cos( metphi_ );
   float mety = met_ * sin( metphi_ );
@@ -143,7 +160,6 @@ void PartonCombinatorics::recoHadronicTop(){
   int ib[5];
 
   if ( !isData_ ){
-
     // Matching MC algoritm search over all conbinations  until the
     // right combination is found. More than one candidate is suported
     //  but later only the first is used.
@@ -156,6 +172,7 @@ void PartonCombinatorics::recoHadronicTop(){
             if ( (mc_.at(jw2)==2 && mc_.at(jw1)==2 && mc_.at(jb)==1 && mc_.at(jbl)==-1) ||
                  (mc_.at(jw2)==-2 && mc_.at(jw1)==-2 && mc_.at(jb)==-1 && mc_.at(jbl)==1) ) {
 	      if ( match == 5 ) break;
+              if ( __debug ) cout << "PartonCombinatorics::recoHadronicTop MC found:" << match << endl;
 	      ibl[match] = jbl;
 	      iw1[match] = jw1;
 	      iw2[match] = jw2;
@@ -164,6 +181,7 @@ void PartonCombinatorics::recoHadronicTop(){
             }
   }
 
+  if ( __debug ) cout << "PartonCombinatorics::recoHadronicTop MC done" << endl;
   ////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
 
   vector<int> v_i, v_j;
@@ -227,6 +245,7 @@ void PartonCombinatorics::recoHadronicTop(){
       v_k2.push_back(c2);
     }
 
+  if ( __debug ) cout << "PartonCombinatorics::recoHadronicTop W done" << endl;
 
   list<Candidate> chi2candidates;
 
