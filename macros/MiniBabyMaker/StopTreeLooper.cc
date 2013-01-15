@@ -4,12 +4,13 @@
 
 #include "StopTreeLooper.h"
 
+//#include "../Core/STOPT.h"
+#include "../Core/stopUtils.h"
 #include "../Plotting/PlotUtilities.h"
 #include "../Core/MT2Utility.h"
 #include "../Core/mt2bl_bisect.h"
 #include "../Core/mt2w_bisect.h"
 #include "../Core/PartonCombinatorics.h"
-#include "../Core/stopUtils.h"
 
 #include "TROOT.h"
 #include "TH1F.h"
@@ -27,6 +28,8 @@
 #include <map>
 #include <set>
 #include <list>
+
+using namespace Stop;
 
 StopTreeLooper::StopTreeLooper()
 {
@@ -201,19 +204,20 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     // load the stop baby tree
     //---------------------------------
 
-    StopTree *tree = new StopTree();
-    tree->LoadTree(currentFile->GetTitle());
-    tree->InitTree();
+    TFile *file = new TFile( currentFile->GetTitle() );
+    TTree *tree = (TTree*)file->Get("t");
+    stopt.Init(tree);
+
 
     //---------------------------------
     // event loop
     //---------------------------------
 
-    ULong64_t nEvents = tree->tree_->GetEntries();
+    ULong64_t nEvents = tree->GetEntries();
     //nEvents = 1000;
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
-      tree->tree_->GetEntry(event);
+      tree->GetEntry(event);
 
       //---------------------------------
       // increment counters
@@ -237,12 +241,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //------------------------------------------ 
 
       if( isData ) {
-        DorkyEventIdentifier id = {tree->run_,tree->event_, tree->lumi_ };
+        DorkyEventIdentifier id = {stopt.run(), stopt.event(), stopt.lumi() };
         if (is_duplicate(id) ){
           continue;
         }
 	if (is_badLaserEvent(id) ){
-	  //std::cout<<"Removed bad laser calibration event:" <<tree->run_<<"   "<<tree->event_<<"\n";
+	  //std::cout<<"Removed bad laser calibration event:" << stopt.run() <<"   "<< stopt.event.() <<"\n";
 	  continue;
 	}
       }
@@ -251,44 +255,44 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // event weight
       //------------------------------------------ 
 
-      float evtweight    = isData ? 1. : ( tree->weight_ * tree->nvtxweight_ * tree->mgcor_ );
+      float evtweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
 
       if( name.Contains("T2") ) {
-	int bin = h_nsig->FindBin(tree->mg_,tree->ml_);
+	int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
 	float nevents = h_nsig->GetBinContent(bin);
-	evtweight = tree->xsecsusy_ * 1000.0 / nevents; 
+	evtweight =  stopt.xsecsusy() * 1000.0 / nevents; 
 
 	//cout << "mg " << tree->mg_ << " ml " << tree->ml_ << " bin " << bin << " nevents " << nevents << " xsec " << tree->xsecsusy_ << " weight " << evtweight << endl;
       }
 
 
-      float trigweight   = isData ? 1. : getsltrigweight(tree->id1_, tree->lep1_.Pt(), tree->lep1_.Eta());
-      float trigweightdl = isData ? 1. : getdltrigweight(tree->id1_, tree->id2_);
+      float trigweight   = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
+      float trigweightdl = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
 
       //------------------------------------------ 
       // selection criteria
       //------------------------------------------ 
       
-      if ( !passEvtSelection(tree, name) ) continue; // >=1 lepton, rho cut, MET filters, veto 2 nearby leptons
-      if ( tree->npfjets30_ < 4          ) continue; // >=4 jets
-      if ( tree->t1metphicorr_ < 50.0    ) continue; // MET > 50 GeV
+      if ( !passEvtSelection(name) ) continue; // >=1 lepton, rho cut, MET filters, veto 2 nearby leptons
+      if ( getNJets() < 4          ) continue; // >=4 jets
+      if ( stopt.t1metphicorr() < 50.0    ) continue; // MET > 50 GeV
 
       //------------------------------------------ 
       // get list of candidates
       //------------------------------------------ 
       
-      float met = tree->t1metphicorr_;
-      float metphi = tree->t1metphicorrphi_;
+      float met = stopt.t1metphicorr();
+      float metphi = stopt.t1metphicorrphi();
 
       // get list of candidates
-      PartonCombinatorics pc (*(tree->pfjets_), tree->pfjets_csv_, tree->pfjets_sigma_, tree->pfjets_mc3_, tree->lep1_, met, metphi, isData);
+      PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), stopt.lep1(), met, metphi, isData);
       MT2CHI2 mc = pc.getMt2Chi2();
 
       //------------------------------------------ 
       // event shapes
       //------------------------------------------ 
 
-      std::vector<LorentzVector>* myPfJets = tree->pfjets_;
+      std::vector<LorentzVector>  myPfJets = stopt.pfjets();
       std::vector<LorentzVector>  jetVector;
       std::vector<LorentzVector>  jetLeptonVector;
       std::vector<LorentzVector>  jetLeptonMetVector;
@@ -304,12 +308,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       float HT_OSM=0;
 
 
-      LorentzVector lep1_p4( tree->lep1_.px() , tree->lep1_.py() , 0 , tree->lep1_.E() ); 
+      LorentzVector lep1_p4( stopt.lep1().px() , stopt.lep1().py() , 0 , stopt.lep1().E() ); 
 
-      LorentzVector met_p4( tree->t1metphicorr_ * cos( tree->t1metphicorr_ ) , 
-			    tree->t1metphicorr_ * sin( tree->t1metphicorr_ ) , 
+      LorentzVector met_p4( stopt.t1metphicorr() * cos( stopt.t1metphicorr()) , 
+			    stopt.t1metphicorr() * sin( stopt.t1metphicorr()) , 
 			    0,
-			    tree->t1metphicorr_
+			    stopt.t1metphicorr()
 			    );
 
       jetLeptonVector.push_back(lep1_p4);
@@ -317,12 +321,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       jetLeptonMetVector.push_back(lep1_p4);
       jetLeptonMetVector.push_back(met_p4);
 
-      for ( unsigned int i=0; i<myPfJets->size() ; i++) {
+      for ( unsigned int i=0; i<myPfJets.size() ; i++) {
 
-	if( myPfJets->at(i).pt()<30 )          continue;
-	if( fabs(myPfJets->at(i).eta())>3.0 )  continue;
+	if( myPfJets.at(i).pt()<30 )          continue;
+	if( fabs(myPfJets.at(i).eta())>3.0 )  continue;
 
-	LorentzVector jet_p4( myPfJets->at(i).px() , myPfJets->at(i).py() , 0 , myPfJets->at(i).E() );
+	LorentzVector jet_p4( myPfJets.at(i).px() , myPfJets.at(i).py() , 0 , myPfJets.at(i).E() );
     
 	// jetVector.push_back(myPfJets->at(i));
 	// jetLeptonVector.push_back(myPfJets->at(i));
@@ -332,14 +336,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	jetLeptonVector.push_back(jet_p4);
 	jetLeptonMetVector.push_back(jet_p4);
 
-	float dPhiL = getdphi(tree->lep1_.Phi(), myPfJets->at(i).phi() );
-	float dPhiM = getdphi(tree->t1metphicorrphi_, myPfJets->at(i).phi() );
+	float dPhiL = getdphi(stopt.lep1().Phi(), myPfJets.at(i).phi() );
+	float dPhiM = getdphi(stopt.t1metphicorrphi(), myPfJets.at(i).phi() );
     
-	if(dPhiL<(3.14/2))  HT_SSL=HT_SSL+myPfJets->at(i).pt();
-	if(dPhiL>=(3.14/2)) HT_OSL=HT_OSL+myPfJets->at(i).pt();
+	if(dPhiL<(3.14/2))  HT_SSL=HT_SSL+myPfJets.at(i).pt();
+	if(dPhiL>=(3.14/2)) HT_OSL=HT_OSL+myPfJets.at(i).pt();
 
-	if(dPhiM<(3.14/2))  HT_SSM=HT_SSM+myPfJets->at(i).pt();
-	if(dPhiM>=(3.14/2)) HT_OSM=HT_OSM+myPfJets->at(i).pt();
+	if(dPhiM<(3.14/2))  HT_SSM=HT_SSM+myPfJets.at(i).pt();
+	if(dPhiM>=(3.14/2)) HT_OSM=HT_OSM+myPfJets.at(i).pt();
 
       }
   
@@ -361,15 +365,23 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       
       initBaby(); // set all branches to -1
 
+      vector<int> indexBJets=getBJetIndex(0.679);
+      if(indexBJets.size()>0) pt_b_ = myPfJets.at(indexBJets.at(0)).pt();
+
+      int J1Index=leadingJetIndex( stopt.pfjets(), -1, -1);
+      int J2Index=leadingJetIndex( stopt.pfjets(), J1Index, -1);
+      pt_J1_ = myPfJets.at(J1Index).pt();
+      pt_J2_ = myPfJets.at(J2Index).pt();
+
       // which selections are passed
-      sig_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_>=1 ) ? 1 : 0; // pass signal region preselection
-      cr1_        = ( passOneLeptonSelection(tree, isData) && tree->nbtagscsvm_==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
-      cr4_        = ( passDileptonSelection(tree, isData) && tree->nbtagscsvm_>=1) ? 1 : 0; // pass CR4 (dilepton) control region preselection
-      cr5_        = ( passLepPlusIsoTrkSelection(tree, isData) && tree->nbtagscsvm_>=1) ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
+      sig_        = ( passOneLeptonSelection(isData) && indexBJets.size()>=1 ) ? 1 : 0; // pass signal region preselection
+      cr1_        = ( passOneLeptonSelection(isData) && indexBJets.size()==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
+      cr4_        = ( passDileptonSelection(isData) && indexBJets.size()==1) ? 1 : 0; // pass CR4 (dilepton) control region preselection
+      cr5_        = ( passLepPlusIsoTrkSelection(isData) && indexBJets.size()==1) ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
 
       // kinematic variables
-      met_        = tree->t1metphicorr_;       // MET (type1, MET-phi corrections)
-      mt_         = tree->t1metphicorrmt_;     // MT (type1, MET-phi corrections)
+      met_        = stopt.t1metphicorr();       // MET (type1, MET-phi corrections)
+      mt_         = stopt.t1metphicorrmt();     // MT (type1, MET-phi corrections)
 
       // chi2 and MT2 variables
       chi2min_			= mc.one_chi2;               // minimum chi2 
@@ -394,27 +406,27 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       dltrigeff_  = trigweightdl;                 // trigger weight (dilepton)
 
       // hadronic variables 
-      nb_         = tree->nbtagscsvm_;            // nbjets (pT > 30, CSVM)
-      njets_      = tree->npfjets30_;             // njets (pT > 30, eta < 2.5)
+      nb_         = indexBJets.size();            // nbjets (pT > 30, CSVM)
+      njets_      = getNJets();             // njets (pT > 30, eta < 2.5)
 
       // lepton variables
-      passisotrk_   = passIsoTrkVeto(tree) ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
-      passisotrkv2_ = passIsoTrkVeto_v2(tree) ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
-      nlep_       = tree->ngoodlep_;              // number of analysis selected leptons
+      passisotrk_   = passIsoTrkVeto() ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
+      passisotrkv2_ = passIsoTrkVeto_v2() ? 1 : 0; // is there an isolated track? (pT>10 GeV, reliso<0.1)
+      nlep_       = stopt.ngoodlep();              // number of analysis selected leptons
  
-      lep1pt_     = tree->lep1_.pt();             // 1st lepton pt
-      lep1eta_    = fabs( tree->lep1_.eta() );    // 1st lepton eta
+      lep1pt_     = stopt.lep1().pt();             // 1st lepton pt
+      lep1eta_    = fabs( stopt.lep1().eta() );    // 1st lepton eta
 
       if( nlep_ > 1 ){
-	lep2pt_    = tree->lep1_.pt();            // 2nd lepton pt
-	lep2eta_   = tree->lep1_.eta();           // 2nd lepton eta
-	dilmass_   = tree->dilmass_;              // dilepton mass
+	lep2pt_    = stopt.lep1().pt();            // 2nd lepton pt
+	lep2eta_   = stopt.lep1().eta();           // 2nd lepton eta
+	dilmass_   = stopt.dilmass();              // dilepton mass
       }
       
       // susy vars
-      mstop_       = tree->mg_;                   // stop mass
-      mlsp_        = tree->ml_;                   // LSP mass
-      x_           = tree->x_;                    // chargino mass parameter x
+      mstop_       = stopt.mg();                   // stop mass
+      mlsp_        = stopt.ml();                   // LSP mass
+      x_           = stopt.x();                    // chargino mass parameter x
 
       // event shapes (from jets only)
       thrjet_    = thrust.thrust();
@@ -443,8 +455,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       htosm_      = HT_OSM;
       htratiom_   = HT_SSM / (HT_OSM + HT_SSM);
 
-      dphimj1_    = getdphi(tree->t1metphicorrphi_, jetVector.at(0).phi() );
-      dphimj2_    = getdphi(tree->t1metphicorrphi_, jetVector.at(1).phi() );
+      dphimj1_    = getdphi(stopt.t1metphicorrphi(), jetVector.at(0).phi() );
+      dphimj2_    = getdphi(stopt.t1metphicorrphi(), jetVector.at(1).phi() );
       dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
 
       rand_       = r.Uniform(0.0,1.0);
@@ -484,7 +496,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.20 $";
+  string revision = "$Revision: 1.21 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
@@ -551,6 +563,9 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("dphimj1"          ,        &dphimj1_         ,         "dphimj1/F"          );
   outTree_->Branch("dphimj2"          ,        &dphimj2_         ,         "dphimj2/F"          );
   outTree_->Branch("dphimjmin"        ,        &dphimjmin_       ,         "dphimjmin/F"        );
+  outTree_->Branch("pt_b"             ,        &pt_b_            ,         "pt_b/F"             );
+  outTree_->Branch("pt_J1"            ,        &pt_J1_           ,         "pt_J1/F"            );
+  outTree_->Branch("pt_J2"            ,        &pt_J2_           ,         "pt_J2/F"            );
   outTree_->Branch("rand"             ,        &rand_            ,         "rand/F"             );
 
 }
@@ -632,6 +647,11 @@ void StopTreeLooper::initBaby(){
   mstop_      = -1.0;
   mlsp_       = -1.0;
   x_          = -1.0;
+
+  // jet kinematics
+  pt_b_ = -1.0;
+  pt_J1_ = -1.0;
+  pt_J2_ = -1.0;
 
   rand_       = -1.0;
 }

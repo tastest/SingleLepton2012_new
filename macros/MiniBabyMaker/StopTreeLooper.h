@@ -8,7 +8,8 @@
 
 #include <iostream>
 //#include "Math/LorentzVector.h"
-#include "../Core/StopTree.h"
+/////#include "../Core/StopTree.h"
+#include "../Core/STOPT.h"
  
 #include <cmath>
 #include <map>
@@ -132,6 +133,11 @@ class StopTreeLooper {
 	Float_t lep2pt_;
 	Float_t lep2eta_;
 	Float_t dilmass_;
+
+	// jet kinematics
+	Float_t pt_b_;
+	Float_t pt_J1_;
+	Float_t pt_J2_;
 
 	// susy variables
 	Float_t mstop_;
