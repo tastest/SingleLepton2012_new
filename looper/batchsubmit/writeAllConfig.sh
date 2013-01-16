@@ -130,6 +130,7 @@ TAG="V00-02-11_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTWJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTWJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTGJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTGJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTWWJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTWWJets
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBZToLL_4F_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7C-v1/V05-03-20/ ${TAG}_TBZ
 
 ##
 ## QCD
