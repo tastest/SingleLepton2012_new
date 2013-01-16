@@ -66,7 +66,7 @@ public:
 	static const float PTMIN_B = 30;
 	static const float PTMIN_O = 30;
 	static const float JET_PT = 30.;
-	static const float JET_ETA = 3.0;
+	static const float JET_ETA = 2.4;
 	static const float PDG_TOP_MASS = 173.5;
 	static const float PDG_W_MASS = 80.385;
 	static const float BTAG_MED = 0.679;
