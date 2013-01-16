@@ -214,7 +214,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //nEvents = 1000;
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
-      tree->GetEntry(event);
+      stopt.GetEntry(event);
 
       //---------------------------------
       // increment counters
@@ -269,7 +269,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //------------------------------------------ 
       // selection criteria
       //------------------------------------------ 
-      
+
       if ( !passEvtSelection(name) ) continue; // >=1 lepton, rho cut, MET filters, veto 2 nearby leptons
       if ( getNJets() < 4          ) continue; // >=4 jets
       if ( stopt.t1metphicorr() < 50.0    ) continue; // MET > 50 GeV
@@ -282,11 +282,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       float metphi = stopt.t1metphicorrphi();
 
       // get list of candidates
-//       vector<LorentzVector> pc_jets = stopt.pfjets();
-//       vector<float> pc_btag = stopt.pfjets_csv();
-//       vector<float> pc_sigma = stopt.pfjets_sigma();
-//       vector<float> pc_mc3 = stopt.pfjets_sigma();
-//       vector<LorentzVector> pc_jets = stopt.pfjets();
+
       PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), stopt.lep1(), met, metphi, isData);
       MT2CHI2 mc = pc.getMt2Chi2();
 
@@ -498,7 +494,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.22 $";
+  string revision = "$Revision: 1.23 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
