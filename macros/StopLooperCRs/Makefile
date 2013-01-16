@@ -9,15 +9,15 @@ ifeq ($(shell root-config --platform),macosx)
 	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector
 endif
 
-SOURCES = ../Core/PartonCombinatorics.cc StopTreeLooper.cc ../Plotting/PlotUtilities.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/MT2Utility.cc ../Core/stopUtils.cc ../../CORE/Thrust.cc ../../CORE/EventShape.cc
+SOURCES = ../Core/PartonCombinatorics.cc StopTreeLooper.cc ../Plotting/PlotUtilities.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/MT2Utility.cc ../Core/stopUtils.cc ../../CORE/Thrust.cc ../../CORE/EventShape.cc ../Core/STOPT.cc
 OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libStopTreeLooper.so
 
 $(LIB):	$(OBJECTS) 
 	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@  $(shell root-config --libs) -lMinuit
 
-LinkDef_out.cxx: LinkDef.h StopTreeLooper.h  
-	rootcint -f $@ -c $(INCLUDE) StopTreeLooper.h  $<
+LinkDef_out.cxx: LinkDef.h StopTreeLooper.h ../Plotting/PlotUtilities.h ../Core/stopUtils.h   
+	rootcint -f $@ -c $(INCLUDE) StopTreeLooper.h ../Plotting/PlotUtilities.h ../Core/stopUtils.h $<
 
 # General rule for making object files
 %.d:	%.cc

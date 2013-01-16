@@ -14,7 +14,6 @@ void doAll() {
 
   gSystem->Load("../../Tools/MiniFWLite/libMiniFWLite.so");
 
-  gROOT->ProcessLine(".L ../Core/StopTree.h+");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
 
   StopTreeLooper *looper = new StopTreeLooper();
@@ -23,7 +22,7 @@ void doAll() {
   // samples to run over
   //
  
-  char* path = "/nfs-3/userdata/stop/current_4jskim";
+  char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim";
 
 //   const int NSAMPLES = 15;
 //   char* sampletag[NSAMPLES] = {

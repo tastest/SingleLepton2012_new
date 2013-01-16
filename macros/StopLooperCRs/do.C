@@ -1,4 +1,4 @@
-void do(char* path, char* sample){
+void do(char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim", char* sample = "ttdl_powheg"){
   //------------------------------ 
   // load stuff
   //------------------------------ 
@@ -11,7 +11,6 @@ void do(char* path, char* sample){
   gSystem->Load("../../Tools/MiniFWLite/libMiniFWLite.so");
 
   //  gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
-  gROOT->ProcessLine(".L ../Core/StopTree.h+");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
 
   StopTreeLooper *looper = new StopTreeLooper();
