@@ -1090,15 +1090,23 @@ void StopTreeLooper::makeCR4Plots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_cr4_subleadleppt"+tag_selection+tag_njets         +flav_tag_dl, min(stopt.lep2().Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr4_subleadleppt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(stopt.lep2().Pt(), x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //angle between lead-lep and met
-	 float dphi_metlep = getdphi( stopt.lep1().Phi() , t1metphicorrphi );
+  float dphi_metlep = getdphi( stopt.lep1().Phi() , t1metphicorrphi );
   plot1D("h_cr4_dphi_metlep"+tag_selection                   +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets         +flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr4_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   /// MT2 and chi2                                                                                                                                                       
-  plot1D("h_cr4_mt2wmin_"+tag_selection         +flav_tag_dl, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr4_mt2bmin_"+tag_selection         +flav_tag_dl, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr4_mt2blmin_"+tag_selection        +flav_tag_dl, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr4_chi2minprob_"+tag_selection     +flav_tag_dl, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr4_mt2wmin"+tag_selection         		 +flav_tag_dl, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2wmin"+tag_selection+tag_njets         +flav_tag_dl, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2wmin"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2bmin"+tag_selection                   +flav_tag_dl, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2bmin"+tag_selection+tag_njets         +flav_tag_dl, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2bmin"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2blmin"+tag_selection                   +flav_tag_dl, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2blmin"+tag_selection+tag_njets         +flav_tag_dl, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_mt2blmin"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr4_chi2minprob"+tag_selection                   +flav_tag_dl, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr4_chi2minprob"+tag_selection+tag_njets         +flav_tag_dl, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr4_chi2minprob"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
 
   //MT
   //binning for mT plots
@@ -1163,10 +1171,18 @@ void StopTreeLooper::makeCR5Plots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr5_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   /// MT2 and chi2                                                                                                                                                       
-  plot1D("h_cr5_mt2wmin_"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr5_mt2bmin_"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr5_mt2blmin_"+tag_selection         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr5_chi2minprob_"+tag_selection        +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr5_mt2wmin"+tag_selection                   +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2wmin"+tag_selection+tag_njets         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2wmin"+tag_selection+tag_njets+tag_kbin+flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2bmin"+tag_selection                   +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2bmin"+tag_selection+tag_njets         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2bmin"+tag_selection+tag_njets+tag_kbin+flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2blmin"+tag_selection                   +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2blmin"+tag_selection+tag_njets         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_mt2blmin"+tag_selection+tag_njets+tag_kbin+flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr5_chi2minprob"+tag_selection                   +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr5_chi2minprob"+tag_selection+tag_njets         +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr5_chi2minprob"+tag_selection+tag_njets+tag_kbin+flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
 
   //MT
   //binning for mT plots
@@ -1223,10 +1239,10 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   float minDphi_J12=getMinDphi(t1metphicorrphi, jets.at(0),jets.at(1));
   plot1D("h_sig_mindPhiJ12"+tag_selection         +flav_tag, minDphi_J12, evtweight, h_1d, 15, 0., TMath::Pi());
   /// MT2 and chi2
-  plot1D("h_sig_mt2wmin_"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_sig_mt2bmin_"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_sig_mt2blmin_"+tag_selection         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_sig_chi2minprob_"+tag_selection        +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_sig_mt2wmin"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_sig_mt2bmin"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_sig_mt2blmin"+tag_selection        +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_sig_chi2minprob"+tag_selection     +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
 
   //MT
   //binning for mT plots
@@ -1289,12 +1305,18 @@ void StopTreeLooper::makeCR1Plots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets         +flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr1_dphi_metlep"+tag_selection+tag_njets+tag_kbin+flav_tag, dphi_metlep, evtweight, h_1d, 15, 0., TMath::Pi());
   /// MT2 and chi2
-  plot1D("h_cr1_mt2wmin_"+tag_selection         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr1_mt2bmin_"+tag_selection         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr1_mt2blmin_"+tag_selection         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
-  plot1D("h_cr1_chi2minprob_"+tag_selection        +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
-
-
+  plot1D("h_cr1_mt2wmin"+tag_selection                   +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2wmin"+tag_selection+tag_njets         +flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2wmin"+tag_selection+tag_njets+tag_kbin+flav_tag, mt2wmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2bmin"+tag_selection                   +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2bmin"+tag_selection+tag_njets         +flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2bmin"+tag_selection+tag_njets+tag_kbin+flav_tag, mt2bmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2blmin"+tag_selection                   +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2blmin"+tag_selection+tag_njets         +flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_mt2blmin"+tag_selection+tag_njets+tag_kbin+flav_tag, mt2blmin_ , evtweight, h_1d, 100, 0., 500);
+  plot1D("h_cr1_chi2minprob"+tag_selection                   +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr1_chi2minprob"+tag_selection+tag_njets         +flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
+  plot1D("h_cr1_chi2minprob"+tag_selection+tag_njets+tag_kbin+flav_tag, chi2minprob_ , evtweight, h_1d, 100, 0., 1);
 
   //MT
   //binning for mT plots
@@ -1356,18 +1378,18 @@ void StopTreeLooper::makeZPlots( float evtweight, std::map<std::string, TH1F*> &
   plot1D("h_z_mt"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_z_mt"+tag_selection+tag_njets+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
 
-  // if ( stopt.npfjets30_<1 ) return;
-  // plot1D("h_z_j1pt" +tag_selection+flav_tag, min(stopt.pfjet1().Pt(), (float)399.99), evtweight, h_1d, 20, 30., 400.);
-  // plot1D("h_z_j1eta"+tag_selection+flav_tag, stopt.pfjet1().Eta(), evtweight, h_1d, 24, -2.4, 2.4);
-  // if ( stopt.npfjets30_<2 ) return;
-  // plot1D("h_z_j2pt" +tag_selection+flav_tag, min(stopt.pfjet2().Pt(), (float)299.99), evtweight, h_1d, 20, 30., 300.);
-  // plot1D("h_z_j2eta"+tag_selection+flav_tag, stopt.pfjet2().Eta(), evtweight, h_1d, 24, -2.4, 2.4);
-  // if ( stopt.npfjets30_<3 ) return;
-  // plot1D("h_z_j3pt" +tag_selection+flav_tag, min(stopt.pfjet3().Pt(), (float)199.99), evtweight, h_1d, 20, 30., 200.);
-  // plot1D("h_z_j3eta"+tag_selection+flav_tag, stopt.pfjet3().Eta(), evtweight, h_1d, 24, -2.4, 2.4);
-  // if ( stopt.npfjets30_<4 ) return;
-  // plot1D("h_z_j4pt" +tag_selection+flav_tag, min(stopt.pfjet4().Pt(), (float)119.99), evtweight, h_1d, 20, 30., 120.);
-  // plot1D("h_z_j4eta"+tag_selection+flav_tag, stopt.pfjet4().Eta(), evtweight, h_1d, 24, -2.4, 2.4);
+  if ( n_jets<1 ) return;
+  plot1D("h_z_j1pt" +tag_selection+flav_tag, min(jets.at(0).Pt(), (float)399.99), evtweight, h_1d, 20, 30., 400.);
+  plot1D("h_z_j1eta"+tag_selection+flav_tag, jets.at(0).Eta(), evtweight, h_1d, 24, -2.4, 2.4);
+  if ( n_jets<2 ) return;
+  plot1D("h_z_j2pt" +tag_selection+flav_tag, min(jets.at(1).Pt(), (float)299.99), evtweight, h_1d, 20, 30., 300.);
+  plot1D("h_z_j2eta"+tag_selection+flav_tag, jets.at(1).Eta(), evtweight, h_1d, 24, -2.4, 2.4);
+  if ( n_jets<3 ) return;
+  plot1D("h_z_j3pt" +tag_selection+flav_tag, min(jets.at(2).Pt(), (float)199.99), evtweight, h_1d, 20, 30., 200.);
+  plot1D("h_z_j3eta"+tag_selection+flav_tag, jets.at(2).Eta(), evtweight, h_1d, 24, -2.4, 2.4);
+  if ( n_jets<4 ) return;
+  plot1D("h_z_j4pt" +tag_selection+flav_tag, min(jets.at(3).Pt(), (float)119.99), evtweight, h_1d, 20, 30., 120.);
+  plot1D("h_z_j4eta"+tag_selection+flav_tag, jets.at(3).Eta(), evtweight, h_1d, 24, -2.4, 2.4);
   
 }
 
