@@ -143,6 +143,36 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id) {
 }
 
 
+//--------------------------------------------------------------------
+
+std::set<DorkyEventIdentifier> events_hcallasercalib; 
+int load_badhcallaserevents  () {
+
+  ifstream in;
+  in.open("../Core/badhcallaser_events.txt");
+
+   int run, event, lumi;
+   int nlines = 0;
+
+   while (1) {
+      in >> run >> event >> lumi;
+      if (!in.good()) break;
+      nlines++;
+      DorkyEventIdentifier id = {run, event, lumi };
+      events_hcallasercalib.insert(id);
+   }
+   printf(" found %d bad events \n",nlines);
+
+   in.close();
+
+   return 0;
+
+}
+
+bool is_badHcalLaserEvent (const DorkyEventIdentifier &id) {
+  if (events_hcallasercalib.find(id) != events_hcallasercalib.end()) return true;
+  return false;
+}
 
 //--------------------------------------------------------------------
 
@@ -157,6 +187,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   printf("[StopTreeLooper::loop] %s\n", name.Data());
 
   load_badlaserevents();
+  load_badhcallaserevents();
 
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
@@ -267,6 +298,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         }
 	if (is_badLaserEvent(id) ){
 	  //std::cout<< "Removed bad laser calibration event:" << stopt.run() << "   " << stopt.event() <<"\n";
+	  continue;
+	}
+	if (is_badHcalLaserEvent(id) ){
+	  std::cout<< "Removed bad hcal laser calibration event:" << stopt.run() << "   " << stopt.event() <<"\n";
 	  continue;
 	}
       } 
