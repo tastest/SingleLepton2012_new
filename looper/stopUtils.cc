@@ -447,7 +447,27 @@ int isGenQGLMatched ( LorentzVector p4, float dR ) {
 }
 
 //--------------------------------------------------------------------                                                                                                                                               
+unsigned int indexGenJet ( LorentzVector p4, float genminpt) {
 
+  //return dR to closest gen-jet with pT > genminpt                                                                                                                                                                  
+  float mindeltaR = 9999.;
+  unsigned int min_igen = -1;
+
+  for (unsigned int igen = 0; igen < genjets_p4().size(); igen++) {
+    LorentzVector vgenj = genjets_p4().at(igen);
+    if ( vgenj.Pt() < genminpt ) continue;
+    float deltaR = ROOT::Math::VectorUtil::DeltaR( p4 , vgenj );
+    if ( deltaR< mindeltaR ) {
+      mindeltaR = deltaR;
+      min_igen = igen;
+    }
+  }
+
+  return min_igen;
+
+}
+
+//--------------------------------------------------------------------                                                                                                                                               
 float dRGenJet ( LorentzVector p4, float genminpt) {
 
   //return dR to closest gen-jet with pT > genminpt                                                                                                                                                                  

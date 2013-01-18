@@ -21,9 +21,11 @@
 #include "TRandom3.h"
 #include "Math/LorentzVector.h"
 
+/*
 #include "../CORE/MT2/MT2Utility.h"
 #include "mt2w_bisect.h"
 #include "mt2bl_bisect.h"
+*/
 #include "../CORE/CMS2.h"
 #include "../CORE/utilities.h"
 #include "../CORE/ssSelections.h"
@@ -53,6 +55,7 @@ using namespace std;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
 //typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
 typedef map<unsigned int, unsigned int> m_uiui;
+
 
 struct indP4{
   LorentzVector p4obj;
@@ -125,6 +128,8 @@ bool isGenBMatched ( LorentzVector p4, float dR );
 int isGenQGMatched ( LorentzVector p4, float dR );
 
 int isGenQGLMatched ( LorentzVector p4, float dR );
+
+unsigned int indexGenJet ( LorentzVector p4, float genminpt=20.) ;
 
 float dRGenJet ( LorentzVector p4, float genminpt=20. );
 

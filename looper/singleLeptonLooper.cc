@@ -7,7 +7,6 @@
 #include "../Tools/vtxreweight.h"
 #include "../Tools/msugraCrossSection.h"
 #include "BtagFuncs.h"
-//#include "../Tools/bTagEff_BTV.h"
 
 //#include "stopUtils.h"
 
@@ -105,6 +104,14 @@ void singleLeptonLooper::InitBaby(){
   nbtagscsvlcorr_   = 0;
   nbtagscsvmcorr_   = 0;
   nbtagscsvtcorr_   = 0;
+
+  // chi2 and MT2
+  chi2min_=-1.;
+  chi2minprob_=-1.;
+
+  mt2bmin_=-1.;
+  mt2blmin_=-1.;
+  mt2wmin_=-1.;
 
   // njets with JEC variation
   njetsUp_	= 0;
@@ -257,18 +264,26 @@ void singleLeptonLooper::InitBaby(){
   pfcand10_       = 0;
   pfcanddir10_       = 0;
   pfcandveto10_       = 0;
+  pfcandOS10_       = 0;
+
   pfcandid5_       =-1; 
   pfcandid10_      =-1;
   pfcanddirid10_      =-1;
   pfcandvetoid10_      =-1;
+  pfcandidOS10_      =-1;
+
   pfcandiso5_     = 9999.;     
   pfcandiso10_    = 9999.;     
   pfcanddiriso10_    = 9999.;     
   pfcandvetoiso10_    = 9999.;     
+  pfcandisoOS10_    = 9999.;     
+
   pfcandpt5_      = 9999.;
   pfcandpt10_     = 9999.;
   pfcanddirpt10_     = 9999.;
   pfcandvetopt10_     = 9999.;
+  pfcandptOS10_     = 9999.;
+
   pfcandmindrj5_  = 9999.;
   pfcandmindrj10_ = 9999.;
   pfcanddirmindrj10_ = 9999.;
@@ -370,9 +385,11 @@ void singleLeptonLooper::InitBaby(){
 
   //clear vectors
   pfjets_.clear();
+  pfjets_genJet_.clear();
   pfjets_csv_.clear();
   pfjets_corr_.clear();
   pfjets_mc3_.clear();
+  pfjets_lrm_.clear();
   pfjets_qgtag_.clear();
   pfjets_genJetDr_.clear();
   pfjets_sigma_.clear();
@@ -539,320 +556,6 @@ float getMuTriggerWeightNew( float pt, float eta ) {
 
   return 1;
 }
-
-//--------------------------------------------------------------------
-
-bool compare_candidates( Candidate x, Candidate y ){
-  return x.chi2 < y.chi2;
-}
-
-double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
-{
-    if (verbose) {
-        printf("c1: %4.2f\n", c1);
-        printf("m12: %4.2f\n", m12);
-        printf("m22: %4.2f\n", m22);
-        printf("m02: %4.2f\n", m02);
-    }
-
-    double a = m22;
-    double b = (m02 - m12 - m22) * c1;
-    double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
-
-    if (verbose) {
-        printf("a: %4.2f\n", a);
-        printf("b: %4.2f\n", b);
-        printf("c: %4.2f\n", c);
-    }
-
-    double num = -1. * b + sqrt(b * b - 4 * a * c);
-    double den = 2 * a;
-
-    if (verbose) {
-        printf("num: %4.2f\n", num);
-        printf("den: %4.2f\n", den);
-        printf("num/den: %4.2f\n", num/den);
-    }
-
-    return (num/den);
-}
-
-
-double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
-              double m12, double m22, double m02){
-    double rat1 = pt1 * (1 - c1) / sigma1;
-    double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
-
-    return ( rat1 * rat1 + rat2 * rat2);
-}
-
-//void StopSelector::minuitFunction(int& npar, double *gout, double &result, double par[], int flg)
-void minuitFunction(int&, double* , double &result, double par[], int){
-  result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
-}
-
-
-/* Reconstruct the hadronic top candidates, select the best candidate and
- * store the chi2 =  (m_jj - m_W)^2/sigma_m_jj + (m_jjj - m_t)^2/sigma_m_jjj
- * return the number of candidates found.
- *
- * n_jets - number of jets.
- * jets - jets
- * btag - b-tagging information of the jets
- * mc - qgjet montecarlo match number for the jets
- * 
- * returns a list of candidates sorted by chi2 ( if __sort = true in .h );
-*/ 
-
-
-
-list<Candidate> recoHadronicTop(std::vector<float> sigma_jets, bool isData,
-                                 LorentzVector* lep, double met, double metphi,
-                                 VofP4 jets, std::vector<float> btag){
-
-  assert( jets.size() == btag.size() );
-  assert( jets.size() == sigma_jets.size() );
-
-  float metx = met * cos( metphi );
-  float mety = met * sin( metphi );
-
-  int n_jets = jets.size();
-
-  if ( isData )
-    for (int i=0; i<n_jets; ++i)
-      sigma_jets[i] *= getDataMCRatio(jets[i].eta());
-
-  
-  vector<int> mc;
-
-  if (!isData) {
-  for (unsigned int i=0; i<jets.size(); i++)
-    mc.push_back( isGenQGMatched( jets.at(i), 0.4 ) );
-  }
-
-  int ibl[5];
-  int iw1[5];
-  int iw2[5];
-  int ib[5];
-
-  if ( !isData ){
-     
-     // Matching MC algoritm search over all conbinations  until the 
-     // right combination is found. More than one candidate is suported 
-     //  but later only the first is used.
-     // 
-    int match = 0;
-    for (int jbl=0; jbl<n_jets; ++jbl )
-      for (int jb=0; jb<n_jets; ++jb )
-        for (int jw1=0; jw1<n_jets; ++jw1 )
-          for (int jw2=jw1+1; jw2<n_jets; ++jw2 )
-            if ( (mc.at(jw2)==2 && mc.at(jw1)==2 && mc.at(jb)==1 && mc.at(jbl)==-1) ||
-                 (mc.at(jw2)==-2 && mc.at(jw1)==-2 && mc.at(jb)==-1 && mc.at(jbl)==1) ) {
-	      if ( match == 5 ) break;
-	      ibl[match] = jbl;
-	      iw1[match] = jw1;
-	      iw2[match] = jw2;
-	      ib[match] = jb;
-	      match++;
-            }
-  }
-  
-////////    * Combinatorics. j_1 Pt must be > PTMIN_W1 and so on.
-  
-  vector<int> v_i, v_j;
-  vector<double> v_k1, v_k2;
-  for ( int i=0; i<n_jets; ++i )
-    for ( int j=i+1; j<n_jets; ++j ){
-      double pt_w1 = jets[i].Pt();
-      double pt_w2 = jets[j].Pt();
-      if (pt_w1 < PTMIN_J1  || pt_w2 < PTMIN_J2)
-        continue;
-
-      //
-      //  W
-      //
-      LorentzVector hadW = jets[i] + jets[j];
-
-      //
-      //  W Mass Constraint.
-      //
-      TFitter *minimizer = new TFitter();
-      double p1 = -1;
-
-      minimizer->ExecuteCommand("SET PRINTOUT", &p1, 1);
-      minimizer->SetFCN(minuitFunction);
-      minimizer->SetParameter(0 , "c1"     , 1.1             , 1 , 0 , 0);
-      minimizer->SetParameter(1 , "pt1"    , 1.0             , 1 , 0 , 0);
-      minimizer->SetParameter(2 , "sigma1" , sigma_jets[i]   , 1 , 0 , 0);
-      minimizer->SetParameter(3 , "pt2"    , 1.0             , 1 , 0 , 0);
-      minimizer->SetParameter(4 , "sigma2" , sigma_jets[j]   , 1 , 0 , 0);
-      minimizer->SetParameter(5 , "m12"    , jets[i].mass2() , 1 , 0 , 0);
-      minimizer->SetParameter(6 , "m22"    , jets[j].mass2() , 1 , 0 , 0);
-      minimizer->SetParameter(7 , "m02"    , hadW.mass2()    , 1 , 0 , 0);
-
-      for (unsigned int k = 1; k < 8; k++)
-        minimizer->FixParameter(k);
-
-      minimizer->ExecuteCommand("SIMPLEX", 0, 0);
-      minimizer->ExecuteCommand("MIGRAD", 0, 0);
-
-      double c1 = minimizer->GetParameter(0);
-      if (c1!=c1) {
-	cout<<"[recoHadronicTop] ERROR: c1 parameter is NAN! Skipping this parton combination: "
-	    <<"run: "<<evt_run()
-	    <<" lumi: "<<evt_lumiBlock()
-	    <<" event: "<<evt_event();  
-	for (int i=0; i<(int)jets.size(); ++i) 
-	  if (jets[i].mass2()<0.001) 
-	    cout<<". Found jet "<<i
-		<<" with mass2 "<<jets[i].mass2()
-		<<"!!!"
-		<<endl;
-	continue;
-      }
-
-      double c2 = fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2());
-                
-      delete minimizer;
-
-     
-  //     * W Mass check :)
-  //     *  Never trust a computer you can't throw out a window. 
- //      *  - Steve Wozniak 
-
-//      cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = " 
-//           << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
-      
-      v_i.push_back(i);
-      v_j.push_back(j);
-      v_k1.push_back(c1);
-      v_k2.push_back(c2);
-    }
-
-
-  list<Candidate> chi2candidates;
-        
-  mt2_bisect::mt2 mt2_event;
-  mt2bl_bisect::mt2bl mt2bl_event;
-  mt2w_bisect::mt2w mt2w_event;
-  
-  for ( int b=0; b<n_jets; ++b )
-    for (int o=0; o<n_jets; ++o){
-      if ( b == o )
-        continue;
-
-      if ( btag[b] < BTAG_MIN && btag[o] < BTAG_MIN )
-        continue;
-
-      double pt_b = jets[b].Pt();
-      if ( btag[b] >= BTAG_MIN && pt_b < PTMIN_BTAG )
-        continue;
-
-      if ( btag[b] < BTAG_MIN && pt_b < PTMIN_B )
-        continue;
-
-      double pt_o = jets[o].Pt();
-      if ( btag[o] >= BTAG_MIN && pt_o < PTMIN_OTAG )
-        continue;
-
-      if ( btag[o] < BTAG_MIN && pt_o < PTMIN_O)
-        continue;
-
-      ///
-      //  MT2 Variables
-      ///
-
-      double pl[4];     // Visible lepton
-      double pb1[4];    // bottom on the same side as the visible lepton
-      double pb2[4];    // other bottom, paired with the invisible W
-      double pmiss[3];  // <unused>, pmx, pmy   missing pT
-      pl[0]= lep->E(); pl[1]= lep->Px(); pl[2]= lep->Py(); pl[3]= lep->Pz();
-      pb1[1] = jets[o].Px();  pb1[2] = jets[o].Py();   pb1[3] = jets[o].Pz();
-      pb2[1] = jets[b].Px();  pb2[2] = jets[b].Py();   pb2[3] = jets[b].Pz();
-      pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
-
-      double pmiss_lep[3];
-      pmiss_lep[0] = 0.;
-      pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
-
-      pb1[0] = jets[o].mass();
-      pb2[0] = jets[b].mass();
-      mt2_event.set_momenta( pb1, pb2, pmiss_lep );
-      mt2_event.set_mn( 80.385 );   // Invisible particle mass
-      double c_mt2b = mt2_event.get_mt2();
-
-      pb1[0] = jets[o].E();
-      pb2[0] = jets[b].E();
-      mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
-      double c_mt2bl = mt2bl_event.get_mt2bl();
-
-      mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
-      double c_mt2w = mt2w_event.get_mt2w();
-
-//      cout << b << ":"<< btag[b] << " - " << o << ":" << btag[o] << " = " << c_mt2w << endl;
-
-      for (unsigned int w = 0; w < v_i.size() ; ++w ){
-        int i = v_i[w];
-        int j = v_j[w];
-        if ( i==o || i==b || j==o || j==b )
-            continue;
-
-        double pt_w1 = jets[i].Pt();
-        double pt_w2 = jets[j].Pt();
-
-	///
-	//  W Mass.
-	///
-	LorentzVector hadW = jets[i] + jets[j];
-	double massW = hadW.mass();
-
-	double c1 = v_k1[w];
-	double c2 = v_k2[w];
-
-	///
-	// Top Mass.
-	///
-        LorentzVector hadT = (jets[i] * c1) + (jets[j] * c2) + jets[b];
-        double massT = hadT.mass();
-
-        double pt_w = hadW.Pt();
-        double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
-                        + pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
-        double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
-        double pt_t = hadT.Pt();
-        double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
-                        + c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
-                        + pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
-        double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
-
-        double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
-                      + (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
-
-        bool c_match = ( !isData &&  iw1[0]==i && iw2[0]==j && ib[0]==b && ibl[0]==o );
-
-        Candidate c;
-        c.chi2  = c_chi2;
-        c.mt2b  = c_mt2b;
-        c.mt2w  = c_mt2w;
-        c.mt2bl = c_mt2bl;
-        c.j1 = i;
-        c.j2 = j;
-        c.bi = b;
-        c.oi = o;
-        c.k1 = c1;
-        c.k2 = c2;
-        c.match = c_match;
-
-        chi2candidates.push_back(c);
-      }
-    }
-
-   if (__SORT) 
-     chi2candidates.sort(compare_candidates);
-
-   return chi2candidates;
-}
-
 
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
@@ -2089,7 +1792,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  mindz=gsftrks_dz_pv(itrk,0).first;
 	}
 
-      
 	//store loose definition to compare with previous results
 	float iso = myTrackIso.iso_dr03_dz020_pt00 / pfcands_p4().at(ipf).pt();
 
@@ -2167,8 +1869,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	if( pfcands_p4().at(ipf).pt() < 10  ) continue;
 
-	/// this is the default case Track with dz<0.05 ; pt>10 ; notLeadingLepton
+	/// this is with the OS requirement
 
+	float charge=(pfcands_particleId().at(ipf)*id1_);
+	// charge < 0 is a SS
+	// charge > 0 is a OS
+
+	if( iso < pfcandisoOS10_ && charge>0){
+	  pfcandisoOS10_ = iso;
+	  pfcandptOS10_ = pfcands_p4().at(ipf).pt();
+	  pfcandOS10_ = &pfcands_p4().at(ipf);
+	  pfcandidOS10_ =  pfcands_particleId().at(ipf);
+	}
+
+	/// this is the default case Track with dz<0.05 ; pt>10 ; notLeadingLepton
 	if( iso < pfcandiso10_ ){
 	  pfcandiso10_ = iso;
 	  pfcandpt10_ = pfcands_p4().at(ipf).pt();
@@ -2329,15 +2043,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float maxjetpt  = -1.;
       float ht_ = 0.;
 
-      VofP4 vpfjets_p4;
-      vpfjets_p4.clear();
       VofP4 vpfrawjets_p4;
       vpfrawjets_p4.clear();
       VofiP4 vipfjets_p4;
       vipfjets_p4.clear();
       
-      vector<float> vpfjets_csv;
-      vector<float> vpfjets_sigma;
       vector<float> fullcors;
       vector<float> l2l3cors;
       vector<float> rescors;
@@ -2346,8 +2056,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       l2l3cors.clear();
       rescors.clear();
       l1cors.clear();
-      vpfjets_csv.clear();
-      vpfjets_sigma.clear();
 
       rhovor_ = evt_ww_rho_vor();
 
@@ -2428,7 +2136,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// PFJetID
 	if( !passesPFJetID(ijet) ){
 	  jetid_ = 0;
-	  if( vjet.pt() > 30 && fabs( vjet.eta() ) < 2.5 ) jetid30_ = 0;
+	  if( vjet.pt() > 30 && fabs( vjet.eta() ) < 2.4 ) jetid30_ = 0;
 	  continue;
 	}
  
@@ -2468,28 +2176,23 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if( vjet.pt() > 20 && fabs( vjet.eta() ) < 4.7 ){
 	  vipfjets_p4.push_back( ivjet );
 
-	  // the following 2 vectors are passed to the recoHadronicTop function
-	  vpfjets_p4.push_back(vjet); 
-	  vpfjets_csv.push_back(pfjets_combinedSecondaryVertexBJetTag().at(ijet));
-	  vpfjets_sigma.push_back(getJetResolution(pfjets_p4().at(ijet), jetSmearer ));
-
 	}
 
 	// njets JEC up
-	if( vjetUp.pt() > 30. && fabs( vjetUp.eta() ) < 2.5 ){
+	if( vjetUp.pt() > 30. && fabs( vjetUp.eta() ) < 2.4 ){
 	  njetsUp_++;
 	  htUp_ += vjetUp.pt();
 	}
 
 	// njets JEC down
-	if( vjetDown.pt() > 30. && fabs( vjetDown.eta() ) < 2.5 ){
+	if( vjetDown.pt() > 30. && fabs( vjetDown.eta() ) < 2.4 ){
 	  njetsDown_++;
 	  htDown_ += vjetDown.pt();
 	}
 
 	// njets: L1FastL2L3Residual, pt > 30 GeV
 	if(       vjet.pt()    < 30. )           continue;
-	if( fabs( vjet.eta() ) > 2.5 )           continue;
+	if( fabs( vjet.eta() ) > 2.4 )           continue;
 
 	htpf30_ += vjet.pt();
         npfjets30_ ++;
@@ -2717,6 +2420,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	t1metphicorrlepphi_ = atan2( mety , metx );
       }
 
+      //--------------------------------
+      // Store vector of jets
+      //--------------------------------
+
       // store L1FastL2L3Residual pfjets
       // check if jet is b-tagged
       //      sort(vpfjets_p4.begin(), vpfjets_p4.end(), sortByPt);
@@ -2726,19 +2433,27 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
+	pfjets_lrm_.push_back(getLRM(vipfjets_p4.at(i).p4ind));
+
+	//	cout << "lrm " << getLRM(vipfjets_p4.at(i).p4ind) << endl;
 
 	pfjets_corr_.push_back(vipfjets_p4.at(i).p4obj.pt()/pfjets_p4().at(vipfjets_p4.at(i).p4ind).pt());
 	pfjets_sigma_.push_back( getJetResolution(vipfjets_p4.at(i).p4obj, jetSmearer ) );
 
 	if( isData ){
+
 	  pfjets_mc3_.push_back( -1 );
 	  pfjets_genJetDr_.push_back( -1.0 );
 	  pfjets_lepjet_.push_back( -1 );
+
 	}
 	else{
+
 	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
+	  pfjets_genJet_.push_back(genjets_p4().at(indexGenJet(vipfjets_p4.at(i).p4obj)));
+
 	}
 
 	//beta variables
@@ -2777,8 +2492,37 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	dphijm_ = acos(cos(vjet.phi()-evt_pfmetPhi()));
       }
 
-      emjet10_     = -1;
-      emjet20_     = -1;
+      //--------------------------------
+      // Hadronic Top and MT2
+      //--------------------------------
+
+      vector<LorentzVector> jets;
+      vector<float> sigma_jets;
+
+      int n_jets = pfjets_.size();
+      double sigma[n_jets];
+
+      for( unsigned int i = 0 ; i < n_jets ; ++i ){
+
+	jets.push_back( pfjets_.at(i));
+
+	sigma[i] = pfjets_sigma_.at(i);
+        if ( isData ) sigma[i] *= getDataMCRatio(jets[i].eta());
+	sigma_jets.push_back(sigma[i]);
+
+      } 
+
+      // get list of candidates
+      PartonCombinatorics pc (jets , pfjets_csv_, sigma_jets, pfjets_mc3_, *lep1_, t1metphicorr_, t1metphicorrphi_, isData);
+      MT2CHI2 mc = pc.getMt2Chi2();
+
+      // chi2 and MT2 variables
+      chi2min_= mc.one_chi2;               // minimum chi2 
+      chi2minprob_= TMath::Prob(chi2min_,1);   // probability of minimum chi2
+
+      mt2bmin_= mc.three_mt2b;             // minimum MT2b
+      mt2blmin_= mc.three_mt2bl;            // minimum MT2bl
+      mt2wmin_= mc.three_mt2w;             // minimum MT2w
 
       //--------------------------------
       // get non-isolated leptons
@@ -2877,7 +2621,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  if( rejectJet ) continue;
 	    
 	  if( vgjet.pt() < 30.                   )  continue;
-	  if( fabs( vgjet.eta() ) > 2.5          )  continue;
+	  if( fabs( vgjet.eta() ) > 2.4          )  continue;
 	    
 	  ngenjets_++;
 	  htgen_ += vgjet.pt();
@@ -3259,22 +3003,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       sltrigweight_ = isData ? 1. : getsltrigweight( id1_, lep1_->pt() , lep1_->eta() );
       dltrigweight_ = (!isData && ngoodlep_>1) ? getdltrigweight( id1_, id2_ ) : 1.;
     
-
       /// hadronic stop reconstruction
-      candidates_.clear(); 
+      //      candidates_.clear(); 
 
-      // OLD: used uncorrected jets
-      // list<Candidate> candidates = recoHadronicTop(jetSmearer, isData, lep1_,
-      //                   t1metphicorr_, t1metphicorrphi_,
-      //                   vpfrawjets_p4, pfjets_combinedSecondaryVertexBJetTag());
-
-      // NEW: use corrected jets and corresponding CSV values
-      list<Candidate> candidates = recoHadronicTop(vpfjets_sigma, isData, lep1_,
-                        t1metphicorr_, t1metphicorrphi_,
-                        vpfjets_p4, vpfjets_csv);
-
-      for (list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); ++it)
-          candidates_.push_back(*it);
+      //      for (list<Candidate>::iterator it = candidates.begin(); it != candidates.end(); ++it)
+      //          candidates_.push_back(*it);
 
       jets_.clear();
       btag_.clear();
@@ -3548,6 +3281,13 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t1metphicorrphi_off" , &t1metphicorrphi_off_ , "t1metphicorrphi_off/F");
   outTree->Branch("t1metphicorrmt_off"  , &t1metphicorrmt_off_  , "t1metphicorrmt_off/F");
 
+  // MT2 and CHI2
+  outTree->Branch("mt2bmin"           , &mt2bmin_           , "mt2bmin/F");
+  outTree->Branch("mt2blmin"          , &mt2blmin_          , "mt2blmin/F");
+  outTree->Branch("mt2wmin"           , &mt2wmin_           , "mt2wmin/F");
+  outTree->Branch("chi2min"           , &chi2min_           , "chi2min/F");
+  outTree->Branch("chi2minprob"       , &chi2minprob_       , "chi2minprob/F");
+
   // btag variables		      
   outTree->Branch("nbtagsssv",        &nbtagsssv_,        "nbtagsssv/I");
   outTree->Branch("nbtagstcl",        &nbtagstcl_,        "nbtagstcl/I");
@@ -3712,6 +3452,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcandpt10",       &pfcandpt10_,       "pfcandpt10/F");  
   outTree->Branch("pfcandmindrj10",   &pfcandmindrj10_,   "pfcandmindrj10/F");  
 
+  outTree->Branch("pfcandidOS10",       &pfcandidOS10_,       "pfcandidOS10/I");
+  outTree->Branch("pfcandisoOS10",      &pfcandisoOS10_,      "pfcandisoOS10/F");  
+  outTree->Branch("pfcandptOS10",       &pfcandptOS10_,       "pfcandptOS10/F");  
+
   outTree->Branch("pfcanddirid10",       &pfcanddirid10_,       "pfcanddirid10/I");
   outTree->Branch("pfcanddiriso10",      &pfcanddiriso10_,      "pfcanddiriso10/F");  
   outTree->Branch("pfcanddirpt10",       &pfcanddirpt10_,       "pfcanddirpt10/F");  
@@ -3827,12 +3571,14 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("lep_t_id",            &lep_t_id_,            "lep_t_id/I");  
   outTree->Branch("lep_tbar_id",         &lep_tbar_id_,         "lep_tbar_id/I");  
 
-  outTree->Branch("candidates", "std::vector<Candidate>", &candidates_);
-  outTree->Branch("jets", "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &jets_ );
-  outTree->Branch("btag", "std::vector<float>", &btag_ );
+  //  outTree->Branch("candidates", "std::vector<Candidate>", &candidates_);
+  //  outTree->Branch("jets", "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &jets_ );
+  //  outTree->Branch("btag", "std::vector<float>", &btag_ );
 
   outTree->Branch("pfjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_ );
+  outTree->Branch("pfjets_genJet_"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_genJet_ );
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
+  outTree->Branch("pfjets_lrm", "std::vector<float>", &pfjets_lrm_ );
  
   outTree->Branch("pfjets_beta",      "std::vector<float>", &pfjets_beta_      );
   outTree->Branch("pfjets_beta2",     "std::vector<float>", &pfjets_beta2_     );
@@ -3847,6 +3593,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
   outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
   outTree->Branch("pfjets_qgtag",   "std::vector<float>", &pfjets_qgtag_    );
+  outTree->Branch("pfjets_lrm",   "std::vector<float>", &pfjets_lrm_    );
   outTree->Branch("pfjets_sigma",   "std::vector<float>", &pfjets_sigma_    );
   outTree->Branch("pfjets_lepjet",  "std::vector<int>"  , &pfjets_lepjet_   );
 

@@ -10,7 +10,7 @@ ifeq ($(shell root-config --platform),macosx)
 	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector
 endif
 
-SOURCES = singleLeptonLooper.cc mt2w_bisect.cc mt2bl_bisect.cc ../CORE/MT2/MT2Utility.cc stopUtils.cc
+SOURCES = singleLeptonLooper.cc ../macros/Core/PartonCombinatorics.cc ../macros/Core/mt2w_bisect.cc ../macros/Core/mt2bl_bisect.cc ../macros/Core/MT2Utility.cc  stopUtils.cc
 OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libsingleLeptonLooper.so
 

@@ -2,7 +2,6 @@
 #define singleLeptonLooper_h
 
 #include "TFitter.h"
-#include "Candidate.h"
 
 #include <vector>
 #include <list>
@@ -12,6 +11,23 @@
 #include "Math/PxPyPzE4D.h"
 
 #include "stopUtils.h"
+
+#include "../macros/Core/MT2Utility.h"
+#include "../macros/Core/mt2bl_bisect.h"
+#include "../macros/Core/mt2w_bisect.h"
+//#include "Candidate.h"                                                                                                                                                                 
+class Candidate : public TObject {
+ public:
+  float chi2, mt2w, mt2bl, mt2b;
+  int j1, j2, bi, oi;
+  float k1, k2;
+  bool match;
+
+  ClassDef(Candidate, 2)
+    };
+
+
+#include "../macros/Core/PartonCombinatorics.h"
 
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
 #include "../CORE/QuarkGluonTagger/QuarkGluonTagger.h"
@@ -190,14 +206,20 @@ class singleLeptonLooper
         Int_t pfcandid10_;     
         Int_t pfcanddirid10_;     
         Int_t pfcandvetoid10_;     
+        Int_t pfcandidOS10_;     
+
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
         Float_t pfcanddiriso10_;     
         Float_t pfcandvetoiso10_;     
+        Float_t pfcandisoOS10_;     
+
         Float_t pfcandpt5_;
         Float_t pfcandpt10_;
         Float_t pfcanddirpt10_;
         Float_t pfcandvetopt10_;
+        Float_t pfcandptOS10_;
+
         Float_t pfcandmindrj5_;
         Float_t pfcandmindrj10_;
         Float_t pfcanddirmindrj10_;
@@ -352,6 +374,7 @@ class singleLeptonLooper
         LorentzVector*  pfcand10_;
         LorentzVector*  pfcanddir10_;
         LorentzVector*  pfcandveto10_;
+        LorentzVector*  pfcandOS10_;
         LorentzVector*  lep1_;
         LorentzVector*  lep2_;
         LorentzVector*  trklep1_;
@@ -369,11 +392,12 @@ class singleLeptonLooper
 	LorentzVector*  mcnu_;
 	LorentzVector*  mclep_;
 
-        std::vector<Candidate>  candidates_;
+	//        std::vector<Candidate>  candidates_;
         VofP4 jets_;
-        std::vector<float> btag_;
+	std::vector<float> btag_;
 
         VofP4 pfjets_;
+        VofP4 pfjets_genJet_;
         std::vector<float> pfjets_csv_;
 	//jet corrections and ID
 	std::vector<float> pfjets_corr_;
@@ -381,6 +405,8 @@ class singleLeptonLooper
 	std::vector<int>   pfjets_mc3_;
 	//qg tagging
 	std::vector<float> pfjets_qgtag_;
+	//jet shape
+	std::vector<float> pfjets_lrm_;
 	//gen jet matching
 	std::vector<float> pfjets_genJetDr_;
 	//truth lepton matching
@@ -396,6 +422,14 @@ class singleLeptonLooper
         /* std::vector<float> pfjets_beta2_0p15_; */
         /* std::vector<float> pfjets_beta_0p2_;   */
         /* std::vector<float> pfjets_beta2_0p2_;  */
+
+	float chi2min_;
+	float chi2minprob_;
+
+	float mt2bmin_;
+	float mt2blmin_;
+	float mt2wmin_;
+
 
 	Int_t hyptype_;
 
