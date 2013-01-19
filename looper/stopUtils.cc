@@ -451,7 +451,7 @@ unsigned int indexGenJet ( LorentzVector p4, float genminpt) {
 
   //return dR to closest gen-jet with pT > genminpt                                                                                                                                                                  
   float mindeltaR = 9999.;
-  unsigned int min_igen = -1;
+  unsigned int min_igen = 9999.;
 
   for (unsigned int igen = 0; igen < genjets_p4().size(); igen++) {
     LorentzVector vgenj = genjets_p4().at(igen);
