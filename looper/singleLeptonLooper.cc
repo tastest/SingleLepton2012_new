@@ -2452,7 +2452,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
-	  pfjets_genJet_.push_back(genjets_p4().at(indexGenJet(vipfjets_p4.at(i).p4obj)));
+	  if(genjets_p4().size()>indexGenJet(vipfjets_p4.at(i).p4obj)) pfjets_genJet_.push_back(genjets_p4().at(indexGenJet(vipfjets_p4.at(i).p4obj)));
 
 	}
 
