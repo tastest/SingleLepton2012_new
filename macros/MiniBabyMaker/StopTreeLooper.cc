@@ -94,6 +94,39 @@ bool is_duplicate (const DorkyEventIdentifier &id) {
 
 //--------------------------------------------------------------------
 
+
+std::set<DorkyEventIdentifier> events_hcallasercalib; 
+int load_badhcallaserevents  () {
+
+  ifstream in;
+  in.open("../Core/badhcallaser_events.txt");
+
+  int run, event, lumi;
+  int nlines = 0;
+
+  while (1) {
+    in >> run >> event >> lumi;
+    if (!in.good()) break;
+    nlines++;
+    DorkyEventIdentifier id = {run, event, lumi };
+    events_hcallasercalib.insert(id);
+  }
+  printf(" found %d bad events \n",nlines);
+
+  in.close();
+
+  return 0;
+
+}
+
+bool is_badHcalLaserEvent (const DorkyEventIdentifier &id) {
+  if (events_hcallasercalib.find(id) != events_hcallasercalib.end()) return true;
+  return false;
+}
+
+
+//--------------------------------------------------------------------
+
 std::set<DorkyEventIdentifier> events_lasercalib; 
 int load_badlaserevents  () {
 
@@ -130,6 +163,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   printf("[StopTreeLooper::loop] %s\n", name.Data());
 
   load_badlaserevents  ();
+  load_badhcallaserevents();
+
 
   //---------------------------------
   // check for valid chain
@@ -246,6 +281,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  //std::cout<<"Removed bad laser calibration event:" << stopt.run() <<"   "<< stopt.event.() <<"\n";
 	  continue;
 	}
+	if (is_badHcalLaserEvent(id) ){
+	  std::cout<< "Removed bad hcal laser calibration event:" << stopt.run() << "   " << stopt.event() <<"\n";
+	  continue;
+	}
+
       }
 
       //------------------------------------------ 
@@ -513,7 +553,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.24 $";
+  string revision = "$Revision: 1.25 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
