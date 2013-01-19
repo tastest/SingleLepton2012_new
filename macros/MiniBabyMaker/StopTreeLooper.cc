@@ -358,12 +358,31 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       EventShape eventshapelm(jetLeptonMetVector);
 
       //------------------------------------------ 
+      // datasets bit
+      //------------------------------------------ 
+
+      bool dataset_1l=false;
+
+      if((isData) && name.Contains("muo") && (abs(stopt.id1()) == 13 ))  dataset_1l=true;
+      if((isData) && name.Contains("ele") && (abs(stopt.id1()) == 11 ))  dataset_1l=true;
+
+      if(!isData) dataset_1l=true;
+
+      bool dataset_CR4=false;
+
+      if((isData) && name.Contains("dimu") && (abs(stopt.id1()) == 13 ) && (abs(stopt.id2())==13) && (fabs( stopt.dilmass() - 91.) > 15.)) dataset_CR4=true;
+      if((isData) && name.Contains("diele") && (abs(stopt.id1()) == 11 ) && (abs(stopt.id2())==11) && (fabs( stopt.dilmass() - 91.) > 15.)) dataset_CR4=true;
+      if((isData) && name.Contains("mueg") && abs(stopt.id1()) != abs(stopt.id2())) dataset_CR4=true;
+
+      if(!isData) dataset_CR4=true;
+
+      //------------------------------------------ 
       // variables to add to baby
       //------------------------------------------ 
       
       initBaby(); // set all branches to -1
 
-      vector<int> indexBJets=getBJetIndex(0.679);
+      vector<int> indexBJets=getBJetIndex(0.679,-1,-1);
       if(indexBJets.size()>0) pt_b_ = myPfJets.at(indexBJets.at(0)).pt();
 
       int J1Index=leadingJetIndex( stopt.pfjets(), -1, -1);
@@ -372,10 +391,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       pt_J2_ = myPfJets.at(J2Index).pt();
 
       // which selections are passed
-      sig_        = ( passOneLeptonSelection(isData) && indexBJets.size()>=1 ) ? 1 : 0; // pass signal region preselection
-      cr1_        = ( passOneLeptonSelection(isData) && indexBJets.size()==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
-      cr4_        = ( passDileptonSelection(isData) && indexBJets.size()==1) ? 1 : 0; // pass CR4 (dilepton) control region preselection
-      cr5_        = ( passLepPlusIsoTrkSelection(isData) && indexBJets.size()==1) ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
+      sig_        = ( dataset_1l && passOneLeptonSelection(isData) && indexBJets.size()>=1 ) ? 1 : 0; // pass signal region preselection
+      cr1_        = ( dataset_1l && passOneLeptonSelection(isData) && indexBJets.size()==0 ) ? 1 : 0; // pass CR1 (b-veto) control region preselection
+      cr4_        = ( dataset_CR4 && passDileptonSelection(isData) && indexBJets.size()==1) ? 1 : 0; // pass CR4 (dilepton) control region preselection
+      cr5_        = ( dataset_1l && passLepPlusIsoTrkSelection(isData) && indexBJets.size()==1) ? 1 : 0; // pass CR1 (lepton+isotrack) control region preselection
 
       // kinematic variables
       met_        = stopt.t1metphicorr();       // MET (type1, MET-phi corrections)
@@ -494,7 +513,7 @@ void StopTreeLooper::makeTree(const char *prefix){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.23 $";
+  string revision = "$Revision: 1.24 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
