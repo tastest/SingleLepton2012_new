@@ -15,6 +15,14 @@
 #include <map>
 #include <list>
 
+#if not defined(__CINT__) || defined(__MAKECINT__)
+// needs to be included when makecint runs (ACLIC)
+#include "TMVA/Factory.h"
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#endif
+
+
 using namespace std;
 
 /* ------------------------------------------------------------------------- */
@@ -50,7 +58,7 @@ class StopTreeLooper {
         list<Candidate> recoHadronicTop(StopTree*, bool, bool);
         list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree);
 	void initBaby();
-	void makeTree(const char*);
+	void makeTree(const char*, TChain *chain);
 
         TTree  *outTree_;
         TFile  *outFile_;
@@ -145,6 +153,7 @@ class StopTreeLooper {
 	Float_t x_;
 
 	Float_t rand_;
+	Float_t bdt_;
 
     private:
 

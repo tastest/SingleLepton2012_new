@@ -1,6 +1,6 @@
 CC = g++
 ROOFITINCLUDE = $(shell scramv1 tool info roofitcore | grep INCLUDE | sed 's/^INCLUDE=/-I/')
-INCLUDE = -I../ -I./ $(ROOFITINCLUDE)
+INCLUDE = -I../ -I./ $(ROOFITINCLUDE )
 CFLAGS = -Wall -g -fPIC $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS) -DTOOLSLIB
 LINKER = g++
 
@@ -14,7 +14,7 @@ OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libStopTreeLooper.so
 
 $(LIB):	$(OBJECTS) 
-	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@  $(shell root-config --libs) -lMinuit
+	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@  $(shell root-config --libs) -lMinuit -lTMVA
 
 LinkDef_out.cxx: LinkDef.h StopTreeLooper.h  
 	rootcint -f $@ -c $(INCLUDE) StopTreeLooper.h  $<

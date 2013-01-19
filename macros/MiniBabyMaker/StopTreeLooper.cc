@@ -183,9 +183,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   gROOT->cd();
 
-  makeTree(name.Data());
+  makeTree(name.Data(), chain);
 
-  TH2F* h_nsig = new TH2F();
+  TH2F *h_nsig, *h_nsig25, *h_nsig75 ;
   
   if( name.Contains("T2") ){
     char* h_nsig_filename = "";
@@ -205,8 +205,33 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     if( f_nsig == 0 ) cout << "ERROR! didn't find file " << h_nsig_filename << endl;
 
     h_nsig = (TH2F*) f_nsig->Get("masses");
+
+    if( name.Contains("T2bw") ){
+      h_nsig25 = (TH2F*) f_nsig->Get("masses25");
+      h_nsig75 = (TH2F*) f_nsig->Get("masses75");
+    }
+    
+
   }
 
+      float apply_mva = true;
+      TMVA::Reader *reader;
+      if ( apply_mva ) {
+          reader = new TMVA::Reader( "!Color:!Silent" );
+          reader->AddVariable("met", &met_); 
+          reader->AddVariable("lep1pt", &lep1pt_); 
+          reader->AddVariable("chi2minprob", &chi2minprob_); 
+          reader->AddVariable("mt2wmin", &mt2wmin_); 
+          reader->AddVariable("htssm/(htosm+htssm)", &htratiom_); 
+          reader->AddVariable("dphimjmin", &dphimjmin_); 
+          reader->AddVariable("pt_b", &pt_b_); 
+
+          TString dir    = "/home/users/magania/stop/SingleLepton2012/MVA/weights/";
+          TString prefix = "classification_T2tt_8_BDT";
+
+          TString weightfile = dir + prefix + TString(".weights.xml");
+          reader->BookMVA( "BDT1" , weightfile );
+      } 
 
   // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
   // if( vtx_file == 0 ){
@@ -294,7 +319,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       float evtweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
 
-      if( name.Contains("T2") ) {
+      if( name.Contains("T2tt") ) {
 	int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
 	float nevents = h_nsig->GetBinContent(bin);
 	evtweight =  stopt.xsecsusy() * 1000.0 / nevents; 
@@ -302,6 +327,25 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	//cout << "mg " << tree->mg_ << " ml " << tree->ml_ << " bin " << bin << " nevents " << nevents << " xsec " << tree->xsecsusy_ << " weight " << evtweight << endl;
       }
 
+      if( name.Contains("T2bw") ) {
+        float nevents = 0;
+        if ( stopt.x() == 0.25 ){
+	   int bin = h_nsig25->FindBin(stopt.mg(),stopt.ml());
+   	   nevents = h_nsig25->GetBinContent(bin);
+        } else if ( stopt.x() == 0.50 ){
+	   int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
+   	   nevents = h_nsig->GetBinContent(bin);
+        } else if ( stopt.x() == 0.75 ){
+	   int bin = h_nsig75->FindBin(stopt.mg(),stopt.ml());
+   	   nevents = h_nsig75->GetBinContent(bin);
+        }
+
+        assert ( nevents > 0 );
+
+	evtweight =  stopt.xsecsusy() * 1000.0 / nevents; 
+
+//	cout << "mg " << stopt.mg() << " ml " << stopt.ml() << " x " << stopt.x() << " nevents " << nevents << " xsec " << stopt.xsecsusy() << " weight " << evtweight << endl;
+      }
 
       float trigweight   = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
       float trigweightdl = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
@@ -518,6 +562,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       rand_       = r.Uniform(0.0,1.0);
 
+      if ( apply_mva ) {
+          bdt_ = reader->EvaluateMVA( "BDT1" );
+      }
+
       // fill me up
       nEventsPass++;
       outTree_->Fill();
@@ -548,17 +596,19 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 // create the tree and set branch addresses
 //--------------------------------------------
 
-void StopTreeLooper::makeTree(const char *prefix){
+void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
 
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.25 $";
+  string revision = "$Revision: 1.26 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
 
-  outTree_ = new TTree("t","Tree");
+//  outTree_ = new TTree("t","Tree");
+
+  outTree_ = chain->CloneTree(0);
 
   outTree_->Branch("lep1pt"           ,        &lep1pt_          ,         "lep1pt/F"		);
   outTree_->Branch("lep1eta"          ,        &lep1eta_         ,         "lep1eta/F"		);
@@ -624,6 +674,8 @@ void StopTreeLooper::makeTree(const char *prefix){
   outTree_->Branch("pt_J1"            ,        &pt_J1_           ,         "pt_J1/F"            );
   outTree_->Branch("pt_J2"            ,        &pt_J2_           ,         "pt_J2/F"            );
   outTree_->Branch("rand"             ,        &rand_            ,         "rand/F"             );
+
+  outTree_->Branch("bdt"             ,        &bdt_            ,           "bdt/F"             );
 
 }
 
