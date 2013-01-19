@@ -122,8 +122,7 @@ TAG="V00-02-11_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWWJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_WWWJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWZNoGstarJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_WWZNoGstarJets
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WZZNoGstarJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_WZZNoGstarJets
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWGJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-3_slim/ ${TAG}_WWGJets
-
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WWGJets_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_WWGJets
 
 #
 # TTV
