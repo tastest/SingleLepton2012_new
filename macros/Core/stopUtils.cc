@@ -39,7 +39,7 @@ unsigned int getNJets(){
 
 }
 
-vector<int> getBJetIndex(double discr)
+vector<int> getBJetIndex(double discr, int iskip1, int iskip2)
 {
 
   vector<int> btagJets;
@@ -49,8 +49,14 @@ vector<int> getBJetIndex(double discr)
     if( stopt.pfjets().at(i).pt()<30 )  continue;
     if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
     if( stopt.pfjets_csv().at(i)      < discr   ) continue;
+
+    // skip these indices                                                                                                                                                                                  
+    if( i == iskip1 ) continue;
+    if( i == iskip2 ) continue;
+
     //    nbtags++;                                                                                                                                                        
     btagJets.push_back(i);
+
   }
 
   return btagJets;
@@ -414,6 +420,38 @@ bool passLepPlusIsoTrkSelection(bool isData)
   return true;
 
 }
+
+//-------------------------------------------
+// on-the-fly MET phi corrections
+//-------------------------------------------
+
+bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool pickMuE) 
+{
+  //single lepton plus iso trk selection for 8 TeV 53 analysis
+
+  //at least one lepton
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  //pass isolated track requirement
+  //unfortunately changed default value to 9999.
+  //////  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
+
+  bool foundIsoTrack_noEMU=(stopt.pfcandpt10() <9998. && (abs(stopt.pfcandid10())!=13 && abs(stopt.pfcandid10())!=11 ) && stopt.pfcandiso10() < 0.1); 
+  bool foundIsoTrack_EMU=(stopt.pfcandpt5() <9998. && (abs(stopt.pfcandid5())==13 || abs(stopt.pfcandid5())==11 ) && stopt.pfcandiso5() < 0.2); 
+
+  ///  if(foundIsoTrack_EMU) cout << "EMU " << foundIsoTrack_EMU << endl;
+  ///  if(foundIsoTrack_noEMU) cout << "noEMU " << foundIsoTrack_noEMU << endl;
+
+  bool muE=(pickMuE && foundIsoTrack_EMU );
+  bool noMuE=(!pickMuE && foundIsoTrack_noEMU);
+
+  if(muE) return true;
+  if(noMuE) return true;
+
+  return false;
+
+}
+
 
 //-------------------------------------------
 // on-the-fly MET phi corrections

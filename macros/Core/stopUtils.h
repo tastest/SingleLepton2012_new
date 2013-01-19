@@ -24,7 +24,7 @@ using namespace std;
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1, int iskip2);
 unsigned int getNJets();
-vector<int> getBJetIndex(double discr);
+vector<int> getBJetIndex(double discr, int iskip1, int iskip2);
 
 float getdltrigweight(int id1, int id2);
 float getsltrigweight(int id1, float pt, float eta);
@@ -37,6 +37,8 @@ bool passIsoTrkVeto_v2();
 bool passSingleLeptonSelection(bool isData);
 bool passDileptonSelection(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
+bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
+
 pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 
 float getDataMCRatio(float eta);
