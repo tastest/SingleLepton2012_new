@@ -26,9 +26,6 @@ class StopTreeLooper {
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
 
-	float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
-
-
     private:
 
 	string m_outfilename_;

@@ -31,6 +31,10 @@
 
 using namespace Stop;
 
+std::set<DorkyEventIdentifier> already_seen; 
+std::set<DorkyEventIdentifier> events_lasercalib; 
+std::set<DorkyEventIdentifier> events_hcallasercalib; 
+
 StopTreeLooper::StopTreeLooper()
 {
   m_outfilename_ = "histos.root";
@@ -50,111 +54,6 @@ void StopTreeLooper::setOutFileName(string filename)
   m_outfilename_ = filename;
 
 }
-//--------------------------------------------------------------------
-
-struct DorkyEventIdentifier {
-  // this is a workaround for not having unique event id's in MC
-  unsigned long int run, event,lumi;
-  bool operator < (const DorkyEventIdentifier &) const;
-  bool operator == (const DorkyEventIdentifier &) const;
-};
-
-//--------------------------------------------------------------------
-
-bool DorkyEventIdentifier::operator < (const DorkyEventIdentifier &other) const
-{
-  if (run != other.run)
-    return run < other.run;
-  if (event != other.event)
-    return event < other.event;
-  if(lumi != other.lumi)
-    return lumi < other.lumi;
-  return false;
-}
-
-//--------------------------------------------------------------------
-
-bool DorkyEventIdentifier::operator == (const DorkyEventIdentifier &other) const
-{
-  if (run != other.run)
-    return false;
-  if (event != other.event)
-    return false;
-  return true;
-}
-
-//--------------------------------------------------------------------
-
-std::set<DorkyEventIdentifier> already_seen; 
-bool is_duplicate (const DorkyEventIdentifier &id) {
-  std::pair<std::set<DorkyEventIdentifier>::const_iterator, bool> ret =
-    already_seen.insert(id);
-  return !ret.second;
-}
-
-//--------------------------------------------------------------------
-
-
-std::set<DorkyEventIdentifier> events_hcallasercalib; 
-int load_badhcallaserevents  () {
-
-  ifstream in;
-  in.open("../Core/badhcallaser_events.txt");
-
-  int run, event, lumi;
-  int nlines = 0;
-
-  while (1) {
-    in >> run >> event >> lumi;
-    if (!in.good()) break;
-    nlines++;
-    DorkyEventIdentifier id = {run, event, lumi };
-    events_hcallasercalib.insert(id);
-  }
-  printf(" found %d bad events \n",nlines);
-
-  in.close();
-
-  return 0;
-
-}
-
-bool is_badHcalLaserEvent (const DorkyEventIdentifier &id) {
-  if (events_hcallasercalib.find(id) != events_hcallasercalib.end()) return true;
-  return false;
-}
-
-
-//--------------------------------------------------------------------
-
-std::set<DorkyEventIdentifier> events_lasercalib; 
-int load_badlaserevents  () {
-
-  ifstream in;
-  in.open("../Core/badlaser_events.txt");
-
-  int run, event, lumi;
-  int nlines = 0;
-
-  while (1) {
-    in >> run >> event >> lumi;
-    if (!in.good()) break;
-    nlines++;
-    DorkyEventIdentifier id = {run, event, lumi };
-    events_lasercalib.insert(id);
-  }
-  printf(" found %d bad events \n",nlines);
-
-  in.close();
-
-  return 0;
-
-}
-
-bool is_badLaserEvent (const DorkyEventIdentifier &id) {
-  if (events_lasercalib.find(id) != events_lasercalib.end()) return true;
-  return false;
-}
 
 void StopTreeLooper::loop(TChain *chain, TString name)
 {
@@ -162,9 +61,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   printf("[StopTreeLooper::loop] %s\n", name.Data());
 
-  load_badlaserevents  ();
-  load_badhcallaserevents();
-
+  load_badlaserevents("../Core/badlaser_events.txt", events_lasercalib);
+  load_badlaserevents("../Core/badhcallaser_events.txt", events_hcallasercalib);
 
   //---------------------------------
   // check for valid chain
@@ -293,24 +191,23 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	//	i_permille_old = i_permille;
       }
 
-      //------------------------------------------ 
+      //---------------------
       // skip duplicates
-      //------------------------------------------ 
+      //---------------------
 
       if( isData ) {
         DorkyEventIdentifier id = {stopt.run(), stopt.event(), stopt.lumi() };
-        if (is_duplicate(id) ){
+        if (is_duplicate(id, already_seen) ){
           continue;
         }
-	if (is_badLaserEvent(id) ){
-	  //std::cout<<"Removed bad laser calibration event:" << stopt.run() <<"   "<< stopt.event.() <<"\n";
+	if (is_badLaserEvent(id,events_lasercalib) ){
+	  //std::cout<< "Removed bad laser calibration event:" << run << "   " << event<<"\n";
 	  continue;
 	}
-	if (is_badHcalLaserEvent(id) ){
-	  std::cout<< "Removed bad hcal laser calibration event:" << stopt.run() << "   " << stopt.event() <<"\n";
+	if (is_badLaserEvent(id,events_hcallasercalib) ){
+	  //std::cout<< "Removed bad hcal laser calibration event:" << run << "   " << event<<"\n";
 	  continue;
 	}
-
       }
 
       //------------------------------------------ 
@@ -601,7 +498,7 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.26 $";
+  string revision = "$Revision: 1.27 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();

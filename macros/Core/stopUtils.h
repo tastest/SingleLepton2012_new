@@ -47,6 +47,17 @@ float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
 float getdphi( float phi1 , float phi2 );
 float dRbetweenVectors(LorentzVector vec1,LorentzVector vec2 );
 float getMinDphi(float metPhi, LorentzVector vec1, LorentzVector vec2 );
+float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
 
+struct DorkyEventIdentifier {
+  // this is a workaround for not having unique event id's in MC
+  unsigned long int run, event,lumi;
+  bool operator < (const DorkyEventIdentifier &) const;
+  bool operator == (const DorkyEventIdentifier &) const;
+};
+
+bool is_duplicate (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &already_seen);
+int load_badlaserevents  (char* filename, std::set<DorkyEventIdentifier> &events_lasercalib);
+bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &events_lasercalib);
 
 #endif

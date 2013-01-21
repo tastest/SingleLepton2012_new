@@ -11,12 +11,15 @@
 
 #include <vector> 
 #include <list> 
+#include <iostream>
+#include <fstream>
 
 #include "MT2Utility.h"
 #include "mt2bl_bisect.h"
 #include "mt2w_bisect.h"
 
 using namespace Stop;
+using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -533,4 +536,71 @@ float getMinDphi(float metPhi, LorentzVector vec1, LorentzVector vec2 ) {
 
   return dphimjmin_;
 
+}
+
+
+//---------------------------------------
+// duplicates and filters
+//---------------------------------------
+
+bool DorkyEventIdentifier::operator < (const DorkyEventIdentifier &other) const
+{
+  if (run != other.run)
+    return run < other.run;
+  if (event != other.event)
+    return event < other.event;
+  if(lumi != other.lumi)
+    return lumi < other.lumi;
+  return false;
+}
+
+//--------------------------------------------------------------------
+
+bool DorkyEventIdentifier::operator == (const DorkyEventIdentifier &other) const
+{
+  if (run != other.run)
+    return false;
+  if (event != other.event)
+    return false;
+  return true;
+}
+
+//--------------------------------------------------------------------
+
+bool is_duplicate (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &already_seen) {
+  std::pair<std::set<DorkyEventIdentifier>::const_iterator, bool> ret =
+    already_seen.insert(id);
+  return !ret.second;
+}
+
+//--------------------------------------------------------------------
+
+int load_badlaserevents  (char* filename, std::set<DorkyEventIdentifier> &events_lasercalib) {
+
+  ifstream in;
+  in.open(filename);
+
+   unsigned long int run, event, lumi;
+   int nlines = 0;
+
+   while (1) {
+      in >> run >> event >> lumi;
+      if (!in.good()) break;
+      nlines++;
+      DorkyEventIdentifier id = {run, event, lumi };
+      events_lasercalib.insert(id);
+   }
+   printf(" found %d bad events \n",nlines);
+
+   in.close();
+
+   return 0;
+
+}
+
+//--------------------------------------------------------------------
+
+bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &events_lasercalib) {
+  if (events_lasercalib.find(id) != events_lasercalib.end()) return true;
+  return false;
 }

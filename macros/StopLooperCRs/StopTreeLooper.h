@@ -25,7 +25,6 @@ class StopTreeLooper {
 
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
-	float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
 
 	//plotting
 	void makeSIGPlots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
