@@ -3593,7 +3593,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
   outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
   outTree->Branch("pfjets_qgtag",   "std::vector<float>", &pfjets_qgtag_    );
-  outTree->Branch("pfjets_lrm",   "std::vector<float>", &pfjets_lrm_    );
   outTree->Branch("pfjets_sigma",   "std::vector<float>", &pfjets_sigma_    );
   outTree->Branch("pfjets_lepjet",  "std::vector<int>"  , &pfjets_lepjet_   );
 
