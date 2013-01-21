@@ -22,7 +22,7 @@ class StopTreeLooper {
 
         StopTreeLooper();
         ~StopTreeLooper();
-
+ 
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
 
@@ -49,6 +49,19 @@ class StopTreeLooper {
 	float t1metphicorr;
 	float t1metphicorrphi;
 	float t1metphicorrmt;
+	//min dphi {j1,j2}
+	float dphimjmin;
+	float dphimj1;
+	float dphimj2;
+	//b pt
+	float pt_b;
+	//maria variables
+	float htssl;
+	float htosl;
+	float htratiol;
+	float htssm;
+	float htosm;
+	float htratiom;
 	//for mt peak definition
 	float min_mtpeak;
 	float max_mtpeak; 
