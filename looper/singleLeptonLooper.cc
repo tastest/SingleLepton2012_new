@@ -387,9 +387,12 @@ void singleLeptonLooper::InitBaby(){
   pfjets_.clear();
   pfjets_genJet_.clear();
   pfjets_csv_.clear();
+  pfjets_chm_.clear();
+  pfjets_neu_.clear();
   pfjets_corr_.clear();
   pfjets_mc3_.clear();
   pfjets_lrm_.clear();
+  pfjets_lrm2_.clear();
   pfjets_qgtag_.clear();
   pfjets_genJetDr_.clear();
   pfjets_sigma_.clear();
@@ -397,7 +400,9 @@ void singleLeptonLooper::InitBaby(){
   pfjets_beta_.clear();
   pfjets_beta2_.clear();
   pfjets_beta_0p1_.clear();
+  pfjets_beta_0p2_.clear();
   pfjets_beta2_0p1_.clear();
+  pfjets_beta2_0p5_.clear();
   // pfjets_beta_0p15_.clear();
   // pfjets_beta2_0p15_.clear();
   // pfjets_beta_0p2_.clear();
@@ -2432,8 +2437,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( int i = 0 ; i < (int)vipfjets_p4.size() ; ++i ){
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
+	pfjets_chm_.push_back(pfjets_chargedMultiplicity().at(vipfjets_p4.at(i).p4ind));
+	pfjets_neu_.push_back(pfjets_neutralMultiplicity().at(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
-	pfjets_lrm_.push_back(getLRM(vipfjets_p4.at(i).p4ind));
+	pfjets_lrm_.push_back(getLRM(vipfjets_p4.at(i).p4ind,1));
+	pfjets_lrm2_.push_back(getLRM(vipfjets_p4.at(i).p4ind,2));
 
 	//	cout << "lrm " << getLRM(vipfjets_p4.at(i).p4ind) << endl;
 
@@ -2442,7 +2450,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // Save the jet resolution. if it is MC scale by a factor given by
         // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
         float sigma =  getJetResolution(vipfjets_p4.at(i).p4obj, jetSmearer );
-        if ( !isData ) sigma *= getDataMCRatio(vipfjets_p4.at(i).p4obj.eta())
+        if ( !isData ) sigma *= getDataMCRatio(vipfjets_p4.at(i).p4obj.eta());
 	pfjets_sigma_.push_back( sigma );
 
 	if( isData ){
@@ -2465,7 +2473,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_beta_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,1));
 	pfjets_beta2_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,2));
         pfjets_beta_0p1_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.1 ) );
+        pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
         pfjets_beta2_0p1_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.1 ) );
+	pfjets_beta2_0p5_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.5 ) );
         // pfjets_beta_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.15) );
         // pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
         // pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
@@ -3583,12 +3593,17 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_ );
   outTree->Branch("pfjets_genJet_"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_genJet_ );
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
+  outTree->Branch("pfjets_chm", "std::vector<float>", &pfjets_chm_ );
+  outTree->Branch("pfjets_neu", "std::vector<float>", &pfjets_neu_ );
   outTree->Branch("pfjets_lrm", "std::vector<float>", &pfjets_lrm_ );
+  outTree->Branch("pfjets_lrm2", "std::vector<float>", &pfjets_lrm2_ );
  
   outTree->Branch("pfjets_beta",      "std::vector<float>", &pfjets_beta_      );
   outTree->Branch("pfjets_beta2",     "std::vector<float>", &pfjets_beta2_     );
   outTree->Branch("pfjets_beta_0p1",  "std::vector<float>", &pfjets_beta_0p1_  );
+  outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );
   outTree->Branch("pfjets_beta2_0p1", "std::vector<float>", &pfjets_beta2_0p1_ );
+  outTree->Branch("pfjets_beta2_0p5", "std::vector<float>", &pfjets_beta2_0p5_ );
   // outTree->Branch("pfjets_beta_0p15", "std::vector<float>", &pfjets_beta_0p15_ );
   // outTree->Branch("pfjets_beta2_0p15","std::vector<float>", &pfjets_beta2_0p15_);
   // outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );

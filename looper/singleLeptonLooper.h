@@ -399,6 +399,9 @@ class singleLeptonLooper
         VofP4 pfjets_;
         VofP4 pfjets_genJet_;
         std::vector<float> pfjets_csv_;
+	// CHM and NEU
+        std::vector<float> pfjets_chm_;
+        std::vector<float> pfjets_neu_;
 	//jet corrections and ID
 	std::vector<float> pfjets_corr_;
 	//status 3 parton matching
@@ -407,6 +410,7 @@ class singleLeptonLooper
 	std::vector<float> pfjets_qgtag_;
 	//jet shape
 	std::vector<float> pfjets_lrm_;
+	std::vector<float> pfjets_lrm2_;
 	//gen jet matching
 	std::vector<float> pfjets_genJetDr_;
 	//truth lepton matching
@@ -417,6 +421,8 @@ class singleLeptonLooper
 	std::vector<float> pfjets_beta_;
 	std::vector<float> pfjets_beta2_;
         std::vector<float> pfjets_beta_0p1_;
+        std::vector<float> pfjets_beta_0p2_;
+        std::vector<float> pfjets_beta2_0p5_;
         std::vector<float> pfjets_beta2_0p1_;
         /* std::vector<float> pfjets_beta_0p15_;  */
         /* std::vector<float> pfjets_beta2_0p15_; */
