@@ -82,6 +82,7 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   char* sample;
   //MC
   if (infile.Contains("TTJets_MassiveBinDECAY_TuneZ2star_8TeV"))     sample = Form("ttall_%s",  	 outfileid.Data());
+  else if (infile.Contains("TTJets_HadronicMGDecays_8TeV-madgraph")) sample = Form("ttfake_lmg_%s",  	 outfileid.Data());
   else if (infile.Contains("TTJets_FullLeptMGDecays_8TeV-madgraph")) sample = Form("ttdl_lmg_%s",  	 outfileid.Data());
   else if (infile.Contains("TTJets_SemiLeptMGDecays_8TeV-madgraph")) sample = Form("ttsl_lmg_%s",  	 outfileid.Data());
   else if (infile.Contains("WJetsToLNu"))                            sample = Form("wjets_%s",           outfileid.Data());
