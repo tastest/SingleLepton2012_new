@@ -2438,7 +2438,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	//	cout << "lrm " << getLRM(vipfjets_p4.at(i).p4ind) << endl;
 
 	pfjets_corr_.push_back(vipfjets_p4.at(i).p4obj.pt()/pfjets_p4().at(vipfjets_p4.at(i).p4ind).pt());
-	pfjets_sigma_.push_back( getJetResolution(vipfjets_p4.at(i).p4obj, jetSmearer ) );
+
+        // Save the jet resolution. if it is MC scale by a factor given by
+        // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
+        float sigma =  getJetResolution(vipfjets_p4.at(i).p4obj, jetSmearer );
+        if ( !isData ) sigma *= getDataMCRatio(vipfjets_p4.at(i).p4obj.eta())
+	pfjets_sigma_.push_back( sigma );
 
 	if( isData ){
 
