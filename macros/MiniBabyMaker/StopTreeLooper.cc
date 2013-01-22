@@ -164,6 +164,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     TTree *tree = (TTree*)file->Get("t");
     stopt.Init(tree);
 
+    tree->CopyAddresses(outTree_);
+
     //---------------------------------
     // event loop
     //---------------------------------
@@ -173,6 +175,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     for(ULong64_t event = 0; event < nEvents; ++event) {
       stopt.GetEntry(event);
+      tree->GetEntry(event);
 
       //---------------------------------
       // increment counters
@@ -498,7 +501,7 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.27 $";
+  string revision = "$Revision: 1.28 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
@@ -507,72 +510,69 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
 
   outTree_ = chain->CloneTree(0);
 
-  outTree_->Branch("lep1pt"           ,        &lep1pt_          ,         "lep1pt/F"		);
-  outTree_->Branch("lep1eta"          ,        &lep1eta_         ,         "lep1eta/F"		);
-  outTree_->Branch("sig"              ,        &sig_             ,         "sig/I"		);
-  outTree_->Branch("cr1"              ,        &cr1_             ,         "cr1/I"		);
-  outTree_->Branch("cr4"              ,        &cr4_             ,         "cr4/I"		);
-  outTree_->Branch("cr5"              ,        &cr5_             ,         "cr5/I"		);
-  outTree_->Branch("met"              ,        &met_             ,         "met/F"		);
-  outTree_->Branch("mt"               ,        &mt_              ,         "mt/F"		);
-  outTree_->Branch("weight"           ,        &weight_          ,         "weight/F"		);
-  outTree_->Branch("sltrigeff"        ,        &sltrigeff_       ,         "sltrigeff/F"	);
-  outTree_->Branch("dltrigeff"        ,        &dltrigeff_       ,         "dltrigeff/F"	);
-  outTree_->Branch("nb"               ,        &nb_              ,         "nb/I"		);
-  outTree_->Branch("njets"            ,        &njets_           ,         "njets/I"		);
-  outTree_->Branch("passisotrk"       ,        &passisotrk_      ,         "passisotrk/I"	);
-  outTree_->Branch("passisotrkv2"     ,        &passisotrkv2_    ,         "passisotrkv2/I"	);
-  outTree_->Branch("nlep"             ,        &nlep_            ,         "nlep/I"		);
-  outTree_->Branch("lep1pt"           ,        &lep1pt_          ,         "lep1pt/F"		);
-  outTree_->Branch("lep1eta"          ,        &lep1eta_         ,         "lep1eta/F"		);
-  outTree_->Branch("lep2pt"           ,        &lep2pt_          ,         "lep2pt/F"		);
-  outTree_->Branch("lep2eta"          ,        &lep2eta_         ,         "lep2eta/F"		);
-  outTree_->Branch("dilmass"          ,        &dilmass_         ,         "dilmass/F"		);
-  outTree_->Branch("mstop"            ,        &mstop_           ,         "mstop/F"		);
-  outTree_->Branch("mlsp"             ,        &mlsp_            ,         "mlsp/F"		);
-  outTree_->Branch("x"                ,        &x_               ,         "x/F"		);
-  outTree_->Branch("chi2min"          ,        &chi2min_         ,         "chi2min/F"          );
-  outTree_->Branch("chi2minprob"      ,        &chi2minprob_     ,         "chi2minprob/F"      );
-  outTree_->Branch("chi2min_mt2b"     ,        &chi2min_mt2b_    ,         "chi2min_mt2b/F"     );  
-  outTree_->Branch("chi2min_mt2bl"    ,        &chi2min_mt2bl_   ,         "chi2min_mt2bl/F"    );  
-  outTree_->Branch("chi2min_mt2w"     ,        &chi2min_mt2w_    ,         "chi2min_mt2w/F"     );  
-  outTree_->Branch("mt2bmin"          ,        &mt2bmin_         ,         "mt2bmin/F"          );       
-  outTree_->Branch("mt2blmin"         ,        &mt2blmin_        ,         "mt2blmin/F"         );       
-  outTree_->Branch("mt2wmin"          ,        &mt2wmin_         ,         "mt2wmin/F"          );       
-  outTree_->Branch("mt2bmin_chi2"     ,        &mt2bmin_chi2_    ,         "mt2bmin_chi2/F"     );       
-  outTree_->Branch("mt2blmin_chi2"    ,        &mt2blmin_chi2_   ,         "mt2blmin_chi2/F"    );       
-  outTree_->Branch("mt2wmin_chi2"     ,        &mt2wmin_chi2_    ,         "mt2wmin_chi2/F"     );       
-  outTree_->Branch("mt2bmin_chi2prob" ,        &mt2bmin_chi2prob_    ,         "mt2bmin_chi2prob/F"     );       
-  outTree_->Branch("mt2blmin_chi2prob",        &mt2blmin_chi2prob_   ,         "mt2blmin_chi2prob/F"    );       
-  outTree_->Branch("mt2wmin_chi2prob" ,        &mt2wmin_chi2prob_    ,         "mt2wmin_chi2prob/F"     );       
-  outTree_->Branch("ncand"            ,        &ncand_           ,         "ncand/F"            );       
-  outTree_->Branch("thrjet"           ,        &thrjet_          ,         "thrjet/F"           );
-  outTree_->Branch("sphjet"           ,        &sphjet_          ,         "sphjet/F"           );
-  outTree_->Branch("apljet"           ,        &apljet_          ,         "apljet/F"           );
-  outTree_->Branch("cirjet"           ,        &cirjet_          ,         "cirjet/F"           );
-  outTree_->Branch("thrjetl"          ,        &thrjetl_         ,         "thrjetl/F"          );
-  outTree_->Branch("sphjetl"          ,        &sphjetl_         ,         "sphjetl/F"          );
-  outTree_->Branch("apljetl"          ,        &apljetl_         ,         "apljetl/F"          );
-  outTree_->Branch("cirjetl"          ,        &cirjetl_         ,         "cirjetl/F"          );
-  outTree_->Branch("thrjetlm"         ,        &thrjetlm_        ,         "thrjetlm/F"         );
-  outTree_->Branch("sphjetlm"         ,        &sphjetlm_        ,         "sphjetlm/F"         );
-  outTree_->Branch("apljetlm"         ,        &apljetlm_        ,         "apljetlm/F"         );
-  outTree_->Branch("cirjetlm"         ,        &cirjetlm_        ,         "cirjetlm/F"         );
-  outTree_->Branch("htssl"            ,        &htssl_           ,         "htssl/F"            );
-  outTree_->Branch("htosl"            ,        &htosl_           ,         "htosl/F"            );
-  outTree_->Branch("htratiol"         ,        &htratiol_        ,         "htraiol/F"          );
-  outTree_->Branch("htssm"            ,        &htssm_           ,         "htssm/F"            );
-  outTree_->Branch("htosm"            ,        &htosm_           ,         "htosm/F"            );
-  outTree_->Branch("htratiom"         ,        &htratiom_        ,         "htraiom/F"          );
-  outTree_->Branch("dphimj1"          ,        &dphimj1_         ,         "dphimj1/F"          );
-  outTree_->Branch("dphimj2"          ,        &dphimj2_         ,         "dphimj2/F"          );
-  outTree_->Branch("dphimjmin"        ,        &dphimjmin_       ,         "dphimjmin/F"        );
-  outTree_->Branch("pt_b"             ,        &pt_b_            ,         "pt_b/F"             );
-  outTree_->Branch("pt_J1"            ,        &pt_J1_           ,         "pt_J1/F"            );
-  outTree_->Branch("pt_J2"            ,        &pt_J2_           ,         "pt_J2/F"            );
-  outTree_->Branch("rand"             ,        &rand_            ,         "rand/F"             );
-
-  outTree_->Branch("bdt"             ,        &bdt_            ,           "bdt/F"             );
+  outTree_->Branch("mini_sig"              ,        &sig_             ,         "mini_sig/I"		);
+  outTree_->Branch("mini_cr1"              ,        &cr1_             ,         "mini_cr1/I"		);
+  outTree_->Branch("mini_cr4"              ,        &cr4_             ,         "mini_cr4/I"		);
+  outTree_->Branch("mini_cr5"              ,        &cr5_             ,         "mini_cr5/I"		);
+  outTree_->Branch("mini_met"              ,        &met_             ,         "mini_met/F"		);
+  outTree_->Branch("mini_mt"               ,        &mt_              ,         "mini_mt/F"		);
+  outTree_->Branch("mini_weight"           ,        &weight_          ,         "mini_weight/F"		);
+  outTree_->Branch("mini_sltrigeff"        ,        &sltrigeff_       ,         "mini_sltrigeff/F"	);
+  outTree_->Branch("mini_dltrigeff"        ,        &dltrigeff_       ,         "mini_dltrigeff/F"	);
+  outTree_->Branch("mini_nb"               ,        &nb_              ,         "mini_nb/I"		);
+  outTree_->Branch("mini_njets"            ,        &njets_           ,         "mini_njets/I"		);
+  outTree_->Branch("mini_passisotrk"       ,        &passisotrk_      ,         "mini_passisotrk/I"	);
+  outTree_->Branch("mini_passisotrkv2"     ,        &passisotrkv2_    ,         "mini_passisotrkv2/I"	);
+  outTree_->Branch("mini_nlep"             ,        &nlep_            ,         "mini_nlep/I"		);
+  outTree_->Branch("mini_lep1pt"           ,        &lep1pt_          ,         "mini_lep1pt/F"		);
+  outTree_->Branch("mini_lep1eta"          ,        &lep1eta_         ,         "mini_lep1eta/F"		);
+  outTree_->Branch("mini_lep2pt"           ,        &lep2pt_          ,         "mini_lep2pt/F"		);
+  outTree_->Branch("mini_lep2eta"          ,        &lep2eta_         ,         "mini_lep2eta/F"		);
+  outTree_->Branch("mini_dilmass"          ,        &dilmass_         ,         "mini_dilmass/F"		);
+  outTree_->Branch("mini_mstop"            ,        &mstop_           ,         "mini_mstop/F"		);
+  outTree_->Branch("mini_mlsp"             ,        &mlsp_            ,         "mini_mlsp/F"		);
+  outTree_->Branch("mini_x"                ,        &x_               ,         "mini_x/F"		);
+  outTree_->Branch("mini_chi2min"          ,        &chi2min_         ,         "mini_chi2min/F"          );
+  outTree_->Branch("mini_chi2minprob"      ,        &chi2minprob_     ,         "mini_chi2minprob/F"      );
+  outTree_->Branch("mini_chi2min_mt2b"     ,        &chi2min_mt2b_    ,         "mini_chi2min_mt2b/F"     );  
+  outTree_->Branch("mini_chi2min_mt2bl"    ,        &chi2min_mt2bl_   ,         "mini_chi2min_mt2bl/F"    );  
+  outTree_->Branch("mini_chi2min_mt2w"     ,        &chi2min_mt2w_    ,         "mini_chi2min_mt2w/F"     );  
+  outTree_->Branch("mini_mt2bmin"          ,        &mt2bmin_         ,         "mini_mt2bmin/F"          );       
+  outTree_->Branch("mini_mt2blmin"         ,        &mt2blmin_        ,         "mini_mt2blmin/F"         );       
+  outTree_->Branch("mini_mt2wmin"          ,        &mt2wmin_         ,         "mini_mt2wmin/F"          );       
+  outTree_->Branch("mini_mt2bmin_chi2"     ,        &mt2bmin_chi2_    ,         "mini_mt2bmin_chi2/F"     );       
+  outTree_->Branch("mini_mt2blmin_chi2"    ,        &mt2blmin_chi2_   ,         "mini_mt2blmin_chi2/F"    );       
+  outTree_->Branch("mini_mt2wmin_chi2"     ,        &mt2wmin_chi2_    ,         "mini_mt2wmin_chi2/F"     );       
+  outTree_->Branch("mini_mt2bmin_chi2prob" ,        &mt2bmin_chi2prob_    ,     "mini_mt2bmin_chi2prob/F"     );       
+  outTree_->Branch("mini_mt2blmin_chi2prob",        &mt2blmin_chi2prob_   ,     "mini_mt2blmin_chi2prob/F"    );       
+  outTree_->Branch("mini_mt2wmin_chi2prob" ,        &mt2wmin_chi2prob_    ,     "mini_mt2wmin_chi2prob/F"     );       
+  outTree_->Branch("mini_ncand"            ,        &ncand_           ,         "mini_ncand/F"            );       
+  outTree_->Branch("mini_thrjet"           ,        &thrjet_          ,         "mini_thrjet/F"           );
+  outTree_->Branch("mini_sphjet"           ,        &sphjet_          ,         "mini_sphjet/F"           );
+  outTree_->Branch("mini_apljet"           ,        &apljet_          ,         "mini_apljet/F"           );
+  outTree_->Branch("mini_cirjet"           ,        &cirjet_          ,         "mini_cirjet/F"           );
+  outTree_->Branch("mini_thrjetl"          ,        &thrjetl_         ,         "mini_thrjetl/F"          );
+  outTree_->Branch("mini_sphjetl"          ,        &sphjetl_         ,         "mini_sphjetl/F"          );
+  outTree_->Branch("mini_apljetl"          ,        &apljetl_         ,         "mini_apljetl/F"          );
+  outTree_->Branch("mini_cirjetl"          ,        &cirjetl_         ,         "mini_cirjetl/F"          );
+  outTree_->Branch("mini_thrjetlm"         ,        &thrjetlm_        ,         "mini_thrjetlm/F"         );
+  outTree_->Branch("mini_sphjetlm"         ,        &sphjetlm_        ,         "mini_sphjetlm/F"         );
+  outTree_->Branch("mini_apljetlm"         ,        &apljetlm_        ,         "mini_apljetlm/F"         );
+  outTree_->Branch("mini_cirjetlm"         ,        &cirjetlm_        ,         "mini_cirjetlm/F"         );
+  outTree_->Branch("mini_htssl"            ,        &htssl_           ,         "mini_htssl/F"            );
+  outTree_->Branch("mini_htosl"            ,        &htosl_           ,         "mini_htosl/F"            );
+  outTree_->Branch("mini_htratiol"         ,        &htratiol_        ,         "mini_htraiol/F"          );
+  outTree_->Branch("mini_htssm"            ,        &htssm_           ,         "mini_htssm/F"            );
+  outTree_->Branch("mini_htosm"            ,        &htosm_           ,         "mini_htosm/F"            );
+  outTree_->Branch("mini_htratiom"         ,        &htratiom_        ,         "mini_htraiom/F"          );
+  outTree_->Branch("mini_dphimj1"          ,        &dphimj1_         ,         "mini_dphimj1/F"          );
+  outTree_->Branch("mini_dphimj2"          ,        &dphimj2_         ,         "mini_dphimj2/F"          );
+  outTree_->Branch("mini_dphimjmin"        ,        &dphimjmin_       ,         "mini_dphimjmin/F"        );
+  outTree_->Branch("mini_pt_b"             ,        &pt_b_            ,         "mini_pt_b/F"             );
+  outTree_->Branch("mini_pt_J1"            ,        &pt_J1_           ,         "mini_pt_J1/F"            );
+  outTree_->Branch("mini_pt_J2"            ,        &pt_J2_           ,         "mini_pt_J2/F"            );
+  outTree_->Branch("mini_rand"             ,        &rand_            ,         "mini_rand/F"             );
+  outTree_->Branch("mini_bdt"              ,        &bdt_            ,          "mini_bdt/F"             );
 
 }
 
