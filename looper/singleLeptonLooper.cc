@@ -1878,7 +1878,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	float charge=(pfcands_particleId().at(ipf)*id1_);
 	// charge < 0 is a SS , charge > 0 is a OS for e/mu; need to flip for pions
-	if((abs(pfcands_particleId().at(ipf))!=11) || (abs(pfcands_particleId().at(ipf))!=13)) charge*=(-1); 
+	if((abs(pfcands_particleId().at(ipf))!=11) && (abs(pfcands_particleId().at(ipf))!=13)) charge*=(-1); 
 
 	if( iso < pfcandisoOS10_ && charge>0){
 	  pfcandisoOS10_ = iso;
