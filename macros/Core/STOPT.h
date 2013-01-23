@@ -13,31 +13,6 @@
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 using namespace std; 
-
-//
-// Ntuple structure:
-//
-// Ntuple content:
-
-struct MT2struct {
-  float mt2w;
-  float mt2b;
-  float mt2bl;
-  float chi2;
-};
-
-class Candidate : public TObject {
-public:
- float chi2, mt2w, mt2bl, mt2b;
- int j1, j2, bi, oi;
- float k1, k2;
- bool match;
-
- ClassDef(Candidate, 2)
-};
-
-typedef vector<Candidate> CANDIDATES;
-
 class STOPT {
 private: 
 protected: 
@@ -480,6 +455,21 @@ protected:
 	float	t1metphicorrmt_off_;
 	TBranch *t1metphicorrmt_off_branch;
 	bool t1metphicorrmt_off_isLoaded;
+	float	mt2bmin_;
+	TBranch *mt2bmin_branch;
+	bool mt2bmin_isLoaded;
+	float	mt2blmin_;
+	TBranch *mt2blmin_branch;
+	bool mt2blmin_isLoaded;
+	float	mt2wmin_;
+	TBranch *mt2wmin_branch;
+	bool mt2wmin_isLoaded;
+	float	chi2min_;
+	TBranch *chi2min_branch;
+	bool chi2min_isLoaded;
+	float	chi2minprob_;
+	TBranch *chi2minprob_branch;
+	bool chi2minprob_isLoaded;
 	int	nbtagsssv_;
 	TBranch *nbtagsssv_branch;
 	bool nbtagsssv_isLoaded;
@@ -948,6 +938,15 @@ protected:
 	float	pfcandmindrj10_;
 	TBranch *pfcandmindrj10_branch;
 	bool pfcandmindrj10_isLoaded;
+	int	pfcandidOS10_;
+	TBranch *pfcandidOS10_branch;
+	bool pfcandidOS10_isLoaded;
+	float	pfcandisoOS10_;
+	TBranch *pfcandisoOS10_branch;
+	bool pfcandisoOS10_isLoaded;
+	float	pfcandptOS10_;
+	TBranch *pfcandptOS10_branch;
+	bool pfcandptOS10_isLoaded;
 	int	pfcanddirid10_;
 	TBranch *pfcanddirid10_branch;
 	bool pfcanddirid10_isLoaded;
@@ -1263,18 +1262,27 @@ protected:
 	int	lep_tbar_id_;
 	TBranch *lep_tbar_id_branch;
 	bool lep_tbar_id_isLoaded;
-	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jets_;
-	TBranch *jets_branch;
-	bool jets_isLoaded;
-	vector<float> *btag_;
-	TBranch *btag_branch;
-	bool btag_isLoaded;
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *pfjets_;
 	TBranch *pfjets_branch;
 	bool pfjets_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *pfjets_genJet__;
+	TBranch *pfjets_genJet__branch;
+	bool pfjets_genJet__isLoaded;
 	vector<float> *pfjets_csv_;
 	TBranch *pfjets_csv_branch;
 	bool pfjets_csv_isLoaded;
+	vector<float> *pfjets_chm_;
+	TBranch *pfjets_chm_branch;
+	bool pfjets_chm_isLoaded;
+	vector<float> *pfjets_neu_;
+	TBranch *pfjets_neu_branch;
+	bool pfjets_neu_isLoaded;
+	vector<float> *pfjets_lrm_;
+	TBranch *pfjets_lrm_branch;
+	bool pfjets_lrm_isLoaded;
+	vector<float> *pfjets_lrm2_;
+	TBranch *pfjets_lrm2_branch;
+	bool pfjets_lrm2_isLoaded;
 	vector<float> *pfjets_beta_;
 	TBranch *pfjets_beta_branch;
 	bool pfjets_beta_isLoaded;
@@ -1284,9 +1292,15 @@ protected:
 	vector<float> *pfjets_beta_0p1_;
 	TBranch *pfjets_beta_0p1_branch;
 	bool pfjets_beta_0p1_isLoaded;
+	vector<float> *pfjets_beta_0p2_;
+	TBranch *pfjets_beta_0p2_branch;
+	bool pfjets_beta_0p2_isLoaded;
 	vector<float> *pfjets_beta2_0p1_;
 	TBranch *pfjets_beta2_0p1_branch;
 	bool pfjets_beta2_0p1_isLoaded;
+	vector<float> *pfjets_beta2_0p5_;
+	TBranch *pfjets_beta2_0p5_branch;
+	bool pfjets_beta2_0p5_isLoaded;
 	vector<float> *pfjets_corr_;
 	TBranch *pfjets_corr_branch;
 	bool pfjets_corr_isLoaded;
@@ -1492,15 +1506,15 @@ void Init(TTree *tree) {
 		stop_tbar_branch = tree->GetBranch("stop_tbar");
 		if (stop_tbar_branch) {stop_tbar_branch->SetAddress(&stop_tbar_);}
 	}
-	jets_branch = 0;
-	if (tree->GetBranch("jets") != 0) {
-		jets_branch = tree->GetBranch("jets");
-		if (jets_branch) {jets_branch->SetAddress(&jets_);}
-	}
 	pfjets_branch = 0;
 	if (tree->GetBranch("pfjets") != 0) {
 		pfjets_branch = tree->GetBranch("pfjets");
 		if (pfjets_branch) {pfjets_branch->SetAddress(&pfjets_);}
+	}
+	pfjets_genJet__branch = 0;
+	if (tree->GetBranch("pfjets_genJet_") != 0) {
+		pfjets_genJet__branch = tree->GetBranch("pfjets_genJet_");
+		if (pfjets_genJet__branch) {pfjets_genJet__branch->SetAddress(&pfjets_genJet__);}
 	}
   tree->SetMakeClass(1);
 	acc_2010_branch = 0;
@@ -2232,6 +2246,31 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("t1metphicorrmt_off") != 0) {
 		t1metphicorrmt_off_branch = tree->GetBranch("t1metphicorrmt_off");
 		if (t1metphicorrmt_off_branch) {t1metphicorrmt_off_branch->SetAddress(&t1metphicorrmt_off_);}
+	}
+	mt2bmin_branch = 0;
+	if (tree->GetBranch("mt2bmin") != 0) {
+		mt2bmin_branch = tree->GetBranch("mt2bmin");
+		if (mt2bmin_branch) {mt2bmin_branch->SetAddress(&mt2bmin_);}
+	}
+	mt2blmin_branch = 0;
+	if (tree->GetBranch("mt2blmin") != 0) {
+		mt2blmin_branch = tree->GetBranch("mt2blmin");
+		if (mt2blmin_branch) {mt2blmin_branch->SetAddress(&mt2blmin_);}
+	}
+	mt2wmin_branch = 0;
+	if (tree->GetBranch("mt2wmin") != 0) {
+		mt2wmin_branch = tree->GetBranch("mt2wmin");
+		if (mt2wmin_branch) {mt2wmin_branch->SetAddress(&mt2wmin_);}
+	}
+	chi2min_branch = 0;
+	if (tree->GetBranch("chi2min") != 0) {
+		chi2min_branch = tree->GetBranch("chi2min");
+		if (chi2min_branch) {chi2min_branch->SetAddress(&chi2min_);}
+	}
+	chi2minprob_branch = 0;
+	if (tree->GetBranch("chi2minprob") != 0) {
+		chi2minprob_branch = tree->GetBranch("chi2minprob");
+		if (chi2minprob_branch) {chi2minprob_branch->SetAddress(&chi2minprob_);}
 	}
 	nbtagsssv_branch = 0;
 	if (tree->GetBranch("nbtagsssv") != 0) {
@@ -3013,6 +3052,21 @@ void Init(TTree *tree) {
 		pfcandmindrj10_branch = tree->GetBranch("pfcandmindrj10");
 		if (pfcandmindrj10_branch) {pfcandmindrj10_branch->SetAddress(&pfcandmindrj10_);}
 	}
+	pfcandidOS10_branch = 0;
+	if (tree->GetBranch("pfcandidOS10") != 0) {
+		pfcandidOS10_branch = tree->GetBranch("pfcandidOS10");
+		if (pfcandidOS10_branch) {pfcandidOS10_branch->SetAddress(&pfcandidOS10_);}
+	}
+	pfcandisoOS10_branch = 0;
+	if (tree->GetBranch("pfcandisoOS10") != 0) {
+		pfcandisoOS10_branch = tree->GetBranch("pfcandisoOS10");
+		if (pfcandisoOS10_branch) {pfcandisoOS10_branch->SetAddress(&pfcandisoOS10_);}
+	}
+	pfcandptOS10_branch = 0;
+	if (tree->GetBranch("pfcandptOS10") != 0) {
+		pfcandptOS10_branch = tree->GetBranch("pfcandptOS10");
+		if (pfcandptOS10_branch) {pfcandptOS10_branch->SetAddress(&pfcandptOS10_);}
+	}
 	pfcanddirid10_branch = 0;
 	if (tree->GetBranch("pfcanddirid10") != 0) {
 		pfcanddirid10_branch = tree->GetBranch("pfcanddirid10");
@@ -3353,15 +3407,30 @@ void Init(TTree *tree) {
 		lep_tbar_id_branch = tree->GetBranch("lep_tbar_id");
 		if (lep_tbar_id_branch) {lep_tbar_id_branch->SetAddress(&lep_tbar_id_);}
 	}
-	btag_branch = 0;
-	if (tree->GetBranch("btag") != 0) {
-		btag_branch = tree->GetBranch("btag");
-		if (btag_branch) {btag_branch->SetAddress(&btag_);}
-	}
 	pfjets_csv_branch = 0;
 	if (tree->GetBranch("pfjets_csv") != 0) {
 		pfjets_csv_branch = tree->GetBranch("pfjets_csv");
 		if (pfjets_csv_branch) {pfjets_csv_branch->SetAddress(&pfjets_csv_);}
+	}
+	pfjets_chm_branch = 0;
+	if (tree->GetBranch("pfjets_chm") != 0) {
+		pfjets_chm_branch = tree->GetBranch("pfjets_chm");
+		if (pfjets_chm_branch) {pfjets_chm_branch->SetAddress(&pfjets_chm_);}
+	}
+	pfjets_neu_branch = 0;
+	if (tree->GetBranch("pfjets_neu") != 0) {
+		pfjets_neu_branch = tree->GetBranch("pfjets_neu");
+		if (pfjets_neu_branch) {pfjets_neu_branch->SetAddress(&pfjets_neu_);}
+	}
+	pfjets_lrm_branch = 0;
+	if (tree->GetBranch("pfjets_lrm") != 0) {
+		pfjets_lrm_branch = tree->GetBranch("pfjets_lrm");
+		if (pfjets_lrm_branch) {pfjets_lrm_branch->SetAddress(&pfjets_lrm_);}
+	}
+	pfjets_lrm2_branch = 0;
+	if (tree->GetBranch("pfjets_lrm2") != 0) {
+		pfjets_lrm2_branch = tree->GetBranch("pfjets_lrm2");
+		if (pfjets_lrm2_branch) {pfjets_lrm2_branch->SetAddress(&pfjets_lrm2_);}
 	}
 	pfjets_beta_branch = 0;
 	if (tree->GetBranch("pfjets_beta") != 0) {
@@ -3378,10 +3447,20 @@ void Init(TTree *tree) {
 		pfjets_beta_0p1_branch = tree->GetBranch("pfjets_beta_0p1");
 		if (pfjets_beta_0p1_branch) {pfjets_beta_0p1_branch->SetAddress(&pfjets_beta_0p1_);}
 	}
+	pfjets_beta_0p2_branch = 0;
+	if (tree->GetBranch("pfjets_beta_0p2") != 0) {
+		pfjets_beta_0p2_branch = tree->GetBranch("pfjets_beta_0p2");
+		if (pfjets_beta_0p2_branch) {pfjets_beta_0p2_branch->SetAddress(&pfjets_beta_0p2_);}
+	}
 	pfjets_beta2_0p1_branch = 0;
 	if (tree->GetBranch("pfjets_beta2_0p1") != 0) {
 		pfjets_beta2_0p1_branch = tree->GetBranch("pfjets_beta2_0p1");
 		if (pfjets_beta2_0p1_branch) {pfjets_beta2_0p1_branch->SetAddress(&pfjets_beta2_0p1_);}
+	}
+	pfjets_beta2_0p5_branch = 0;
+	if (tree->GetBranch("pfjets_beta2_0p5") != 0) {
+		pfjets_beta2_0p5_branch = tree->GetBranch("pfjets_beta2_0p5");
+		if (pfjets_beta2_0p5_branch) {pfjets_beta2_0p5_branch->SetAddress(&pfjets_beta2_0p5_);}
 	}
 	pfjets_corr_branch = 0;
 	if (tree->GetBranch("pfjets_corr") != 0) {
@@ -3565,6 +3644,11 @@ void GetEntry(unsigned int idx)
 		t1metphicorr_off_isLoaded = false;
 		t1metphicorrphi_off_isLoaded = false;
 		t1metphicorrmt_off_isLoaded = false;
+		mt2bmin_isLoaded = false;
+		mt2blmin_isLoaded = false;
+		mt2wmin_isLoaded = false;
+		chi2min_isLoaded = false;
+		chi2minprob_isLoaded = false;
 		nbtagsssv_isLoaded = false;
 		nbtagstcl_isLoaded = false;
 		nbtagstcm_isLoaded = false;
@@ -3721,6 +3805,9 @@ void GetEntry(unsigned int idx)
 		pfcandiso10_isLoaded = false;
 		pfcandpt10_isLoaded = false;
 		pfcandmindrj10_isLoaded = false;
+		pfcandidOS10_isLoaded = false;
+		pfcandisoOS10_isLoaded = false;
+		pfcandptOS10_isLoaded = false;
 		pfcanddirid10_isLoaded = false;
 		pfcanddiriso10_isLoaded = false;
 		pfcanddirpt10_isLoaded = false;
@@ -3826,14 +3913,19 @@ void GetEntry(unsigned int idx)
 		stop_tbar_isLoaded = false;
 		lep_t_id_isLoaded = false;
 		lep_tbar_id_isLoaded = false;
-		jets_isLoaded = false;
-		btag_isLoaded = false;
 		pfjets_isLoaded = false;
+		pfjets_genJet__isLoaded = false;
 		pfjets_csv_isLoaded = false;
+		pfjets_chm_isLoaded = false;
+		pfjets_neu_isLoaded = false;
+		pfjets_lrm_isLoaded = false;
+		pfjets_lrm2_isLoaded = false;
 		pfjets_beta_isLoaded = false;
 		pfjets_beta2_isLoaded = false;
 		pfjets_beta_0p1_isLoaded = false;
+		pfjets_beta_0p2_isLoaded = false;
 		pfjets_beta2_0p1_isLoaded = false;
+		pfjets_beta2_0p5_isLoaded = false;
 		pfjets_corr_isLoaded = false;
 		pfjets_mc3_isLoaded = false;
 		pfjets_genJetDr_isLoaded = false;
@@ -3991,6 +4083,11 @@ void LoadAllBranches()
 	if (t1metphicorr_off_branch != 0) t1metphicorr_off();
 	if (t1metphicorrphi_off_branch != 0) t1metphicorrphi_off();
 	if (t1metphicorrmt_off_branch != 0) t1metphicorrmt_off();
+	if (mt2bmin_branch != 0) mt2bmin();
+	if (mt2blmin_branch != 0) mt2blmin();
+	if (mt2wmin_branch != 0) mt2wmin();
+	if (chi2min_branch != 0) chi2min();
+	if (chi2minprob_branch != 0) chi2minprob();
 	if (nbtagsssv_branch != 0) nbtagsssv();
 	if (nbtagstcl_branch != 0) nbtagstcl();
 	if (nbtagstcm_branch != 0) nbtagstcm();
@@ -4147,6 +4244,9 @@ void LoadAllBranches()
 	if (pfcandiso10_branch != 0) pfcandiso10();
 	if (pfcandpt10_branch != 0) pfcandpt10();
 	if (pfcandmindrj10_branch != 0) pfcandmindrj10();
+	if (pfcandidOS10_branch != 0) pfcandidOS10();
+	if (pfcandisoOS10_branch != 0) pfcandisoOS10();
+	if (pfcandptOS10_branch != 0) pfcandptOS10();
 	if (pfcanddirid10_branch != 0) pfcanddirid10();
 	if (pfcanddiriso10_branch != 0) pfcanddiriso10();
 	if (pfcanddirpt10_branch != 0) pfcanddirpt10();
@@ -4252,14 +4352,19 @@ void LoadAllBranches()
 	if (stop_tbar_branch != 0) stop_tbar();
 	if (lep_t_id_branch != 0) lep_t_id();
 	if (lep_tbar_id_branch != 0) lep_tbar_id();
-	if (jets_branch != 0) jets();
-	if (btag_branch != 0) btag();
 	if (pfjets_branch != 0) pfjets();
+	if (pfjets_genJet__branch != 0) pfjets_genJet_();
 	if (pfjets_csv_branch != 0) pfjets_csv();
+	if (pfjets_chm_branch != 0) pfjets_chm();
+	if (pfjets_neu_branch != 0) pfjets_neu();
+	if (pfjets_lrm_branch != 0) pfjets_lrm();
+	if (pfjets_lrm2_branch != 0) pfjets_lrm2();
 	if (pfjets_beta_branch != 0) pfjets_beta();
 	if (pfjets_beta2_branch != 0) pfjets_beta2();
 	if (pfjets_beta_0p1_branch != 0) pfjets_beta_0p1();
+	if (pfjets_beta_0p2_branch != 0) pfjets_beta_0p2();
 	if (pfjets_beta2_0p1_branch != 0) pfjets_beta2_0p1();
+	if (pfjets_beta2_0p5_branch != 0) pfjets_beta2_0p5();
 	if (pfjets_corr_branch != 0) pfjets_corr();
 	if (pfjets_mc3_branch != 0) pfjets_mc3();
 	if (pfjets_genJetDr_branch != 0) pfjets_genJetDr();
@@ -6165,6 +6270,71 @@ void LoadAllBranches()
 			t1metphicorrmt_off_isLoaded = true;
 		}
 		return t1metphicorrmt_off_;
+	}
+	float &mt2bmin()
+	{
+		if (not mt2bmin_isLoaded) {
+			if (mt2bmin_branch != 0) {
+				mt2bmin_branch->GetEntry(index);
+			} else { 
+				printf("branch mt2bmin_branch does not exist!\n");
+				exit(1);
+			}
+			mt2bmin_isLoaded = true;
+		}
+		return mt2bmin_;
+	}
+	float &mt2blmin()
+	{
+		if (not mt2blmin_isLoaded) {
+			if (mt2blmin_branch != 0) {
+				mt2blmin_branch->GetEntry(index);
+			} else { 
+				printf("branch mt2blmin_branch does not exist!\n");
+				exit(1);
+			}
+			mt2blmin_isLoaded = true;
+		}
+		return mt2blmin_;
+	}
+	float &mt2wmin()
+	{
+		if (not mt2wmin_isLoaded) {
+			if (mt2wmin_branch != 0) {
+				mt2wmin_branch->GetEntry(index);
+			} else { 
+				printf("branch mt2wmin_branch does not exist!\n");
+				exit(1);
+			}
+			mt2wmin_isLoaded = true;
+		}
+		return mt2wmin_;
+	}
+	float &chi2min()
+	{
+		if (not chi2min_isLoaded) {
+			if (chi2min_branch != 0) {
+				chi2min_branch->GetEntry(index);
+			} else { 
+				printf("branch chi2min_branch does not exist!\n");
+				exit(1);
+			}
+			chi2min_isLoaded = true;
+		}
+		return chi2min_;
+	}
+	float &chi2minprob()
+	{
+		if (not chi2minprob_isLoaded) {
+			if (chi2minprob_branch != 0) {
+				chi2minprob_branch->GetEntry(index);
+			} else { 
+				printf("branch chi2minprob_branch does not exist!\n");
+				exit(1);
+			}
+			chi2minprob_isLoaded = true;
+		}
+		return chi2minprob_;
 	}
 	int &nbtagsssv()
 	{
@@ -8194,6 +8364,45 @@ void LoadAllBranches()
 		}
 		return pfcandmindrj10_;
 	}
+	int &pfcandidOS10()
+	{
+		if (not pfcandidOS10_isLoaded) {
+			if (pfcandidOS10_branch != 0) {
+				pfcandidOS10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandidOS10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandidOS10_isLoaded = true;
+		}
+		return pfcandidOS10_;
+	}
+	float &pfcandisoOS10()
+	{
+		if (not pfcandisoOS10_isLoaded) {
+			if (pfcandisoOS10_branch != 0) {
+				pfcandisoOS10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandisoOS10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandisoOS10_isLoaded = true;
+		}
+		return pfcandisoOS10_;
+	}
+	float &pfcandptOS10()
+	{
+		if (not pfcandptOS10_isLoaded) {
+			if (pfcandptOS10_branch != 0) {
+				pfcandptOS10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandptOS10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandptOS10_isLoaded = true;
+		}
+		return pfcandptOS10_;
+	}
 	int &pfcanddirid10()
 	{
 		if (not pfcanddirid10_isLoaded) {
@@ -9559,32 +9768,6 @@ void LoadAllBranches()
 		}
 		return lep_tbar_id_;
 	}
-	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jets()
-	{
-		if (not jets_isLoaded) {
-			if (jets_branch != 0) {
-				jets_branch->GetEntry(index);
-			} else { 
-				printf("branch jets_branch does not exist!\n");
-				exit(1);
-			}
-			jets_isLoaded = true;
-		}
-		return *jets_;
-	}
-	vector<float> &btag()
-	{
-		if (not btag_isLoaded) {
-			if (btag_branch != 0) {
-				btag_branch->GetEntry(index);
-			} else { 
-				printf("branch btag_branch does not exist!\n");
-				exit(1);
-			}
-			btag_isLoaded = true;
-		}
-		return *btag_;
-	}
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets()
 	{
 		if (not pfjets_isLoaded) {
@@ -9598,6 +9781,19 @@ void LoadAllBranches()
 		}
 		return *pfjets_;
 	}
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_genJet_()
+	{
+		if (not pfjets_genJet__isLoaded) {
+			if (pfjets_genJet__branch != 0) {
+				pfjets_genJet__branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_genJet__branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_genJet__isLoaded = true;
+		}
+		return *pfjets_genJet__;
+	}
 	vector<float> &pfjets_csv()
 	{
 		if (not pfjets_csv_isLoaded) {
@@ -9610,6 +9806,58 @@ void LoadAllBranches()
 			pfjets_csv_isLoaded = true;
 		}
 		return *pfjets_csv_;
+	}
+	vector<float> &pfjets_chm()
+	{
+		if (not pfjets_chm_isLoaded) {
+			if (pfjets_chm_branch != 0) {
+				pfjets_chm_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_chm_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_chm_isLoaded = true;
+		}
+		return *pfjets_chm_;
+	}
+	vector<float> &pfjets_neu()
+	{
+		if (not pfjets_neu_isLoaded) {
+			if (pfjets_neu_branch != 0) {
+				pfjets_neu_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_neu_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_neu_isLoaded = true;
+		}
+		return *pfjets_neu_;
+	}
+	vector<float> &pfjets_lrm()
+	{
+		if (not pfjets_lrm_isLoaded) {
+			if (pfjets_lrm_branch != 0) {
+				pfjets_lrm_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_lrm_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_lrm_isLoaded = true;
+		}
+		return *pfjets_lrm_;
+	}
+	vector<float> &pfjets_lrm2()
+	{
+		if (not pfjets_lrm2_isLoaded) {
+			if (pfjets_lrm2_branch != 0) {
+				pfjets_lrm2_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_lrm2_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_lrm2_isLoaded = true;
+		}
+		return *pfjets_lrm2_;
 	}
 	vector<float> &pfjets_beta()
 	{
@@ -9650,6 +9898,19 @@ void LoadAllBranches()
 		}
 		return *pfjets_beta_0p1_;
 	}
+	vector<float> &pfjets_beta_0p2()
+	{
+		if (not pfjets_beta_0p2_isLoaded) {
+			if (pfjets_beta_0p2_branch != 0) {
+				pfjets_beta_0p2_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_beta_0p2_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_beta_0p2_isLoaded = true;
+		}
+		return *pfjets_beta_0p2_;
+	}
 	vector<float> &pfjets_beta2_0p1()
 	{
 		if (not pfjets_beta2_0p1_isLoaded) {
@@ -9662,6 +9923,19 @@ void LoadAllBranches()
 			pfjets_beta2_0p1_isLoaded = true;
 		}
 		return *pfjets_beta2_0p1_;
+	}
+	vector<float> &pfjets_beta2_0p5()
+	{
+		if (not pfjets_beta2_0p5_isLoaded) {
+			if (pfjets_beta2_0p5_branch != 0) {
+				pfjets_beta2_0p5_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_beta2_0p5_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_beta2_0p5_isLoaded = true;
+		}
+		return *pfjets_beta2_0p5_;
 	}
 	vector<float> &pfjets_corr()
 	{
@@ -9915,6 +10189,11 @@ namespace Stop {
 	float &t1metphicorr_off();
 	float &t1metphicorrphi_off();
 	float &t1metphicorrmt_off();
+	float &mt2bmin();
+	float &mt2blmin();
+	float &mt2wmin();
+	float &chi2min();
+	float &chi2minprob();
 	int &nbtagsssv();
 	int &nbtagstcl();
 	int &nbtagstcm();
@@ -10071,6 +10350,9 @@ namespace Stop {
 	float &pfcandiso10();
 	float &pfcandpt10();
 	float &pfcandmindrj10();
+	int &pfcandidOS10();
+	float &pfcandisoOS10();
+	float &pfcandptOS10();
 	int &pfcanddirid10();
 	float &pfcanddiriso10();
 	float &pfcanddirpt10();
@@ -10176,14 +10458,19 @@ namespace Stop {
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_tbar();
 	int &lep_t_id();
 	int &lep_tbar_id();
-	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jets();
-	vector<float> &btag();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets();
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_genJet_();
 	vector<float> &pfjets_csv();
+	vector<float> &pfjets_chm();
+	vector<float> &pfjets_neu();
+	vector<float> &pfjets_lrm();
+	vector<float> &pfjets_lrm2();
 	vector<float> &pfjets_beta();
 	vector<float> &pfjets_beta2();
 	vector<float> &pfjets_beta_0p1();
+	vector<float> &pfjets_beta_0p2();
 	vector<float> &pfjets_beta2_0p1();
+	vector<float> &pfjets_beta2_0p5();
 	vector<float> &pfjets_corr();
 	vector<int> &pfjets_mc3();
 	vector<float> &pfjets_genJetDr();
