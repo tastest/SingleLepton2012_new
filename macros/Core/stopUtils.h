@@ -22,6 +22,19 @@
 
 using namespace std;
 
+class Candidate : public TObject {
+ public:
+  float chi2, mt2w, mt2bl, mt2b;
+  int j1, j2, bi, oi;
+  float k1, k2;
+  bool match;
+  
+  ClassDef(Candidate, 2)
+    };
+
+typedef vector<Candidate> CANDIDATES;
+
+
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1, int iskip2);
 unsigned int getNJets();
 vector<int> getBJetIndex(double discr, int iskip1, int iskip2);
