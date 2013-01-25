@@ -38,6 +38,9 @@ This should create a set of .cmd files and a submit script submitAll.sh
 the job .out and .err files should be located in the job_logs directory 
 the submission log should be in submit_logs
 
+to resubmit some jobs
+> ./resubmitConfig.sh <CMDFILE>
+
 4) Once the jobs are done, merge the output with the mergeHadoopOutput script
 set the output directory where the babies are located to the COPYDIR location from before
 pass as argument the output tag name
