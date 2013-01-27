@@ -391,6 +391,7 @@ void singleLeptonLooper::InitBaby(){
   pfjets_neu_.clear();
   pfjets_corr_.clear();
   pfjets_mc3_.clear();
+  pfjets_flav_.clear();
   pfjets_lrm_.clear();
   pfjets_lrm2_.clear();
   pfjets_qgtag_.clear();
@@ -2456,6 +2457,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if( isData ){
 
 	  pfjets_mc3_.push_back( -1 );
+    pfjets_flav_.push_back( -1 );
 	  pfjets_genJetDr_.push_back( -1.0 );
 	  pfjets_lepjet_.push_back( -1 );
 
@@ -2463,6 +2465,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	else{
 
 	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
+    pfjets_flav_.push_back((isGenBMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 5 : (isGenCMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 4 : 0)));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
 	  if(genjets_p4().size()>indexGenJet(vipfjets_p4.at(i).p4obj)) pfjets_genJet_.push_back(genjets_p4().at(indexGenJet(vipfjets_p4.at(i).p4obj)));
@@ -3611,6 +3614,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
   outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
   outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
+  outTree->Branch("pfjets_flav",    "std::vector<int>"  , &pfjets_flav_     ); 
   outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
   outTree->Branch("pfjets_qgtag",   "std::vector<float>", &pfjets_qgtag_    );
   outTree->Branch("pfjets_sigma",   "std::vector<float>", &pfjets_sigma_    );

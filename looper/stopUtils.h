@@ -125,6 +125,8 @@ struct myTrackIso trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0
                               
 bool isGenBMatched ( LorentzVector p4, float dR );
 
+bool isGenCMatched ( LorentzVector p4, float dR );
+
 int isGenQGMatched ( LorentzVector p4, float dR );
 
 int isGenQGLMatched ( LorentzVector p4, float dR );

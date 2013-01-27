@@ -396,6 +396,21 @@ bool isGenBMatched ( LorentzVector p4, float dR ) {
 }
 
 //--------------------------------------------------------------------                                                                                                                                               
+bool isGenCMatched ( LorentzVector p4, float dR ) {
+
+  //For now only checking status 3 in dR                                                                                                                                                                             
+  for (unsigned int igen = 0; igen < genps_p4().size(); igen++) {
+
+    int id = genps_id().at(igen);
+    if( abs(id)!=4 ) continue;
+
+    if( ROOT::Math::VectorUtil::DeltaR( p4 , genps_p4().at(igen) ) < dR ) return true;
+
+  }
+  return false;
+}
+
+//--------------------------------------------------------------------                                                                                                                                               
 
 int isGenQGMatched ( LorentzVector p4, float dR ) {
   //Start from the end that seems to have the decay products of the W first                                                                                                                                          

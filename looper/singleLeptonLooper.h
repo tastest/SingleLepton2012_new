@@ -406,6 +406,7 @@ class singleLeptonLooper
 	std::vector<float> pfjets_corr_;
 	//status 3 parton matching
 	std::vector<int>   pfjets_mc3_;
+	std::vector<int>   pfjets_flav_;
 	//qg tagging
 	std::vector<float> pfjets_qgtag_;
 	//jet shape
