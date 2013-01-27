@@ -429,6 +429,7 @@ class singleLeptonLooper
         /* std::vector<float> pfjets_beta2_0p15_; */
         /* std::vector<float> pfjets_beta_0p2_;   */
         /* std::vector<float> pfjets_beta2_0p2_;  */
+	std::vector<float> pfjets_mvaPUid_;
 
 	float chi2min_;
 	float chi2minprob_;

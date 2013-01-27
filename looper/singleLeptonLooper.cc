@@ -404,11 +404,12 @@ void singleLeptonLooper::InitBaby(){
   pfjets_beta_0p2_.clear();
   pfjets_beta2_0p1_.clear();
   pfjets_beta2_0p5_.clear();
+  pfjets_mvaPUid_.clear();
   // pfjets_beta_0p15_.clear();
   // pfjets_beta2_0p15_.clear();
   // pfjets_beta_0p2_.clear();
   // pfjets_beta2_0p2_.clear();
-  
+
 
 }
 
@@ -2483,6 +2484,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
         // pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
         // pfjets_beta2_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.2 ) );	
+	pfjets_mvaPUid_.push_back(pfjets_mvavalue().at(vipfjets_p4.at(i).p4ind));
+
       }
 
       //store distance to closest jet for pfcand
@@ -3611,6 +3614,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   // outTree->Branch("pfjets_beta2_0p15","std::vector<float>", &pfjets_beta2_0p15_);
   // outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );
   // outTree->Branch("pfjets_beta2_0p2", "std::vector<float>", &pfjets_beta2_0p2_ );
+  outTree->Branch("pfjets_mvaPUid",      "std::vector<float>", &pfjets_mvaPUid_ );
 
   outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
   outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
