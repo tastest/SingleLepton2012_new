@@ -442,10 +442,15 @@ int isGenQGLMatched ( LorentzVector p4, float dR ) {
     int mothid = genps_id_mother().at(igen);
     // cout<<"status 3 particle ID "<<id<<" mother "<<mothid                                                                                                                                                         
     //  <<" dR to jet "<<deltaR<<endl;                                                                                                                                                                               
-    if (abs(id)<6 && abs(mothid)==24)
-      return (mothid>0) ? 2 : -2;
+    // B from the top
     if (abs(id)==5 && abs(mothid)==6)
       return (mothid>0) ? 1 : -1;
+    // uds from the W
+    if (abs(id)<4 && abs(mothid)==24)
+      return (mothid>0) ? 2 : -2;
+    // c from the W
+    if (abs(id)==4 && abs(mothid)==24)
+      return (mothid>0) ? 5 : -5;
 
     if (abs(id)==11 && abs(mothid)==24)
       return (mothid>0) ? 11 : -11;
