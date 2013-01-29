@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVA_stop.C,v 1.3 2013/01/07 23:54:23 benhoob Exp $
+// @(#)root/tmva $Id: TMVA_stop.C,v 1.4 2013/01/29 15:40:22 magania Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -51,7 +51,7 @@
 
 using namespace std;
 
-void TMVA_stop( TString myMethodList = "" )
+void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_parameter = 0.25)
 {
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
    // if you use your private .rootrc, or run from a different directory, please copy the
@@ -75,28 +75,31 @@ void TMVA_stop( TString myMethodList = "" )
   TCut njets4("njets>=4");
   TCut met100("met>=100");
   TCut mt120("mt>=120");
+  TCut mt100("mt>=100");
   TCut nb1("nb>=1");
   //TCut isotrk("passisotrk==1");
   TCut isotrk("passisotrkv2==1");
   TCut lep_pt30("nlep>=1 && lep1pt>30.0");
    
-  TCut  sel      = lep_pt30 + isotrk + njets4 + met100 + mt120 + nb1;
-  char* sigpoint = "T2tt_450_0";
+  TCut  sel  = lep_pt30 + isotrk + njets4 + mt120 + met100 + nb1;
 
   cout << "Using selection      : " << sel.GetTitle() << endl;
-  cout << "Doing signal point   : " << sigpoint       << endl;
+  cout << "Doing signal point   : " << train_region       << endl;
 
   //-----------------------------------------------------
   // choose which variables to include in MVA training
   //-----------------------------------------------------
   
   std::map<std::string,int> mvaVar;
-  mvaVar[ "met" ]			= 0;
+  mvaVar[ "met" ]			= 1;
   mvaVar[ "lep1pt" ]			= 1;
   mvaVar[ "mt2wmin" ]			= 1;
   mvaVar[ "htratiom" ]	                = 1;
   mvaVar[ "chi2minprob" ]		= 1;
   mvaVar[ "dphimjmin" ]			= 1;
+  mvaVar[ "pt_b" ]			= 1;
+  mvaVar[ "pt_J1" ]			= 0;
+  mvaVar[ "pt_J2" ]			= 0;
   mvaVar[ "rand" ]			= 0;
 
   mvaVar[ "mt" ]			= 0;
@@ -126,36 +129,54 @@ void TMVA_stop( TString myMethodList = "" )
   mvaVar[ "dphimj2" ]			= 0;
   mvaVar[ "metsig" ]			= 0;
 
-
-  // cout << "Variables for MVA    :" << endl;
-  // if( mvaVar[ "met"     ]  == 1 ) cout << "met"     << endl;
-  // if( mvaVar[ "mt"      ]  == 1 ) cout << "mt"      << endl;
-  // if( mvaVar[ "mt2w"    ]  == 1 ) cout << "mt2w"    << endl;
-  // if( mvaVar[ "mt2bl"   ]  == 1 ) cout << "mt2bl"   << endl;
-  // if( mvaVar[ "mt2b"    ]  == 1 ) cout << "mt2b"    << endl;
-  // if( mvaVar[ "chi2"    ]  == 1 ) cout << "chi2"    << endl;
-  // if( mvaVar[ "lep1pt"  ]  == 1 ) cout << "lep1pt"  << endl;
-  // if( mvaVar[ "lep1eta" ]  == 1 ) cout << "lep1eta" << endl;
-  
   //---------------------------------
   //choose bkg samples to include
   //---------------------------------
-  
-  const char* babyPath = "/tas/benhoob/StopBabies/output_V00-02-04_2012_4jskim/MiniBabies/V00-00-01";
-  
-  cout << "Adding backgrounds from path " << babyPath << endl;
+  cout << "Background trees: " << endl;
+  int n_backgrounds = 2;
 
-  TChain *chbackground = new TChain("t");
-  chbackground->Add(Form("%s/ttdl_powheg_mini.root",babyPath)); cout << "ttdl_powheg" << endl;
-  chbackground->Add(Form("%s/ttsl_powheg_mini.root",babyPath)); cout << "ttsl_powheg" << endl;
+  TString backgrounds[] = {"ttdl_powheg", "ttsl_powheg"};
+
+  TString bkgPath = "/nfs-3/userdata/stop/MiniBabies/4jskim";
+
+  TChain* chBkgTrain = new TChain("t");
+  TChain* chBkgTest = new TChain("t");
+ 
+  for (int i = 0; i < n_backgrounds; i++) {
+     TString bkgTrainChain = bkgPath + "/" + backgrounds[i] + "_train.root";
+     TString bkgTestChain  = bkgPath + "/" + backgrounds[i] + "_test.root" ; 
+   
+     cout << "    " << bkgTrainChain << endl;
+     cout << "    " << bkgTestChain << endl;
+   
+     chBkgTrain->Add(bkgTrainChain);
+     chBkgTest ->Add(bkgTestChain );
+  }
 
   //---------------------------------
   //choose signal sample to include
   //---------------------------------
+  cout << "Signal trees: " << endl;
+  TString s_train_region = "";
+  s_train_region += train_region;
+  TString s_x_parameter = "";
+  s_x_parameter = Form("%.2f",x_parameter);
 
-  TChain *chsignal = new TChain("t");
+  TString signalPath = "/nfs-3/userdata/stop/MiniBabies";
 
-  chsignal->Add(Form("%s/%s_mini.root",babyPath,sigpoint));
+  TChain *chSignalTrain = new TChain("t");
+  TChain *chSignalTest = new TChain("t");
+
+  TString base_name = signalPath + "/" + signal_name + "/" + signal_name + "_" + s_train_region;
+  if (signal_name == "T2bw") base_name = base_name + "_" + s_x_parameter;
+  TString signalTestChain  = base_name + "_test.root" ;
+  TString signalTrainChain = base_name + "_train.root" ;
+
+  cout << "    " << signalTrainChain << endl;
+  cout << "    " << signalTestChain  << endl;
+
+  chSignalTrain->Add(signalTrainChain);
+  chSignalTest ->Add(signalTestChain);
 
   //-----------------------------------------------------
   // choose backgrounds to include for multiple outputs
@@ -186,36 +207,36 @@ void TMVA_stop( TString myMethodList = "" )
    std::map<std::string,int> Use;
 
    // --- Cut optimisation
-   Use["Cuts"]            = 1;
-   Use["CutsD"]           = 1;
+   Use["Cuts"]            = 0;
+   Use["CutsD"]           = 0;
    Use["CutsPCA"]         = 0;
    Use["CutsGA"]          = 0;
    Use["CutsSA"]          = 0;
    // 
    // --- 1-dimensional likelihood ("naive Bayes estimator")
-   Use["Likelihood"]      = 1;
+   Use["Likelihood"]      = 0;
    Use["LikelihoodD"]     = 0; // the "D" extension indicates decorrelated input variables (see option strings)
-   Use["LikelihoodPCA"]   = 1; // the "PCA" extension indicates PCA-transformed input variables (see option strings)
+   Use["LikelihoodPCA"]   = 0; // the "PCA" extension indicates PCA-transformed input variables (see option strings)
    Use["LikelihoodKDE"]   = 0;
    Use["LikelihoodMIX"]   = 0;
    //
    // --- Mutidimensional likelihood and Nearest-Neighbour methods
-   Use["PDERS"]           = 1;
+   Use["PDERS"]           = 0;
    Use["PDERSD"]          = 0;
    Use["PDERSPCA"]        = 0;
-   Use["PDEFoam"]         = 1;
+   Use["PDEFoam"]         = 0;
    Use["PDEFoamBoost"]    = 0; // uses generalised MVA method boosting
-   Use["KNN"]             = 1; // k-nearest neighbour method
+   Use["KNN"]             = 0; // k-nearest neighbour method
    //
    // --- Linear Discriminant Analysis
-   Use["LD"]              = 1; // Linear Discriminant identical to Fisher
+   Use["LD"]              = 0; // Linear Discriminant identical to Fisher
    Use["Fisher"]          = 0;
    Use["FisherG"]         = 0;
    Use["BoostedFisher"]   = 0; // uses generalised MVA method boosting
    Use["HMatrix"]         = 0;
    //
    // --- Function Discriminant analysis
-   Use["FDA_GA"]          = 1; // minimisation of user-defined function using Genetics Algorithm
+   Use["FDA_GA"]          = 0; // minimisation of user-defined function using Genetics Algorithm
    Use["FDA_SA"]          = 0;
    Use["FDA_MC"]          = 0;
    Use["FDA_MT"]          = 0;
@@ -225,25 +246,26 @@ void TMVA_stop( TString myMethodList = "" )
    // --- Neural Networks (all are feed-forward Multilayer Perceptrons)
    Use["MLP"]             = 0; // Recommended ANN
    Use["MLPBFGS"]         = 0; // Recommended ANN with optional training method
-   Use["MLPBNN"]          = 1; // Recommended ANN with BFGS training method and bayesian regulator
+   Use["MLPBNN"]          = 0; // Recommended ANN with BFGS training method and bayesian regulator
    Use["CFMlpANN"]        = 0; // Depreciated ANN from ALEPH
    Use["TMlpANN"]         = 0; // ROOT's own ANN
    //
    // --- Support Vector Machine 
-   Use["SVM"]             = 1;
+   Use["SVM"]             = 0;
    // 
    // --- Boosted Decision Trees
    Use["BDT"]             = 1; // uses Adaptive Boost
+   Use["BDT1"]            = 1; // uses Adaptive Boost
    Use["BDTG"]            = 0; // uses Gradient Boost
    Use["BDTB"]            = 0; // uses Bagging
    Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
    // 
    // --- Friedman's RuleFit method, ie, an optimised series of cuts ("rules")
-   Use["RuleFit"]         = 1;
+   Use["RuleFit"]         = 0;
    //
    // --- multi-output MVA's
-   Use["multi_BDTG"]      = 1;
-   Use["multi_MLP"]       = 1;
+   Use["multi_BDTG"]      = 0;
+   Use["multi_MLP"]       = 0;
    Use["multi_FDA_GA"]    = 0;
 
    //
@@ -252,31 +274,16 @@ void TMVA_stop( TString myMethodList = "" )
    std::cout << std::endl;
    std::cout << "==> Start TMVAClassification" << std::endl;
 
-   // Select methods (don't look at this code - not of interest)
-   if (myMethodList != "") {
-      for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) it->second = 0;
-
-      std::vector<TString> mlist = TMVA::gTools().SplitString( myMethodList, ',' );
-      for (UInt_t i=0; i<mlist.size(); i++) {
-         std::string regMethod(mlist[i]);
-
-         if (Use.find(regMethod) == Use.end()) {
-            std::cout << "Method \"" << regMethod << "\" not known in TMVA under this name. Choose among the following:" << std::endl;
-            for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) std::cout << it->first << " ";
-            std::cout << std::endl;
-            return;
-         }
-         Use[regMethod] = 1;
-      }
-   }
-
-   // --------------------------------------------------------------------------------------------------
-
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-   TString outfileName( "TMVA.root" );
+   TString outfileName = "TMVA_" + signal_name + "_" + s_train_region;
+   if (signal_name == "T2bw") outfileName = outfileName +"_" + s_x_parameter;
+   outfileName += ".root";
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
+
+   TString classification_name = "classification_" + signal_name + "_" + s_train_region;
+   if (signal_name == "T2bw") classification_name = classification_name +"_" + s_x_parameter;
 
    /*
    TString multioutfileName( "TMVA_HWW_multi.root" );
@@ -296,7 +303,7 @@ void TMVA_stop( TString myMethodList = "" )
    // The second argument is the output file for the training results
    // All TMVA output can be suppressed by removing the "!" (not) in
    // front of the "Silent" argument in the option string
-   TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
+   TMVA::Factory *factory = new TMVA::Factory( classification_name, outputFile,
                                                "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
    /*
    TMVA::Factory *multifactory;
@@ -354,7 +361,11 @@ void TMVA_stop( TString myMethodList = "" )
    if( mvaVar[ "dphimj2"       ]  == 1 ) factory->AddVariable( "dphimj2"                ,  "#Delta#phi(j2,E_{T}^{miss})",       ""   , 'F' );
    if( mvaVar[ "dphimjmin"     ]  == 1 ) factory->AddVariable( "dphimjmin"              ,  "min(#Delta#phi(j_{1,2},E_{T}^{miss}))",       ""   , 'F' );
    if( mvaVar[ "rand"          ]  == 1 ) factory->AddVariable( "rand"                   ,  "random(0,1)"                ,       ""   , 'F' );
-   if( mvaVar[ "metsig"        ]  == 1 ) factory->AddVariable( "met/sqrt(htosl+htssl)"  ,  "E_{T}^{miss}/#sqrt{H_{T}}"  ,       "#sqrt{GeV}"   , 'F' );
+   if( mvaVar[ "metsig"        ]  == 1 ) factory->AddVariable( "met/sqrt(htosl+htssl)"  ,  "E_{T}^{miss}/#sqrt{H_{T}}"  ,       "#sqrt{GeV}"   , 'F' )
+;
+   if( mvaVar[ "pt_b"          ]  == 1 ) factory->AddVariable( "pt_b"  ,       "P_T(b) GeV"   , 'F' );
+   if( mvaVar[ "pt_J1"          ]  == 1 ) factory->AddVariable( "pt_J1"  ,       "P_T(J1) GeV"   , 'F' );
+   if( mvaVar[ "pt_J2"          ]  == 1 ) factory->AddVariable( "pt_J2"  ,       "P_T(J2) GeV"   , 'F' );
    
    /*
    if( doMultipleOutputs ){
@@ -382,40 +393,42 @@ void TMVA_stop( TString myMethodList = "" )
    //factory->AddSpectator( "spec1 := var1*2",  "Spectator 1", "units", 'F' );
    //factory->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
 
-   TTree *signal     = (TTree*) chsignal;
-   TTree *background = (TTree*) chbackground;
+   TTree* signalTrainingTree =  (TTree*) chSignalTrain;
+   TTree* signalTestTree =  (TTree*) chSignalTest;
+
+   TTree* bkgTrainingTree =  (TTree*) chBkgTrain;
+   TTree* bkgTestTree =  (TTree*) chBkgTest;
    
-   std::cout << "--- TMVAClassification       : Using bkg input files: -------------------" <<  std::endl;
-
-   TObjArray *listOfBkgFiles = chbackground->GetListOfFiles();
-   TIter bkgFileIter(listOfBkgFiles);
-   TChainElement* currentBkgFile = 0;
-
-   while((currentBkgFile = (TChainElement*)bkgFileIter.Next())) {
-     std::cout << currentBkgFile->GetTitle() << std::endl;
-   }
-
-   std::cout << "--- TMVAClassification       : Using sig input files: -------------------" <<  std::endl;
-   
-   TObjArray *listOfSigFiles = chsignal->GetListOfFiles();
-   TIter sigFileIter(listOfSigFiles);
-   TChainElement* currentSigFile = 0;
-
-   while((currentSigFile = (TChainElement*)sigFileIter.Next())) {
-     std::cout << currentSigFile->GetTitle() << std::endl;
-   }
+//    std::cout << "--- TMVAClassification       : Using bkg input files: -------------------" <<  std::endl;
+// 
+//    TObjArray *listOfBkgFiles = chbackground->GetListOfFiles();
+//    TIter bkgFileIter(listOfBkgFiles);
+//    TChainElement* currentBkgFile = 0;
+// 
+//    while((currentBkgFile = (TChainElement*)bkgFileIter.Next())) {
+//      std::cout << currentBkgFile->GetTitle() << std::endl;
+//    }
+// 
+//    std::cout << "--- TMVAClassification       : Using sig input files: -------------------" <<  std::endl;
+//    
+//    TObjArray *listOfSigFiles = chsignal->GetListOfFiles();
+//    TIter sigFileIter(listOfSigFiles);
+//    TChainElement* currentSigFile = 0;
+// 
+//    while((currentSigFile = (TChainElement*)sigFileIter.Next())) {
+//      std::cout << currentSigFile->GetTitle() << std::endl;
+//    }
 
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
-   Double_t backgroundWeight = 10;
+   Double_t backgroundWeight = 1.0;
    
-   // You can add an arbitrary number of signal or background trees
-   factory->AddSignalTree    ( signal,     signalWeight     );
-   factory->AddBackgroundTree( background, backgroundWeight );
-      
    // To give different trees for training and testing, do as follows:
-   //    factory->AddSignalTree( signalTrainingTree, signalTrainWeight, "Training" );
-   //    factory->AddSignalTree( signalTestTree,     signalTestWeight,  "Test" );
+   factory->AddSignalTree( signalTrainingTree, signalWeight, "Training" );
+   factory->AddSignalTree( signalTestTree,     signalWeight,  "Test" );
+
+   factory->AddBackgroundTree( bkgTrainingTree, backgroundWeight, "Training" );
+   factory->AddBackgroundTree( bkgTestTree,     backgroundWeight,  "Test" );
    
    // Use the following code instead of the above two or four lines to add signal and background
    // training and test events "by hand"
@@ -639,7 +652,7 @@ void TMVA_stop( TString myMethodList = "" )
 
    // TMVA ANN: MLP (recommended ANN) -- all ANNs in TMVA are Multilayer Perceptrons
    if (Use["MLP"])
-      factory->BookMethod( TMVA::Types::kMLP, "MLP", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:!UseRegulator" );
+      factory->BookMethod( TMVA::Types::kMLP, "MLP", "!H:!V:NeuronType=tanh:VarTransform=N:NCycles=1000:HiddenLayers=N+N:TestRate=5:!UseRegulator:LearningRate=0.2:DecayRate=0.001:BPMode=batch:BatchSize=500"); 
 
    if (Use["MLPBFGS"])
       factory->BookMethod( TMVA::Types::kMLP, "MLPBFGS", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:TrainingMethod=BFGS:!UseRegulator" );
@@ -667,7 +680,10 @@ void TMVA_stop( TString myMethodList = "" )
    if (Use["BDT"])  // Adaptive Boost
       factory->BookMethod( TMVA::Types::kBDT, "BDT",
                            "!H:!V:NTrees=850:nEventsMin=150:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" );
-                           //"!H:!V:NTrees=850:nEventsMin=150:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" );
+
+   if (Use["BDT1"])  // Adaptive Boost
+      factory->BookMethod( TMVA::Types::kBDT, "BDT1",
+                             "!H:!V:NTrees=200:nEventsMin=300:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=4:PruneMethod=NoPruning" );
 
    if (Use["BDTB"]) // Bagging
       factory->BookMethod( TMVA::Types::kBDT, "BDTB",

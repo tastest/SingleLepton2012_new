@@ -265,7 +265,7 @@ namespace TMVAGlob {
          TString dir = f.Remove( f.Last( '/' ), f.Length() - f.Last( '/' ) );
          gSystem->mkdir( dir );
 
-         TString pngName = fname + ".png";
+         TString pngName = fname + ".jpg";
          TString pdfName = fname + ".pdf";
          TString gifName = fname + ".gif";
          TString epsName = fname + ".eps";
@@ -285,8 +285,8 @@ namespace TMVAGlob {
 	   cout << "--- printing all files as pdf's, to turn off go to tmvaglob.C L285"       << endl;
 	   cout << "--- --------------------------------------------------------------------" << endl;
 	   // c->Print(epsName);
-	   // c->Print(pngName);
-	   c->Print(pdfName);
+	   c->Print(pngName);
+	   //c->Print(pdfName);
 	   // c->Print(gifName);
 	 }
          // else {
