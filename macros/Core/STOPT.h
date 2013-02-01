@@ -1307,6 +1307,9 @@ protected:
 	vector<int> *pfjets_mc3_;
 	TBranch *pfjets_mc3_branch;
 	bool pfjets_mc3_isLoaded;
+	vector<int> *pfjets_flav_;
+	TBranch *pfjets_flav_branch;
+	bool pfjets_flav_isLoaded;
 	vector<float> *pfjets_genJetDr_;
 	TBranch *pfjets_genJetDr_branch;
 	bool pfjets_genJetDr_isLoaded;
@@ -3472,6 +3475,11 @@ void Init(TTree *tree) {
 		pfjets_mc3_branch = tree->GetBranch("pfjets_mc3");
 		if (pfjets_mc3_branch) {pfjets_mc3_branch->SetAddress(&pfjets_mc3_);}
 	}
+	pfjets_flav_branch = 0;
+	if (tree->GetBranch("pfjets_flav") != 0) {
+		pfjets_flav_branch = tree->GetBranch("pfjets_flav");
+		if (pfjets_flav_branch) {pfjets_flav_branch->SetAddress(&pfjets_flav_);}
+	}
 	pfjets_genJetDr_branch = 0;
 	if (tree->GetBranch("pfjets_genJetDr") != 0) {
 		pfjets_genJetDr_branch = tree->GetBranch("pfjets_genJetDr");
@@ -3928,6 +3936,7 @@ void GetEntry(unsigned int idx)
 		pfjets_beta2_0p5_isLoaded = false;
 		pfjets_corr_isLoaded = false;
 		pfjets_mc3_isLoaded = false;
+		pfjets_flav_isLoaded = false;
 		pfjets_genJetDr_isLoaded = false;
 		pfjets_qgtag_isLoaded = false;
 		pfjets_sigma_isLoaded = false;
@@ -4367,6 +4376,7 @@ void LoadAllBranches()
 	if (pfjets_beta2_0p5_branch != 0) pfjets_beta2_0p5();
 	if (pfjets_corr_branch != 0) pfjets_corr();
 	if (pfjets_mc3_branch != 0) pfjets_mc3();
+	if (pfjets_flav_branch != 0) pfjets_flav();
 	if (pfjets_genJetDr_branch != 0) pfjets_genJetDr();
 	if (pfjets_qgtag_branch != 0) pfjets_qgtag();
 	if (pfjets_sigma_branch != 0) pfjets_sigma();
@@ -9963,6 +9973,19 @@ void LoadAllBranches()
 		}
 		return *pfjets_mc3_;
 	}
+	vector<int> &pfjets_flav()
+	{
+		if (not pfjets_flav_isLoaded) {
+			if (pfjets_flav_branch != 0) {
+				pfjets_flav_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_flav_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_flav_isLoaded = true;
+		}
+		return *pfjets_flav_;
+	}
 	vector<float> &pfjets_genJetDr()
 	{
 		if (not pfjets_genJetDr_isLoaded) {
@@ -10473,6 +10496,7 @@ namespace Stop {
 	vector<float> &pfjets_beta2_0p5();
 	vector<float> &pfjets_corr();
 	vector<int> &pfjets_mc3();
+	vector<int> &pfjets_flav();
 	vector<float> &pfjets_genJetDr();
 	vector<float> &pfjets_qgtag();
 	vector<float> &pfjets_sigma();

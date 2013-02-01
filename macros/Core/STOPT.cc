@@ -431,6 +431,7 @@ namespace Stop {
 	vector<float> &pfjets_beta2_0p5() { return stopt.pfjets_beta2_0p5(); }
 	vector<float> &pfjets_corr() { return stopt.pfjets_corr(); }
 	vector<int> &pfjets_mc3() { return stopt.pfjets_mc3(); }
+	vector<int> &pfjets_flav() { return stopt.pfjets_flav(); }
 	vector<float> &pfjets_genJetDr() { return stopt.pfjets_genJetDr(); }
 	vector<float> &pfjets_qgtag() { return stopt.pfjets_qgtag(); }
 	vector<float> &pfjets_sigma() { return stopt.pfjets_sigma(); }
