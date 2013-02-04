@@ -2537,7 +2537,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	jets.push_back( pfjets_.at(i));
 
 	sigma[i] = pfjets_sigma_.at(i);
-        if ( isData ) sigma[i] *= getDataMCRatio(jets[i].eta());
+        if ( !isData ) sigma[i] *= getDataMCRatio(jets[i].eta());
 	sigma_jets.push_back(sigma[i]);
 
       } 
