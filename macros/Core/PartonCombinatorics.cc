@@ -170,7 +170,9 @@ void PartonCombinatorics::recoHadronicTop(){
         for (int jw1=0; jw1<n_jets_; ++jw1 )
           for (int jw2=jw1+1; jw2<n_jets_; ++jw2 )
             if ( (mc_.at(jw2)==2 && mc_.at(jw1)==2 && mc_.at(jb)==1 && mc_.at(jbl)==-1) ||
-                 (mc_.at(jw2)==-2 && mc_.at(jw1)==-2 && mc_.at(jb)==-1 && mc_.at(jbl)==1) ) {
+                 (mc_.at(jw2)==-2 && mc_.at(jw1)==-2 && mc_.at(jb)==-1 && mc_.at(jbl)==1) ||
+		 (mc_.at(jw2)==5 && mc_.at(jw1)==5 && mc_.at(jb)==1 && mc_.at(jbl)==-1) ||
+                 (mc_.at(jw2)==-5 && mc_.at(jw1)==-5 && mc_.at(jb)==-1 && mc_.at(jbl)==1) ) {
 	      if ( match == 5 ) break;
               if ( __debug ) cout << "PartonCombinatorics::recoHadronicTop MC found:" << match << endl;
 	      ibl[match] = jbl;
