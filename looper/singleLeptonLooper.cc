@@ -391,6 +391,9 @@ void singleLeptonLooper::InitBaby(){
   pfjets_neu_.clear();
   pfjets_corr_.clear();
   pfjets_mc3_.clear();
+  pfjets_mcflavorAlgo_.clear();
+  pfjets_mcflavorPhys_.clear();
+
   pfjets_flav_.clear();
   pfjets_lrm_.clear();
   pfjets_lrm2_.clear();
@@ -409,7 +412,7 @@ void singleLeptonLooper::InitBaby(){
   // pfjets_beta2_0p15_.clear();
   // pfjets_beta_0p2_.clear();
   // pfjets_beta2_0p2_.clear();
-
+  pfjets_mvaBeta_.clear();
 
 }
 
@@ -866,6 +869,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         continue;
       }
    
+
       //---------------------------------------------
       // find leptons passing analysis selection
       //---------------------------------------------
@@ -2458,7 +2462,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if( isData ){
 
 	  pfjets_mc3_.push_back( -1 );
-    pfjets_flav_.push_back( -1 );
+	  pfjets_flav_.push_back( -1 );
+	  pfjets_mcflavorAlgo_.push_back( -1 );
+	  pfjets_mcflavorPhys_.push_back( -1 );
 	  pfjets_genJetDr_.push_back( -1.0 );
 	  pfjets_lepjet_.push_back( -1 );
 
@@ -2466,7 +2472,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	else{
 
 	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
-    pfjets_flav_.push_back((isGenBMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 5 : (isGenCMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 4 : 0)));
+	  pfjets_mcflavorAlgo_.push_back( pfjets_mcflavorAlgo().at(vipfjets_p4.at(i).p4ind) );
+	  pfjets_mcflavorPhys_.push_back( pfjets_mcflavorPhys().at(vipfjets_p4.at(i).p4ind) );
+	  pfjets_flav_.push_back((isGenBMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 5 : (isGenCMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 4 : 0)));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
 	  if(genjets_p4().size()>indexGenJet(vipfjets_p4.at(i).p4obj)) pfjets_genJet_.push_back(genjets_p4().at(indexGenJet(vipfjets_p4.at(i).p4obj)));
@@ -2484,7 +2492,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
         // pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
         // pfjets_beta2_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.2 ) );	
-	pfjets_mvaPUid_.push_back(pfjets_mvavalue().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaPUid_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaBeta_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
 
       }
 

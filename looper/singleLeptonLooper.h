@@ -407,6 +407,9 @@ class singleLeptonLooper
 	//status 3 parton matching
 	std::vector<int>   pfjets_mc3_;
 	std::vector<int>   pfjets_flav_;
+	std::vector<int>   pfjets_mcflavorAlgo_;
+	std::vector<int>   pfjets_mcflavorPhys_;
+
 	//qg tagging
 	std::vector<float> pfjets_qgtag_;
 	//jet shape
@@ -430,6 +433,7 @@ class singleLeptonLooper
         /* std::vector<float> pfjets_beta_0p2_;   */
         /* std::vector<float> pfjets_beta2_0p2_;  */
 	std::vector<float> pfjets_mvaPUid_;
+	std::vector<float> pfjets_mvaBeta_;
 
 	float chi2min_;
 	float chi2minprob_;
