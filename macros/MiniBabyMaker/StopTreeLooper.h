@@ -54,9 +54,9 @@ class StopTreeLooper {
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
 
-	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
-        list<Candidate> recoHadronicTop(StopTree*, bool, bool);
-        list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree);
+	//	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
+	//        list<Candidate> recoHadronicTop(StopTree*, bool, bool);
+	//        list<Candidate> getBTaggedCands(list<Candidate> &candidates, StopTree* tree);
 	void initBaby();
 	void makeTree(const char*, TChain *chain);
 

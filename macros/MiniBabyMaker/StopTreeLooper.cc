@@ -265,9 +265,25 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       float met = stopt.t1metphicorr();
       float metphi = stopt.t1metphicorrphi();
 
+      /// TEMPORARY FIX for now
+
+      vector<float> sigma_jets;
+
+      int n_jets = stopt.pfjets().size();
+      double sigma[n_jets];
+
+      for( unsigned int i = 0 ; i < n_jets ; ++i ){
+
+	sigma[i] = stopt.pfjets_sigma().at(i);
+        if(name.Contains("T2")) sigma[i] *= getDataMCRatio(jets[i].eta());
+	sigma_jets.push_back(sigma[i]);
+
+      }
+
       // get list of candidates
 
-      PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), stopt.lep1(), met, metphi, isData);
+      //      PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), stopt.lep1(), met, metphi, isData);
+      PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), sigma_jets, stopt.pfjets_mc3(), stopt.lep1(), met, metphi, isData);
       MT2CHI2 mc = pc.getMt2Chi2();
 
       //------------------------------------------ 
@@ -306,7 +322,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       for ( unsigned int i=0; i<myPfJets.size() ; i++) {
 
 	if( myPfJets.at(i).pt()<30 )          continue;
-	if( fabs(myPfJets.at(i).eta())>3.0 )  continue;
+	if( fabs(myPfJets.at(i).eta())>2.4 )  continue;
 
 	LorentzVector jet_p4( myPfJets.at(i).px() , myPfJets.at(i).py() , 0 , myPfJets.at(i).E() );
     
@@ -501,7 +517,7 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.28 $";
+  string revision = "$Revision: 1.29 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
