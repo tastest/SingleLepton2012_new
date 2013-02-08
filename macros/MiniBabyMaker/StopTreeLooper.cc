@@ -439,7 +439,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	lep2eta_   = stopt.lep1().eta();           // 2nd lepton eta
 	dilmass_   = stopt.dilmass();              // dilepton mass
       }
-      
+ 
+      if(indexBJets.size()>0) {
+	dRleptB1_ = deltaR(stopt.pfjets().at(indexBJets.at(0)).eta() , stopt.pfjets().at(indexBJets.at(0)).phi() , stopt.lep1().eta(), stopt.lep1().phi());
+      }
+
       // susy vars
       mstop_       = stopt.mg();                   // stop mass
       mlsp_        = stopt.ml();                   // LSP mass
@@ -517,7 +521,7 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.29 $";
+  string revision = "$Revision: 1.30 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
@@ -540,6 +544,7 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   outTree_->Branch("mini_passisotrk"       ,        &passisotrk_      ,         "mini_passisotrk/I"	);
   outTree_->Branch("mini_passisotrkv2"     ,        &passisotrkv2_    ,         "mini_passisotrkv2/I"	);
   outTree_->Branch("mini_nlep"             ,        &nlep_            ,         "mini_nlep/I"		);
+  outTree_->Branch("mini_dRleptB1"         ,        &dRleptB1_        ,         "mini_dRleptB1/F"	);
   outTree_->Branch("mini_lep1pt"           ,        &lep1pt_          ,         "mini_lep1pt/F"		);
   outTree_->Branch("mini_lep1eta"          ,        &lep1eta_         ,         "mini_lep1eta/F"		);
   outTree_->Branch("mini_lep2pt"           ,        &lep2pt_          ,         "mini_lep2pt/F"		);
@@ -659,6 +664,7 @@ void StopTreeLooper::initBaby(){
   // lepton variables
   passisotrk_ = -1;
   nlep_       = -1;
+  dRleptB1_   = -1;
   lep1pt_     = -1.0;
   lep1eta_    = -1.0;
   lep2pt_     = -1.0;

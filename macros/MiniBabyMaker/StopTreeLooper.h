@@ -137,6 +137,7 @@ class StopTreeLooper {
 
 	Float_t lep1pt_;
 	Float_t lep1eta_;
+	Float_t dRleptB1_;
 
 	Float_t lep2pt_;
 	Float_t lep2eta_;
