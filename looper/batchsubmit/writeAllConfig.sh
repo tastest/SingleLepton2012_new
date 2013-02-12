@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-02-11_2012"
+TAG="V00-02-16_2012"
 
 #
 # DATA
@@ -55,8 +55,8 @@ TAG="V00-02-11_2012"
 #
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-18_slim/ ${TAG}_TTJetsMG
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A_ext-v1/V05-03-20_slim/ ${TAG}_TTJetsFullHadMG
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_FullLeptMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-20_slim/ ${TAG}_TTJetsFullLeptMG
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_SemiLeptMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A_ext-v1/V05-03-20_slim/ ${TAG}_TTJetsSemiLeptMG
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_FullLeptMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-20_slim/SingleOrDiLepton/ ${TAG}_TTJetsFullLeptMG
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_SemiLeptMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A_ext-v1/V05-03-20_slim/SingleOrDiLepton/ ${TAG}_TTJetsSemiLeptMG
 
 #
 # ALTERNATIVE TTBAR
@@ -74,9 +74,6 @@ TAG="V00-02-11_2012"
 #
 # W+JETS
 #
-
-##./writeConfig.sh /hadoop/cms/store/user/linacre/CMS2_V05-03-13/W4JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_W4JetsToLNu
-##./writeConfig.sh /hadoop/cms/store/user/linacre/CMS2_V05-03-13/W3JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/ ${TAG}_W3JetsToLNu
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_WJetsToLNu
 
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/W1JetsToLNu_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_W1JetsToLNu
