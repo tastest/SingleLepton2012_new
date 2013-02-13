@@ -198,6 +198,16 @@ void WHLooper::loop(TChain *chain, TString name)
       // ADD CODE BELOW THIS LINE
       //----------------------------------------------------------------------------
 
+      float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+      int njets = getNJets();
+      int nbjets = (int) getBJetIndex(0.679,-1,-1).size();
+
+      plot1D("h_lep1pt",       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
+      plot1D("h_lep1mt",       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
+      plot1D("h_pfmet",        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
+      plot1D("h_njets",        njets,              evtweight, h_1d, 10, 0., 10.);
+      plot1D("h_nbjets",       nbjets,    evtweight, h_1d, 5, 0., 5.);
+
 
     } // end event loop
 
