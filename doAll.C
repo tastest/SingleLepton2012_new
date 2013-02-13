@@ -1,7 +1,7 @@
-#ifndef __CINT__
 #include <vector>
 #include <string>
 
+#ifndef __CINT__
 #include "TChain.h"
 #include "TSystem.h"
 #include "TROOT.h"
@@ -27,16 +27,16 @@ void doAll() {
  
   std::string indir = "/nfs-3/userdata/stop/output_V00-02-11_2012_2jskim";
 
-  std::string outdir = "test";
+  std::string outdir = "test2";
 
-  TChain* data        = new TChain("T1");
-  TChain* tt          = new TChain("T1");
-  TChain* wjets       = new TChain("T1");
-  TChain* zjets       = new TChain("T1");
-  TChain* vv          = new TChain("T1");
-  TChain* t           = new TChain("T1");
-  TChain* ttV         = new TChain("T1");
-  TChain* vvv         = new TChain("T1");
+  TChain* data        = new TChain("t");
+  TChain* tt          = new TChain("t");
+  TChain* wjets       = new TChain("t");
+  TChain* zjets       = new TChain("t");
+  TChain* vv          = new TChain("t");
+  TChain* t           = new TChain("t");
+  TChain* ttV         = new TChain("t");
+  TChain* vvv         = new TChain("t");
 
   std::vector<string> labels;
   std::vector<TChain*> sample;
@@ -61,7 +61,7 @@ void doAll() {
 
   for (unsigned int i = 0; i < sample.size(); ++i) {
     std::cout << "running on sample: " << labels[i] << std::endl;
-    looper->setOutFileName(Form("output/%s/%s_histos.root", outdir, labels[i]));
+    looper->setOutFileName(Form("output/%s/%s_histos.root", outdir.c_str(), labels[i].c_str()));
     looper->loop(sample[i], labels[i]);
   }
 

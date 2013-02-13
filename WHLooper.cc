@@ -67,7 +67,7 @@ void WHLooper::loop(TChain *chain, TString name)
   // check for valid chain
   //------------------------------
 
-  printf("[WHLooper::loop] %s\n", name.Data());
+  cout << "[WHLooper::loop] sample: " << name << endl;
 
   load_badlaserevents("../Core/badlaser_events.txt", events_lasercalib);
   load_badlaserevents("../Core/badhcallaser_events.txt", events_hcallasercalib);
@@ -120,6 +120,8 @@ void WHLooper::loop(TChain *chain, TString name)
     //----------------------------
     // load the stop baby tree
     //----------------------------
+
+    cout << "[WHLooper::loop] running on file: " << currentFile->GetTitle() << endl;
 
     TFile *file = new TFile( currentFile->GetTitle() );
     TTree *tree = (TTree*)file->Get("t");
