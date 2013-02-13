@@ -19,6 +19,7 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "TChain.h"
+#include "TBenchmark.h"
 #include "Riostream.h"
 
 #include <algorithm>
@@ -57,6 +58,10 @@ void WHLooper::setOutFileName(string filename)
 
 void WHLooper::loop(TChain *chain, TString name)
 {
+
+  // Benchmark
+  TBenchmark *bmark = new TBenchmark();
+  bmark->Start("benchmark");
 
   //------------------------------
   // check for valid chain
@@ -105,6 +110,7 @@ void WHLooper::loop(TChain *chain, TString name)
   unsigned int nEvents = chain->GetEntries();
   nEventsChain = nEvents;
   ULong64_t nEventsTotal = 0;
+  ULong64_t nEventsPass = 0;
   //  ULong64_t i_permille_old = 0;
 
   bool isData = name.Contains("data") ? true : false;
@@ -181,6 +187,7 @@ void WHLooper::loop(TChain *chain, TString name)
       //----------------------------------------------------------------------------
 
       if ( !passEvtSelection(name) ) continue;
+      ++nEventsPass;
 
       //----------------------------------------------------------------------------
       // Function to perform MET phi corrections on-the-fly
@@ -234,6 +241,16 @@ void WHLooper::loop(TChain *chain, TString name)
   already_seen.clear();
 
   gROOT->cd();
+
+  bmark->Stop("benchmark");
+  cout << endl;
+  cout << nEventsTotal << " Events Processed" << endl;
+  cout << nEventsPass << " Events Passed" << endl;
+  cout << "------------------------------" << endl;
+  cout << "CPU  Time:	" << Form( "%.01f s", bmark->GetCpuTime("benchmark")  ) << ", Rate: " << Form( "%.1f Hz", float(nEventsTotal)/bmark->GetCpuTime("benchmark")) << endl;
+  cout << "Real Time:	" << Form( "%.01f s", bmark->GetRealTime("benchmark") ) << ", Rate: " << Form( "%.1f Hz", float(nEventsTotal)/bmark->GetRealTime("benchmark")) << endl;
+  cout << endl;
+  delete bmark;
 
 }
 

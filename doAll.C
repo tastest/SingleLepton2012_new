@@ -1,4 +1,7 @@
 #ifndef __CINT__
+#include <vector>
+#include <string>
+
 #include "TChain.h"
 #include "TSystem.h"
 #include "TROOT.h"
@@ -22,40 +25,48 @@ void doAll() {
   // samples to run over
   //
  
-  char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_2jskim";
+  std::string indir = "/nfs-3/userdata/stop/output_V00-02-11_2012_2jskim";
 
-  char* outdir = "test";
+  std::string outdir = "test";
 
-  const int NSAMPLES = 14;
-  char* sampletag[NSAMPLES] = {
-    "DYStitchtot",
-    "data_diel",
-    "data_dimu",
-    "data_ele",
-    "data_mueg",
-    "data_muo",
-    "diboson",
-    "tWall",
-    "triboson",
-    "ttV",
-    "ttdl_powheg",
-    "ttfake_powheg",
-    "ttsl_powheg",
-    "w1to4jets"
-  };
+  TChain* data        = new TChain("T1");
+  TChain* tt          = new TChain("T1");
+  TChain* wjets       = new TChain("T1");
+  TChain* zjets       = new TChain("T1");
+  TChain* vv          = new TChain("T1");
+  TChain* t           = new TChain("T1");
+  TChain* ttV         = new TChain("T1");
+  TChain* vvv         = new TChain("T1");
 
-  TChain *ch[NSAMPLES];
-    
-  for (int i=0; i<NSAMPLES; ++i) {
-    ch[i] = new TChain("t");
-    ch[i]->Add(Form("%s/%s*.root", path, sampletag[i]));
-    looper->setOutFileName(Form("output/%s/%s_histos.root", outdir, sampletag[i]));
-    looper->loop(ch[i], sampletag[i]);
+  std::vector<string> labels;
+  std::vector<TChain*> sample;
+
+  data->  Add(Form("%s/data_*.root"       , indir.c_str()));
+  wjets-> Add(Form("%s/w1to4jets.root"         , indir.c_str()));
+  zjets-> Add(Form("%s/DYStitchtot.root"         , indir.c_str()));
+  tt->    Add(Form("%s/tt*_powheg.root"         , indir.c_str()));
+  vv->    Add(Form("%s/diboson.root"            , indir.c_str()));
+  t->     Add(Form("%s/tWall.root"             , indir.c_str()));
+  ttV->   Add(Form("%s/ttV.root"           , indir.c_str()));
+  vvv->   Add(Form("%s/triboson.root"           , indir.c_str()));
+
+  sample.push_back(tt);      labels.push_back("ttbar");
+  sample.push_back(wjets);   labels.push_back("wjets");
+  sample.push_back(zjets);   labels.push_back("zjets");
+  sample.push_back(vv);      labels.push_back("VV");
+  sample.push_back(t);       labels.push_back("single_top");
+  sample.push_back(ttV);     labels.push_back("ttV");
+  sample.push_back(vvv);     labels.push_back("VVV");
+  sample.push_back(data);    labels.push_back("data");
+
+  for (unsigned int i = 0; i < sample.size(); ++i) {
+    std::cout << "running on sample: " << labels[i] << std::endl;
+    looper->setOutFileName(Form("output/%s/%s_histos.root", outdir, labels[i]));
+    looper->loop(sample[i], labels[i]);
   }
 
   delete looper;
-  for (int i=0; i<NSAMPLES; ++i) 
-    delete ch[i];
+  for (unsigned int i = 0; i < sample.size(); ++i) delete sample[i];
 
 }
 
