@@ -293,7 +293,7 @@ bool passTwoLeptonSelection(bool isData)
 }
 
 //-------------------------------------------
-// the isolated track veto
+// the isolated track veto used at HCP
 //-------------------------------------------
 
 bool passIsoTrkVeto() 
@@ -308,7 +308,7 @@ bool passIsoTrkVeto()
 }
 
 //-------------------------------------------
-// the isolated track veto
+// the isolated track veto looser E+mu
 //-------------------------------------------
 
 bool passIsoTrkVeto_v2() 
@@ -323,6 +323,25 @@ bool passIsoTrkVeto_v2()
   return true;
 
 }
+
+
+//-------------------------------------------
+// the isolated track veto looser E+mu and OSTrack
+//-------------------------------------------
+
+bool passIsoTrkVeto_v3() 
+{
+
+  //pass isolated track veto
+  //unfortunately changed default value to 9999.
+  if ( stopt.pfcandptOS10() <9998. && abs(stopt.pfcandidOS10())!=13 && abs(stopt.pfcandidOS10())!=11 && stopt.pfcandisoOS10() < 0.1 ) return false;
+  if ( stopt.pfcandpt5()  <9998. && abs(stopt.pfcandid5())==13 && stopt.pfcandiso5() < 0.2) return false;
+  if ( stopt.pfcandpt5()  <9998. && abs(stopt.pfcandid5())==11 && stopt.pfcandiso5() < 0.2) return false;
+
+  return true;
+
+}
+
 
 //-------------------------------------------
 // >=1 selected lepton and trigger
