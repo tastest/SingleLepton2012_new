@@ -22,11 +22,26 @@ void doAll() {
   // samples to run over
   //
  
-  char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim";
+  char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_2jskim";
 
-  const int NSAMPLES = 1;
+  char* outdir = "test";
+
+  const int NSAMPLES = 14;
   char* sampletag[NSAMPLES] = {
-    "ttdl_powheg"
+    "DYStitchtot",
+    "data_diel",
+    "data_dimu",
+    "data_ele",
+    "data_mueg",
+    "data_muo",
+    "diboson",
+    "tWall",
+    "triboson",
+    "ttV",
+    "ttdl_powheg",
+    "ttfake_powheg",
+    "ttsl_powheg",
+    "w1to4jets"
   };
 
   TChain *ch[NSAMPLES];
@@ -34,7 +49,7 @@ void doAll() {
   for (int i=0; i<NSAMPLES; ++i) {
     ch[i] = new TChain("t");
     ch[i]->Add(Form("%s/%s*.root", path, sampletag[i]));
-    looper->setOutFileName(Form("output/%s_histos.root", sampletag[i]));
+    looper->setOutFileName(Form("output/%s/%s_histos.root", outdir, sampletag[i]));
     looper->loop(ch[i], sampletag[i]);
   }
 
