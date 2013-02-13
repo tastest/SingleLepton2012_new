@@ -95,11 +95,11 @@ int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1
 //------------------------------------------------------------------------------------------------
 
 float getDataMCRatio(float eta){
-  if (eta >=0.0 && eta < 0.5) return 1.052;
-  if (eta >=0.5 && eta < 1.1) return 1.057;
-  if (eta >=1.1 && eta < 1.7) return 1.096;
-  if (eta >=1.7 && eta < 2.3) return 1.134;
-  if (eta >=2.3 && eta < 5.0) return 1.288;
+  if (fabs(eta) >=0.0 && fabs(eta) < 0.5) return 1.052;
+  if (fabs(eta) >=0.5 && fabs(eta) < 1.1) return 1.057;
+  if (fabs(eta) >=1.1 && fabs(eta) < 1.7) return 1.096;
+  if (fabs(eta) >=1.7 && fabs(eta) < 2.3) return 1.134;
+  if (fabs(eta) >=2.3 && fabs(eta) < 5.0) return 1.288;
   return 1.0;
 }
 
