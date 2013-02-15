@@ -20,6 +20,8 @@
 #include "TMath.h"
 #include "TChain.h"
 #include "TBenchmark.h"
+#include "TVector2.h"
+#include "Math/VectorUtil.h"
 #include "Riostream.h"
 
 #include <algorithm>
@@ -34,6 +36,16 @@ std::set<DorkyEventIdentifier> already_seen;
 std::set<DorkyEventIdentifier> events_lasercalib; 
 std::set<DorkyEventIdentifier> events_hcallasercalib; 
 
+//--------------------------------------------------------------------
+
+// This is meant to be passed as the third argument, the predicate, of the standard library sort algorithm
+inline bool sortByPt(const LorentzVector &vec1, const LorentzVector &vec2 ) {
+    return vec1.pt() > vec2.pt();
+}
+
+
+//--------------------------------------------------------------------
+
 WHLooper::WHLooper()
 {
   m_outfilename_ = "histos.root";
@@ -44,9 +56,13 @@ WHLooper::WHLooper()
   max_mtpeak = -9999.; 
 }
 
+//--------------------------------------------------------------------
+
 WHLooper::~WHLooper()
 {
 }
+
+//--------------------------------------------------------------------
 
 void WHLooper::setOutFileName(string filename)
 {
@@ -207,13 +223,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       // require 1 lepton sel + iso track veto
       if (!passSingleLeptonSelection(isData)) continue;
-      if (!passIsoTrkVeto_v3()) continue;
+      if (!passIsoTrkVeto_v2()) continue;
 
       // require 2 bjets
-      //      int njets = getNJets();
-      // medium csv: 0.679
-      std::vector<int> bjetIdx = getBJetIndex(0.679,-1,-1);
-      int nbjets = bjetIdx.size();
+      myBJets_ = getBJets(WHLooper::CSVM);
+      int nbjets = myBJets_.size();
       if (nbjets < 2) continue;
 
       ++nEventsPass;
@@ -265,18 +279,61 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 //--------------------------------------------------------------------
 
+std::vector<LorentzVector> WHLooper::getBJets(const csvpoint csv) {
+
+  std::vector<LorentzVector> bjets;
+  float csvcut = getCSVCut(csv);
+
+  std::vector<int> bjetIdx = getBJetIndex(csvcut,-1,-1);
+
+  for (unsigned int i=0; i<bjetIdx.size(); ++i) {
+    bjets.push_back(stopt.pfjets().at(i));
+  }
+
+  // sort by pt
+  sort(bjets.begin()  , bjets.end()  , sortByPt);
+
+  return bjets;
+
+}
+
+//--------------------------------------------------------------------
+
+float WHLooper::getCSVCut(const csvpoint csv) {
+  float csvcut = 10.;
+  if (csv == WHLooper::CSVM) csvcut = 0.679;
+  else if (csv == WHLooper::CSVL) csvcut = 0.244;
+  else if (csv == WHLooper::CSVT) csvcut = 0.898;
+
+  return csvcut;
+}
+
+//--------------------------------------------------------------------
+
 void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight, const std::string& suffix) {
 
   float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
   int njets = getNJets();
-  // medium csv: 0.679
-  int nbjets = (int) getBJetIndex(0.679,-1,-1).size();
 
   plot1D(string("h_lep1pt")+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D(string("h_lep1mt")+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
   plot1D(string("h_pfmet")+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
   plot1D(string("h_njets")+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
-  plot1D(string("h_nbjets")+suffix,       nbjets,    evtweight, h_1d, 5, 0., 5.);
+  plot1D(string("h_nbjets")+suffix,       myBJets_.size(),    evtweight, h_1d, 5, 0., 5.);
+
+  // bjets and bbbar plots
+  if (myBJets_.size() >= 2) {
+    plot1D(string("h_bjet1pt")+suffix,       myBJets_[0].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D(string("h_bjet2pt")+suffix,       myBJets_[1].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D(string("h_bjet1eta")+suffix,       myBJets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
+    plot1D(string("h_bjet2eta")+suffix,       myBJets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
+
+    LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
+    plot1D(string("h_bbm")+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D(string("h_bbpt")+suffix,       bb.pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D(string("h_bbdphi")+suffix,  TVector2::Phi_0_2pi(myBJets_[0].phi() - myBJets_[1].phi()), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    plot1D(string("h_bbdr")+suffix,  ROOT::Math::VectorUtil::DeltaR( myBJets_.at(0) , myBJets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+  }
 
   return;
 }

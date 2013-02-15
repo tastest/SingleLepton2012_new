@@ -17,29 +17,34 @@ using namespace std;
 
 class WHLooper {
 
-    public:
+ public:
   typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-        WHLooper();
-        ~WHLooper();
+  enum csvpoint { CSVL, CSVM, CSVT };
 
-        void setOutFileName(string filename); 
-        void loop(TChain *chain, TString name);
+  WHLooper();
+  ~WHLooper();
 
-    private:
+  void setOutFileName(string filename); 
+  void loop(TChain *chain, TString name);
 
-        void fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& suffix = "");
+ private:
 
-	string m_outfilename_;
-	//for phi corrected met
-	float t1metphicorr;
-	float t1metphicorrphi;
-	float t1metphicorrmt;
-	//for mt peak definition
-	float min_mtpeak;
-	float max_mtpeak; 
+  void fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& suffix = "");
+  std::vector<LorentzVector> getBJets(const csvpoint csv = WHLooper::CSVM);
+  float getCSVCut(const csvpoint csv = WHLooper::CSVM);
 
-	std::vector<LorentzVector> * myPfJets;
+  string m_outfilename_;
+  //for phi corrected met
+  float t1metphicorr;
+  float t1metphicorrphi;
+  float t1metphicorrmt;
+  //for mt peak definition
+  float min_mtpeak;
+  float max_mtpeak; 
+
+  std::vector<LorentzVector> myJets_;
+  std::vector<LorentzVector> myBJets_;
 
 };
 
