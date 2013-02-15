@@ -189,7 +189,6 @@ void WHLooper::loop(TChain *chain, TString name)
       //----------------------------------------------------------------------------
 
       if ( !passEvtSelection(name) ) continue;
-      ++nEventsPass;
 
       //----------------------------------------------------------------------------
       // Function to perform MET phi corrections on-the-fly
@@ -206,6 +205,10 @@ void WHLooper::loop(TChain *chain, TString name)
       //----------------------------------------------------------------------------
       // ADD CODE BELOW THIS LINE
       //----------------------------------------------------------------------------
+
+      // require 1 lepton sel
+      if (!passOneLeptonSelection(isData)) continue;
+      ++nEventsPass;
 
       float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
       int njets = getNJets();
