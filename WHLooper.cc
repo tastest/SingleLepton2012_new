@@ -207,6 +207,14 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       // require 1 lepton sel
       if (!passOneLeptonSelection(isData)) continue;
+
+      // require 2 bjets
+      //      int njets = getNJets();
+      // medium csv: 0.679
+      std::vector<int> bjetIdx = getBJetIndex(0.679,-1,-1);
+      int nbjets = bjetIdx.size();
+      if (nbjets <= 2) continue;
+
       ++nEventsPass;
 
       // fill hists
