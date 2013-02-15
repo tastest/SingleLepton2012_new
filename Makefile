@@ -1,6 +1,7 @@
 CC = g++
 ROOFITINCLUDE = $(shell scramv1 tool info roofitcore | grep INCLUDE | sed 's/^INCLUDE=/-I/')
-INCLUDE = -I../ -I./ $(ROOFITINCLUDE)
+#INCLUDE = -I../ -I./ $(ROOFITINCLUDE)
+INCLUDE = -I../ -I./ 
 CFLAGS = -Wall -g -fPIC $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS) -DTOOLSLIB
 LINKER = g++
 
