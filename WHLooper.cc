@@ -56,8 +56,7 @@ void WHLooper::setOutFileName(string filename)
 
 //--------------------------------------------------------------------
 
-void WHLooper::loop(TChain *chain, TString name)
-{
+void WHLooper::loop(TChain *chain, TString name) {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -210,16 +209,10 @@ void WHLooper::loop(TChain *chain, TString name)
       if (!passOneLeptonSelection(isData)) continue;
       ++nEventsPass;
 
-      float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
-      int njets = getNJets();
-      int nbjets = (int) getBJetIndex(0.679,-1,-1).size();
-
-      plot1D("h_lep1pt",       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
-      plot1D("h_lep1mt",       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
-      plot1D("h_pfmet",        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
-      plot1D("h_njets",        njets,              evtweight, h_1d, 10, 0., 10.);
-      plot1D("h_nbjets",       nbjets,    evtweight, h_1d, 5, 0., 5.);
-
+      // fill hists
+      fillHists1D(h_1d,evtweight);
+      if (stopt.leptype() == 0) fillHists1D(h_1d,evtweight,"_e");
+      else if (stopt.leptype() == 1) fillHists1D(h_1d,evtweight,"_m");
 
     } // end event loop
 
@@ -230,18 +223,20 @@ void WHLooper::loop(TChain *chain, TString name)
     //
     // finish
     //
+
+  savePlots(h_1d, (char*)m_outfilename_.c_str());
+
+  // TFile outfile(m_outfilename_.c_str(),"RECREATE") ; 
+  // printf("[WHLooper::loop] Saving histograms to %s\n", m_outfilename_.c_str());
   
-  TFile outfile(m_outfilename_.c_str(),"RECREATE") ; 
-  printf("[WHLooper::loop] Saving histograms to %s\n", m_outfilename_.c_str());
+  // std::map<std::string, TH1F*>::iterator it1d;
+  // for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
+  //   it1d->second->Write(); 
+  //   delete it1d->second;
+  // }
   
-  std::map<std::string, TH1F*>::iterator it1d;
-  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
-    it1d->second->Write(); 
-    delete it1d->second;
-  }
-  
-  outfile.Write();
-  outfile.Close();
+  // outfile.Write();
+  // outfile.Close();
 
   already_seen.clear();
 
@@ -259,3 +254,20 @@ void WHLooper::loop(TChain *chain, TString name)
 
 }
 
+//--------------------------------------------------------------------
+
+void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight, const std::string& suffix) {
+
+  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+  int njets = getNJets();
+  // medium csv: 0.679
+  int nbjets = (int) getBJetIndex(0.679,-1,-1).size();
+
+  plot1D(string("h_lep1pt")+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D(string("h_lep1mt")+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D(string("h_pfmet")+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
+  plot1D(string("h_njets")+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
+  plot1D(string("h_nbjets")+suffix,       nbjets,    evtweight, h_1d, 5, 0., 5.);
+
+  return;
+}

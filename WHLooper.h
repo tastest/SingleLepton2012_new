@@ -28,6 +28,8 @@ class WHLooper {
 
     private:
 
+        void fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& suffix = "");
+
 	string m_outfilename_;
 	//for phi corrected met
 	float t1metphicorr;
