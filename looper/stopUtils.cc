@@ -206,25 +206,26 @@ float getDataMCRatio(float eta){
 
 /////--------------------------------------------------------------------
 
-pair<float,float> Type1PFMETSmear(JetSmearer* jetSmearer, bool isData,
-				  VofP4 jets_p4 , float met, float metphi){
+pair<float,float> Type1PFMETSmearRec(JetSmearer* jetSmearer, bool isData,
+				     VofP4 &jets_p4 , vector<float> &fullcors, 
+				     float met, float metphi){
   float metx = met * cos( metphi );
   float mety = met * sin( metphi );
 
   if (!isData){
-    UInt_t seed = 0;
+    unsigned int seed = 0;
 
     for (unsigned int i=0; i<jets_p4.size(); ++i)
-      seed += jets_p4.at(i).Pt()*1000;
+      seed += (unsigned int)jets_p4.at(i).Phi()*1000;
 
     TRandom3 kicker(seed);
 
     for (unsigned int i=0; i<jets_p4.size(); ++i){
-      LorentzVector recJet = jets_p4.at(i);
+      LorentzVector recJet = jets_p4.at(i)*fullcors.at(i);
 
-      float c = getDataMCRatio(recJet.eta());
-      double sigma = getJetResolution(recJet, jetSmearer);
-      double alpha = kicker.Gaus(0.0, TMath::Sqrt(c*c-1.0)*sigma);
+      float smearFactor = getDataMCRatio(recJet.eta());
+      double sigmaEn = getJetResolution(recJet, jetSmearer)*recJet.E()*TMath::Sqrt(smearFactor*smearFactor - 1.);
+      double alpha = kicker.Gaus(0.0, sigmaEn)/TMath::Max(jets_p4.at(i).E(), jets_p4.at(i).E()*fullcors.at(i));
 
       metx -= alpha*recJet.px();
       mety -= alpha*recJet.py();
@@ -471,7 +472,7 @@ unsigned int indexGenJet ( LorentzVector p4, float genminpt) {
 
   //return dR to closest gen-jet with pT > genminpt                                                                                                                                                                  
   float mindeltaR = 9999.;
-  unsigned int min_igen = 9999.;
+  unsigned int min_igen = 9999;
 
   for (unsigned int igen = 0; igen < genjets_p4().size(); igen++) {
     LorentzVector vgenj = genjets_p4().at(igen);

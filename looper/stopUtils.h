@@ -81,8 +81,9 @@ pair<float,float> Type1PFMET( VofP4 jets_p4 , vector<float> cors , vector<float>
 
 float getDataMCRatio(float eta);
 
-pair<float,float> Type1PFMETSmear(JetSmearer* jetSmearer, bool isData,
-				  VofP4 jets_p4 , float met, float metphi);
+pair<float,float> Type1PFMETSmearRec(JetSmearer* jetSmearer, bool isData,
+				     VofP4 &jets_p4 , vector<float> &fullcors, 
+				     float met, float metphi);
 
 float getMT( float leppt , float lepphi , float met , float metphi );
 

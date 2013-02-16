@@ -345,6 +345,11 @@ class singleLeptonLooper
 	Float_t t1metphicorrmtup_;
 	Float_t t1metphicorrmtdn_;
 
+	//smeared and phicorred type1 mets
+	Float_t t1metphicorr_smear_gen_;
+	Float_t t1metphicorrphi_smear_gen_;
+	Float_t t1metphicorrmt_smear_gen_;
+
 	//official prescription
 	Float_t t1met_off_;
 	Float_t t1metphi_off_;
@@ -403,6 +408,7 @@ class singleLeptonLooper
         std::vector<float> pfjets_chm_;
         std::vector<float> pfjets_neu_;
 	//jet corrections and ID
+	std::vector<float> pfjets_l1corr_;
 	std::vector<float> pfjets_corr_;
 	//status 3 parton matching
 	std::vector<int>   pfjets_mc3_;
@@ -535,6 +541,7 @@ class singleLeptonLooper
 	Float_t trkjetmetproj_;
         Float_t htUp_;
         Float_t htDown_;
+        Int_t   ntruepu_;
         Int_t   npu_;
         Int_t   npuMinusOne_;
         Int_t   npuPlusOne_;

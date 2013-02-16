@@ -389,6 +389,7 @@ void singleLeptonLooper::InitBaby(){
   pfjets_csv_.clear();
   pfjets_chm_.clear();
   pfjets_neu_.clear();
+  pfjets_l1corr_.clear();
   pfjets_corr_.clear();
   pfjets_mc3_.clear();
   pfjets_mcflavorAlgo_.clear();
@@ -1188,7 +1189,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	// this is a weight which corrects for the wrong MG W->lnu BF
 	if( TString(prefix).Contains("ttall") ||
-	    TString(prefix).Contains("tt_") ){
+	    TString(prefix).Contains("tt_") ||
+	    TString(prefix).Contains("ttsl_") ||
+	    TString(prefix).Contains("ttdl_") ){
 	  if( nleps == 0 ) mgcor_ = 1.028;
 	  if( nleps == 1 ) mgcor_ = 0.986;
 	  if( nleps == 2 ) mgcor_ = 0.945;
@@ -2018,14 +2021,17 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       indexfirstGoodVertex_=firstGoodVertex();
 
+      ntruepu_ = 0;
       npu_ = 0;
       npuMinusOne_ = 0;
       npuPlusOne_ = 0;
       if ( !isData ) {
         //Information for out-of-time PU
         for (unsigned int nbc=0;nbc<puInfo_nPUvertices().size();++nbc) {
-	  if (puInfo_bunchCrossing().at(nbc)==0) npu_ = puInfo_nPUvertices().at(nbc);
-	  else if (puInfo_bunchCrossing().at(nbc)==-1) npuMinusOne_ = puInfo_nPUvertices().at(nbc);
+	  if (puInfo_bunchCrossing().at(nbc)==0) {
+	    npu_ = puInfo_nPUvertices().at(nbc);
+	    ntruepu_ = (int)puInfo_trueNumInteractions().at(nbc);
+	  } else if (puInfo_bunchCrossing().at(nbc)==-1) npuMinusOne_ = puInfo_nPUvertices().at(nbc);
 	  else if (puInfo_bunchCrossing().at(nbc)==+1) npuPlusOne_ = puInfo_nPUvertices().at(nbc);
 	}
 	//remove 3d-vtx reweighting for the moment, can do on the fly
@@ -2058,7 +2064,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       vpfrawjets_p4.clear();
       VofiP4 vipfjets_p4;
       vipfjets_p4.clear();
-      
+      //corrections for all 
+      vector<float> l1cors_all;
+      l1cors_all.clear();
+
       vector<float> fullcors;
       vector<float> l2l3cors;
       vector<float> rescors;
@@ -2076,9 +2085,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float jetpty = 0.0;
 
       for (unsigned int ijet = 0 ; ijet < pfjets_p4().size() ; ijet++) {
-
+	
 	// skip jets with |eta| > 5.0
-	if( fabs( pfjets_p4().at(ijet).eta() ) > 5.0 ) continue;
+	if( fabs( pfjets_p4().at(ijet).eta() ) > 5.0 ) {
+	  l1cors_all.push_back( -99999. );
+	  continue;
+	}
 
 	// get L1FastL2L3Residual total correction
 	jet_corrector_pfL1FastJetL2L3->setRho   ( evt_ww_rho_vor()           );
@@ -2100,6 +2112,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  if( factors.size() == 4 ) rescorr = factors.at(3) / factors.at(2);
 	  else                      cout << "ERROR! " << factors.size() << " jetSubCorrections" << endl;
 	}
+
+	l1cors_all.push_back( factors.at(0) );
 
 	LorentzVector vjet      = corr    * pfjets_p4().at(ijet);
 	indP4 ivjet = { vjet, ijet };
@@ -2186,7 +2200,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	// store L1FastL2L3Residual jet p4's pt > 15 GeV
 	if( vjet.pt() > 20 && fabs( vjet.eta() ) < 4.7 ){
 	  vipfjets_p4.push_back( ivjet );
-
 	}
 
 	// njets JEC up
@@ -2371,11 +2384,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       // MET after Jet PT smearing.
       pair<float, float> p_t1met10Smear = 
-	Type1PFMETSmear(jetSmearer, isData, vpfrawjets_p4 , t1met10_, t1met10phi_);
+	Type1PFMETSmearRec(jetSmearer, isData, vpfrawjets_p4 , fullcors, t1metphicorr_, t1metphicorrphi_);
       t1met10s_ = p_t1met10Smear.first;
       t1met10sphi_ = p_t1met10Smear.second;
 
-      //---------------------------------------
+      //---------------------------------------    
       // now calculate METup and METdown
       //---------------------------------------
 
@@ -2452,6 +2465,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	//	cout << "lrm " << getLRM(vipfjets_p4.at(i).p4ind) << endl;
 
 	pfjets_corr_.push_back(vipfjets_p4.at(i).p4obj.pt()/pfjets_p4().at(vipfjets_p4.at(i).p4ind).pt());
+	pfjets_l1corr_.push_back(l1cors_all.at(vipfjets_p4.at(i).p4ind));
 
         // Save the jet resolution. if it is MC scale by a factor given by
         // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
@@ -2472,14 +2486,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	else{
 
 	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
-	  pfjets_mcflavorAlgo_.push_back( pfjets_mcflavorAlgo().at(vipfjets_p4.at(i).p4ind) );
-	  pfjets_mcflavorPhys_.push_back( pfjets_mcflavorPhys().at(vipfjets_p4.at(i).p4ind) );
+	  //COMMENTED FOR NEXT NTUPLE VERISION
+	  // pfjets_mcflavorAlgo_.push_back( pfjets_mcflavorAlgo().at(vipfjets_p4.at(i).p4ind) );
+	  // pfjets_mcflavorPhys_.push_back( pfjets_mcflavorPhys().at(vipfjets_p4.at(i).p4ind) );
 	  pfjets_flav_.push_back((isGenBMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 5 : (isGenCMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 4 : 0)));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
 	  if(genjets_p4().size()>indexGenJet(vipfjets_p4.at(i).p4obj)) pfjets_genJet_.push_back(genjets_p4().at(indexGenJet(vipfjets_p4.at(i).p4obj)));
 
-	}
+	} 
 
 	//beta variables
 	pfjets_beta_.push_back(pfjet_beta(vipfjets_p4.at(i).p4ind,1));
@@ -2492,10 +2507,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
         // pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
         // pfjets_beta2_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.2 ) );	
-	pfjets_mvaPUid_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
-	pfjets_mvaBeta_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
+	//COMMENTED FOR NEXT NTUPLE VERISION
+	// pfjets_mvaPUid_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
+	// pfjets_mvaBeta_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
 
       }
+      l1cors_all.clear();
 
       //store distance to closest jet for pfcand
       if ( nleps_ == 2 ) {
@@ -3335,6 +3352,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("njetsDown",        &njetsDown_,        "njetsDown/I");
   outTree->Branch("htUp",             &htUp_,             "htUp/F");
   outTree->Branch("htDown",           &htDown_,           "htDown/F");
+  outTree->Branch("ntruepu",          &ntruepu_,          "ntruepu/I");
   outTree->Branch("npu",              &npu_,              "npu/I");
   outTree->Branch("npuMinusOne",      &npuMinusOne_,      "npuMinusOne/I");
   outTree->Branch("npuPlusOne",       &npuPlusOne_,       "npuPlusOne/I");
@@ -3626,6 +3644,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   // outTree->Branch("pfjets_beta2_0p2", "std::vector<float>", &pfjets_beta2_0p2_ );
   outTree->Branch("pfjets_mvaPUid",      "std::vector<float>", &pfjets_mvaPUid_ );
 
+  outTree->Branch("pfjets_l1corr",  "std::vector<float>", &pfjets_l1corr_   );
   outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
   outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
   outTree->Branch("pfjets_flav",    "std::vector<int>"  , &pfjets_flav_     ); 
