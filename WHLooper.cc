@@ -192,11 +192,12 @@ void WHLooper::loop(TChain *chain, TString name) {
       //---------------------------------------------------------------------------- 
 
       float evtweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
+      if (name.Contains("TChiwh_250_1")) evtweight *= 6.1E-03;
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( nvtx, h_vtx_wgt, isData );
 
-      plot1D("h_vtx",       stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
-      plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
+      plot1D("h_nvtx_nosel",       stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
+      plot1D("h_vtxweight_nosel", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
 
       //----------------------------------------------------------------------------
       // apply preselection:
@@ -230,9 +231,23 @@ void WHLooper::loop(TChain *chain, TString name) {
       int nbjets = myBJets_.size();
       if (nbjets < 2) continue;
 
+      // specific cuts: dummy signal region
+      LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
+      float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+      int njets = getNJets();
+      if (bb.M() < 95. || bb.M() > 150.) continue;
+      if (lep1mt < 120.) continue;
+      //      if (nbjets > 2 || njets > 3) continue;
+      if (njets > 2) continue;
+      if (stopt.pfmet() < 150.) continue;
+      if (bb.pt() < 150.) continue;
+
       ++nEventsPass;
 
       // fill hists
+      plot1D("h_nvtx",       stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
+      plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
+
       fillHists1D(h_1d,evtweight);
       if (stopt.leptype() == 0) fillHists1D(h_1d,evtweight,"_e");
       else if (stopt.leptype() == 1) fillHists1D(h_1d,evtweight,"_m");
@@ -314,12 +329,18 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
   int njets = getNJets();
+  TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
+  TVector2 met;
+  met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
+  TVector2 w = lep+met; 
 
   plot1D(string("h_lep1pt")+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D(string("h_lep1eta")+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
   plot1D(string("h_lep1mt")+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
   plot1D(string("h_pfmet")+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
   plot1D(string("h_njets")+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
   plot1D(string("h_nbjets")+suffix,       myBJets_.size(),    evtweight, h_1d, 5, 0., 5.);
+  plot1D(string("h_wpt")+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
 
   // bjets and bbbar plots
   if (myBJets_.size() >= 2) {
@@ -329,10 +350,13 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D(string("h_bjet2eta")+suffix,       myBJets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
 
     LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
-    plot1D(string("h_bbm")+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D(string("h_bbmass")+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
     plot1D(string("h_bbpt")+suffix,       bb.pt(),       evtweight, h_1d, 500, 0., 500.);
     plot1D(string("h_bbdphi")+suffix,  TVector2::Phi_0_2pi(myBJets_[0].phi() - myBJets_[1].phi()), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
     plot1D(string("h_bbdr")+suffix,  ROOT::Math::VectorUtil::DeltaR( myBJets_.at(0) , myBJets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+
+    plot1D(string("h_bblep1dr")+suffix,  ROOT::Math::VectorUtil::DeltaR( bb , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+
   }
 
   return;
