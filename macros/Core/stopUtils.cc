@@ -1,6 +1,7 @@
 #include "stopUtils.h"
 
 #include "Math/LorentzVector.h"
+#include "Math/VectorUtil.h"
 #include "Math/Point3D.h"
 #include "TMath.h"
 #include "TBranch.h"
@@ -103,6 +104,16 @@ float getDataMCRatio(float eta){
   return 1.0;
 }
 
+//------------------------------------------------------------------------------------------------
+// Fix function to partial correction used in looper before 1.16
+//------------------------------------------------------------------------------------------------
+
+float getDataMCRatioFix(float eta){
+  if ( eta > 0 ) 
+	return 1.0;
+  else
+     	return getDataMCRatio(eta);
+}
 
 
 //-------------------------------------------
@@ -623,3 +634,269 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdenti
   if (events_lasercalib.find(id) != events_lasercalib.end()) return true;
   return false;
 }
+
+
+//--------------------------------------------------------------------
+double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVector lep, float met, float metphi){
+	// I am asumming that jets is sorted by Pt
+
+	assert ( jets.size() == btag.size() );
+	assert ( jets.size() < 15 );
+
+	// First we count the number of b-tagged jets, and separate those non b-tagged
+	int n_btag = 0;
+	int n_nobtag = 0;
+	int bjets[15];
+	int non_bjets[15];
+	for( int i = 0 ; i < jets.size() ; i++ ){
+		if( btag.at(i) > BTAG_MED )
+			bjets[n_btag++] = i;
+		else
+			non_bjets[n_nobtag++] = i;
+	}
+
+//	cout << "n_btag = " << n_btag << endl;
+
+	// We do different things depending on the number of b-tagged jets
+	// arXiv:1203.4813 recipe
+	if (n_btag == 0){
+		// If no b-jets select the minimum of the mt2w from all combinations with 
+		// the three leading jets
+		float min_mt2w = 9999;
+		for (int i=0; i<3; i++)
+			for (int j=0; j<3; j++){
+				if (i == j) continue;
+				float c_mt2w = mt2wWrapper(lep, 
+						jets[non_bjets[i]],
+						jets[non_bjets[j]], met, metphi);
+				if (c_mt2w < min_mt2w)
+					min_mt2w = c_mt2w;
+			}
+		return min_mt2w;
+	} else if (n_btag == 1 ){
+		// if only one b-jet choose the two non leading jets and choose the smaller
+		float min_mt2w = 9999;
+		for (int i=0; i<2; i++){
+			float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
+			if (c_mt2w < min_mt2w)
+				min_mt2w = c_mt2w;
+		}
+		for (int i=0; i<2; i++){
+			float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi);
+			if (c_mt2w < min_mt2w)
+				min_mt2w = c_mt2w;
+		}
+		return min_mt2w;
+	} else if (n_btag == 2) {
+		// if two b-jets use those :)
+		float c1_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[bjets[1]], met, metphi);
+		float c2_mt2w = mt2wWrapper(lep, jets[bjets[1]], jets[bjets[0]], met, metphi);
+		return TMath::Min(c1_mt2w, c2_mt2w);
+	} else if (n_btag >= 3) {
+		// if 3 or more b-jets the paper says ignore b-tag and do like 0-bjets 
+		// but we are going to make the combinations with the three leading b-jets
+		float min_mt2w = 9999;
+		for (int i=0; i<3; i++)
+			for (int j=0; j<3; j++){
+				if (i == j) continue;
+				float c_mt2w = mt2wWrapper(lep, 
+						jets[bjets[i]],
+						jets[bjets[j]], met, metphi);
+				if (c_mt2w < min_mt2w)
+					min_mt2w = c_mt2w;
+			}
+		return min_mt2w;
+	}
+
+	return -1.;
+}
+
+//---------------------------------------------------------------------
+
+
+// This funcion is a wrapper for mt2w_bissect that take LorentzVectors instead of doubles
+double mt2wWrapper(LorentzVector lep, LorentzVector jet_o, LorentzVector jet_b, float met, float metphi){
+//	mt2_bisect::mt2 mt2_event;
+//	mt2bl_bisect::mt2bl mt2bl_event;
+	mt2w_bisect::mt2w mt2w_event;
+
+	float metx = met * cos( metphi );
+	float mety = met * sin( metphi );
+
+	double pl[4];     // Visible lepton
+	double pb1[4];    // bottom on the same side as the visible lepton
+	double pb2[4];    // other bottom, paired with the invisible W
+	double pmiss[3];  // <unused>, pmx, pmy   missing pT
+	pl[0]= lep.E(); pl[1]= lep.Px(); pl[2]= lep.Py(); pl[3]= lep.Pz();
+	pb1[1] = jet_o.Px();  pb1[2] = jet_o.Py();   pb1[3] = jet_o.Pz();
+	pb2[1] = jet_b.Px();  pb2[2] = jet_b.Py();   pb2[3] = jet_b.Pz();
+	pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
+
+//	This is for mt2b and mt2bl calculation. Keep here if you want to extend the function.
+/*
+	double pmiss_lep[3];
+	pmiss_lep[0] = 0.;
+	pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
+
+	pb1[0] = jets_o.mass();
+	pb2[0] = jets_b.mass();
+	mt2_event.set_momenta( pb1, pb2, pmiss_lep );
+	mt2_event.set_mn( 80.385 );   // Invisible particle mass
+	double c_mt2b = mt2_event.get_mt2();
+*/
+
+	pb1[0] = jet_o.E();
+	pb2[0] = jet_b.E();
+
+//	Also for mt2bl calculation.
+//
+//	mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
+//	double c_mt2bl = mt2bl_event.get_mt2bl();
+
+	mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
+	double c_mt2w = mt2w_event.get_mt2w();
+
+	return c_mt2w;
+}
+
+
+// This funcion is a wrapper for mt2w_bissect that take LorentzVectors instead of doubles
+double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets){
+
+	assert(jets.size() == sigma_jets.size());
+	assert(jets.size() < 15);
+
+	int n_jets = jets.size();
+
+	int j1=-1;
+	int j2=-1;
+	int bi=-1;
+	double min_dR = 9999;
+	for (int i=0; i < n_jets; i++)
+		for (int j=0; j < n_jets; j++){
+			double dR =  ROOT::Math::VectorUtil::DeltaR(jets.at(i),jets.at(j));
+			LorentzVector hadW = jets.at(i) + jets.at(j);
+			if ( dR < min_dR && hadW.mass() > 60){
+				min_dR = dR;
+				j1 = i;
+				j2 = j;
+			}
+		}
+	if ( j1 < 0 || j2 < 0 ) return -1;
+	
+	LorentzVector hadW = jets.at(j1) + jets.at(j2);
+
+	min_dR = 9999;	
+	for (int j=0; j < n_jets; j++){
+		double dR =  ROOT::Math::VectorUtil::DeltaR(hadW,jets.at(j));
+		LorentzVector hadT = hadW + jets.at(j);
+		if ( dR < min_dR && hadT.mass() > 130 && hadT.mass()< 205 ){
+			min_dR = dR;
+			bi = j;
+		}
+	}
+
+	if ( bi <  0 ) return -1;
+
+/*
+	LorentzVector c1_direction = jets.at(0)/jets.at(0).P();
+	LorentzVector c2_direction = jets.at(1)/jets.at(1).P();
+
+	int cluster1[15];
+	int cluster2[15];
+	int n_cluster1, n_cluster2;
+
+	float diff2;
+	do {
+		n_cluster1 = 0;
+		n_cluster2 = 0;
+		for(int i=0; i < n_jets; i++){
+			double dRc1 = (c1_direction - jets.at(i)).P();
+			double dRc2 = (c2_direction - jets.at(i)).P();
+//			cout << "RR: " << dRc1 << "  " << dRc2 <<  "   " << jets.at(i) << endl;
+			if ( dRc1 < dRc2 )
+				cluster1[n_cluster1++] = i;
+			else
+				cluster2[n_cluster2++] = i;
+		}
+
+		LorentzVector c1_new;
+		for ( int i=0; i<n_cluster1; i++)
+			c1_new += jets.at(cluster1[i]);
+		c1_new = c1_new/c1_new.P();
+
+		LorentzVector c2_new;
+		for ( int i=0; i<n_cluster2; i++)
+			c2_new += jets.at(cluster2[i]);
+		c2_new = c2_new/c2_new.P();
+
+//		cout << c1_new << "    " << c2_new << endl;
+
+		diff2 = ( c1_new - c1_direction ).P2() + ( c2_new - c2_direction ).P2();
+//		cout << n_cluster1 << "   " << n_cluster2 << "   " << diff2 << endl;
+
+		c1_direction = c1_new;
+		c2_direction = c2_new;
+
+		assert ( n_cluster1 > 0 ); 
+		assert ( n_cluster2 > 0 ); 
+	} while ( diff2 > 0.001 );
+
+	cout << n_cluster1 << "   " << n_cluster2 << "   " << diff2 << endl;
+
+	
+
+	double min_chi2 = 9999;
+	for ( int b=0; b<n_jets; ++b )
+		for (int j1=0; j1<n_jets; ++j1)
+			for (int j2=0; j2<n_jets; ++j2){
+				if (b == j1 || b == j2 || j1 == j2) continue;
+				
+				double c_chi2 = getChi2(jets.at(b), jets.at(j1), jets.at(j2),
+						sigma_jets.at(b), sigma_jets.at(j1), sigma_jets.at(j2));
+				
+				if (c_chi2 < min_chi2) min_chi2 = c_chi2;
+
+			}
+*/
+
+	double c_chi2 =  getChi2(jets.at(bi), jets.at(j1), jets.at(j2), 
+		sigma_jets.at(bi), sigma_jets.at(j1), sigma_jets.at(j2) ); 
+	return c_chi2;
+}
+
+double getChi2(LorentzVector jets_b, LorentzVector jets_j1, LorentzVector jets_j2,
+		float sigma_b, float sigma_j1, float sigma_j2){
+
+	LorentzVector hadW = jets_j1 + jets_j2;
+	LorentzVector hadT = jets_b + hadW;
+
+	double massT = hadT.mass();
+	double massW = hadW.mass();
+
+	double pt_w1 = jets_j1.Pt();
+	double pt_w2 = jets_j2.Pt();
+	double pt_b = jets_b.Pt();
+
+	double pt_w = hadW.Pt();
+
+	double sigma_w2 = pt_w1*sigma_j1 * pt_w1*sigma_j1
+		+ pt_w2*sigma_j2 * pt_w2*sigma_j2;
+
+	double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
+
+	double pt_t = hadT.Pt();
+
+	double sigma_t2 = pt_w1*sigma_j1 * pt_w1*sigma_j1
+		+ pt_w2*sigma_j2 * pt_w2*sigma_j2
+		+ pt_b*sigma_b * pt_b*sigma_b;
+
+	double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
+
+	double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
+		+ (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+
+	return c_chi2;
+}
+
+
