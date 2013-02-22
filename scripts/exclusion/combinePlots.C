@@ -1,4 +1,4 @@
-#include "Utils/SMS_utils.C"
+//#include "Utils/SMS_utils.C"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -488,7 +488,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->SetTextSize(0.04);
   t->DrawLatex(0.18,0.94,"CMS Preliminary                 #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
   
-
+  /*
   //-------------------------------
   // best signal region
   //-------------------------------
@@ -672,18 +672,18 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   hexcl_expm1->Draw("colz");
   gr_expm1->Draw("lp");
   t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
-
+*/
 
   if( print ){
     if     ( TString(sample).Contains("T2tt") ){
       can1->Print("../../plots/combinePlots_T2tt.pdf");
-      can2->Print("../../plots/combinePlots_T2tt_bestSignalRegion.pdf");
-      can3->Print("../../plots/combinePlots_T2tt_excludedPoints.pdf");
+      //can2->Print("../../plots/combinePlots_T2tt_bestSignalRegion.pdf");
+      //can3->Print("../../plots/combinePlots_T2tt_excludedPoints.pdf");
     }
     else if( TString(sample).Contains("T2bw") ){
       can1->Print(Form("../../plots/combinePlots_T2bw_x%i.pdf",x));
-      can2->Print(Form("../../plots/combinePlots_T2bw_x%i_bestSignalRegion.pdf",x));
-      can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints.pdf",x));
+      //can2->Print(Form("../../plots/combinePlots_T2bw_x%i_bestSignalRegion.pdf",x));
+      //can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints.pdf",x));
     }
   }
 
