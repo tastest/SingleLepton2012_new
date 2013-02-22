@@ -264,30 +264,35 @@ void singleLeptonLooper::InitBaby(){
   pfcand10_       = 0;
   pfcanddir10_       = 0;
   pfcandveto10_       = 0;
+  pfcandvetoL10_       = 0;
   pfcandOS10_       = 0;
 
   pfcandid5_       =-1; 
   pfcandid10_      =-1;
   pfcanddirid10_      =-1;
   pfcandvetoid10_      =-1;
+  pfcandvetoLid10_      =-1;
   pfcandidOS10_      =-1;
 
   pfcandiso5_     = 9999.;     
   pfcandiso10_    = 9999.;     
   pfcanddiriso10_    = 9999.;     
   pfcandvetoiso10_    = 9999.;     
+  pfcandvetoLiso10_    = 9999.;     
   pfcandisoOS10_    = 9999.;     
 
   pfcandpt5_      = 9999.;
   pfcandpt10_     = 9999.;
   pfcanddirpt10_     = 9999.;
   pfcandvetopt10_     = 9999.;
+  pfcandvetoLpt10_     = 9999.;
   pfcandptOS10_     = 9999.;
 
   pfcandmindrj5_  = 9999.;
   pfcandmindrj10_ = 9999.;
   pfcanddirmindrj10_ = 9999.;
   pfcandvetomindrj10_ = 9999.;
+  pfcandvetoLmindrj10_ = 9999.;
 
   trkpt10pt0p1_	    = 9999.;
   trkreliso10pt0p1_ = 9999.;
@@ -1774,7 +1779,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 
 	if( pfcands_p4().at(ipf).pt() < 5  ) continue;
-
 	if( pfcands_charge().at(ipf) == 0   ) continue;
 
 	struct myTrackIso myTrackIso=trackIso(ipf);
@@ -1788,6 +1792,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 	bool isLeadLepton = ( ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , 
 						goodLeptons.at(imaxpt) ) < 0.1 ) ? true : false;
+
+	/// this is with the OS requirement
+	float charge=(pfcands_particleId().at(ipf)*id1_);
+	// charge < 0 is a SS , charge > 0 is a OS for e/mu; need to flip for pions
+	if((abs(pfcands_particleId().at(ipf))!=11) && (abs(pfcands_particleId().at(ipf))!=13)) charge*=(-1); 
 
 	//////////
 
@@ -1842,7 +1851,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 
 	// with veto cone
-	iso = myTrackIso.iso_dr00503_dz005_pt00 / pfcands_p4().at(ipf).pt();
+	iso = myTrackIso.iso_dr0503_dz005_pt00 / pfcands_p4().at(ipf).pt();
 
 	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandvetoiso10_ && !isLeadLepton ){
 
@@ -1853,6 +1862,18 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	}
 
+
+	// with veto cone
+	iso = myTrackIso.iso_dr01503_dz005_pt00 / pfcands_p4().at(ipf).pt();
+
+	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandvetoLiso10_ && !isLeadLepton ){
+
+	  pfcandvetoLiso10_ = iso;
+          pfcandvetoLpt10_ = pfcands_p4().at(ipf).pt();
+          pfcandvetoL10_ = &pfcands_p4().at(ipf);
+          pfcandvetoLid10_ =  pfcands_particleId().at(ipf);
+
+	}
 
 	//recalculated definition of the isolation with the default values
 	iso = myTrackIso.iso_dr03_dz005_pt00 / pfcands_p4().at(ipf).pt();
@@ -1882,12 +1903,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 
 	if( pfcands_p4().at(ipf).pt() < 10  ) continue;
-
-	/// this is with the OS requirement
-
-	float charge=(pfcands_particleId().at(ipf)*id1_);
-	// charge < 0 is a SS , charge > 0 is a OS for e/mu; need to flip for pions
-	if((abs(pfcands_particleId().at(ipf))!=11) && (abs(pfcands_particleId().at(ipf))!=13)) charge*=(-1); 
 
 	if( iso < pfcandisoOS10_ && charge>0){
 	  pfcandisoOS10_ = iso;
@@ -3514,6 +3529,11 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcandvetopt10",       &pfcandvetopt10_,       "pfcandvetopt10/F");  
   outTree->Branch("pfcandvetomindrj10",   &pfcandvetomindrj10_,   "pfcandvetomindrj10/F");  
 
+  outTree->Branch("pfcandvetoLid10",       &pfcandvetoLid10_,       "pfcandvetoLid10/I");
+  outTree->Branch("pfcandvetoLiso10",      &pfcandvetoLiso10_,      "pfcandvetoLiso10/F");  
+  outTree->Branch("pfcandvetoLpt10",       &pfcandvetoLpt10_,       "pfcandvetoLpt10/F");  
+  outTree->Branch("pfcandvetoLmindrj10",   &pfcandvetoLmindrj10_,   "pfcandvetoLmindrj10/F");  
+
   outTree->Branch("emjet10",          &emjet10_,          "emjet10/F");  
   outTree->Branch("mjj",              &mjj_,              "mjj/F");  
   outTree->Branch("emjet20",          &emjet20_,          "emjet20/F");  
@@ -3605,6 +3625,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcandOS10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandOS10_	);
   outTree->Branch("pfcanddir10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcanddir10_	);
   outTree->Branch("pfcandveto10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandveto10_	);
+  outTree->Branch("pfcandvetoL10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandvetoL10_	);
   outTree->Branch("jet"	      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &jet_	);
 
   outTree->Branch("nonisoel"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &nonisoel_	);

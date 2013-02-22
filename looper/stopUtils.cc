@@ -264,7 +264,8 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
   iso.iso_dr04_dz005_pt00=0.;
 
   // veto cone
-  iso.iso_dr00503_dz005_pt00=0.; 
+  iso.iso_dr01503_dz005_pt00=0.; 
+  iso.iso_dr0503_dz005_pt00=0.;
 
   //pt Variation                                                                                                                      
   iso.iso_dr03_dz005_pt01=0.;
@@ -284,6 +285,12 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
     if( ipf == thisPf                 ) continue; // skip this PFCandidate
                                                                                                                
     if(pfcands_charge().at(ipf) == 0 ) continue; // skip neutrals                                                                                                                          
+
+    // we do not use the electron and muon in the isolation sum,                                                                                                                                        
+    // to avoid overlap with the other lepton in the event  
+    if(abs(pfcands_particleId().at(ipf))==13) continue;                                                                                         
+    if(abs(pfcands_particleId().at(ipf))==11) continue;                                                                                         
+
     //----------------------------------------                                                                                                                                                   
     // find closest PV and dz w.r.t. that PV                                                                                                                                                     
    //----------------------------------------                                                                                                                                                   
@@ -342,7 +349,10 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
 
     }
 
-    //---------------------------------------                                                                                                                                     // passes cuts, add up isolation value                                                                                                                                        //---------------------------------------                                                                                                                                                    
+    //---------------------------------------                                                                                                                                     
+    // passes cuts, add up isolation value                                                                                                                                        
+    //---------------------------------------                                                                                                                                                    
+
     coneR=0.3;    
     double dr=ROOT::Math::VectorUtil::DeltaR( pfcands_p4().at(ipf) , pfcands_p4().at(thisPf) );
     if( dr > coneR ) continue; // skip pfcands outside the cone                                     
@@ -353,8 +363,11 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
     // cone 04
     //    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.iso_dr03_dz005_pt00+= pfcands_p4().at(ipf).pt();
 
-    // veto Cone 0.05
-    if(pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 && dr >= 0.005) iso.iso_dr00503_dz005_pt00 += pfcands_p4().at(ipf).pt();
+    // veto Cone 0.05 // this hould be ok for the taus
+    if(pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 && dr >= 0.05) iso.iso_dr0503_dz005_pt00 += pfcands_p4().at(ipf).pt();
+
+    // veto Cone 0.015 // this should be ok for the electron in the endcap
+    if(pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05 && dr >= 0.015) iso.iso_dr01503_dz005_pt00 += pfcands_p4().at(ipf).pt();
 
     // this is the iso-sum option
     if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.isoDir_dr03_dz005_pt00 +=pfcands_p4().at(ipf).pt()*(1-3*dr);

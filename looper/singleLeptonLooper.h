@@ -206,24 +206,28 @@ class singleLeptonLooper
         Int_t pfcandid10_;     
         Int_t pfcanddirid10_;     
         Int_t pfcandvetoid10_;     
+        Int_t pfcandvetoLid10_;     
         Int_t pfcandidOS10_;     
 
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
         Float_t pfcanddiriso10_;     
         Float_t pfcandvetoiso10_;     
+        Float_t pfcandvetoLiso10_;     
         Float_t pfcandisoOS10_;     
 
         Float_t pfcandpt5_;
         Float_t pfcandpt10_;
         Float_t pfcanddirpt10_;
         Float_t pfcandvetopt10_;
+        Float_t pfcandvetoLpt10_;
         Float_t pfcandptOS10_;
 
         Float_t pfcandmindrj5_;
         Float_t pfcandmindrj10_;
         Float_t pfcanddirmindrj10_;
         Float_t pfcandvetomindrj10_;
+        Float_t pfcandvetoLmindrj10_;
 
 	Float_t pfcandpt10pt0p1_;
 	Float_t pfcandiso10pt0p1_;
@@ -379,6 +383,7 @@ class singleLeptonLooper
         LorentzVector*  pfcand10_;
         LorentzVector*  pfcanddir10_;
         LorentzVector*  pfcandveto10_;
+        LorentzVector*  pfcandvetoL10_;
         LorentzVector*  pfcandOS10_;
         LorentzVector*  lep1_;
         LorentzVector*  lep2_;
