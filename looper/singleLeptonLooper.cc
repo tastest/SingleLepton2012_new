@@ -1243,10 +1243,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    stop_tbar_ = &(genps_p4().at(igen));   
 
     //store neutralino
-    if ( mothid == 1000006  && ( abs(id) == 1000022 ) ) {
+    if ( genps_id_mother().at(igen) == 1000006  && ( abs(id) == 1000022 ) ) {
       neutralino_t_ = &(genps_p4().at(igen));
     }
-    if ( mothid == -1000006 && ( abs(id) == 1000022 ) ) {
+    if ( genps_id_mother().at(igen) == -1000006 && ( abs(id) == 1000022 ) ) {
       neutralino_tbar_ = &(genps_p4().at(igen));
     }
 
