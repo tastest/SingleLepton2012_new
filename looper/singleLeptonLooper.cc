@@ -144,6 +144,10 @@ void singleLeptonLooper::InitBaby(){
   t1metphicorrphi_off_	= -999.;
   t1metphicorrmt_off_	= -999.;
 
+  //calomet
+  calomet_              =-999.;
+  calometphi_           =-999.;
+
   //trkmet
   trkmet_              =-999.;
   trkmetphi_           =-999.;
@@ -2510,9 +2514,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	else{
 
 	  pfjets_mc3_.push_back(isGenQGLMatched( vipfjets_p4.at(i).p4obj, 0.4 ));
-	  //COMMENTED FOR NEXT NTUPLE VERISION
-	  // pfjets_mcflavorAlgo_.push_back( pfjets_mcflavorAlgo().at(vipfjets_p4.at(i).p4ind) );
-	  // pfjets_mcflavorPhys_.push_back( pfjets_mcflavorPhys().at(vipfjets_p4.at(i).p4ind) );
+	  pfjets_mcflavorAlgo_.push_back( pfjets_mcflavorAlgo().at(vipfjets_p4.at(i).p4ind) );
+	  pfjets_mcflavorPhys_.push_back( pfjets_mcflavorPhys().at(vipfjets_p4.at(i).p4ind) );
 	  pfjets_flav_.push_back((isGenBMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 5 : (isGenCMatched(vipfjets_p4.at(i).p4obj, 0.5) ? 4 : 0)));
 	  pfjets_genJetDr_.push_back(dRGenJet ( vipfjets_p4.at(i).p4obj ));
 	  pfjets_lepjet_.push_back(getLeptonMatchIndex( &vipfjets_p4.at(i).p4obj,mclep1_, mclep2_, 0.4 ));
@@ -2531,9 +2534,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
         // pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
         // pfjets_beta2_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.2 ) );	
-	//COMMENTED FOR NEXT NTUPLE VERISION
-	// pfjets_mvaPUid_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
-	// pfjets_mvaBeta_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaPUid_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaBeta_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
 
       }
       l1cors_all.clear();
@@ -2736,6 +2738,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       meff_ = ht_ + pfmet_ + lep1_->pt();
 
       m_events.insert(pair<int,int>(evt_event(), 1));
+
+      // calo met
+      calomet_ = evt_met();
+      calometphi_ = evt_metPhi() ;
 
       // track met
       pair<float, float> trkMET = getTrackerMET(lep1_); 
@@ -3261,6 +3267,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("genmet",          &genmet_,           "genmet/F");
   outTree->Branch("gensumet",        &gensumet_,         "gensumet/F");
   outTree->Branch("genmetphi",       &genmetphi_,        "genmetphi/F");
+  outTree->Branch("calomet",         &calomet_,          "calomet/F");
+  outTree->Branch("calometphi",      &calometphi_,       "calometphi/F");
   outTree->Branch("trkmet",          &trkmet_,           "trkmet/F");
   outTree->Branch("trkmetphi",       &trkmetphi_,        "trkmetphi/F");
   outTree->Branch("trkmet_nolepcorr",    &trkmet_nolepcorr_,    "trkmet_nolepcorr/F");

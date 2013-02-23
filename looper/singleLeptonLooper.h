@@ -532,6 +532,9 @@ class singleLeptonLooper
         Int_t   njetsUp_;
         Int_t   npfjets25_;
         Int_t   njetsDown_;
+
+	Float_t calomet_;
+	Float_t calometphi_;
 	Float_t trkmet_nolepcorr_;
 	Float_t trkmetphi_nolepcorr_;
 	Float_t trkmet_;
