@@ -270,6 +270,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandveto10_       = 0;
   pfcandvetoL10_       = 0;
   pfcandOS10_       = 0;
+  pfcandOS10looseZ_       = 0;
+  pfcand5looseZ_        = 0;
 
   pfcandid5_       =-1; 
   pfcandid10_      =-1;
@@ -277,6 +279,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetoid10_      =-1;
   pfcandvetoLid10_      =-1;
   pfcandidOS10_      =-1;
+  pfcandidOS10looseZ_      =-1;
+  pfcandid5looseZ_       =-1; 
 
   pfcandiso5_     = 9999.;     
   pfcandiso10_    = 9999.;     
@@ -284,6 +288,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetoiso10_    = 9999.;     
   pfcandvetoLiso10_    = 9999.;     
   pfcandisoOS10_    = 9999.;     
+  pfcandisoOS10looseZ_    = 9999.;     
+  pfcandiso5looseZ_     = 9999.;     
 
   pfcandpt5_      = 9999.;
   pfcandpt10_     = 9999.;
@@ -291,6 +297,17 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetopt10_     = 9999.;
   pfcandvetoLpt10_     = 9999.;
   pfcandptOS10_     = 9999.;
+  pfcandptOS10looseZ_     = 9999.;
+  pfcandpt5looseZ_      = 9999.;
+
+  pfcanddz5_      = 9999.;
+  pfcanddz10_     = 9999.;
+  pfcanddirdz10_     = 9999.;
+  pfcandvetodz10_     = 9999.;
+  pfcandvetoLdz10_     = 9999.;
+  pfcanddzOS10_     = 9999.;
+  pfcanddzOS10looseZ_     = 9999.;
+  pfcanddz5looseZ_      = 9999.;
 
   pfcandmindrj5_  = 9999.;
   pfcandmindrj10_ = 9999.;
@@ -1767,8 +1784,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       // track isolation variable definition
       //------------------------------------------------------
       float dz_cut = 0.05;
-      float dz_cut_loose = 0.2;
-
+      float dz_cut_loose = 0.1;
       //------------------------------------------------------
       // store pt and iso for most isolated track (pt>10 GeV) and (pt>5 GeV)
       //------------------------------------------------------
@@ -1779,7 +1795,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float miniso10     = 999;
       trkpt10loose_      = -1.0;
       trkreliso10loose_  = 1000.;
-
 
       trkpt5_          = -1.0;
       trkreliso5_      = 1000.;
@@ -1828,12 +1843,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  mindz=gsftrks_dz_pv(itrk,0).first;
 	}
 
-	//store loose definition to compare with previous results
-	float iso = myTrackIso.iso_dr03_dz020_pt00 / pfcands_p4().at(ipf).pt();
+	// start with loose dz cut
+	if( fabs(mindz) > dz_cut_loose ) continue;
 
- 	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs(mindz) > dz_cut_loose ) continue;
- 	}
+	//store loose definition to compare with previous results
+	float iso = myTrackIso.iso_dr03_dz010_pt00 / pfcands_p4().at(ipf).pt();
 
 	if(pfcands_p4().at(ipf).pt()>=10 && iso < trkreliso10loose_ && !isGoodLepton ){
 	  trkpt10loose_       = pfcands_p4().at(ipf).pt();
@@ -1846,11 +1860,24 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  trkreliso5loose_ = iso;
 	}
 
-	//tighten dz cut
- 	if( itrk < (int)trks_trk_p4().size() && itrk >= 0 ){
- 	  if( fabs(mindz) > dz_cut ) continue;
- 	}
+	if( pfcands_p4().at(ipf).pt()>=5 && iso < pfcandiso5_ && !isLeadLepton){
+	  pfcandiso5looseZ_ = iso;
+	  pfcanddz5looseZ_ = mindz;
+	  pfcandpt5looseZ_ = pfcands_p4().at(ipf).pt();
+	  pfcand5looseZ_ = &pfcands_p4().at(ipf);
+          pfcandid5looseZ_ =  pfcands_particleId().at(ipf);
+	}
 
+	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandisoOS10_ && !isLeadLepton && charge>0){
+	  pfcandisoOS10looseZ_ = iso;
+	  pfcanddzOS10looseZ_ = mindz;
+	  pfcandptOS10looseZ_ = pfcands_p4().at(ipf).pt();
+	  pfcandOS10looseZ_ = &pfcands_p4().at(ipf);
+	  pfcandidOS10looseZ_ =  pfcands_particleId().at(ipf);
+	}
+
+	//tighten dz cut
+	if( fabs(mindz) > dz_cut ) continue;
 
 	iso=myTrackIso.isoDir_dr03_dz005_pt00/pfcands_p4().at(ipf).pt();
 
@@ -1874,7 +1901,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
           pfcandvetoid10_ =  pfcands_particleId().at(ipf);
 
 	}
-
 
 	// with veto cone
 	iso = myTrackIso.iso_dr01503_dz005_pt00 / pfcands_p4().at(ipf).pt();
@@ -1910,6 +1936,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	if( pfcands_p4().at(ipf).pt()>=5 && iso < pfcandiso5_){
 	  pfcandiso5_ = iso;
+	  pfcanddz5_ = mindz;
 	  pfcandpt5_ = pfcands_p4().at(ipf).pt();
 	  pfcand5_ = &pfcands_p4().at(ipf);
           pfcandid5_ =  pfcands_particleId().at(ipf);
@@ -1919,6 +1946,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	if( iso < pfcandisoOS10_ && charge>0){
 	  pfcandisoOS10_ = iso;
+	  pfcanddzOS10_ = mindz;
 	  pfcandptOS10_ = pfcands_p4().at(ipf).pt();
 	  pfcandOS10_ = &pfcands_p4().at(ipf);
 	  pfcandidOS10_ =  pfcands_particleId().at(ipf);
@@ -1927,6 +1955,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	/// this is the default case Track with dz<0.05 ; pt>10 ; notLeadingLepton
 	if( iso < pfcandiso10_ ){
 	  pfcandiso10_ = iso;
+	  pfcanddz10_ = mindz;
 	  pfcandpt10_ = pfcands_p4().at(ipf).pt();
 	  pfcand10_ = &pfcands_p4().at(ipf);
 	  pfcandid10_ =  pfcands_particleId().at(ipf);
@@ -3525,16 +3554,29 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcandid5",        &pfcandid5_,        "pfcandid5/I");
   outTree->Branch("pfcandiso5",       &pfcandiso5_,       "pfcandiso5/F");  
   outTree->Branch("pfcandpt5",        &pfcandpt5_,        "pfcandpt5/F");  
+  outTree->Branch("pfcanddz5",        &pfcanddz5_,        "pfcanddz5/F");  
   outTree->Branch("pfcandmindrj5",    &pfcandmindrj5_,    "pfcandmindrj5/F");  
 
   outTree->Branch("pfcandid10",       &pfcandid10_,       "pfcandid10/I");
   outTree->Branch("pfcandiso10",      &pfcandiso10_,      "pfcandiso10/F");  
   outTree->Branch("pfcandpt10",       &pfcandpt10_,       "pfcandpt10/F");  
+  outTree->Branch("pfcanddz10",       &pfcanddz10_,       "pfcanddz10/F");  
   outTree->Branch("pfcandmindrj10",   &pfcandmindrj10_,   "pfcandmindrj10/F");  
 
   outTree->Branch("pfcandidOS10",       &pfcandidOS10_,       "pfcandidOS10/I");
   outTree->Branch("pfcandisoOS10",      &pfcandisoOS10_,      "pfcandisoOS10/F");  
   outTree->Branch("pfcandptOS10",       &pfcandptOS10_,       "pfcandptOS10/F");  
+  outTree->Branch("pfcanddzOS10",       &pfcanddzOS10_,       "pfcanddzOS10/F");  
+
+  outTree->Branch("pfcandid5looseZ",        &pfcandid5looseZ_,        "pfcandid5looseZ/I");
+  outTree->Branch("pfcandiso5looseZ",       &pfcandiso5looseZ_,       "pfcandiso5looseZ/F");  
+  outTree->Branch("pfcandpt5looseZ",        &pfcandpt5looseZ_,        "pfcandpt5looseZ/F");  
+  outTree->Branch("pfcanddz5looseZ",        &pfcanddz5looseZ_,        "pfcanddz5looseZ/F");  
+
+  outTree->Branch("pfcandidOS10looseZ",       &pfcandidOS10looseZ_,       "pfcandidOS10looseZ/I");
+  outTree->Branch("pfcandisoOS10looseZ",      &pfcandisoOS10looseZ_,      "pfcandisoOS10looseZ/F");  
+  outTree->Branch("pfcandptOS10looseZ",       &pfcandptOS10looseZ_,       "pfcandptOS10looseZ/F");  
+  outTree->Branch("pfcanddzOS10looseZ",       &pfcanddzOS10looseZ_,       "pfcanddzOS10looseZ/F");  
 
   outTree->Branch("pfcanddirid10",       &pfcanddirid10_,       "pfcanddirid10/I");
   outTree->Branch("pfcanddiriso10",      &pfcanddiriso10_,      "pfcanddiriso10/F");  
@@ -3640,6 +3682,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcand5"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand5_	);
   outTree->Branch("pfcand10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand10_	);
   outTree->Branch("pfcandOS10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandOS10_	);
+  outTree->Branch("pfcandOS10looseZ"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandOS10looseZ_	);
+  outTree->Branch("pfcand5looseZ"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand5looseZ_	);
   outTree->Branch("pfcanddir10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcanddir10_	);
   outTree->Branch("pfcandveto10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandveto10_	);
   outTree->Branch("pfcandvetoL10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandvetoL10_	);
