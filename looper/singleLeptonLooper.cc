@@ -1161,6 +1161,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       lep_tbar_	= 0;   
       stop_t_	= 0;   
       stop_tbar_ = 0;   
+      neutralino_t_ = 0;   
+      neutralino_tbar_ = 0;  
 
       npartons_    =  0;
       nwzpartons_  = -9;
@@ -1240,6 +1242,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  else if ( id == -1000006 )
 	    stop_tbar_ = &(genps_p4().at(igen));   
 
+    //store neutralino
+    if ( mothid == 1000006  && ( abs(id) == 1000022 ) ) {
+      neutralino_t_ = &(genps_p4().at(igen));
+    }
+    if ( mothid == -1000006 && ( abs(id) == 1000022 ) ) {
+      neutralino_tbar_ = &(genps_p4().at(igen));
+    }
 
 	  //store daughter lepton
 	  if ( abs(mothid) == 24 && (abs(id) == 11 || abs(id) == 13 || abs(id) ==15)) {
@@ -3638,6 +3647,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("lep_tbar"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &lep_tbar_  );
   outTree->Branch("stop_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_t_   	);
   outTree->Branch("stop_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_tbar_ );
+  outTree->Branch("neutralino_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_t_    );
+  outTree->Branch("neutralino_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_tbar_ );
   outTree->Branch("lep_t_id",            &lep_t_id_,            "lep_t_id/I");  
   outTree->Branch("lep_tbar_id",         &lep_tbar_id_,         "lep_tbar_id/I");  
 

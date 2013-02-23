@@ -368,7 +368,9 @@ class singleLeptonLooper
 	LorentzVector*  lep_t_;   
 	LorentzVector*  lep_tbar_;   
 	LorentzVector*  stop_t_;   
-	LorentzVector*  stop_tbar_;   
+	LorentzVector*  stop_tbar_;
+	LorentzVector*  neutralino_t_;   
+	LorentzVector*  neutralino_tbar_;    
 	LorentzVector*  ttbar_;   
 	LorentzVector*  mlep_;   
 	LorentzVector*  mclep1_;   
