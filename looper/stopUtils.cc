@@ -255,6 +255,7 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
   
   // dz variation                                                                                                                         
   iso.iso_dr03_dz020_pt00=0.;
+  iso.iso_dr03_dz010_pt00=0.;
   iso.iso_dr03_dz000_pt00=0.;
   
   // isolation sum option
@@ -279,6 +280,7 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
   iso.iso_dr03_dz005_pt09=0.;
   iso.iso_dr03_dz005_pt10=0.;
   
+
 
   for (int ipf = 0; ipf < (int)pfcands_p4().size(); ipf++) {
 
@@ -374,7 +376,8 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
     if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.05) iso.isoDir_dr03_dz005_pt00 +=pfcands_p4().at(ipf).pt()*(1-3*dr);
 
     // some dz variation
-    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.00) iso.iso_dr03_dz000_pt00+= pfcands_p4().at(ipf).pt();      
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.00) iso.iso_dr03_dz000_pt00+= pfcands_p4().at(ipf).pt(); 
+    if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.10) iso.iso_dr03_dz010_pt00+= pfcands_p4().at(ipf).pt();     
     if( pfcands_p4().at(ipf).pt()>=0.0 && fabs(mindz) <= 0.20) iso.iso_dr03_dz020_pt00+= pfcands_p4().at(ipf).pt();
     
     // some pt variation

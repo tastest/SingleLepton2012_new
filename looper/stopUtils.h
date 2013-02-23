@@ -104,6 +104,7 @@ struct myTrackIso {
 
   // dz variation
   float iso_dr03_dz000_pt00;
+  float iso_dr03_dz010_pt00;
   float iso_dr03_dz020_pt00;
 
   //pt Variation
