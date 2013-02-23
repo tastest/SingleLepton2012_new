@@ -286,10 +286,11 @@ struct myTrackIso  trackIso( int thisPf , float coneR , float dz_thresh , bool d
                                                                                                                
     if(pfcands_charge().at(ipf) == 0 ) continue; // skip neutrals                                                                                                                          
 
-    // we do not use the electron and muon in the isolation sum,                                                                                                                                        
+    // when we want to find the second isolated muon and electron
+    // we do not use the electron and muon in the isolation sum,                                                                                              
     // to avoid overlap with the other lepton in the event  
-    if(abs(pfcands_particleId().at(ipf))==13) continue;                                                                                         
-    if(abs(pfcands_particleId().at(ipf))==11) continue;                                                                                         
+    if((abs(pfcands_particleId().at(thisPf))==13 || abs(pfcands_particleId().at(thisPf))==11) && abs(pfcands_particleId().at(ipf))==13) continue;                                                                                         
+    if((abs(pfcands_particleId().at(thisPf))==13 || abs(pfcands_particleId().at(thisPf))==11) && abs(pfcands_particleId().at(ipf))==11) continue;                                                                                         
 
     //----------------------------------------                                                                                                                                                   
     // find closest PV and dz w.r.t. that PV                                                                                                                                                     
