@@ -696,12 +696,18 @@ double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVect
 	} else if (n_btag == 1 ){
 	  // if only one b-jet choose the three non-b leading jets and choose the smaller
 	  float min_mt2w = 9999;
-	  for (int i=0; i<3; i++){
+
+	  int nMax=-1;
+	  if(jets.size()==3) nMax=2;
+	  if(jets.size()>3) nMax=4;
+
+	  for (int i=0; i<nMax; i++){
 	    float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
 	    if (c_mt2w < min_mt2w)
 	      min_mt2w = c_mt2w;
 	  }
-	  for (int i=0; i<3; i++){
+
+	  for (int i=0; i<nMax; i++){
 	    float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi);
 	    if (c_mt2w < min_mt2w)
 	      min_mt2w = c_mt2w;
