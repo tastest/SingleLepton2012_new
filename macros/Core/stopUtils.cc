@@ -355,6 +355,25 @@ bool passIsoTrkVeto_v3()
 
 
 //-------------------------------------------
+// the isolated track veto with looser dz
+//-------------------------------------------
+
+bool passIsoTrkVeto_v4()
+{
+
+  //pass isolated track veto
+  //unfortunately changed default value to 9999.
+  if ( stopt.pfcandptOS10looseZ() <9998. && abs(stopt.pfcandid5looseZ())!=13 && abs(stopt.pfcandid5looseZ())!=11 && stopt.pfcandisoOS10looseZ() < 0.1 ) return false;
+
+  if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==13 && stopt.pfcandiso5looseZ() < 0.2) return false;
+  if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==11 && stopt.pfcandiso5looseZ() < 0.2) return false;
+
+  return true;
+
+}
+
+
+//-------------------------------------------
 // >=1 selected lepton and trigger
 //-------------------------------------------
 

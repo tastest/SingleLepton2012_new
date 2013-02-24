@@ -48,6 +48,7 @@ bool passTwoLeptonSelection(bool isData);
 bool passIsoTrkVeto();
 bool passIsoTrkVeto_v2();
 bool passIsoTrkVeto_v3();
+bool passIsoTrkVeto_v4();
 bool passSingleLeptonSelection(bool isData);
 bool passDileptonSelection(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
