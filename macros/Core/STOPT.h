@@ -224,6 +224,12 @@ protected:
 	float	genmetphi_;
 	TBranch *genmetphi_branch;
 	bool genmetphi_isLoaded;
+	float	calomet_;
+	TBranch *calomet_branch;
+	bool calomet_isLoaded;
+	float	calometphi_;
+	TBranch *calometphi_branch;
+	bool calometphi_isLoaded;
 	float	trkmet_;
 	TBranch *trkmet_branch;
 	bool trkmet_isLoaded;
@@ -518,6 +524,9 @@ protected:
 	float	htDown_;
 	TBranch *htDown_branch;
 	bool htDown_isLoaded;
+	int	ntruepu_;
+	TBranch *ntruepu_branch;
+	bool ntruepu_isLoaded;
 	int	npu_;
 	TBranch *npu_branch;
 	bool npu_isLoaded;
@@ -923,6 +932,9 @@ protected:
 	float	pfcandpt5_;
 	TBranch *pfcandpt5_branch;
 	bool pfcandpt5_isLoaded;
+	float	pfcanddz5_;
+	TBranch *pfcanddz5_branch;
+	bool pfcanddz5_isLoaded;
 	float	pfcandmindrj5_;
 	TBranch *pfcandmindrj5_branch;
 	bool pfcandmindrj5_isLoaded;
@@ -935,6 +947,9 @@ protected:
 	float	pfcandpt10_;
 	TBranch *pfcandpt10_branch;
 	bool pfcandpt10_isLoaded;
+	float	pfcanddz10_;
+	TBranch *pfcanddz10_branch;
+	bool pfcanddz10_isLoaded;
 	float	pfcandmindrj10_;
 	TBranch *pfcandmindrj10_branch;
 	bool pfcandmindrj10_isLoaded;
@@ -947,6 +962,33 @@ protected:
 	float	pfcandptOS10_;
 	TBranch *pfcandptOS10_branch;
 	bool pfcandptOS10_isLoaded;
+	float	pfcanddzOS10_;
+	TBranch *pfcanddzOS10_branch;
+	bool pfcanddzOS10_isLoaded;
+	int	pfcandid5looseZ_;
+	TBranch *pfcandid5looseZ_branch;
+	bool pfcandid5looseZ_isLoaded;
+	float	pfcandiso5looseZ_;
+	TBranch *pfcandiso5looseZ_branch;
+	bool pfcandiso5looseZ_isLoaded;
+	float	pfcandpt5looseZ_;
+	TBranch *pfcandpt5looseZ_branch;
+	bool pfcandpt5looseZ_isLoaded;
+	float	pfcanddz5looseZ_;
+	TBranch *pfcanddz5looseZ_branch;
+	bool pfcanddz5looseZ_isLoaded;
+	int	pfcandidOS10looseZ_;
+	TBranch *pfcandidOS10looseZ_branch;
+	bool pfcandidOS10looseZ_isLoaded;
+	float	pfcandisoOS10looseZ_;
+	TBranch *pfcandisoOS10looseZ_branch;
+	bool pfcandisoOS10looseZ_isLoaded;
+	float	pfcandptOS10looseZ_;
+	TBranch *pfcandptOS10looseZ_branch;
+	bool pfcandptOS10looseZ_isLoaded;
+	float	pfcanddzOS10looseZ_;
+	TBranch *pfcanddzOS10looseZ_branch;
+	bool pfcanddzOS10looseZ_isLoaded;
 	int	pfcanddirid10_;
 	TBranch *pfcanddirid10_branch;
 	bool pfcanddirid10_isLoaded;
@@ -971,6 +1013,18 @@ protected:
 	float	pfcandvetomindrj10_;
 	TBranch *pfcandvetomindrj10_branch;
 	bool pfcandvetomindrj10_isLoaded;
+	int	pfcandvetoLid10_;
+	TBranch *pfcandvetoLid10_branch;
+	bool pfcandvetoLid10_isLoaded;
+	float	pfcandvetoLiso10_;
+	TBranch *pfcandvetoLiso10_branch;
+	bool pfcandvetoLiso10_isLoaded;
+	float	pfcandvetoLpt10_;
+	TBranch *pfcandvetoLpt10_branch;
+	bool pfcandvetoLpt10_isLoaded;
+	float	pfcandvetoLmindrj10_;
+	TBranch *pfcandvetoLmindrj10_branch;
+	bool pfcandvetoLmindrj10_isLoaded;
 	float	emjet10_;
 	TBranch *emjet10_branch;
 	bool emjet10_isLoaded;
@@ -1220,12 +1274,24 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcand10_;
 	TBranch *pfcand10_branch;
 	bool pfcand10_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcandOS10_;
+	TBranch *pfcandOS10_branch;
+	bool pfcandOS10_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcandOS10looseZ_;
+	TBranch *pfcandOS10looseZ_branch;
+	bool pfcandOS10looseZ_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcand5looseZ_;
+	TBranch *pfcand5looseZ_branch;
+	bool pfcand5looseZ_isLoaded;
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcanddir10_;
 	TBranch *pfcanddir10_branch;
 	bool pfcanddir10_isLoaded;
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcandveto10_;
 	TBranch *pfcandveto10_branch;
 	bool pfcandveto10_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcandvetoL10_;
+	TBranch *pfcandvetoL10_branch;
+	bool pfcandvetoL10_isLoaded;
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *jet_;
 	TBranch *jet_branch;
 	bool jet_isLoaded;
@@ -1256,6 +1322,12 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *stop_tbar_;
 	TBranch *stop_tbar_branch;
 	bool stop_tbar_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *neutralino_t_;
+	TBranch *neutralino_t_branch;
+	bool neutralino_t_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *neutralino_tbar_;
+	TBranch *neutralino_tbar_branch;
+	bool neutralino_tbar_isLoaded;
 	int	lep_t_id_;
 	TBranch *lep_t_id_branch;
 	bool lep_t_id_isLoaded;
@@ -1301,6 +1373,12 @@ protected:
 	vector<float> *pfjets_beta2_0p5_;
 	TBranch *pfjets_beta2_0p5_branch;
 	bool pfjets_beta2_0p5_isLoaded;
+	vector<float> *pfjets_mvaPUid_;
+	TBranch *pfjets_mvaPUid_branch;
+	bool pfjets_mvaPUid_isLoaded;
+	vector<float> *pfjets_l1corr_;
+	TBranch *pfjets_l1corr_branch;
+	bool pfjets_l1corr_isLoaded;
 	vector<float> *pfjets_corr_;
 	TBranch *pfjets_corr_branch;
 	bool pfjets_corr_isLoaded;
@@ -1449,6 +1527,21 @@ void Init(TTree *tree) {
 		pfcand10_branch = tree->GetBranch("pfcand10");
 		if (pfcand10_branch) {pfcand10_branch->SetAddress(&pfcand10_);}
 	}
+	pfcandOS10_branch = 0;
+	if (tree->GetBranch("pfcandOS10") != 0) {
+		pfcandOS10_branch = tree->GetBranch("pfcandOS10");
+		if (pfcandOS10_branch) {pfcandOS10_branch->SetAddress(&pfcandOS10_);}
+	}
+	pfcandOS10looseZ_branch = 0;
+	if (tree->GetBranch("pfcandOS10looseZ") != 0) {
+		pfcandOS10looseZ_branch = tree->GetBranch("pfcandOS10looseZ");
+		if (pfcandOS10looseZ_branch) {pfcandOS10looseZ_branch->SetAddress(&pfcandOS10looseZ_);}
+	}
+	pfcand5looseZ_branch = 0;
+	if (tree->GetBranch("pfcand5looseZ") != 0) {
+		pfcand5looseZ_branch = tree->GetBranch("pfcand5looseZ");
+		if (pfcand5looseZ_branch) {pfcand5looseZ_branch->SetAddress(&pfcand5looseZ_);}
+	}
 	pfcanddir10_branch = 0;
 	if (tree->GetBranch("pfcanddir10") != 0) {
 		pfcanddir10_branch = tree->GetBranch("pfcanddir10");
@@ -1458,6 +1551,11 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfcandveto10") != 0) {
 		pfcandveto10_branch = tree->GetBranch("pfcandveto10");
 		if (pfcandveto10_branch) {pfcandveto10_branch->SetAddress(&pfcandveto10_);}
+	}
+	pfcandvetoL10_branch = 0;
+	if (tree->GetBranch("pfcandvetoL10") != 0) {
+		pfcandvetoL10_branch = tree->GetBranch("pfcandvetoL10");
+		if (pfcandvetoL10_branch) {pfcandvetoL10_branch->SetAddress(&pfcandvetoL10_);}
 	}
 	jet_branch = 0;
 	if (tree->GetBranch("jet") != 0) {
@@ -1508,6 +1606,16 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("stop_tbar") != 0) {
 		stop_tbar_branch = tree->GetBranch("stop_tbar");
 		if (stop_tbar_branch) {stop_tbar_branch->SetAddress(&stop_tbar_);}
+	}
+	neutralino_t_branch = 0;
+	if (tree->GetBranch("neutralino_t") != 0) {
+		neutralino_t_branch = tree->GetBranch("neutralino_t");
+		if (neutralino_t_branch) {neutralino_t_branch->SetAddress(&neutralino_t_);}
+	}
+	neutralino_tbar_branch = 0;
+	if (tree->GetBranch("neutralino_tbar") != 0) {
+		neutralino_tbar_branch = tree->GetBranch("neutralino_tbar");
+		if (neutralino_tbar_branch) {neutralino_tbar_branch->SetAddress(&neutralino_tbar_);}
 	}
 	pfjets_branch = 0;
 	if (tree->GetBranch("pfjets") != 0) {
@@ -1864,6 +1972,16 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("genmetphi") != 0) {
 		genmetphi_branch = tree->GetBranch("genmetphi");
 		if (genmetphi_branch) {genmetphi_branch->SetAddress(&genmetphi_);}
+	}
+	calomet_branch = 0;
+	if (tree->GetBranch("calomet") != 0) {
+		calomet_branch = tree->GetBranch("calomet");
+		if (calomet_branch) {calomet_branch->SetAddress(&calomet_);}
+	}
+	calometphi_branch = 0;
+	if (tree->GetBranch("calometphi") != 0) {
+		calometphi_branch = tree->GetBranch("calometphi");
+		if (calometphi_branch) {calometphi_branch->SetAddress(&calometphi_);}
 	}
 	trkmet_branch = 0;
 	if (tree->GetBranch("trkmet") != 0) {
@@ -2354,6 +2472,11 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("htDown") != 0) {
 		htDown_branch = tree->GetBranch("htDown");
 		if (htDown_branch) {htDown_branch->SetAddress(&htDown_);}
+	}
+	ntruepu_branch = 0;
+	if (tree->GetBranch("ntruepu") != 0) {
+		ntruepu_branch = tree->GetBranch("ntruepu");
+		if (ntruepu_branch) {ntruepu_branch->SetAddress(&ntruepu_);}
 	}
 	npu_branch = 0;
 	if (tree->GetBranch("npu") != 0) {
@@ -3030,6 +3153,11 @@ void Init(TTree *tree) {
 		pfcandpt5_branch = tree->GetBranch("pfcandpt5");
 		if (pfcandpt5_branch) {pfcandpt5_branch->SetAddress(&pfcandpt5_);}
 	}
+	pfcanddz5_branch = 0;
+	if (tree->GetBranch("pfcanddz5") != 0) {
+		pfcanddz5_branch = tree->GetBranch("pfcanddz5");
+		if (pfcanddz5_branch) {pfcanddz5_branch->SetAddress(&pfcanddz5_);}
+	}
 	pfcandmindrj5_branch = 0;
 	if (tree->GetBranch("pfcandmindrj5") != 0) {
 		pfcandmindrj5_branch = tree->GetBranch("pfcandmindrj5");
@@ -3050,6 +3178,11 @@ void Init(TTree *tree) {
 		pfcandpt10_branch = tree->GetBranch("pfcandpt10");
 		if (pfcandpt10_branch) {pfcandpt10_branch->SetAddress(&pfcandpt10_);}
 	}
+	pfcanddz10_branch = 0;
+	if (tree->GetBranch("pfcanddz10") != 0) {
+		pfcanddz10_branch = tree->GetBranch("pfcanddz10");
+		if (pfcanddz10_branch) {pfcanddz10_branch->SetAddress(&pfcanddz10_);}
+	}
 	pfcandmindrj10_branch = 0;
 	if (tree->GetBranch("pfcandmindrj10") != 0) {
 		pfcandmindrj10_branch = tree->GetBranch("pfcandmindrj10");
@@ -3069,6 +3202,51 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfcandptOS10") != 0) {
 		pfcandptOS10_branch = tree->GetBranch("pfcandptOS10");
 		if (pfcandptOS10_branch) {pfcandptOS10_branch->SetAddress(&pfcandptOS10_);}
+	}
+	pfcanddzOS10_branch = 0;
+	if (tree->GetBranch("pfcanddzOS10") != 0) {
+		pfcanddzOS10_branch = tree->GetBranch("pfcanddzOS10");
+		if (pfcanddzOS10_branch) {pfcanddzOS10_branch->SetAddress(&pfcanddzOS10_);}
+	}
+	pfcandid5looseZ_branch = 0;
+	if (tree->GetBranch("pfcandid5looseZ") != 0) {
+		pfcandid5looseZ_branch = tree->GetBranch("pfcandid5looseZ");
+		if (pfcandid5looseZ_branch) {pfcandid5looseZ_branch->SetAddress(&pfcandid5looseZ_);}
+	}
+	pfcandiso5looseZ_branch = 0;
+	if (tree->GetBranch("pfcandiso5looseZ") != 0) {
+		pfcandiso5looseZ_branch = tree->GetBranch("pfcandiso5looseZ");
+		if (pfcandiso5looseZ_branch) {pfcandiso5looseZ_branch->SetAddress(&pfcandiso5looseZ_);}
+	}
+	pfcandpt5looseZ_branch = 0;
+	if (tree->GetBranch("pfcandpt5looseZ") != 0) {
+		pfcandpt5looseZ_branch = tree->GetBranch("pfcandpt5looseZ");
+		if (pfcandpt5looseZ_branch) {pfcandpt5looseZ_branch->SetAddress(&pfcandpt5looseZ_);}
+	}
+	pfcanddz5looseZ_branch = 0;
+	if (tree->GetBranch("pfcanddz5looseZ") != 0) {
+		pfcanddz5looseZ_branch = tree->GetBranch("pfcanddz5looseZ");
+		if (pfcanddz5looseZ_branch) {pfcanddz5looseZ_branch->SetAddress(&pfcanddz5looseZ_);}
+	}
+	pfcandidOS10looseZ_branch = 0;
+	if (tree->GetBranch("pfcandidOS10looseZ") != 0) {
+		pfcandidOS10looseZ_branch = tree->GetBranch("pfcandidOS10looseZ");
+		if (pfcandidOS10looseZ_branch) {pfcandidOS10looseZ_branch->SetAddress(&pfcandidOS10looseZ_);}
+	}
+	pfcandisoOS10looseZ_branch = 0;
+	if (tree->GetBranch("pfcandisoOS10looseZ") != 0) {
+		pfcandisoOS10looseZ_branch = tree->GetBranch("pfcandisoOS10looseZ");
+		if (pfcandisoOS10looseZ_branch) {pfcandisoOS10looseZ_branch->SetAddress(&pfcandisoOS10looseZ_);}
+	}
+	pfcandptOS10looseZ_branch = 0;
+	if (tree->GetBranch("pfcandptOS10looseZ") != 0) {
+		pfcandptOS10looseZ_branch = tree->GetBranch("pfcandptOS10looseZ");
+		if (pfcandptOS10looseZ_branch) {pfcandptOS10looseZ_branch->SetAddress(&pfcandptOS10looseZ_);}
+	}
+	pfcanddzOS10looseZ_branch = 0;
+	if (tree->GetBranch("pfcanddzOS10looseZ") != 0) {
+		pfcanddzOS10looseZ_branch = tree->GetBranch("pfcanddzOS10looseZ");
+		if (pfcanddzOS10looseZ_branch) {pfcanddzOS10looseZ_branch->SetAddress(&pfcanddzOS10looseZ_);}
 	}
 	pfcanddirid10_branch = 0;
 	if (tree->GetBranch("pfcanddirid10") != 0) {
@@ -3109,6 +3287,26 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfcandvetomindrj10") != 0) {
 		pfcandvetomindrj10_branch = tree->GetBranch("pfcandvetomindrj10");
 		if (pfcandvetomindrj10_branch) {pfcandvetomindrj10_branch->SetAddress(&pfcandvetomindrj10_);}
+	}
+	pfcandvetoLid10_branch = 0;
+	if (tree->GetBranch("pfcandvetoLid10") != 0) {
+		pfcandvetoLid10_branch = tree->GetBranch("pfcandvetoLid10");
+		if (pfcandvetoLid10_branch) {pfcandvetoLid10_branch->SetAddress(&pfcandvetoLid10_);}
+	}
+	pfcandvetoLiso10_branch = 0;
+	if (tree->GetBranch("pfcandvetoLiso10") != 0) {
+		pfcandvetoLiso10_branch = tree->GetBranch("pfcandvetoLiso10");
+		if (pfcandvetoLiso10_branch) {pfcandvetoLiso10_branch->SetAddress(&pfcandvetoLiso10_);}
+	}
+	pfcandvetoLpt10_branch = 0;
+	if (tree->GetBranch("pfcandvetoLpt10") != 0) {
+		pfcandvetoLpt10_branch = tree->GetBranch("pfcandvetoLpt10");
+		if (pfcandvetoLpt10_branch) {pfcandvetoLpt10_branch->SetAddress(&pfcandvetoLpt10_);}
+	}
+	pfcandvetoLmindrj10_branch = 0;
+	if (tree->GetBranch("pfcandvetoLmindrj10") != 0) {
+		pfcandvetoLmindrj10_branch = tree->GetBranch("pfcandvetoLmindrj10");
+		if (pfcandvetoLmindrj10_branch) {pfcandvetoLmindrj10_branch->SetAddress(&pfcandvetoLmindrj10_);}
 	}
 	emjet10_branch = 0;
 	if (tree->GetBranch("emjet10") != 0) {
@@ -3465,6 +3663,16 @@ void Init(TTree *tree) {
 		pfjets_beta2_0p5_branch = tree->GetBranch("pfjets_beta2_0p5");
 		if (pfjets_beta2_0p5_branch) {pfjets_beta2_0p5_branch->SetAddress(&pfjets_beta2_0p5_);}
 	}
+	pfjets_mvaPUid_branch = 0;
+	if (tree->GetBranch("pfjets_mvaPUid") != 0) {
+		pfjets_mvaPUid_branch = tree->GetBranch("pfjets_mvaPUid");
+		if (pfjets_mvaPUid_branch) {pfjets_mvaPUid_branch->SetAddress(&pfjets_mvaPUid_);}
+	}
+	pfjets_l1corr_branch = 0;
+	if (tree->GetBranch("pfjets_l1corr") != 0) {
+		pfjets_l1corr_branch = tree->GetBranch("pfjets_l1corr");
+		if (pfjets_l1corr_branch) {pfjets_l1corr_branch->SetAddress(&pfjets_l1corr_);}
+	}
 	pfjets_corr_branch = 0;
 	if (tree->GetBranch("pfjets_corr") != 0) {
 		pfjets_corr_branch = tree->GetBranch("pfjets_corr");
@@ -3575,6 +3783,8 @@ void GetEntry(unsigned int idx)
 		genmet_isLoaded = false;
 		gensumet_isLoaded = false;
 		genmetphi_isLoaded = false;
+		calomet_isLoaded = false;
+		calometphi_isLoaded = false;
 		trkmet_isLoaded = false;
 		trkmetphi_isLoaded = false;
 		trkmet_nolepcorr_isLoaded = false;
@@ -3673,6 +3883,7 @@ void GetEntry(unsigned int idx)
 		njetsDown_isLoaded = false;
 		htUp_isLoaded = false;
 		htDown_isLoaded = false;
+		ntruepu_isLoaded = false;
 		npu_isLoaded = false;
 		npuMinusOne_isLoaded = false;
 		npuPlusOne_isLoaded = false;
@@ -3808,14 +4019,25 @@ void GetEntry(unsigned int idx)
 		pfcandid5_isLoaded = false;
 		pfcandiso5_isLoaded = false;
 		pfcandpt5_isLoaded = false;
+		pfcanddz5_isLoaded = false;
 		pfcandmindrj5_isLoaded = false;
 		pfcandid10_isLoaded = false;
 		pfcandiso10_isLoaded = false;
 		pfcandpt10_isLoaded = false;
+		pfcanddz10_isLoaded = false;
 		pfcandmindrj10_isLoaded = false;
 		pfcandidOS10_isLoaded = false;
 		pfcandisoOS10_isLoaded = false;
 		pfcandptOS10_isLoaded = false;
+		pfcanddzOS10_isLoaded = false;
+		pfcandid5looseZ_isLoaded = false;
+		pfcandiso5looseZ_isLoaded = false;
+		pfcandpt5looseZ_isLoaded = false;
+		pfcanddz5looseZ_isLoaded = false;
+		pfcandidOS10looseZ_isLoaded = false;
+		pfcandisoOS10looseZ_isLoaded = false;
+		pfcandptOS10looseZ_isLoaded = false;
+		pfcanddzOS10looseZ_isLoaded = false;
 		pfcanddirid10_isLoaded = false;
 		pfcanddiriso10_isLoaded = false;
 		pfcanddirpt10_isLoaded = false;
@@ -3824,6 +4046,10 @@ void GetEntry(unsigned int idx)
 		pfcandvetoiso10_isLoaded = false;
 		pfcandvetopt10_isLoaded = false;
 		pfcandvetomindrj10_isLoaded = false;
+		pfcandvetoLid10_isLoaded = false;
+		pfcandvetoLiso10_isLoaded = false;
+		pfcandvetoLpt10_isLoaded = false;
+		pfcandvetoLmindrj10_isLoaded = false;
 		emjet10_isLoaded = false;
 		mjj_isLoaded = false;
 		emjet20_isLoaded = false;
@@ -3907,8 +4133,12 @@ void GetEntry(unsigned int idx)
 		pftaud_isLoaded = false;
 		pfcand5_isLoaded = false;
 		pfcand10_isLoaded = false;
+		pfcandOS10_isLoaded = false;
+		pfcandOS10looseZ_isLoaded = false;
+		pfcand5looseZ_isLoaded = false;
 		pfcanddir10_isLoaded = false;
 		pfcandveto10_isLoaded = false;
+		pfcandvetoL10_isLoaded = false;
 		jet_isLoaded = false;
 		nonisoel_isLoaded = false;
 		nonisomu_isLoaded = false;
@@ -3919,6 +4149,8 @@ void GetEntry(unsigned int idx)
 		lep_tbar_isLoaded = false;
 		stop_t_isLoaded = false;
 		stop_tbar_isLoaded = false;
+		neutralino_t_isLoaded = false;
+		neutralino_tbar_isLoaded = false;
 		lep_t_id_isLoaded = false;
 		lep_tbar_id_isLoaded = false;
 		pfjets_isLoaded = false;
@@ -3934,6 +4166,8 @@ void GetEntry(unsigned int idx)
 		pfjets_beta_0p2_isLoaded = false;
 		pfjets_beta2_0p1_isLoaded = false;
 		pfjets_beta2_0p5_isLoaded = false;
+		pfjets_mvaPUid_isLoaded = false;
+		pfjets_l1corr_isLoaded = false;
 		pfjets_corr_isLoaded = false;
 		pfjets_mc3_isLoaded = false;
 		pfjets_flav_isLoaded = false;
@@ -4015,6 +4249,8 @@ void LoadAllBranches()
 	if (genmet_branch != 0) genmet();
 	if (gensumet_branch != 0) gensumet();
 	if (genmetphi_branch != 0) genmetphi();
+	if (calomet_branch != 0) calomet();
+	if (calometphi_branch != 0) calometphi();
 	if (trkmet_branch != 0) trkmet();
 	if (trkmetphi_branch != 0) trkmetphi();
 	if (trkmet_nolepcorr_branch != 0) trkmet_nolepcorr();
@@ -4113,6 +4349,7 @@ void LoadAllBranches()
 	if (njetsDown_branch != 0) njetsDown();
 	if (htUp_branch != 0) htUp();
 	if (htDown_branch != 0) htDown();
+	if (ntruepu_branch != 0) ntruepu();
 	if (npu_branch != 0) npu();
 	if (npuMinusOne_branch != 0) npuMinusOne();
 	if (npuPlusOne_branch != 0) npuPlusOne();
@@ -4248,14 +4485,25 @@ void LoadAllBranches()
 	if (pfcandid5_branch != 0) pfcandid5();
 	if (pfcandiso5_branch != 0) pfcandiso5();
 	if (pfcandpt5_branch != 0) pfcandpt5();
+	if (pfcanddz5_branch != 0) pfcanddz5();
 	if (pfcandmindrj5_branch != 0) pfcandmindrj5();
 	if (pfcandid10_branch != 0) pfcandid10();
 	if (pfcandiso10_branch != 0) pfcandiso10();
 	if (pfcandpt10_branch != 0) pfcandpt10();
+	if (pfcanddz10_branch != 0) pfcanddz10();
 	if (pfcandmindrj10_branch != 0) pfcandmindrj10();
 	if (pfcandidOS10_branch != 0) pfcandidOS10();
 	if (pfcandisoOS10_branch != 0) pfcandisoOS10();
 	if (pfcandptOS10_branch != 0) pfcandptOS10();
+	if (pfcanddzOS10_branch != 0) pfcanddzOS10();
+	if (pfcandid5looseZ_branch != 0) pfcandid5looseZ();
+	if (pfcandiso5looseZ_branch != 0) pfcandiso5looseZ();
+	if (pfcandpt5looseZ_branch != 0) pfcandpt5looseZ();
+	if (pfcanddz5looseZ_branch != 0) pfcanddz5looseZ();
+	if (pfcandidOS10looseZ_branch != 0) pfcandidOS10looseZ();
+	if (pfcandisoOS10looseZ_branch != 0) pfcandisoOS10looseZ();
+	if (pfcandptOS10looseZ_branch != 0) pfcandptOS10looseZ();
+	if (pfcanddzOS10looseZ_branch != 0) pfcanddzOS10looseZ();
 	if (pfcanddirid10_branch != 0) pfcanddirid10();
 	if (pfcanddiriso10_branch != 0) pfcanddiriso10();
 	if (pfcanddirpt10_branch != 0) pfcanddirpt10();
@@ -4264,6 +4512,10 @@ void LoadAllBranches()
 	if (pfcandvetoiso10_branch != 0) pfcandvetoiso10();
 	if (pfcandvetopt10_branch != 0) pfcandvetopt10();
 	if (pfcandvetomindrj10_branch != 0) pfcandvetomindrj10();
+	if (pfcandvetoLid10_branch != 0) pfcandvetoLid10();
+	if (pfcandvetoLiso10_branch != 0) pfcandvetoLiso10();
+	if (pfcandvetoLpt10_branch != 0) pfcandvetoLpt10();
+	if (pfcandvetoLmindrj10_branch != 0) pfcandvetoLmindrj10();
 	if (emjet10_branch != 0) emjet10();
 	if (mjj_branch != 0) mjj();
 	if (emjet20_branch != 0) emjet20();
@@ -4347,8 +4599,12 @@ void LoadAllBranches()
 	if (pftaud_branch != 0) pftaud();
 	if (pfcand5_branch != 0) pfcand5();
 	if (pfcand10_branch != 0) pfcand10();
+	if (pfcandOS10_branch != 0) pfcandOS10();
+	if (pfcandOS10looseZ_branch != 0) pfcandOS10looseZ();
+	if (pfcand5looseZ_branch != 0) pfcand5looseZ();
 	if (pfcanddir10_branch != 0) pfcanddir10();
 	if (pfcandveto10_branch != 0) pfcandveto10();
+	if (pfcandvetoL10_branch != 0) pfcandvetoL10();
 	if (jet_branch != 0) jet();
 	if (nonisoel_branch != 0) nonisoel();
 	if (nonisomu_branch != 0) nonisomu();
@@ -4359,6 +4615,8 @@ void LoadAllBranches()
 	if (lep_tbar_branch != 0) lep_tbar();
 	if (stop_t_branch != 0) stop_t();
 	if (stop_tbar_branch != 0) stop_tbar();
+	if (neutralino_t_branch != 0) neutralino_t();
+	if (neutralino_tbar_branch != 0) neutralino_tbar();
 	if (lep_t_id_branch != 0) lep_t_id();
 	if (lep_tbar_id_branch != 0) lep_tbar_id();
 	if (pfjets_branch != 0) pfjets();
@@ -4374,6 +4632,8 @@ void LoadAllBranches()
 	if (pfjets_beta_0p2_branch != 0) pfjets_beta_0p2();
 	if (pfjets_beta2_0p1_branch != 0) pfjets_beta2_0p1();
 	if (pfjets_beta2_0p5_branch != 0) pfjets_beta2_0p5();
+	if (pfjets_mvaPUid_branch != 0) pfjets_mvaPUid();
+	if (pfjets_l1corr_branch != 0) pfjets_l1corr();
 	if (pfjets_corr_branch != 0) pfjets_corr();
 	if (pfjets_mc3_branch != 0) pfjets_mc3();
 	if (pfjets_flav_branch != 0) pfjets_flav();
@@ -5279,6 +5539,32 @@ void LoadAllBranches()
 			genmetphi_isLoaded = true;
 		}
 		return genmetphi_;
+	}
+	float &calomet()
+	{
+		if (not calomet_isLoaded) {
+			if (calomet_branch != 0) {
+				calomet_branch->GetEntry(index);
+			} else { 
+				printf("branch calomet_branch does not exist!\n");
+				exit(1);
+			}
+			calomet_isLoaded = true;
+		}
+		return calomet_;
+	}
+	float &calometphi()
+	{
+		if (not calometphi_isLoaded) {
+			if (calometphi_branch != 0) {
+				calometphi_branch->GetEntry(index);
+			} else { 
+				printf("branch calometphi_branch does not exist!\n");
+				exit(1);
+			}
+			calometphi_isLoaded = true;
+		}
+		return calometphi_;
 	}
 	float &trkmet()
 	{
@@ -6553,6 +6839,19 @@ void LoadAllBranches()
 			htDown_isLoaded = true;
 		}
 		return htDown_;
+	}
+	int &ntruepu()
+	{
+		if (not ntruepu_isLoaded) {
+			if (ntruepu_branch != 0) {
+				ntruepu_branch->GetEntry(index);
+			} else { 
+				printf("branch ntruepu_branch does not exist!\n");
+				exit(1);
+			}
+			ntruepu_isLoaded = true;
+		}
+		return ntruepu_;
 	}
 	int &npu()
 	{
@@ -8309,6 +8608,19 @@ void LoadAllBranches()
 		}
 		return pfcandpt5_;
 	}
+	float &pfcanddz5()
+	{
+		if (not pfcanddz5_isLoaded) {
+			if (pfcanddz5_branch != 0) {
+				pfcanddz5_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddz5_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddz5_isLoaded = true;
+		}
+		return pfcanddz5_;
+	}
 	float &pfcandmindrj5()
 	{
 		if (not pfcandmindrj5_isLoaded) {
@@ -8361,6 +8673,19 @@ void LoadAllBranches()
 		}
 		return pfcandpt10_;
 	}
+	float &pfcanddz10()
+	{
+		if (not pfcanddz10_isLoaded) {
+			if (pfcanddz10_branch != 0) {
+				pfcanddz10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddz10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddz10_isLoaded = true;
+		}
+		return pfcanddz10_;
+	}
 	float &pfcandmindrj10()
 	{
 		if (not pfcandmindrj10_isLoaded) {
@@ -8412,6 +8737,123 @@ void LoadAllBranches()
 			pfcandptOS10_isLoaded = true;
 		}
 		return pfcandptOS10_;
+	}
+	float &pfcanddzOS10()
+	{
+		if (not pfcanddzOS10_isLoaded) {
+			if (pfcanddzOS10_branch != 0) {
+				pfcanddzOS10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddzOS10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddzOS10_isLoaded = true;
+		}
+		return pfcanddzOS10_;
+	}
+	int &pfcandid5looseZ()
+	{
+		if (not pfcandid5looseZ_isLoaded) {
+			if (pfcandid5looseZ_branch != 0) {
+				pfcandid5looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandid5looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandid5looseZ_isLoaded = true;
+		}
+		return pfcandid5looseZ_;
+	}
+	float &pfcandiso5looseZ()
+	{
+		if (not pfcandiso5looseZ_isLoaded) {
+			if (pfcandiso5looseZ_branch != 0) {
+				pfcandiso5looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandiso5looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandiso5looseZ_isLoaded = true;
+		}
+		return pfcandiso5looseZ_;
+	}
+	float &pfcandpt5looseZ()
+	{
+		if (not pfcandpt5looseZ_isLoaded) {
+			if (pfcandpt5looseZ_branch != 0) {
+				pfcandpt5looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandpt5looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandpt5looseZ_isLoaded = true;
+		}
+		return pfcandpt5looseZ_;
+	}
+	float &pfcanddz5looseZ()
+	{
+		if (not pfcanddz5looseZ_isLoaded) {
+			if (pfcanddz5looseZ_branch != 0) {
+				pfcanddz5looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddz5looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddz5looseZ_isLoaded = true;
+		}
+		return pfcanddz5looseZ_;
+	}
+	int &pfcandidOS10looseZ()
+	{
+		if (not pfcandidOS10looseZ_isLoaded) {
+			if (pfcandidOS10looseZ_branch != 0) {
+				pfcandidOS10looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandidOS10looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandidOS10looseZ_isLoaded = true;
+		}
+		return pfcandidOS10looseZ_;
+	}
+	float &pfcandisoOS10looseZ()
+	{
+		if (not pfcandisoOS10looseZ_isLoaded) {
+			if (pfcandisoOS10looseZ_branch != 0) {
+				pfcandisoOS10looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandisoOS10looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandisoOS10looseZ_isLoaded = true;
+		}
+		return pfcandisoOS10looseZ_;
+	}
+	float &pfcandptOS10looseZ()
+	{
+		if (not pfcandptOS10looseZ_isLoaded) {
+			if (pfcandptOS10looseZ_branch != 0) {
+				pfcandptOS10looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandptOS10looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandptOS10looseZ_isLoaded = true;
+		}
+		return pfcandptOS10looseZ_;
+	}
+	float &pfcanddzOS10looseZ()
+	{
+		if (not pfcanddzOS10looseZ_isLoaded) {
+			if (pfcanddzOS10looseZ_branch != 0) {
+				pfcanddzOS10looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddzOS10looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddzOS10looseZ_isLoaded = true;
+		}
+		return pfcanddzOS10looseZ_;
 	}
 	int &pfcanddirid10()
 	{
@@ -8516,6 +8958,58 @@ void LoadAllBranches()
 			pfcandvetomindrj10_isLoaded = true;
 		}
 		return pfcandvetomindrj10_;
+	}
+	int &pfcandvetoLid10()
+	{
+		if (not pfcandvetoLid10_isLoaded) {
+			if (pfcandvetoLid10_branch != 0) {
+				pfcandvetoLid10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandvetoLid10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandvetoLid10_isLoaded = true;
+		}
+		return pfcandvetoLid10_;
+	}
+	float &pfcandvetoLiso10()
+	{
+		if (not pfcandvetoLiso10_isLoaded) {
+			if (pfcandvetoLiso10_branch != 0) {
+				pfcandvetoLiso10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandvetoLiso10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandvetoLiso10_isLoaded = true;
+		}
+		return pfcandvetoLiso10_;
+	}
+	float &pfcandvetoLpt10()
+	{
+		if (not pfcandvetoLpt10_isLoaded) {
+			if (pfcandvetoLpt10_branch != 0) {
+				pfcandvetoLpt10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandvetoLpt10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandvetoLpt10_isLoaded = true;
+		}
+		return pfcandvetoLpt10_;
+	}
+	float &pfcandvetoLmindrj10()
+	{
+		if (not pfcandvetoLmindrj10_isLoaded) {
+			if (pfcandvetoLmindrj10_branch != 0) {
+				pfcandvetoLmindrj10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandvetoLmindrj10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandvetoLmindrj10_isLoaded = true;
+		}
+		return pfcandvetoLmindrj10_;
 	}
 	float &emjet10()
 	{
@@ -9596,6 +10090,45 @@ void LoadAllBranches()
 		}
 		return *pfcand10_;
 	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10()
+	{
+		if (not pfcandOS10_isLoaded) {
+			if (pfcandOS10_branch != 0) {
+				pfcandOS10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandOS10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandOS10_isLoaded = true;
+		}
+		return *pfcandOS10_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10looseZ()
+	{
+		if (not pfcandOS10looseZ_isLoaded) {
+			if (pfcandOS10looseZ_branch != 0) {
+				pfcandOS10looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandOS10looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandOS10looseZ_isLoaded = true;
+		}
+		return *pfcandOS10looseZ_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5looseZ()
+	{
+		if (not pfcand5looseZ_isLoaded) {
+			if (pfcand5looseZ_branch != 0) {
+				pfcand5looseZ_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcand5looseZ_branch does not exist!\n");
+				exit(1);
+			}
+			pfcand5looseZ_isLoaded = true;
+		}
+		return *pfcand5looseZ_;
+	}
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcanddir10()
 	{
 		if (not pfcanddir10_isLoaded) {
@@ -9621,6 +10154,19 @@ void LoadAllBranches()
 			pfcandveto10_isLoaded = true;
 		}
 		return *pfcandveto10_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandvetoL10()
+	{
+		if (not pfcandvetoL10_isLoaded) {
+			if (pfcandvetoL10_branch != 0) {
+				pfcandvetoL10_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandvetoL10_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandvetoL10_isLoaded = true;
+		}
+		return *pfcandvetoL10_;
 	}
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jet()
 	{
@@ -9751,6 +10297,32 @@ void LoadAllBranches()
 			stop_tbar_isLoaded = true;
 		}
 		return *stop_tbar_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_t()
+	{
+		if (not neutralino_t_isLoaded) {
+			if (neutralino_t_branch != 0) {
+				neutralino_t_branch->GetEntry(index);
+			} else { 
+				printf("branch neutralino_t_branch does not exist!\n");
+				exit(1);
+			}
+			neutralino_t_isLoaded = true;
+		}
+		return *neutralino_t_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_tbar()
+	{
+		if (not neutralino_tbar_isLoaded) {
+			if (neutralino_tbar_branch != 0) {
+				neutralino_tbar_branch->GetEntry(index);
+			} else { 
+				printf("branch neutralino_tbar_branch does not exist!\n");
+				exit(1);
+			}
+			neutralino_tbar_isLoaded = true;
+		}
+		return *neutralino_tbar_;
 	}
 	int &lep_t_id()
 	{
@@ -9947,6 +10519,32 @@ void LoadAllBranches()
 		}
 		return *pfjets_beta2_0p5_;
 	}
+	vector<float> &pfjets_mvaPUid()
+	{
+		if (not pfjets_mvaPUid_isLoaded) {
+			if (pfjets_mvaPUid_branch != 0) {
+				pfjets_mvaPUid_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mvaPUid_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mvaPUid_isLoaded = true;
+		}
+		return *pfjets_mvaPUid_;
+	}
+	vector<float> &pfjets_l1corr()
+	{
+		if (not pfjets_l1corr_isLoaded) {
+			if (pfjets_l1corr_branch != 0) {
+				pfjets_l1corr_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_l1corr_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_l1corr_isLoaded = true;
+		}
+		return *pfjets_l1corr_;
+	}
 	vector<float> &pfjets_corr()
 	{
 		if (not pfjets_corr_isLoaded) {
@@ -10135,6 +10733,8 @@ namespace Stop {
 	float &genmet();
 	float &gensumet();
 	float &genmetphi();
+	float &calomet();
+	float &calometphi();
 	float &trkmet();
 	float &trkmetphi();
 	float &trkmet_nolepcorr();
@@ -10233,6 +10833,7 @@ namespace Stop {
 	int &njetsDown();
 	float &htUp();
 	float &htDown();
+	int &ntruepu();
 	int &npu();
 	int &npuMinusOne();
 	int &npuPlusOne();
@@ -10368,14 +10969,25 @@ namespace Stop {
 	int &pfcandid5();
 	float &pfcandiso5();
 	float &pfcandpt5();
+	float &pfcanddz5();
 	float &pfcandmindrj5();
 	int &pfcandid10();
 	float &pfcandiso10();
 	float &pfcandpt10();
+	float &pfcanddz10();
 	float &pfcandmindrj10();
 	int &pfcandidOS10();
 	float &pfcandisoOS10();
 	float &pfcandptOS10();
+	float &pfcanddzOS10();
+	int &pfcandid5looseZ();
+	float &pfcandiso5looseZ();
+	float &pfcandpt5looseZ();
+	float &pfcanddz5looseZ();
+	int &pfcandidOS10looseZ();
+	float &pfcandisoOS10looseZ();
+	float &pfcandptOS10looseZ();
+	float &pfcanddzOS10looseZ();
 	int &pfcanddirid10();
 	float &pfcanddiriso10();
 	float &pfcanddirpt10();
@@ -10384,6 +10996,10 @@ namespace Stop {
 	float &pfcandvetoiso10();
 	float &pfcandvetopt10();
 	float &pfcandvetomindrj10();
+	int &pfcandvetoLid10();
+	float &pfcandvetoLiso10();
+	float &pfcandvetoLpt10();
+	float &pfcandvetoLmindrj10();
 	float &emjet10();
 	float &mjj();
 	float &emjet20();
@@ -10467,8 +11083,12 @@ namespace Stop {
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pftaud();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand10();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10looseZ();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5looseZ();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcanddir10();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandveto10();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandvetoL10();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jet();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &nonisoel();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &nonisomu();
@@ -10479,6 +11099,8 @@ namespace Stop {
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep_tbar();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_t();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_tbar();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_t();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_tbar();
 	int &lep_t_id();
 	int &lep_tbar_id();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets();
@@ -10494,6 +11116,8 @@ namespace Stop {
 	vector<float> &pfjets_beta_0p2();
 	vector<float> &pfjets_beta2_0p1();
 	vector<float> &pfjets_beta2_0p5();
+	vector<float> &pfjets_mvaPUid();
+	vector<float> &pfjets_l1corr();
 	vector<float> &pfjets_corr();
 	vector<int> &pfjets_mc3();
 	vector<int> &pfjets_flav();
