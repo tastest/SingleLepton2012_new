@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "TFitter.h"
 #include "MT2Utility.h"
 #include "mt2bl_bisect.h"
 #include "mt2w_bisect.h"
@@ -657,8 +658,8 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdenti
 
 //--------------------------------------------------------------------
 double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVector lep, float met, float metphi){
-	// I am asumming that jets is sorted by Pt
 
+	// I am asumming that jets is sorted by Pt
 	assert ( jets.size() == btag.size() );
 	assert ( jets.size() < 15 );
 
@@ -668,63 +669,58 @@ double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVect
 	int bjets[15];
 	int non_bjets[15];
 	for( int i = 0 ; i < jets.size() ; i++ ){
-		if( btag.at(i) > BTAG_MED )
-			bjets[n_btag++] = i;
-		else
-			non_bjets[n_nobtag++] = i;
+	  if( btag.at(i) > BTAG_MED )
+	    bjets[n_btag++] = i;
+	  else
+	    non_bjets[n_nobtag++] = i;
 	}
-
-//	cout << "n_btag = " << n_btag << endl;
+	
+	//	cout << "n_btag = " << n_btag << endl;
 
 	// We do different things depending on the number of b-tagged jets
 	// arXiv:1203.4813 recipe
 	if (n_btag == 0){
-		// If no b-jets select the minimum of the mt2w from all combinations with 
-		// the three leading jets
-		float min_mt2w = 9999;
-		for (int i=0; i<3; i++)
-			for (int j=0; j<3; j++){
-				if (i == j) continue;
-				float c_mt2w = mt2wWrapper(lep, 
-						jets[non_bjets[i]],
-						jets[non_bjets[j]], met, metphi);
-				if (c_mt2w < min_mt2w)
-					min_mt2w = c_mt2w;
-			}
-		return min_mt2w;
+	  // If no b-jets select the minimum of the mt2w from all combinations with 
+	  // the three leading jets
+	  float min_mt2w = 9999;
+	  for (int i=0; i<3; i++)
+	    for (int j=0; j<3; j++){
+	      if (i == j) continue;
+	      float c_mt2w = mt2wWrapper(lep, 
+					 jets[non_bjets[i]],
+					 jets[non_bjets[j]], met, metphi);
+	      if (c_mt2w < min_mt2w)
+		min_mt2w = c_mt2w;
+	    }
+	  return min_mt2w;
 	} else if (n_btag == 1 ){
-		// if only one b-jet choose the two non leading jets and choose the smaller
-		float min_mt2w = 9999;
-		for (int i=0; i<2; i++){
-			float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
-			if (c_mt2w < min_mt2w)
-				min_mt2w = c_mt2w;
-		}
-		for (int i=0; i<2; i++){
-			float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi);
-			if (c_mt2w < min_mt2w)
-				min_mt2w = c_mt2w;
-		}
-		return min_mt2w;
-	} else if (n_btag == 2) {
-		// if two b-jets use those :)
-		float c1_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[bjets[1]], met, metphi);
-		float c2_mt2w = mt2wWrapper(lep, jets[bjets[1]], jets[bjets[0]], met, metphi);
-		return TMath::Min(c1_mt2w, c2_mt2w);
-	} else if (n_btag >= 3) {
-		// if 3 or more b-jets the paper says ignore b-tag and do like 0-bjets 
-		// but we are going to make the combinations with the three leading b-jets
-		float min_mt2w = 9999;
-		for (int i=0; i<3; i++)
-			for (int j=0; j<3; j++){
-				if (i == j) continue;
-				float c_mt2w = mt2wWrapper(lep, 
-						jets[bjets[i]],
-						jets[bjets[j]], met, metphi);
-				if (c_mt2w < min_mt2w)
-					min_mt2w = c_mt2w;
-			}
-		return min_mt2w;
+	  // if only one b-jet choose the three non-b leading jets and choose the smaller
+	  float min_mt2w = 9999;
+	  for (int i=0; i<3; i++){
+	    float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
+	    if (c_mt2w < min_mt2w)
+	      min_mt2w = c_mt2w;
+	  }
+	  for (int i=0; i<3; i++){
+	    float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi);
+	    if (c_mt2w < min_mt2w)
+	      min_mt2w = c_mt2w;
+	  }
+	  return min_mt2w;
+	} else if (n_btag >= 2) {
+	  // if 3 or more b-jets the paper says ignore b-tag and do like 0-bjets 
+	  // but we are going to make the combinations with the b-jets
+	  float min_mt2w = 9999;
+	  for (int i=0; i<n_btag; i++)
+	    for (int j=0; j<n_btag; j++){
+	      if (i == j) continue;
+	      float c_mt2w = mt2wWrapper(lep, 
+					 jets[bjets[i]],
+					 jets[bjets[j]], met, metphi);
+	      if (c_mt2w < min_mt2w)
+		min_mt2w = c_mt2w;
+	    }
+	  return min_mt2w;
 	}
 
 	return -1.;
@@ -779,7 +775,53 @@ double mt2wWrapper(LorentzVector lep, LorentzVector jet_o, LorentzVector jet_b, 
 }
 
 
-// This funcion is a wrapper for mt2w_bissect that take LorentzVectors instead of doubles
+//--------------------------------------------------------------------
+double fc2 (double c1, double m12, double m22, double m02, bool verbose = false)
+{
+  if (verbose) {
+    printf("c1: %4.2f\n", c1);
+    printf("m12: %4.2f\n", m12);
+    printf("m22: %4.2f\n", m22);
+    printf("m02: %4.2f\n", m02);
+  }
+
+  double a = m22;
+  double b = (m02 - m12 - m22) * c1;
+  double c = m12 * c1 * c1 - PDG_W_MASS * PDG_W_MASS;
+
+  if (verbose) {
+    printf("a: %4.2f\n", a);
+    printf("b: %4.2f\n", b);
+    printf("c: %4.2f\n", c);
+  }
+
+  double num = -1. * b + sqrt(b * b - 4 * a * c);
+  double den = 2 * a;
+
+  if (verbose) {
+    printf("num: %4.2f\n", num);
+    printf("den: %4.2f\n", den);
+    printf("num/den: %4.2f\n", num/den);
+  }
+
+  return (num/den);
+}
+
+//--------------------------------------------------------------------
+double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2,
+              double m12, double m22, double m02){
+  double rat1 = pt1 * (1 - c1) / sigma1;
+  double rat2 = pt2 * (1 - fc2(c1, m12, m22, m02)) / sigma2;
+
+  return ( rat1 * rat1 + rat2 * rat2);
+}
+
+//--------------------------------------------------------------------
+void minuitFunction(int&, double* , double &result, double par[], int){
+  result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
+}
+
+// This funcion is calcultates the hadronic chi2
 double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets){
 
 	assert(jets.size() == sigma_jets.size());
