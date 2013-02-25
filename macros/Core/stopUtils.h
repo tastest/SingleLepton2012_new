@@ -78,6 +78,7 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdenti
 double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVector lep, float met, float metphi);
 double mt2wWrapper(LorentzVector lep, LorentzVector jet_o, LorentzVector jet_b, float met, float metphi);
 double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets);
+double calculateChi2SNT(vector<LorentzVector> jets, vector<float> sigma_jets, vector<float> btag);
 double fc2 (double c1, double m12, double m22, double m02, bool verbose);
 double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2, double m12, double m22, double m02);
 void minuitFunction(int&, double* , double &result, double par[], int);

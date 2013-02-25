@@ -25,7 +25,6 @@ using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-
 unsigned int getNJets(){
 
   unsigned int njets=0;
@@ -706,7 +705,6 @@ double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVect
 	    if (c_mt2w < min_mt2w)
 	      min_mt2w = c_mt2w;
 	  }
-
 	  for (int i=0; i<nMax; i++){
 	    float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi);
 	    if (c_mt2w < min_mt2w)
@@ -827,7 +825,7 @@ void minuitFunction(int&, double* , double &result, double par[], int){
   result=fchi2(par[0], par[1], par[2], par[3], par[4], par[5], par[6], par[7]);
 }
 
-// This funcion is calcultates the hadronic chi2
+// This function calculates the hadronic chi2 - atlas version
 double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets){
 
 	assert(jets.size() == sigma_jets.size());
@@ -931,6 +929,141 @@ double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets){
 		sigma_jets.at(bi), sigma_jets.at(j1), sigma_jets.at(j2) ); 
 	return c_chi2;
 }
+
+// This function calculates the hadronic chi2 - SNT version
+double calculateChi2SNT(vector<LorentzVector> jets, vector<float> sigma_jets, vector<float> btag){
+
+  assert(jets.size() == sigma_jets.size());
+  assert(jets.size() < 15);
+
+  //check at most first 6 jets
+  int n_jets = jets.size();
+  if (n_jets>6) n_jets = 6;
+  //consider at least 3 jets
+  if (n_jets<3) return 99999.;
+  
+  vector<int> v_i, v_j;
+  vector<double> v_k1, v_k2;
+  for ( int i=0; i<n_jets; ++i )
+    for ( int j=i+1; j<n_jets; ++j ){
+
+      //
+      //  W
+      //
+      LorentzVector hadW = jets[i] + jets[j];
+
+      //
+      //  W Mass Constraint.
+      //
+      TFitter *minimizer = new TFitter();
+      double p1 = -1;
+
+      minimizer->ExecuteCommand("SET PRINTOUT", &p1, 1);
+      minimizer->SetFCN(minuitFunction);
+      minimizer->SetParameter(0 , "c1"     , 1.1             , 1 , 0 , 0);
+      minimizer->SetParameter(1 , "pt1"    , 1.0             , 1 , 0 , 0);
+      minimizer->SetParameter(2 , "sigma1" , sigma_jets[i]   , 1 , 0 , 0);
+      minimizer->SetParameter(3 , "pt2"    , 1.0             , 1 , 0 , 0);
+      minimizer->SetParameter(4 , "sigma2" , sigma_jets[j]   , 1 , 0 , 0);
+      minimizer->SetParameter(5 , "m12"    , jets[i].mass2() , 1 , 0 , 0);
+      minimizer->SetParameter(6 , "m22"    , jets[j].mass2() , 1 , 0 , 0);
+      minimizer->SetParameter(7 , "m02"    , hadW.mass2()    , 1 , 0 , 0);
+
+      for (unsigned int k = 1; k < 8; k++)
+        minimizer->FixParameter(k);
+
+      minimizer->ExecuteCommand("SIMPLEX", 0, 0);
+      minimizer->ExecuteCommand("MIGRAD", 0, 0);
+
+      double c1 = minimizer->GetParameter(0);
+      if (c1!=c1) {
+        cout<<"[PartonCombinatorics::recoHadronicTop] ERROR: c1 parameter is NAN! Skipping this parton combination"
+	    <<endl;
+        continue;
+      }
+      double c2 = fc2(c1, jets[i].mass2(), jets[j].mass2(), hadW.mass2());
+
+      delete minimizer;
+
+
+      //     * W Mass check :)
+      //     *  Never trust a computer you can't throw out a window.
+      //      *  - Steve Wozniak
+
+      // cout << "c1 = " <<  c1 << "  c1 = " << c2 << "   M_jj = "
+      // 	   << ((jets[i] * c1) + (jets[j] * c2)).mass() << endl;
+
+      v_i.push_back(i);
+      v_j.push_back(j);
+      v_k1.push_back(c1);
+      v_k2.push_back(c2);
+    }
+  
+  //Apply b-consistency requirement
+  int n_btag = 0;
+  for( int i = 0 ; i < n_jets ; i++ )
+    if( btag.at(i) > BTAG_MED ) n_btag++;
+
+  double chi2min = 99999.;
+
+  //consider b-jet in leading 3 jets
+  for ( int b=0; b<3; ++b ) {    
+
+    //require b-tagging if have more than 1 b-tag
+    if( n_btag>1 && btag.at(b) < BTAG_MED ) continue;
+    double pt_b = jets[b].Pt();
+      
+    for (unsigned int w = 0; w < v_i.size() ; ++w ) {
+      int i = v_i[w];
+      int j = v_j[w];
+      if ( i==b || j==b ) continue;
+      //count number of b-tagged Ws
+      int nwb = 0;
+      if (btag.at(i) > BTAG_MED) nwb++;
+      if (btag.at(j) > BTAG_MED) nwb++;
+      //no btagged jets in W if have few btags
+      if ( n_btag<3  && nwb>0 ) continue;
+      //In 3 b-tag case, allow for 1 W jet to be tagged
+      // If have more b-tags then btagging information not useful
+      if ( n_btag==3 && nwb>1 ) continue;
+ 
+      double pt_w1 = jets[i].Pt();
+      double pt_w2 = jets[j].Pt();
+      
+      ///
+      //  W Mass.
+      ///
+      LorentzVector hadW = jets[i] + jets[j];
+      double massW = hadW.mass();
+      
+      double c1 = v_k1[w];
+      double c2 = v_k2[w];
+      
+      ///
+      // Top Mass.
+      ///
+      LorentzVector hadT = (jets[i] * c1) + (jets[j] * c2) + jets[b];
+      double massT = hadT.mass();
+      
+      double pt_w = hadW.Pt();
+      double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
+	+ pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
+      double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
+      double pt_t = hadT.Pt();
+      double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
+	+ c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
+	+ pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
+      double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
+      
+      double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
+	+ (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+      if (c_chi2<chi2min) chi2min = c_chi2;
+    }
+  }
+
+  return chi2min;
+}
+
 
 double getChi2(LorentzVector jets_b, LorentzVector jets_j1, LorentzVector jets_j2,
 		float sigma_b, float sigma_j1, float sigma_j2){
