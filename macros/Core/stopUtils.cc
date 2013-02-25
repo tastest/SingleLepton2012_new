@@ -699,7 +699,7 @@ double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVect
 
 	  int nMax=-1;
 	  if(jets.size()==3) nMax=2;
-	  if(jets.size()>3) nMax=4;
+	  if(jets.size()>3) nMax=3;
 
 	  for (int i=0; i<nMax; i++){
 	    float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
