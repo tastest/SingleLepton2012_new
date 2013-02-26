@@ -25,14 +25,14 @@ using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-unsigned int getNJets(){
+unsigned int getNJets(const float etacut){
 
   unsigned int njets=0;
 
   for ( unsigned int i=0; i<stopt.pfjets().size() ; i++) {
     
     if( stopt.pfjets().at(i).pt()<30 )  continue;
-    if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
+    if( fabs(stopt.pfjets().at(i).eta())>etacut )  continue;
     //    if(stopt.pfjets_beta2().at(i)<=0.01) continue;
 
     njets++;
@@ -247,7 +247,7 @@ bool passEvtSelection(TString name)
   //rho requirement
   if ( stopt.rhovor()<0. || stopt.rhovor()>=40. ) return false;
 
-  if (!name.Contains("T2")) {
+  if (!name.Contains("T2")  && !name.Contains("TChiwh")) {
     //met filters
     if ( stopt.csc()      != 0 ) return false;
     if ( stopt.hbhe()     != 1 ) return false;
