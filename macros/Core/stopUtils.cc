@@ -933,7 +933,6 @@ double calculateChi2(vector<LorentzVector>& jets, vector<float>& sigma_jets){
 double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, vector<float>& btag){
 
   assert(jets.size() == sigma_jets.size());
-  assert(jets.size() < 15);
 
   //check at most first 6 jets
   int n_jets = jets.size();
@@ -1006,7 +1005,10 @@ double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, 
   double chi2min = 99999.;
 
   //consider b-jet in leading 3 jets
-  for ( int b=0; b<3; ++b ) {    
+  for ( int b=0; b<n_jets; ++b ) {    
+
+    //if not tagged, consider only 3 leading jets
+    if( btag.at(b)<BTAG_MED && b>2 ) continue;
 
     //require b-tagging if have more than 1 b-tag
     if( n_btag>1 && btag.at(b) < BTAG_MED ) continue;
@@ -1045,18 +1047,19 @@ double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, 
       double massT = hadT.mass();
       
       double pt_w = hadW.Pt();
-      double sigma_w2 = pt_w1*sigma_jets[i] * pt_w1*sigma_jets[i]
-	+ pt_w2*sigma_jets[j] * pt_w2*sigma_jets[j];
-      double smw2 = (1.+2.*pt_w*pt_w/massW/massW)*sigma_w2;
+      double sigma_w2 = pow(pt_w1*sigma_jets[i], 2)
+	+ pow(pt_w2*sigma_jets[j], 2);
+      double smw2 = (1. + 2.*pow(pt_w,2)/pow(massW,2))*sigma_w2;
       double pt_t = hadT.Pt();
-      double sigma_t2 = c1*pt_w1*sigma_jets[i] * c1*pt_w1*sigma_jets[i]
-	+ c2*pt_w2*sigma_jets[j] * c2*pt_w2*sigma_jets[j]
-	+ pt_b*sigma_jets[b] * pt_b*sigma_jets[b];
-      double smtop2 = (1.+2.*pt_t*pt_t/massT/massT)*sigma_t2;
+      double sigma_t2 = pow(c1*pt_w1*sigma_jets[i],2)
+	+ pow(c2*pt_w2*sigma_jets[j],2)
+	+ pow(pt_b*sigma_jets[b],2);
+      double smtop2 = (1. + 2.*pow(pt_t,2)/pow(massT,2))*sigma_t2;
       
-      double c_chi2 = (massT-PDG_TOP_MASS)*(massT-PDG_TOP_MASS)/smtop2
-	+ (massW-PDG_W_MASS)*(massW-PDG_W_MASS)/smw2;
+      double c_chi2 = pow(massT-PDG_TOP_MASS, 2)/smtop2
+	+ pow(massW-PDG_W_MASS, 2)/smw2;
       if (c_chi2<chi2min) chi2min = c_chi2;
+
     }
   }
 
