@@ -55,8 +55,8 @@ vector<int> getBJetIndex(double discr, int iskip1, int iskip2)
     if( stopt.pfjets_csv().at(i)      < discr   ) continue;
 
     // skip these indices                                                                                                                                                                                  
-    if( i == iskip1 ) continue;
-    if( i == iskip2 ) continue;
+    if( int(i) == iskip1 ) continue;
+    if( int(i) == iskip2 ) continue;
 
     //    nbtags++;                                                                                                                                                        
     btagJets.push_back(i);
@@ -569,7 +569,7 @@ float getMT( float pt1 , float phi1 , float pt2 , float phi2 ){
 
 }
 
-float dRbetweenVectors(LorentzVector vec1,LorentzVector vec2 ){ 
+float dRbetweenVectors(LorentzVector& vec1,LorentzVector& vec2 ){ 
 
   float dphi = std::min(::fabs(vec1.Phi() - vec2.Phi()), 2 * M_PI - fabs(vec1.Phi() - vec2.Phi()));
   float deta = vec1.Eta() - vec2.Eta();
@@ -577,7 +577,7 @@ float dRbetweenVectors(LorentzVector vec1,LorentzVector vec2 ){
   return sqrt(dphi*dphi + deta*deta);
 }
 
-float getMinDphi(float metPhi, LorentzVector vec1, LorentzVector vec2 ) {
+float getMinDphi(float metPhi, LorentzVector& vec1, LorentzVector& vec2 ) {
 
   float dphimj1_    = getdphi(metPhi, vec1.phi() );
   float dphimj2_    = getdphi(metPhi, vec2.phi() );
@@ -656,24 +656,23 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdenti
 
 
 //--------------------------------------------------------------------
-double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVector lep, float met, float metphi){
+double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVector& lep, float met, float metphi){
 
 	// I am asumming that jets is sorted by Pt
 	assert ( jets.size() == btag.size() );
-	assert ( jets.size() < 15 );
 
 	// First we count the number of b-tagged jets, and separate those non b-tagged
-	int n_btag = 0;
-	int n_nobtag = 0;
-	int bjets[15];
-	int non_bjets[15];
-	for( int i = 0 ; i < jets.size() ; i++ ){
-	  if( btag.at(i) > BTAG_MED )
-	    bjets[n_btag++] = i;
-	  else
-	    non_bjets[n_nobtag++] = i;
-	}
-	
+	std::vector<int> bjets;
+	std::vector<int> non_bjets;
+	for( unsigned int i = 0 ; i < jets.size() ; i++ ){
+	  if( btag.at(i) > BTAG_MED ) {
+	    bjets.push_back(i);
+	  } else {
+	    non_bjets.push_back(i);
+	  }
+	}	
+
+	int n_btag = (int) bjets.size();
 	//	cout << "n_btag = " << n_btag << endl;
 
 	// We do different things depending on the number of b-tagged jets
@@ -734,7 +733,7 @@ double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVect
 
 
 // This funcion is a wrapper for mt2w_bissect that take LorentzVectors instead of doubles
-double mt2wWrapper(LorentzVector lep, LorentzVector jet_o, LorentzVector jet_b, float met, float metphi){
+double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_b, float met, float metphi){
 //	mt2_bisect::mt2 mt2_event;
 //	mt2bl_bisect::mt2bl mt2bl_event;
 	mt2w_bisect::mt2w mt2w_event;
@@ -826,7 +825,7 @@ void minuitFunction(int&, double* , double &result, double par[], int){
 }
 
 // This function calculates the hadronic chi2 - atlas version
-double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets){
+double calculateChi2(vector<LorentzVector>& jets, vector<float>& sigma_jets){
 
 	assert(jets.size() == sigma_jets.size());
 	assert(jets.size() < 15);
@@ -931,7 +930,7 @@ double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets){
 }
 
 // This function calculates the hadronic chi2 - SNT version
-double calculateChi2SNT(vector<LorentzVector> jets, vector<float> sigma_jets, vector<float> btag){
+double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, vector<float>& btag){
 
   assert(jets.size() == sigma_jets.size());
   assert(jets.size() < 15);
@@ -1065,7 +1064,7 @@ double calculateChi2SNT(vector<LorentzVector> jets, vector<float> sigma_jets, ve
 }
 
 
-double getChi2(LorentzVector jets_b, LorentzVector jets_j1, LorentzVector jets_j2,
+double getChi2(LorentzVector& jets_b, LorentzVector& jets_j1, LorentzVector& jets_j2,
 		float sigma_b, float sigma_j1, float sigma_j2){
 
 	LorentzVector hadW = jets_j1 + jets_j2;

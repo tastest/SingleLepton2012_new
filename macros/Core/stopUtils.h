@@ -61,8 +61,8 @@ float getDataMCRatioFix(float eta);
 
 float vtxweight_n( const int nvertices, TH1F *hist, bool isData );
 float getdphi( float phi1 , float phi2 );
-float dRbetweenVectors(LorentzVector vec1,LorentzVector vec2 );
-float getMinDphi(float metPhi, LorentzVector vec1, LorentzVector vec2 );
+float dRbetweenVectors(LorentzVector& vec1,LorentzVector& vec2 );
+float getMinDphi(float metPhi, LorentzVector& vec1, LorentzVector& vec2 );
 float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
 
 struct DorkyEventIdentifier {
@@ -75,14 +75,14 @@ struct DorkyEventIdentifier {
 bool is_duplicate (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &already_seen);
 int load_badlaserevents  (char* filename, std::set<DorkyEventIdentifier> &events_lasercalib);
 bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &events_lasercalib);
-double calculateMT2w(vector<LorentzVector> jets, vector<float> btag, LorentzVector lep, float met, float metphi);
-double mt2wWrapper(LorentzVector lep, LorentzVector jet_o, LorentzVector jet_b, float met, float metphi);
-double calculateChi2(vector<LorentzVector> jets, vector<float> sigma_jets);
-double calculateChi2SNT(vector<LorentzVector> jets, vector<float> sigma_jets, vector<float> btag);
+double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVector& lep, float met, float metphi);
+double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_b, float met, float metphi);
+double calculateChi2(vector<LorentzVector>& jets, vector<float>& sigma_jets);
+double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, vector<float>& btag);
 double fc2 (double c1, double m12, double m22, double m02, bool verbose);
 double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2, double m12, double m22, double m02);
 void minuitFunction(int&, double* , double &result, double par[], int);
-double getChi2(LorentzVector jets_b, LorentzVector jets_j1, LorentzVector jets_j2, float sigma_b, float sigma_j1, float sigma_j2);
+double getChi2(LorentzVector& jets_b, LorentzVector& jets_j1, LorentzVector& jets_j2, float sigma_b, float sigma_j1, float sigma_j2);
 
 static const float BTAG_MED = 0.679;
 static const float PDG_TOP_MASS = 173.5;
