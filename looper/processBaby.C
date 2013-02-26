@@ -34,7 +34,7 @@ void pickSkimIfExists( TChain *ch, const std::string& base, const std::string& s
   return;
 }
 
-void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-13_slim/merged_ntuple_473.root" )
+void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-25/merged_ntuple_71.root" )
 {
 
   //---------------------------------------------------------------
@@ -85,13 +85,17 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   else if (infile.Contains("TTJets_HadronicMGDecays_8TeV-madgraph")) sample = Form("ttfake_lmg_%s",  	 outfileid.Data());
   else if (infile.Contains("TTJets_FullLeptMGDecays_8TeV-madgraph")) sample = Form("ttdl_lmg_%s",  	 outfileid.Data());
   else if (infile.Contains("TTJets_SemiLeptMGDecays_8TeV-madgraph")) sample = Form("ttsl_lmg_%s",  	 outfileid.Data());
+  else if (infile.Contains("WbbJetsToLNu"))                          sample = Form("wbbjets_%s",         outfileid.Data());
   else if (infile.Contains("WJetsToLNu"))                            sample = Form("wjets_%s",           outfileid.Data());
   else if (infile.Contains("W1JetsToLNu"))                           sample = Form("w1jets_%s",          outfileid.Data());
   else if (infile.Contains("W2JetsToLNu"))                           sample = Form("w2jets_%s",          outfileid.Data());
   else if (infile.Contains("W3JetsToLNu"))                           sample = Form("w3jets_%s",          outfileid.Data());
   else if (infile.Contains("W4JetsToLNu"))                           sample = Form("w4jets_%s",          outfileid.Data());
-  else if (infile.Contains("DY4JetsToLL"))                           sample = Form("DY4Jtot_%s",         outfileid.Data());
   else if (infile.Contains("DYJetsToLL"))                            sample = Form("DYtot_%s",           outfileid.Data());
+  else if (infile.Contains("DY1JetsToLL"))                           sample = Form("DY1Jtot_%s",         outfileid.Data());
+  else if (infile.Contains("DY2JetsToLL"))                           sample = Form("DY2Jtot_%s",         outfileid.Data());
+  else if (infile.Contains("DY3JetsToLL"))                           sample = Form("DY3Jtot_%s",         outfileid.Data());
+  else if (infile.Contains("DY4JetsToLL"))                           sample = Form("DY4Jtot_%s",         outfileid.Data());
   else if (infile.Contains("T_s-channel"))                           sample = Form("tschan_%s",          outfileid.Data());
   else if (infile.Contains("Tbar_s-channel"))                        sample = Form("tbarschan_%s",       outfileid.Data());
   else if (infile.Contains("T_t-channel"))                           sample = Form("ttchan_%s",          outfileid.Data());
