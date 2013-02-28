@@ -473,6 +473,113 @@ bool passLepPlusIsoTrkSelection(bool isData)
 
 }
 
+bool pass_T2tt_LM(bool isData){
+
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  // this is temporary waiting for the new babies
+  if ( !passIsoTrkVeto_v2() ) return false;
+
+  // this is just a preselection
+  if(stopt.t1metphicorr()<100) return false;
+
+  if(stopt.t1metphicorrmt()<120) return false;
+
+  vector<LorentzVector> myJets;
+  vector<float> myJetsTag;
+  vector<int> myJetsMC;
+  vector<float> myJetsSigma;
+  vector<int> btag;
+
+  for (int ijet =0; ijet<stopt.pfjets().size(); ijet++){
+
+    if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
+    if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
+    // later add the beta/PUid with new babies
+
+    myJets.push_back(stopt.pfjets().at(ijet));
+    myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
+    if(stopt.pfjets_csv().at(ijet) > 0.679) btag.push_back( stopt.pfjets_csv().at(ijet) );
+
+    // here the fix waiting for the new babies
+    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet)*getDataMCRatioFix(stopt.pfjets().at(ijet).eta()));
+
+  }
+
+  if(myJets.size()<4) return false;
+  if(btag.size()==0) return false;
+
+  // mindPhi
+  float dphimjmin=getMinDphi(stopt.t1metphicorrphi(), myJets.at(0),myJets.at(1));
+  if(dphimjmin<0.8) return false;
+
+  // chi2
+  double chi2 = calculateChi2SNT(myJets, myJetsSigma, myJetsTag);
+  if(chi2>5) return false;
+
+  // mt2w
+  double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
+  return true;
+
+}
+
+
+bool pass_T2tt_HM(bool isData){
+
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  // this is temporary waiting for the new babies                                                                                                                                    
+  if ( !passIsoTrkVeto_v2() ) return false;
+
+  // this is just a preselection                                                                                                                                                     
+  if(stopt.t1metphicorr()<100) return false;
+
+  if(stopt.t1metphicorrmt()<120) return false;
+
+  vector<LorentzVector> myJets;
+  vector<float> myJetsTag;
+  vector<int> myJetsMC;
+  vector<float> myJetsSigma;
+  vector<int> btag;
+
+  for (int ijet =0; ijet<stopt.pfjets().size(); ijet++){
+
+    if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
+    if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
+    // later add the beta/PUid with new babies                                                                                                                                       
+
+    myJets.push_back(stopt.pfjets().at(ijet));
+    myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
+    if(stopt.pfjets_csv().at(ijet) > 0.679) btag.push_back( stopt.pfjets_csv().at(ijet) );
+
+    // here the fix waiting for the new babies                                                                                                                                       
+    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet)*getDataMCRatioFix(stopt.pfjets().at(ijet).eta()));
+
+  }
+
+  if(myJets.size()<4) return false;
+  if(btag.size()==0) return false;
+
+  // mindPhi                                                                                                                                                                         
+  float dphimjmin=getMinDphi(stopt.t1metphicorrphi(), myJets.at(0),myJets.at(1));
+  if(dphimjmin<0.8) return false;
+
+  // chi2                                                                                                                                                                            
+  double chi2 = calculateChi2SNT(myJets, myJetsSigma, myJetsTag);
+
+  if(chi2>5) return false;
+
+  // mt2w                                                                                                                                                                            
+  double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
+
+  if(x_mt2w<175) return false;
+
+  return true;
+
+
+}
+
+
 //-------------------------------------------
 // on-the-fly MET phi corrections
 //-------------------------------------------

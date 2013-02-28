@@ -54,6 +54,9 @@ bool passDileptonSelection(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
 bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
 
+bool pass_T2tt_LM(bool isData);
+bool pass_T2tt_HM(bool isData);
+
 pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 
 float getDataMCRatio(float eta);
