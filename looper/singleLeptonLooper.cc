@@ -228,6 +228,7 @@ void singleLeptonLooper::InitBaby(){
   nmus_		= -1;
   ntaus_	= -1;
   nleps_	= -1;
+  nbs_	        = -1;
   ptjetraw_	= -9999.;
   ptjet23_	= -9999.;
   ptjetF23_	= -9999.;
@@ -1235,6 +1236,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	LorentzVector vdilepton(0,0,0,0);
 	LorentzVector vttbar(0,0,0,0);
 	int ntops = 0;
+	nbs_ = 0;
 
 	for ( int igen = 0 ; igen < (int)genps_id().size() ; igen++ ) { 
 	  if ( abs( genps_id().at(igen) ) == 11) vdilepton += genps_p4().at(igen); 
@@ -1243,6 +1245,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  int id = genps_id().at(igen);
 	  int pid = abs( genps_id().at(igen) );
 	  int mothid = abs(genps_id_mother().at(igen));
+
+	  if ( abs(id) == 5 ) ++nbs_;
 
 	  if( id == 6 ){
 	    t_         = &(genps_p4().at(igen));
@@ -2813,7 +2817,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if( doTenPercent )	  weight_ *= 10;
       }
 
-      else if(strcmp(prefix,"LMscan") == 0){ 
+      else if(TString(prefix).Contains("TChiwh")) {
+        // need to put some reasonable numbers here..
+	// currently applying xsecs downstream
+	weight_ = 1.;
+      }
+
+      else if(strcmp(prefix,"LMscan") == 0){
 
 	m0_  = -999; //sparm_m0();
 	m12_ = -999; //sparm_m12();
@@ -3515,6 +3525,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("nmus",             &nmus_,             "nmus/I");  
   outTree->Branch("ntaus",            &ntaus_,            "ntaus/I");  
   outTree->Branch("nleps",            &nleps_,            "nleps/I");  
+  outTree->Branch("nbs",              &nbs_,              "nbs/I");  
   outTree->Branch("dphijm",           &dphijm_,           "dphijm/F");  
   outTree->Branch("ptjetraw",         &ptjetraw_,         "ptjetraw/F");  
   outTree->Branch("ptjet23",          &ptjet23_,          "ptjet23/F");  
