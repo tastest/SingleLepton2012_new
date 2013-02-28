@@ -489,7 +489,7 @@ bool pass_T2tt_LM(bool isData){
   vector<float> myJetsTag;
   vector<int> myJetsMC;
   vector<float> myJetsSigma;
-  vector<int> btag;
+  int btag=0;
 
   for (int ijet =0; ijet<stopt.pfjets().size(); ijet++){
 
@@ -499,7 +499,8 @@ bool pass_T2tt_LM(bool isData){
 
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
-    if(stopt.pfjets_csv().at(ijet) > 0.679) btag.push_back( stopt.pfjets_csv().at(ijet) );
+    if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
+
 
     // here the fix waiting for the new babies
     myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet)*getDataMCRatioFix(stopt.pfjets().at(ijet).eta()));
@@ -507,7 +508,7 @@ bool pass_T2tt_LM(bool isData){
   }
 
   if(myJets.size()<4) return false;
-  if(btag.size()==0) return false;
+  if(btag==0) return false;
 
   // mindPhi
   float dphimjmin=getMinDphi(stopt.t1metphicorrphi(), myJets.at(0),myJets.at(1));
@@ -518,7 +519,7 @@ bool pass_T2tt_LM(bool isData){
   if(chi2>5) return false;
 
   // mt2w
-  double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
+  //  double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
   return true;
 
 }
@@ -540,7 +541,7 @@ bool pass_T2tt_HM(bool isData){
   vector<float> myJetsTag;
   vector<int> myJetsMC;
   vector<float> myJetsSigma;
-  vector<int> btag;
+  int btag;
 
   for (int ijet =0; ijet<stopt.pfjets().size(); ijet++){
 
@@ -550,7 +551,7 @@ bool pass_T2tt_HM(bool isData){
 
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
-    if(stopt.pfjets_csv().at(ijet) > 0.679) btag.push_back( stopt.pfjets_csv().at(ijet) );
+    if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
 
     // here the fix waiting for the new babies                                                                                                                                       
     myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet)*getDataMCRatioFix(stopt.pfjets().at(ijet).eta()));
@@ -558,7 +559,7 @@ bool pass_T2tt_HM(bool isData){
   }
 
   if(myJets.size()<4) return false;
-  if(btag.size()==0) return false;
+  if(btag==0) return false;
 
   // mindPhi                                                                                                                                                                         
   float dphimjmin=getMinDphi(stopt.t1metphicorrphi(), myJets.at(0),myJets.at(1));
