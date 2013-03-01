@@ -210,7 +210,7 @@ class singleLeptonLooper
         Int_t pfcandidOS10_;  
         Int_t pfcandidOS10looseZ_;  
         Int_t pfcandid5looseZ_;     
-   
+
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
         Float_t pfcanddiriso10_;     
@@ -404,6 +404,11 @@ class singleLeptonLooper
         LorentzVector*  pfcandOS10_;
         LorentzVector*  pfcandOS10looseZ_;
         LorentzVector*  pfcand5looseZ_;
+
+        LorentzVector*  pfTau_;
+        LorentzVector*  pfTau_leadPtcand_;
+        Int_t pfTau_leadPtcandID_;
+
         LorentzVector*  lep1_;
         LorentzVector*  lep2_;
         LorentzVector*  trklep1_;
