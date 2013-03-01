@@ -33,8 +33,6 @@ const double PTMIN_BTAG = 30;
 const double PTMIN_OTAG = 30; 
 const double PTMIN_B    = 30;  //  This Two should be tigther than the  
 const double PTMIN_O    = 30;  //  b-tagged versions.
-const double PDG_TOP_MASS = 173.5;
-const double PDG_W_MASS = 80.385;
 const double BTAG_MIN = 0.679;
 
 const bool __SORT = true;
@@ -77,23 +75,6 @@ class StopTreeLooper {
 	Float_t mt2b_;
 	Float_t mt2bl_;
 
-	// "best" chi2 and MT2 variables
-	Float_t chi2min_;
-	Float_t chi2minprob_;
-	Float_t chi2min_mt2b_;  
-	Float_t chi2min_mt2bl_; 
-	Float_t chi2min_mt2w_;  
-	Float_t mt2bmin_;       
-	Float_t mt2blmin_;      
-	Float_t mt2wmin_;       
-	Float_t mt2bmin_chi2_;  
-	Float_t mt2blmin_chi2_; 
-	Float_t mt2wmin_chi2_;  
-	Float_t mt2bmin_chi2prob_;  
-	Float_t mt2blmin_chi2prob_; 
-	Float_t mt2wmin_chi2prob_;  
-	Int_t   ncand_;
-
 	// event shapes
 	Float_t thrjet_;
 	Float_t apljet_;
@@ -127,7 +108,7 @@ class StopTreeLooper {
 	Float_t dltrigeff_;
 
 	// hadronic variables
-	Int_t nb_;
+	Float_t nb_;
 	Int_t njets_;
 
 	// lepton variables
@@ -154,12 +135,15 @@ class StopTreeLooper {
 	Float_t x_;
 
 	Float_t rand_;
-	Float_t bdt_;
+	Float_t bdt_[5];
+
+    Float_t t2ttLM_;
+    Float_t t2ttHM_;
 
     private:
 
 	static const float JET_PT = 30.;
-	static const float JET_ETA = 3.0;
+	static const float JET_ETA = 2.4;
 
 	static const int N_JETS_TO_CONSIDER = 6;
 
@@ -169,6 +153,8 @@ class StopTreeLooper {
 	vector<LorentzVector> jets;
 	vector<float> btag;
 	vector<int> mc;
+
+        static const bool __apply_mva = true;
 
 };
 

@@ -1,11 +1,14 @@
-XPATH=/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim
+XPATH=/nfs-3/userdata/stop/output_V00-02-16_2012_4jskim/
+#XPATH=/nfs-3/userdata/stop/output_V00-02-16_2012/
 
-# XPATH=/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3
+#XPATH=/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3
 #XPATH=/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_3/
 
-for tag in `ls -1 $XPATH | grep '.root' | cut -d'.' -f1`;
-  do root -b -q -l doFile.C\(\"$XPATH\",\"$tag\"\) &
-  sleep 10
+#XPATH=/nfs-3/userdata/stop/MiniBabies/V00-02-16_2012_4jskim
+
+for tag in `ls -1 $XPATH | grep root |  cut -d'.' -f1`;
+  do root -b -q -l doFile.C\(\"$XPATH\",\"$tag\"\) & 
+#  sleep 10
 done
 
 let "FAIL=0"

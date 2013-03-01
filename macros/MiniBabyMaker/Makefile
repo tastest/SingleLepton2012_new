@@ -17,7 +17,7 @@ $(LIB):	$(OBJECTS)
 	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@  $(shell root-config --libs) -lMinuit -lTMVA
 
 LinkDef_out.cxx: LinkDef.h StopTreeLooper.h  
-	rootcint -f $@ -c $(INCLUDE) StopTreeLooper.h  $<
+	rootcint -f $@ -c $(INCLUDE) StopTreeLooper.h ../../looper/Candidate.h  $<
 
 # General rule for making object files
 %.d:	%.cc
