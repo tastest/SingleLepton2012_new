@@ -18,12 +18,12 @@ echo "[wrapper] COPYDIR   = " ${COPYDIR}
 
 echo "[wrapper] setting env"
 export CMS_PATH=/code/osgcode/cmssoft/cms
-export SCRAM_ARCH=slc5_amd64_gcc434
+export SCRAM_ARCH=slc5_amd64_gcc462
 source /code/osgcode/cmssoft/cmsset_default.sh
-export ROOTSYS=/code/osgcode/cmssoft/cms/slc5_amd64_gcc434/lcg/root/5.27.06b-cms21/
-export LD_LIBRARY_PATH=$ROOTSYS/lib:/code/osgcode/cmssoft/cms/slc5_amd64_gcc434/external/gcc/4.3.4-cms/lib64:$LD_LIBRARY_PATH
-export PATH=$HOME/bin:$ROOTSYS/bin:$PATH
+source /code/osgcode/fgolf/5.30-patches/bin/thisroot.sh
+export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
 export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH
+echo
 
 #echo "[wrapper] printing env"
 #printenv
