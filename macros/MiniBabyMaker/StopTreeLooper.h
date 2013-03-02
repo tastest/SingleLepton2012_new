@@ -66,31 +66,17 @@ class StopTreeLooper {
 	Int_t cr1_;   
 	Int_t cr4_;
 	Int_t cr5_;   
-	
+
+	// cut and count selections
+	Float_t t2ttLM_;
+	Float_t t2ttHM_;
+
 	// kinematic variables
 	Float_t met_;
-	Float_t mt_;
 	Float_t chi2_;
 	Float_t mt2w_;
-	Float_t mt2b_;
-	Float_t mt2bl_;
 
 	// event shapes
-	Float_t thrjet_;
-	Float_t apljet_;
-	Float_t sphjet_;
-	Float_t cirjet_;
-
-	Float_t thrjetl_;
-	Float_t apljetl_;
-	Float_t sphjetl_;
-	Float_t cirjetl_;
-
-	Float_t thrjetlm_;
-	Float_t apljetlm_;
-	Float_t sphjetlm_;
-	Float_t cirjetlm_;
-
 	Float_t htssl_;
 	Float_t htosl_;
 	Float_t htratiol_;
@@ -107,13 +93,12 @@ class StopTreeLooper {
 	Float_t sltrigeff_;
 	Float_t dltrigeff_;
 
-	// hadronic variables
+	// jet counting
 	Float_t nb_;
 	Int_t njets_;
 
 	// lepton variables
 	Int_t passisotrk_;
-	Int_t passisotrkv2_;
 	Int_t nlep_;
 
 	Float_t lep1pt_;
@@ -135,10 +120,7 @@ class StopTreeLooper {
 	Float_t x_;
 
 	Float_t rand_;
-	Float_t bdt_[5];
-
-    Float_t t2ttLM_;
-    Float_t t2ttHM_;
+	vector<float> bdt_;
 
     private:
 
@@ -146,15 +128,17 @@ class StopTreeLooper {
 	static const float JET_ETA = 2.4;
 
 	static const int N_JETS_TO_CONSIDER = 6;
+	static const int NJETS_CUT = 4;
 
 	string m_outfilename_;
 
-	int n_jets;
+	//jet information
 	vector<LorentzVector> jets;
-	vector<float> btag;
-	vector<int> mc;
+	vector<float> jets_btag;
+	vector<float> jets_sigma;
+	float metphi;
 
-        static const bool __apply_mva = true;
+        static const bool __apply_mva = false; 
 
 };
 

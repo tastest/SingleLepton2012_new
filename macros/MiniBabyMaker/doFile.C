@@ -1,4 +1,4 @@
-doFile(const char* pth, const char* tg) {
+doFile(const char* pth = "/nfs-3/userdata/stop/output_V00-02-18_2012_4jskim", const char* tg = "ttdl_powheg") {
 
   //------------------------------ 
   // load stuff
@@ -10,6 +10,7 @@ doFile(const char* pth, const char* tg) {
   gSystem->Load("libMathCore.so");
 
   //gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
+  gROOT->ProcessLine(".L ../../Tools/MiniFWLite/libMiniFWLite.so");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
   gROOT->ProcessLine(".L ../Core/StopTree.h+");
 
