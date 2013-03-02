@@ -269,6 +269,7 @@ namespace Stop {
 	int &nmus() { return stopt.nmus(); }
 	int &ntaus() { return stopt.ntaus(); }
 	int &nleps() { return stopt.nleps(); }
+	int &nbs() { return stopt.nbs(); }
 	float &dphijm() { return stopt.dphijm(); }
 	float &ptjetraw() { return stopt.ptjetraw(); }
 	float &ptjet23() { return stopt.ptjet23(); }
@@ -420,6 +421,9 @@ namespace Stop {
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pftaud() { return stopt.pftaud(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5() { return stopt.pfcand5(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand10() { return stopt.pfcand10(); }
+	int &pfTau_leadPtcandID() { return stopt.pfTau_leadPtcandID(); }
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau() { return stopt.pfTau(); }
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand() { return stopt.pfTau_leadPtcand(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10() { return stopt.pfcandOS10(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10looseZ() { return stopt.pfcandOS10looseZ(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5looseZ() { return stopt.pfcand5looseZ(); }
