@@ -299,8 +299,15 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	// jet information
 	njets_++;
-	if (njets_==1) pt_J1_ = stopt.pfjets().at(i).pt();
-	if (njets_==2) pt_J2_ = stopt.pfjets().at(i).pt();
+	if (njets_==1) {
+	  pt_J1_   = stopt.pfjets().at(i).pt();
+	  dphimj1_ = getdphi(metphi, stopt.pfjets().at(i).phi() );
+	}
+	if (njets_==2) {
+	  pt_J2_ = stopt.pfjets().at(i).pt();
+	  dphimj2_    = getdphi(metphi, stopt.pfjets().at(i).phi() );
+	  dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
+	}
 	jets.push_back(stopt.pfjets().at(i));
 	jets_sigma.push_back(stopt.pfjets_sigma().at(i));
 
@@ -321,10 +328,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	float dPhiL = getdphi( stopt.lep1().Phi(), stopt.pfjets().at(i).phi() );
 	float dPhiM = getdphi(             metphi, stopt.pfjets().at(i).phi() );
 
-	if( dPhiL  < (TMath::Pi()/2) ) htssl_=htssl_+stopt.pfjets().at(i).pt();
-	if( dPhiL >= (TMath::Pi()/2) ) htosl_=htosl_+stopt.pfjets().at(i).pt();
-	if( dPhiM  < (TMath::Pi()/2) ) htssm_=htssm_+stopt.pfjets().at(i).pt();
-	if( dPhiM >= (TMath::Pi()/2) ) htosm_=htosm_+stopt.pfjets().at(i).pt();
+	if ( dPhiL  < (TMath::Pi()/2) ) htssl_=htssl_+stopt.pfjets().at(i).pt();
+	else htosl_=htosl_+stopt.pfjets().at(i).pt();
+	if ( dPhiM  < (TMath::Pi()/2) ) htssm_=htssm_+stopt.pfjets().at(i).pt();
+	else htosm_=htosm_+stopt.pfjets().at(i).pt();
 
       }
 
@@ -333,11 +340,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // event shapes: HT in hemispheres
       htratiol_   = htssl_ / (htosl_ + htssl_);
       htratiom_   = htssm_ / (htosm_ + htssm_);
-
-      //angles
-      dphimj1_    = njets_>0 ? getdphi(metphi, jets.at(0).phi() ) : -99999.;
-      dphimj2_    = njets_>1 ? getdphi(metphi, jets.at(1).phi() ) : -99999.;
-      dphimjmin_  = njets_>1 ?  TMath::Min( dphimj1_ , dphimj2_ ) : -99999.;
 
       //------------------------------------------ 
       // kinematic variables
@@ -458,7 +460,7 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.33 $";
+  string revision = "$Revision: 1.34 $";
   string revision_no = revision.substr(11, revision.length() - 13);
   outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
   outFile_->cd();
