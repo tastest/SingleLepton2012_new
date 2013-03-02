@@ -494,15 +494,13 @@ bool pass_T2tt_LM(bool isData){
 
     if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
     if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
-    // later add the beta/PUid with new babies
+    // later add the MVA
+    if ( stopt.pfjets_beta2_0p5().at(ijet) < 0.2 ) continue;
 
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
     if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
-
-
-    // here the fix waiting for the new babies
-    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet)*getDataMCRatioFix(stopt.pfjets().at(ijet).eta()));
+    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
 
   }
 
@@ -546,14 +544,14 @@ bool pass_T2tt_HM(bool isData){
 
     if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
     if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
-    // later add the beta/PUid with new babies                                                                                                                                       
+    // later add the MVA
+    if ( stopt.pfjets_beta2_0p5().at(ijet) < 0.2 ) continue;
 
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
     if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
-
-    // here the fix waiting for the new babies                                                                                                                                       
-    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet)*getDataMCRatioFix(stopt.pfjets().at(ijet).eta()));
+                                                                                                                             
+    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
 
   }
 
