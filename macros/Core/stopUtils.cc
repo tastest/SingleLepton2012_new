@@ -466,9 +466,8 @@ bool passLepPlusIsoTrkSelection(bool isData)
   if ( !passSingleLeptonSelection(isData) ) return false;
 
   //pass isolated track requirement
-  //unfortunately changed default value to 9999.
-  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
-
+  if ( passIsoTrkVeto_v4() ) return false;
+  
   return true;
 
 }
@@ -491,7 +490,7 @@ bool pass_T2tt_LM(bool isData){
   vector<float> myJetsSigma;
   int btag=0;
 
-  for (int ijet =0; ijet<stopt.pfjets().size(); ijet++){
+  for (int ijet =0; ijet<(int)stopt.pfjets().size(); ijet++){
 
     if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
     if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
@@ -543,7 +542,7 @@ bool pass_T2tt_HM(bool isData){
   vector<float> myJetsSigma;
   int btag;
 
-  for (int ijet =0; ijet<stopt.pfjets().size(); ijet++){
+  for (int ijet =0; ijet<(int)stopt.pfjets().size(); ijet++){
 
     if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
     if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
