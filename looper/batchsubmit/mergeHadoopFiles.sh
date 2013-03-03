@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HADOOPDIR=/hadoop/cms/store/user/$USERNAME/babies/$1
+HADOOPDIR=/hadoop/cms/store/user/vimartin/babies/$1
 rm unmerged/*.root
 
 echo "
@@ -12,9 +12,9 @@ void mergeHadoopFiles() {
 
 PREFIX=""
 for FILE in `ls $HADOOPDIR`; do
-#    echo cp ${HADOOPDIR}/${FILE} unmerged/
-#    cp ${HADOOPDIR}/${FILE} unmerged/
-    echo "chain->Add(\"${HADOOPDIR}/${FILE}\");" >> mergeHadoopFiles.C
+    echo cp ${HADOOPDIR}/${FILE} unmerged/
+    cp ${HADOOPDIR}/${FILE} unmerged/
+    echo "chain->Add(\"unmerged/${FILE}\");" >> mergeHadoopFiles.C
     PREFIX=`echo ${FILE} | sed 's/\(.*\)_merged.*.root/\1/'`
 done
 

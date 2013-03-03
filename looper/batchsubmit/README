@@ -3,26 +3,26 @@
 --------------------------------------------------
 1) copy files to run looper into job_input directory
 for example, from the looper directory
-> cp -r BtagFuncs.h processBaby.C jetCorrections jetSmearData QGTaggerConfig jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
+> cp -r BtagFuncs.h processBaby.C jetCorrections jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
 
-*) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
-PROXY (not nedded anymore unless you have a special location for your proxy file)
-COPYDIR to point to the desired output directory in hadoop ( default to /hadoop/cms/store/user/${USERNAME}/babies/) where $USERNAME is your username
+2) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
+PROXY
+COPYDIR to point to the desired output directory in hadoop
 
 3) now execute scripts!
 to run on only one dataset for example run the writeConfig.sh script 
 this takes two arguments, the dataset directory on hadoop and the name
 you want to give the output babies and the output directory. 
 for example
-> ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ V00-02-03_2012_TTJets
+> ./writeConfig.sh /hadoop/cms/store/group/snt/papers2011/Summer11MC/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11-PU_S4_START42_V11-v1/V04-02-29_singleLepton/ V00-04-00_TTJets
 creates a condor config file
-condor_V00-02-03_2012_TTJets.cmd
+condor_V00-04-00_TTJets.cmd
 to submit one job per file in the dataset directory 
 
 Note, need to setup grid since apparently this is needed to copy output files at the end of the job.
 something like
 > source /code/osgcode/ucsdt2/gLite32/etc/profile.d/grid_env.sh
-> voms-proxy-init -voms cms -valid 240:00
+> voms-proxy-init -voms cms
 
 now submit to condor
 > condor_submit <CMDFILE>
@@ -37,9 +37,6 @@ This should create a set of .cmd files and a submit script submitAll.sh
 
 the job .out and .err files should be located in the job_logs directory 
 the submission log should be in submit_logs
-
-to resubmit some jobs
-> ./resubmitConfig.sh <CMDFILE>
 
 4) Once the jobs are done, merge the output with the mergeHadoopOutput script
 set the output directory where the babies are located to the COPYDIR location from before

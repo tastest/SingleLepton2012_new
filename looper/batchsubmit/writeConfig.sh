@@ -1,18 +1,12 @@
 #!/bin/bash
 
-while  ! voms-proxy-info -exist
-do echo "No Proxy found issuing \"voms-proxy-init -voms cms\""
-   voms-proxy-init -hours 168 -voms cms
-done
-
 UNIVERSE="grid"
 EXE="wrapper.sh"
 INPUT="wrapper.sh, job_input/input.tar.gz"
 SITE="UCSD"
 SUBMITLOGDIR="${PWD}/submit_logs"
 JOBLOGDIR="${PWD}/job_logs"
-PROXY=$(voms-proxy-info -path)
-USERNAME=$(whoami)
+PROXY="/tmp/x509up_u31116"
 
 LOGDIR=${PWD}/submit_logs
 OUTDIR=${PWD}/job_logs  
@@ -37,14 +31,14 @@ fi
 DIR=$PWD
 rm ${DIR}/job_input/input.*
 #printenv | grep -v PS1 | grep -v printenv | awk '{print "export "$1}' > ${DIR}/job_input/setupenv.sh
-tar -hcf ${DIR}/job_input/input.tar job_input/*
+tar -cf ${DIR}/job_input/input.tar job_input/*
 gzip ${DIR}/job_input/input.tar
 cd ${DIR}
 
 
 DATADIR=$1
 COPYDIRBASE=$2
-COPYDIR=/hadoop/cms/store/user/${USERNAME}/babies/${COPYDIRBASE}
+COPYDIR=/hadoop/cms/store/user/vimartin/babies/${COPYDIRBASE}
 echo "[writeConfig] running on dataset ${DATADIR}"
 echo "[writeConfig] copying output to ${COPYDIR}"
 

@@ -1,44 +1,17 @@
 #ifndef singleLeptonLooper_h
 #define singleLeptonLooper_h
 
-#include "TFitter.h"
-
 #include <vector>
-#include <list>
-#include <string>
 #include <map>
 #include "Math/LorentzVector.h"
 #include "Math/PxPyPzE4D.h"
-
-#include "stopUtils.h"
-
-#include "../macros/Core/MT2Utility.h"
-#include "../macros/Core/mt2bl_bisect.h"
-#include "../macros/Core/mt2w_bisect.h"
-//#include "Candidate.h"                                                                                                                                                                 
-class Candidate : public TObject {
- public:
-  float chi2, mt2w, mt2bl, mt2b;
-  int j1, j2, bi, oi;
-  float k1, k2;
-  bool match;
-
-  ClassDef(Candidate, 2)
-    };
-
-
-#include "../macros/Core/PartonCombinatorics.h"
-
 #include "../CORE/SimpleFakeRate.h" // will .h be ok? lets see.. 101007
-#include "../CORE/QuarkGluonTagger/QuarkGluonTagger.h"
-#include "../CORE/metSelections.h"
 
 //#include "../CORE/topmass/ttdilepsolve.h" REPLACETOPMASS
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
-//typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > P4;
 typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > VofP4;
-//typedef map<unsigned int, unsigned int> m_uiui;
+typedef map<unsigned int, unsigned int> m_uiui;
 
 class  TChain;
 class  TH1F;
@@ -47,47 +20,29 @@ class  TRandom3;
 class  TTree;
 struct metStruct;
 
-/* ------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------- */
-const double PTMIN_J1   = 25;
-const double PTMIN_J2   = 25;
-const double PTMIN_BTAG = 30;
-const double PTMIN_OTAG = 30;
-const double PTMIN_B    = 30;  //  This Two should be tigther than the  
-const double PTMIN_O    = 30;  //  b-tagged versions.
-const double PDG_TOP_MASS = 173.5;
-const double PDG_W_MASS = 80.385;
-const double BTAG_MIN = 0.679;
-
-const bool __SORT = true;
-
-/* ------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------- */
-
-
 class singleLeptonLooper
 {
     public: 
         singleLeptonLooper();
         ~singleLeptonLooper() {}
 
-        /* enum TrigEnum { e_highpt = 0, e_lowpt };   */
-        /* // e_highpt  :   high pt dilepton triggers, 20,10   */
-        /* // e_lowpt   :   dilepton-HT cross triggers, 10,5             */
-        /* enum JetTypeEnum { e_JPT = 0, e_calo , e_pfjet }; */
-        /* // e_JPT     :   jpt jets */
-        /* // e_calo    :   l1 and l2 corrected calo jets */
-        /* // e_pfjet   :   corrected pfjets */
-        /* enum MetTypeEnum { e_tcmet = 0, e_muon, e_muonjes , e_pfmet }; */
-        /* // e_tcmet   :   track corrected met */
-        /* // e_muon    :   calo met with muon corrections */
-        /* // e_muonjes :   calo met with muon and jet energy scale corrections */
-        /* // e_pfmet   :   particle-flow met */
-        /* enum ZVetoEnum   { e_standard = 0, e_allzveto, e_nozveto, e_selectz }; */
-        /* // e_standard:   apply Z-veto to same-flavor pairs */
-        /* // e_allzveto:   apply Z-veto regardless of lepton flavor */
-        /* // e_nozveto :   no Z-veto */
-        /* // e_selectz :   select Z by requiring SF OS pair in Z mass window */
+        enum TrigEnum { e_highpt = 0, e_lowpt };  
+        // e_highpt  :   high pt dilepton triggers, 20,10  
+        // e_lowpt   :   dilepton-HT cross triggers, 10,5            
+        enum JetTypeEnum { e_JPT = 0, e_calo , e_pfjet };
+        // e_JPT     :   jpt jets
+        // e_calo    :   l1 and l2 corrected calo jets
+        // e_pfjet   :   corrected pfjets
+        enum MetTypeEnum { e_tcmet = 0, e_muon, e_muonjes , e_pfmet };
+        // e_tcmet   :   track corrected met
+        // e_muon    :   calo met with muon corrections
+        // e_muonjes :   calo met with muon and jet energy scale corrections
+        // e_pfmet   :   particle-flow met
+        enum ZVetoEnum   { e_standard = 0, e_allzveto, e_nozveto, e_selectz };
+        // e_standard:   apply Z-veto to same-flavor pairs
+        // e_allzveto:   apply Z-veto regardless of lepton flavor
+        // e_nozveto :   no Z-veto
+        // e_selectz :   select Z by requiring SF OS pair in Z mass window
         enum FREnum   { e_qcd = 0, e_wjets };
         // e_qcd     :   derive prediction for 2 fake leptons
         // e_wjets   :   derive prediction for 1 real and one fake lepton
@@ -99,31 +54,33 @@ class singleLeptonLooper
                        );
         void BookHistos (char *prefix);
 	void InitBaby();
-	//	float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx = 0 );
+	float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx = 0 );
+	void weight3D_init( std::string WeightFileName );
+	double weight3D( int pv1, int pv2, int pv3 );
 
         // Set globals
         void set_susybaseline (bool  b)    { g_susybaseline = b; }
         void set_createTree   (bool  b)    { g_createTree   = b; }
         void set_useBitMask   (bool  b)    { g_useBitMask   = b; }
-        void set_version      (const char* v)    { g_version      = v; }
-	void set_json         (const char* v)    { g_json         = v; }        
-        //void set_trigger      (TrigEnum t) { g_trig         = t; } 
+        void set_version      (char* v)    { g_version      = v; }
+	void set_json         (char* v)    { g_json         = v; }        
+        void set_trigger      (TrigEnum t) { g_trig         = t; } 
 
         // Baby ntuple methods
         void makeTree (char *prefix,bool doFakeApp, FREnum frmode );
 	float stopPairCrossSection( float stopmass );
         void closeTree ();
-	//	float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool dovtxcut = false , float pt_thresh = 0.0);
+	float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool dovtxcut = false , float pt_thresh = 0.0);
 	std::vector<float> trackIsoPtRanges( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	std::vector<float> totalIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
 	//pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool is8TeV = false);
-	//	pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
-	//	pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true );
+	pair<float,float> getPhiCorrMET( float met, float metphi, float sumet, bool ismc, bool isA = false);
+
 	bool initialized;
 	TH1D*   stop_xsec_hist;
 	TFile*  stop_xsec_file;
 	//3D Vertex weight
-	//	double Weight3D[50][50][50];
+	double Weight3D[50][50][50];
 
     private:
 
@@ -131,9 +88,9 @@ class singleLeptonLooper
         bool  g_susybaseline;
         bool  g_createTree;
         bool  g_useBitMask;
-        const char* g_version;
-	const char* g_json;      
-	//TrigEnum g_trig;
+        char* g_version;
+	char* g_json;      
+	TrigEnum g_trig;
         TRandom3 *random3_;
 
 	//PDF information
@@ -143,13 +100,9 @@ class singleLeptonLooper
         Int_t pdfid1_; 
 	Int_t pdfid2_;
 
-	Int_t   eldup_;    
-
 	// MC truth lepton info
 	Int_t   mcid1_;    
 	Int_t   mcid2_;    
-	Int_t   lep_t_id_;
-	Int_t   lep_tbar_id_;
 	Int_t	mcdecay1_; 
 	Int_t   mcdecay2_; 
 	Int_t	mcndec1_; 
@@ -202,47 +155,12 @@ class singleLeptonLooper
 	Float_t trkreliso10pt1p0_;
 
 	// extra pfcand vars 
-        Int_t pfcandid5_;     
-        Int_t pfcandid10_;     
-        Int_t pfcanddirid10_;     
-        Int_t pfcandvetoid10_;     
-        Int_t pfcandvetoLid10_;     
-        Int_t pfcandidOS10_;  
-        Int_t pfcandidOS10looseZ_;  
-        Int_t pfcandid5looseZ_;     
-
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
-        Float_t pfcanddiriso10_;     
-        Float_t pfcandvetoiso10_;     
-        Float_t pfcandvetoLiso10_;     
-        Float_t pfcandisoOS10_;     
-        Float_t pfcandisoOS10looseZ_;     
-        Float_t pfcandiso5looseZ_;     
-
         Float_t pfcandpt5_;
         Float_t pfcandpt10_;
-        Float_t pfcanddirpt10_;
-        Float_t pfcandvetopt10_;
-        Float_t pfcandvetoLpt10_;
-        Float_t pfcandptOS10_;
-        Float_t pfcandptOS10looseZ_;
-        Float_t pfcandpt5looseZ_;
-
-        Float_t pfcanddz5_;
-        Float_t pfcanddz10_;
-        Float_t pfcanddirdz10_;
-        Float_t pfcandvetodz10_;
-        Float_t pfcandvetoLdz10_;
-        Float_t pfcanddzOS10_;
-        Float_t pfcanddzOS10looseZ_;
-        Float_t pfcanddz5looseZ_;
-
         Float_t pfcandmindrj5_;
         Float_t pfcandmindrj10_;
-        Float_t pfcanddirmindrj10_;
-        Float_t pfcandvetomindrj10_;
-        Float_t pfcandvetoLmindrj10_;
 
 	Float_t pfcandpt10pt0p1_;
 	Float_t pfcandiso10pt0p1_;
@@ -281,6 +199,13 @@ class singleLeptonLooper
 
 	// pfjet counters
 	Int_t   npfjets30_;
+	Int_t   npfjets35_;
+	Int_t   npfjets40_;
+	Int_t   npfjets45_;
+	Int_t   npfresjets30_;
+	Int_t   npfresjets35_;
+	Int_t   npfresjets40_;
+	Int_t   npfresjets45_;
 	Int_t   npfjets30lepcorr_;
 	Float_t knjets_;
 
@@ -289,6 +214,13 @@ class singleLeptonLooper
 
 	// pfht vars
 	Float_t htpf30_;
+	Float_t htpf35_;
+	Float_t htpf40_;
+	Float_t htpf45_;
+	Float_t htpfres30_;
+	Float_t htpfres35_;
+	Float_t htpfres40_;
+	Float_t htpfres45_;
 
 	// matched lepton vars
 	Int_t   mlepid_;
@@ -323,7 +255,6 @@ class singleLeptonLooper
 
 	// MC truth vars
 	Int_t   npartons_;
-	Int_t   nwzpartons_;
 	Float_t maxpartonpt_;
 	Float_t ptt_;
 	Float_t pttbar_;
@@ -346,10 +277,6 @@ class singleLeptonLooper
 	Float_t lepmetpt_;
 	Float_t lept1met10pt_;
 
-	Float_t t1met10s_;
-	Float_t t1met10sphi_;
-	Float_t t1met10smt_;
-
 	//phi corrected type1 mets
 	Float_t t1metphicorr_;
 	Float_t t1metphicorrphi_;
@@ -364,28 +291,9 @@ class singleLeptonLooper
 	Float_t t1metphicorrmtup_;
 	Float_t t1metphicorrmtdn_;
 
-	//smeared and phicorred type1 mets
-	Float_t t1metphicorr_smear_gen_;
-	Float_t t1metphicorrphi_smear_gen_;
-	Float_t t1metphicorrmt_smear_gen_;
-
-	//official prescription
-	Float_t t1met_off_;
-	Float_t t1metphi_off_;
-	Float_t t1metmt_off_;
-	Float_t t1metphicorr_off_;
-	Float_t t1metphicorrphi_off_;
-	Float_t t1metphicorrmt_off_;
-
 	// assorted p4's
 	LorentzVector*  t_;   
 	LorentzVector*  tbar_;   
-	LorentzVector*  lep_t_;   
-	LorentzVector*  lep_tbar_;   
-	LorentzVector*  stop_t_;   
-	LorentzVector*  stop_tbar_;
-	LorentzVector*  neutralino_t_;   
-	LorentzVector*  neutralino_tbar_;    
 	LorentzVector*  ttbar_;   
 	LorentzVector*  mlep_;   
 	LorentzVector*  mclep1_;   
@@ -398,17 +306,6 @@ class singleLeptonLooper
         LorentzVector*  pftaud_;
         LorentzVector*  pfcand5_;
         LorentzVector*  pfcand10_;
-        LorentzVector*  pfcanddir10_;
-        LorentzVector*  pfcandveto10_;
-        LorentzVector*  pfcandvetoL10_;
-        LorentzVector*  pfcandOS10_;
-        LorentzVector*  pfcandOS10looseZ_;
-        LorentzVector*  pfcand5looseZ_;
-
-        LorentzVector*  pfTau_;
-        LorentzVector*  pfTau_leadPtcand_;
-        Int_t pfTau_leadPtcandID_;
-
         LorentzVector*  lep1_;
         LorentzVector*  lep2_;
         LorentzVector*  trklep1_;
@@ -426,58 +323,31 @@ class singleLeptonLooper
 	LorentzVector*  mcnu_;
 	LorentzVector*  mclep_;
 
-	//        std::vector<Candidate>  candidates_;
-        VofP4 jets_;
-	std::vector<float> btag_;
-
-        VofP4 pfjets_;
-        VofP4 pfjets_genJet_;
-        std::vector<float> pfjets_csv_;
-	// CHM and NEU
-        std::vector<float> pfjets_chm_;
-        std::vector<float> pfjets_neu_;
-	//jet corrections and ID
-	std::vector<float> pfjets_l1corr_;
-	std::vector<float> pfjets_corr_;
-	//status 3 parton matching
-	std::vector<int>   pfjets_mc3_;
-	std::vector<int>   pfjets_flav_;
-	std::vector<int>   pfjets_mcflavorAlgo_;
-	std::vector<int>   pfjets_mcflavorPhys_;
-
-	//qg tagging
-	std::vector<float> pfjets_qgtag_;
-	//jet shape
-	std::vector<float> pfjets_lrm_;
-	std::vector<float> pfjets_lrm2_;
-	//gen jet matching
-	std::vector<float> pfjets_genJetDr_;
-	//truth lepton matching
-        std::vector<int>   pfjets_lepjet_;
-	//jet resolution
-	std::vector<float> pfjets_sigma_;
-	//beta variables
-	std::vector<float> pfjets_beta_;
-	std::vector<float> pfjets_beta2_;
-        std::vector<float> pfjets_beta_0p1_;
-        std::vector<float> pfjets_beta_0p2_;
-        std::vector<float> pfjets_beta2_0p5_;
-        std::vector<float> pfjets_beta2_0p1_;
-        /* std::vector<float> pfjets_beta_0p15_;  */
-        /* std::vector<float> pfjets_beta2_0p15_; */
-        /* std::vector<float> pfjets_beta_0p2_;   */
-        /* std::vector<float> pfjets_beta2_0p2_;  */
-	std::vector<float> pfjets_mvaPUid_;
-	std::vector<float> pfjets_mvaBeta_;
-
-	float chi2min_;
-	float chi2minprob_;
-
-	float mt2bmin_;
-	float mt2blmin_;
-	float mt2wmin_;
-
-
+	// jet p4's
+        LorentzVector*  pfjet1_; 
+        LorentzVector*  pfjet2_; 
+        LorentzVector*  pfjet3_; 
+        LorentzVector*  pfjet4_; 
+        LorentzVector*  pfjet5_; 
+        LorentzVector*  pfjet6_; 
+        Int_t bjet1_; 
+        Int_t bjet2_; 
+        Int_t bjet3_; 
+        Int_t bjet4_; 
+        Int_t bjet5_; 
+        Int_t bjet6_; 
+        Int_t lepjet1_; 
+        Int_t lepjet2_; 
+        Int_t lepjet3_; 
+        Int_t lepjet4_; 
+        Int_t lepjet5_; 
+        Int_t lepjet6_; 
+        Int_t qgjet1_; 
+        Int_t qgjet2_; 
+        Int_t qgjet3_; 
+        Int_t qgjet4_; 
+        Int_t qgjet5_; 
+        Int_t qgjet6_; 
 	Int_t hyptype_;
 
 	Int_t mm_;
@@ -515,8 +385,6 @@ class singleLeptonLooper
         Float_t trgeff_;
         Float_t mutrigweight_;
         Float_t mutrigweight2_;
-        Float_t sltrigweight_;
-        Float_t dltrigweight_;
         Float_t pfmetsig_;
         Float_t smeff_;
         Float_t k_;
@@ -527,15 +395,7 @@ class singleLeptonLooper
         Float_t costhetaweight_;
 	Int_t   njpt_;
 	Float_t htjpt_;
-
-	Int_t   csc_;
-	Int_t   hcallaser_;
-	Int_t   ecaltp_;
-	Int_t   trkfail_;
-	Int_t   eebadsc_;
-	Int_t   hbhenew_;
         Int_t   hbhe_;
-
 	Int_t   jetid_;
 	Int_t   jetid30_;
         Int_t   mull_;
@@ -554,11 +414,6 @@ class singleLeptonLooper
         Int_t   njetsUp_;
         Int_t   npfjets25_;
         Int_t   njetsDown_;
-
-	Float_t calomet_;
-	Float_t calometphi_;
-	Float_t trkmet_nolepcorr_;
-	Float_t trkmetphi_nolepcorr_;
 	Float_t trkmet_;
 	Float_t trkmetphi_;
 	Float_t trkmetproj_;
@@ -573,12 +428,10 @@ class singleLeptonLooper
 	Float_t trkjetmetproj_;
         Float_t htUp_;
         Float_t htDown_;
-        Int_t   ntruepu_;
         Int_t   npu_;
         Int_t   npuMinusOne_;
         Int_t   npuPlusOne_;
         Int_t   nvtx_;
-        Int_t	indexfirstGoodVertex_;
         Float_t dilmass_;
         Float_t topmass_;
         Float_t tcmet_;
@@ -633,11 +486,8 @@ class singleLeptonLooper
 	Int_t   w2_;
 	Float_t iso1_;
 	Float_t isont1_;
-	Float_t isopf1_;
-	Float_t isopfold1_;
 	Float_t iso2_;
 	Float_t isont2_;
-	Float_t isopf2_;
         Float_t ptl2_;
         Float_t etal1_;
         Float_t etal2_;
@@ -666,51 +516,12 @@ class singleLeptonLooper
 	Int_t   nmus_;
 	Int_t   ntaus_;
 	Int_t   nleps_;
-	Int_t   nbs_;
 	Float_t nvtxweight_;
 	Float_t n3dvtxweight_;
 	Float_t etasc1_;
 	Float_t etasc2_;
-	Float_t eoverpin_;
-	Float_t eoverpout_;
-	Float_t dEtaIn_;
-	Float_t dPhiIn_;
-	Float_t sigmaIEtaIEta_;
-	Float_t hOverE_;
-	Float_t ooemoop_;
-	Float_t d0vtx_;
-	Float_t dzvtx_;
-	Float_t expinnerlayers_;
-	Float_t fbrem_;
-	Float_t pfisoch_;
-	Float_t pfisoem_;
-	Float_t pfisonh_;
-	Float_t eSC_;
-	Float_t phiSC_;
-	Float_t eSCRaw_;
-	Float_t eSCPresh_;
 	Float_t emjet10_;
 	Float_t emjet20_;
-	Float_t eoverpin2_;
-	Float_t eoverpout2_;
-	Float_t dEtaIn2_;
-	Float_t dPhiIn2_;
-	Float_t sigmaIEtaIEta2_;
-	Float_t hOverE2_;
-	Float_t ooemoop2_;
-	Float_t d0vtx2_;
-	Float_t dzvtx2_;
-	Float_t expinnerlayers2_;
-	Float_t fbrem2_;
-	Float_t pfisoch2_;
-	Float_t pfisoem2_;
-	Float_t pfisonh2_;
-	Float_t eSC2_;
-	Float_t phiSC2_;
-	Float_t eSCRaw2_;
-	Float_t eSCPresh2_;
-
-
 
 	//recoil
 	Float_t dilrecoil_;

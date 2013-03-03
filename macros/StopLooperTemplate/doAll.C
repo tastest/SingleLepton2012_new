@@ -14,6 +14,7 @@ void doAll() {
 
   gSystem->Load("../../Tools/MiniFWLite/libMiniFWLite.so");
 
+  gROOT->ProcessLine(".L ../Core/StopTree.h+");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
 
   StopTreeLooper *looper = new StopTreeLooper();
@@ -22,11 +23,11 @@ void doAll() {
   // samples to run over
   //
  
-  char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim";
+  char* path = "/tas/benhoob/StopBabies/output/V00-02-03_2012_TTJets_Powheg";
 
   const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
-    "ttdl_powheg"
+    "tt_powheg_merged_ntuple_2_smallTree"
   };
 
   TChain *ch[NSAMPLES];
