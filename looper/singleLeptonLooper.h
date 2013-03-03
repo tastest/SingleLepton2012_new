@@ -409,6 +409,10 @@ class singleLeptonLooper
         LorentzVector*  pfTau_leadPtcand_;
         Int_t pfTau_leadPtcandID_;
 
+        LorentzVector*  pfTauLoose_;
+        LorentzVector*  pfTauLoose_leadPtcand_;
+        Int_t pfTauLoose_leadPtcandID_;
+
         LorentzVector*  lep1_;
         LorentzVector*  lep2_;
         LorentzVector*  trklep1_;
