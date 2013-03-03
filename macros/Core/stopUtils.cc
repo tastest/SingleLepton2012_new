@@ -33,7 +33,7 @@ unsigned int getNJets(const float etacut){
     
     if( stopt.pfjets().at(i).pt()<30 )  continue;
     if( fabs(stopt.pfjets().at(i).eta())>etacut )  continue;
-    //    if(stopt.pfjets_beta2().at(i)<=0.01) continue;
+    if ( stopt.pfjets_beta2_0p5().at(i) < 0.2 ) continue;
 
     njets++;
 
@@ -52,6 +52,7 @@ vector<int> getBJetIndex(double discr, int iskip1, int iskip2)
 
     if( stopt.pfjets().at(i).pt()<30 )  continue;
     if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
+    if ( stopt.pfjets_beta2_0p5().at(i) < 0.2 ) continue;
     if( stopt.pfjets_csv().at(i)      < discr   ) continue;
 
     // skip these indices                                                                                                                                                                                  
@@ -270,34 +271,12 @@ bool passEvtSelection(TString name)
 }
 
 //-------------------------------------------
-// good lepton + veto isolated track
+// the isolated track veto used at HCP
 //-------------------------------------------
 
-bool passOneLeptonSelection( bool isData) 
-{
-  //single lepton selection for 8 TeV 53 analysis
-  if ( !passSingleLeptonSelection(isData) ) return false;
+bool passTauVeto() {
 
-  //pass isolated track veto
-  //unfortunately changed default value to 9999.
-  if ( stopt.pfcandpt10() <9998. && stopt.pfcandiso10() < 0.1 ) return false;
-
-  return true;
-
-}
-
-//-------------------------------------------
-// dilepton selection
-//-------------------------------------------
-
-bool passTwoLeptonSelection(bool isData) 
-{
-  //single lepton selection for 8 TeV 53 analysis
-  if ( !passDileptonSelection(isData) ) return false;
-
-  //apply isolated track veto in addition to 2 leptons
-  //default value for this one is -999
-  if ( stopt.trkpt10loose() >0. && stopt.trkreliso10loose() < 0.1 ) return false;
+  if(stopt.pfTau_leadPtcandID()!=(-1)) return false;
 
   return true;
 
@@ -363,6 +342,7 @@ bool passIsoTrkVeto_v4()
 
   //pass isolated track veto
   //unfortunately changed default value to 9999.
+  // We want to check for the generic track only there is now good e/mu candidate
   if ( stopt.pfcandptOS10looseZ() <9998. && abs(stopt.pfcandid5looseZ())!=13 && abs(stopt.pfcandid5looseZ())!=11 && stopt.pfcandisoOS10looseZ() < 0.1 ) return false;
 
   if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==13 && stopt.pfcandiso5looseZ() < 0.2) return false;
@@ -455,6 +435,42 @@ bool passDileptonSelection(bool isData)
 }
 
 //-------------------------------------------
+// good lepton + veto isolated track
+//-------------------------------------------
+
+bool passOneLeptonSelection( bool isData) 
+{
+  //single lepton selection for 8 TeV 53 analysis
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  //pass isolated track veto
+  //unfortunately changed default value to 9999.
+  //  if ( stopt.pfcandpt10() <9998. && stopt.pfcandiso10() < 0.1 ) return false;
+  if ( !passIsoTrkVeto_v4() ) return false;
+
+  return true;
+
+}
+
+//-------------------------------------------
+// dilepton selection
+//-------------------------------------------
+
+bool passTwoLeptonSelection(bool isData) 
+{
+  //single lepton selection for 8 TeV 53 analysis
+  if ( !passDileptonSelection(isData) ) return false;
+
+  //apply isolated track veto in addition to 2 leptons
+  //default value for this one is -999
+  if ( stopt.trkpt10loose() >0. && stopt.trkreliso10loose() < 0.1 ) return false;
+
+  return true;
+
+}
+
+
+//-------------------------------------------
 // lepton + isolated track selection CR5
 //-------------------------------------------
 
@@ -466,8 +482,10 @@ bool passLepPlusIsoTrkSelection(bool isData)
   if ( !passSingleLeptonSelection(isData) ) return false;
 
   //pass isolated track requirement
-  if ( passIsoTrkVeto_v4() ) return false;
-  
+  //unfortunately changed default value to 9999.
+  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
+  //  if ( passIsoTrkVeto_v4() ) return false;
+
   return true;
 
 }
@@ -476,8 +494,7 @@ bool pass_T2tt_LM(bool isData){
 
   if ( !passSingleLeptonSelection(isData) ) return false;
 
-  // this is temporary waiting for the new babies
-  if ( !passIsoTrkVeto_v2() ) return false;
+  if ( !passIsoTrkVeto_v4() ) return false;
 
   // this is just a preselection
   if(stopt.t1metphicorr()<100) return false;
@@ -527,7 +544,7 @@ bool pass_T2tt_HM(bool isData){
   if ( !passSingleLeptonSelection(isData) ) return false;
 
   // this is temporary waiting for the new babies                                                                                                                                    
-  if ( !passIsoTrkVeto_v2() ) return false;
+  if ( !passIsoTrkVeto_v4() ) return false;
 
   // this is just a preselection                                                                                                                                                     
   if(stopt.t1metphicorr()<100) return false;
@@ -550,8 +567,8 @@ bool pass_T2tt_HM(bool isData){
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
     if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
-                                                                                                                             
     myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
+
 
   }
 
@@ -592,9 +609,8 @@ bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool pickMuE)
   //pass isolated track requirement
   //unfortunately changed default value to 9999.
   //////  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
-
-  bool foundIsoTrack_noEMU=(stopt.pfcandpt10() <9998. && (abs(stopt.pfcandid10())!=13 && abs(stopt.pfcandid10())!=11 ) && stopt.pfcandiso10() < 0.1); 
-  bool foundIsoTrack_EMU=(stopt.pfcandpt5() <9998. && (abs(stopt.pfcandid5())==13 || abs(stopt.pfcandid5())==11 ) && stopt.pfcandiso5() < 0.2); 
+  bool foundIsoTrack_noEMU=(stopt.pfcandptOS10looseZ() <9998. && (abs(stopt.pfcandidOS10looseZ())!=13 && abs(stopt.pfcandidOS10looseZ())!=11 ) && stopt.pfcandisoOS10looseZ() < 0.1); 
+  bool foundIsoTrack_EMU= (stopt.pfcandpt5looseZ() <9998. && (abs(stopt.pfcandid5looseZ())==13 || abs(stopt.pfcandid5looseZ())==11 ) && stopt.pfcandiso5looseZ() < 0.2);
 
   ///  if(foundIsoTrack_EMU) cout << "EMU " << foundIsoTrack_EMU << endl;
   ///  if(foundIsoTrack_noEMU) cout << "noEMU " << foundIsoTrack_noEMU << endl;
