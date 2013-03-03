@@ -34,7 +34,8 @@ void pickSkimIfExists( TChain *ch, const std::string& base, const std::string& s
   return;
 }
 
-void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-25/merged_ntuple_71.root" )
+void processBaby( TString outfileid = "merged_ntuple_74", TString infile = "/hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012A-13Jul2012-v1_AOD//merged_ntuple_74.root" )
+//void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-25/merged_ntuple_71.root" )
 {
 
   //---------------------------------------------------------------
@@ -96,6 +97,16 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   else if (infile.Contains("DY2JetsToLL"))                           sample = Form("DY2Jtot_%s",         outfileid.Data());
   else if (infile.Contains("DY3JetsToLL"))                           sample = Form("DY3Jtot_%s",         outfileid.Data());
   else if (infile.Contains("DY4JetsToLL"))                           sample = Form("DY4Jtot_%s",         outfileid.Data());
+  else if (infile.Contains("TBarToDilepton_tW-channel"))	     sample = Form("tbartWchanb_2l_%s",  outfileid.Data());
+  else if (infile.Contains("TBarToLeptons_s-channel"))		     sample = Form("tbarschan_l_%s", 	 outfileid.Data());
+  else if (infile.Contains("TBarToLeptons_t-channel"))		     sample = Form("tbartchan_l_%s", 	 outfileid.Data());
+  else if (infile.Contains("TBarToThadWlep_tW-channel"))	     sample = Form("tbartWchan_thWl_%s", outfileid.Data());
+  else if (infile.Contains("TBarToTlepWhad_tW-channel"))	     sample = Form("tbartWchan_tlWh_%s", outfileid.Data());
+  else if (infile.Contains("TToDilepton_tW-channel"))	     	     sample = Form("ttWchan_2l_%s", 	 outfileid.Data());
+  else if (infile.Contains("TToLeptons_s-channel"))		     sample = Form("tschan_l_%s", 	 outfileid.Data());
+  else if (infile.Contains("TToLeptons_t-channel"))		     sample = Form("ttchan_l_%s", 	 outfileid.Data());
+  else if (infile.Contains("TToThadWlep_tW-channel"))	     	     sample = Form("ttWchan_thWl_%s", 	 outfileid.Data());
+  else if (infile.Contains("TToTlepWhad_tW-channel"))	     	     sample = Form("ttWchan_tlWh_%s", 	 outfileid.Data());
   else if (infile.Contains("T_s-channel"))                           sample = Form("tschan_%s",          outfileid.Data());
   else if (infile.Contains("Tbar_s-channel"))                        sample = Form("tbarschan_%s",       outfileid.Data());
   else if (infile.Contains("T_t-channel"))                           sample = Form("ttchan_%s",          outfileid.Data());

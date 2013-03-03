@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-02-18_2012"
+TAG="V00-02-19_2012"
 
 #
 # DATA
@@ -40,7 +40,6 @@ TAG="V00-02-18_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/MuEG_Run2012C-24Aug2012-v1_AOD/merged/ ${TAG}_MuEG2012C_24Aug2012v1V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/MuEG_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_MuEG2012C_PromptRecov2V532
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/MuEG_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_MuEG2012D_PromptRecov1V532
-
 
 # --- DOUBLE ELECTRON ---
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/DoubleElectron_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_DoubleElectron2012A_recover06Aug2012v1V532
@@ -93,6 +92,16 @@ TAG="V00-02-18_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-schannel
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_Tbar-tchannel 
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-tchannel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToDilepton_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToDilepton_tW-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToLeptons_s-channel_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToLeptons_s-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToLeptons_t-channel_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToLeptons_t-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToThadWlep_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToThadWlep_tW-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToTlepWhad_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToTlepWhad_tW-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TToDilepton_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TToDilepton_tW-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TToLeptons_s-channel_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TToLeptons_s-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TToLeptons_t-channel_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TToLeptons_t-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TToThadWlep_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TToThadWlep_tW-channel
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TToTlepWhad_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TToTlepWhad_tW-channel
 
 #
 # DY+JETS
