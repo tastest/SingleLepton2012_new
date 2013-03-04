@@ -32,6 +32,10 @@
 
 using namespace Stop;
 
+const bool doFlavorPlots = false;
+const bool doNM1Plots = true;
+const bool doMiniBaby = false;
+
 std::set<DorkyEventIdentifier> already_seen; 
 std::set<DorkyEventIdentifier> events_lasercalib; 
 std::set<DorkyEventIdentifier> events_hcallasercalib; 
@@ -43,6 +47,16 @@ inline bool sortByPt(const LorentzVector &vec1, const LorentzVector &vec2 ) {
     return vec1.pt() > vec2.pt();
 }
 
+//--------------------------------------------------------------------
+
+// from the internets: to replace a subset of a string
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
 
 //--------------------------------------------------------------------
 
@@ -78,6 +92,19 @@ void WHLooper::loop(TChain *chain, TString name) {
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
+  if (name.Contains("wjets") || name.Contains("wbb")) {
+    isWjets_ = true;
+  } else {
+    isWjets_ = false;
+  }
+
+  if (name.Contains("TChiwh")) {
+    isTChiwh_ = true;
+  } else {
+    isTChiwh_ = false;
+  }
+
+
   //------------------------------
   // check for valid chain
   //------------------------------
@@ -98,11 +125,66 @@ void WHLooper::loop(TChain *chain, TString name) {
   // set up histograms
   //------------------------------
 
+  if (doMiniBaby) {
+    string outbabyfile = m_outfilename_;
+    replace(outbabyfile,"histos","minibaby");
+    cout << "[WHLooper::loop] creating minibaby file: " << outbabyfile << endl;
+    MakeBabyNtuple(outbabyfile.c_str());
+  }
+
   gROOT->cd();
+
+  cout << "[WHLooper::loop] creating output file: " << m_outfilename_ << endl;
+
+  outfile_ = new TFile(m_outfilename_.c_str(),"RECREATE") ; 
 
   cout << "[WHLooper::loop] setting up histos" << endl;
 
-  std::map<std::string, TH1F*> h_1d;
+  std::map<std::string, TH1F*> h_1d_presel;
+  std::map<std::string, TH1F*> h_1d_presel_nobs;
+  std::map<std::string, TH1F*> h_1d_presel_bs;
+  std::map<std::string, TH1F*> h_1d_njets_nm1;
+  std::map<std::string, TH1F*> h_1d_njetsalleta_nm1;
+  std::map<std::string, TH1F*> h_1d_bbmass_nm1;
+  std::map<std::string, TH1F*> h_1d_bbmass_nobs_nm1;
+  std::map<std::string, TH1F*> h_1d_bbmass_bs_nm1;
+  std::map<std::string, TH1F*> h_1d_lep1mt_nm1;
+  std::map<std::string, TH1F*> h_1d_mt2w_nm1;
+  std::map<std::string, TH1F*> h_1d_pfmet_nm1;
+  std::map<std::string, TH1F*> h_1d_bbpt_nm1;
+  std::map<std::string, TH1F*> h_1d_wpt_nm1;
+  std::map<std::string, TH1F*> h_1d_bbwdphi_nm1;
+  std::map<std::string, TH1F*> h_1d_final;
+  std::map<std::string, TH1F*> h_1d_final_nobs;
+  std::map<std::string, TH1F*> h_1d_final_bs;
+  std::map<std::string, TH2F*> h_2d_final;
+
+  outfile_->mkdir("presel");
+  if (isWjets_) {
+    outfile_->mkdir("presel_nobs");
+    outfile_->mkdir("presel_bs");
+  }
+  if (doNM1Plots) {
+    outfile_->mkdir("njets_nm1");
+    outfile_->mkdir("njetsalleta_nm1");
+    outfile_->mkdir("bbmass_nm1");
+    if (isWjets_) {
+      outfile_->mkdir("bbmass_nobs_nm1");
+      outfile_->mkdir("bbmass_bs_nm1");
+    }
+    outfile_->mkdir("lep1mt_nm1");
+    outfile_->mkdir("mt2w_nm1");
+    outfile_->mkdir("pfmet_nm1");
+    outfile_->mkdir("bbpt_nm1");
+    outfile_->mkdir("wpt_nm1");
+    outfile_->mkdir("bbwdphi_nm1");
+  }
+  outfile_->mkdir("final");
+  if (isWjets_) {
+    outfile_->mkdir("final_nobs");
+    outfile_->mkdir("final_bs");
+  }
+  outfile_->cd("presel");
 
   //------------------------------
   // vtx reweighting
@@ -192,12 +274,21 @@ void WHLooper::loop(TChain *chain, TString name) {
       //---------------------------------------------------------------------------- 
 
       float evtweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
-      if (name.Contains("TChiwh_250_1")) evtweight *= 6.1E-03;
+      // cross section weights for TChiwh samples:
+      //  xsec (pb) * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.58 / nevents (10000)
+      float weight_lumi_br_nevents = 1.914E-02;
+      if (isTChiwh_) {
+	if (name.Contains("TChiwh_150_1")) evtweight *= 2.4 * 0.5 * weight_lumi_br_nevents; // now 20k events
+	else if (name.Contains("TChiwh_200_1")) evtweight *= 0.79 * 0.5 * weight_lumi_br_nevents; // now 20k events
+	else if (name.Contains("TChiwh_250_1")) evtweight *= 0.32 * weight_lumi_br_nevents;
+	else if (name.Contains("TChiwh_300_1")) evtweight *= 0.15 * weight_lumi_br_nevents;
+	else if (name.Contains("TChiwh_350_1")) evtweight *= 0.074 * weight_lumi_br_nevents;
+      }
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( nvtx, h_vtx_wgt, isData );
 
-      plot1D("h_nvtx_nosel",       stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
-      plot1D("h_vtxweight_nosel", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
+      plot1D("h_nvtx_nosel",       stopt.nvtx(),       evtweight, h_1d_presel, 40, 0, 40);
+      plot1D("h_vtxweight_nosel", stopt.nvtxweight(), evtweight, h_1d_presel, 41, -4., 4.);
 
       //----------------------------------------------------------------------------
       // apply preselection:
@@ -224,33 +315,94 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       // require 1 lepton sel + iso track veto
       if (!passSingleLeptonSelection(isData)) continue;
-      if (!passIsoTrkVeto_v2()) continue;
+      if (stopt.ngoodlep() != 1) continue;
+      if (!passIsoTrkVeto_v3()) continue;
+
+      // set mt2w to dummy value
+      mt2w_ = -1.;
 
       // require 2 bjets
       myBJets_ = getBJets(WHLooper::CSVM);
+      //      myBJets_ = getBJets(WHLooper::CSVL);
+      int njets = getNJets(true);
+      int njetsalleta = getNJets(true,4.7);
       int nbjets = myBJets_.size();
+      //      if (njetsalleta != 2) continue;
+      //      if (stopt.pfmet() < 150.) continue;
       if (nbjets < 2) continue;
+      fillHists1DWrapper(h_1d_presel,evtweight,"presel");
+      if (isWjets_) {
+      	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_presel_nobs,evtweight,"presel_nobs");
+      	else fillHists1DWrapper(h_1d_presel_bs,evtweight,"presel_bs");
+      }
 
       // specific cuts: dummy signal region
+      //      if (nbjets < 2) continue;
+      std::vector<LorentzVector> bjets_csvm = getBJets(WHLooper::CSVM);
+      int nbjets_csvm = bjets_csvm.size();
       LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
       float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
-      int njets = getNJets();
-      if (bb.M() < 95. || bb.M() > 150.) continue;
-      if (lep1mt < 120.) continue;
-      //      if (nbjets > 2 || njets > 3) continue;
+      TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
+      TVector2 met;
+      met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
+      TVector2 w = lep+met; 
+
+      //      if (nbjets_csvm < 1) continue;
+      if (nbjets_csvm < 2) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_njets_nm1,evtweight,"njets_nm1");
       if (njets > 2) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_njetsalleta_nm1,evtweight,"njetsalleta_nm1");
+      if (njetsalleta > 2) continue;
+
+      // calculate mt2w, after requiring exactly two jets
+      // make dummy vector of csv values for bjets, for mt2w calc
+      std::vector<float> bjets_csv(2, 0.99);
+      mt2w_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi());
+
+      // consider tightening bbmass to 110,140 for low mass sel??
+      if (doNM1Plots) fillHists1DWrapper(h_1d_bbmass_nm1,evtweight,"bbmass_nm1");
+      if (doNM1Plots && isWjets_) {
+	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_bbmass_nobs_nm1,evtweight,"bbmass_nobs_nm1");
+	else fillHists1DWrapper(h_1d_bbmass_bs_nm1,evtweight,"bbmass_bs_nm1");
+      }
+      //           if (bb.M() < 95. || bb.M() > 150.) continue;
+      if (bb.M() < 100. || bb.M() > 140.) continue;
+      // if (bb.M() < 150.) continue;
+
+      // fill minibaby after bbmass cut
+      if (doMiniBaby) FillBabyNtuple(evtweight);
+
+      if (doNM1Plots) fillHists1DWrapper(h_1d_lep1mt_nm1,evtweight,"lep1mt_nm1");
+      if (lep1mt < 120.) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_mt2w_nm1,evtweight,"mt2w_nm1");
+      if (mt2w_ < 175.) continue;
+      //      if (mt2w_ < 200.) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_pfmet_nm1,evtweight,"pfmet_nm1");
       if (stopt.pfmet() < 150.) continue;
+      // if (stopt.pfmet() < 80.) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_bbpt_nm1,evtweight,"bbpt_nm1");
       if (bb.pt() < 150.) continue;
+      //      if (bb.pt() < 175.) continue;
+      //      if (bb.pt() < 220.) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_wpt_nm1,evtweight,"wpt_nm1");
+      if (w.Mod() < 150.) continue;
+      //      if (w.Mod() < 220.) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_bbwdphi_nm1,evtweight,"bbwdphi_nm1");
+      if (fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())) < 2.95) continue;
 
       ++nEventsPass;
 
       // fill hists
-      plot1D("h_nvtx",       stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
-      plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
+      plot1D("h_nvtx",       stopt.nvtx(),       evtweight, h_1d_final, 40, 0, 40);
+      plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d_final, 41, -4., 4.);
 
-      fillHists1D(h_1d,evtweight);
-      if (stopt.leptype() == 0) fillHists1D(h_1d,evtweight,"_e");
-      else if (stopt.leptype() == 1) fillHists1D(h_1d,evtweight,"_m");
+      fillHists1DWrapper(h_1d_final,evtweight,"final");
+      if (name.Contains("wjets") || name.Contains("wbb")) {
+	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_final_nobs,evtweight,"final_nobs");
+	else fillHists1DWrapper(h_1d_final_bs,evtweight,"final_bs");
+      }
+
+      plot2D("h_wpt_vs_bbpt", w.Mod(), bb.pt(), evtweight, h_2d_final, 500, 0, 1000, 500, 0, 1000);
 
     } // end event loop
 
@@ -262,23 +414,45 @@ void WHLooper::loop(TChain *chain, TString name) {
     // finish
     //
 
-  savePlots(h_1d, (char*)m_outfilename_.c_str());
+  //  savePlots12(h_1d, h_2d, (char*)m_outfilename_.c_str());
 
-  // TFile outfile(m_outfilename_.c_str(),"RECREATE") ; 
-  // printf("[WHLooper::loop] Saving histograms to %s\n", m_outfilename_.c_str());
-  
-  // std::map<std::string, TH1F*>::iterator it1d;
-  // for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
-  //   it1d->second->Write(); 
-  //   delete it1d->second;
-  // }
-  
-  // outfile.Write();
-  // outfile.Close();
+  savePlotsDir(h_1d_presel,outfile_,"presel");
+  if (isWjets_) {
+    savePlotsDir(h_1d_presel_nobs,outfile_,"presel_nobs");
+    savePlotsDir(h_1d_presel_bs,outfile_,"presel_bs");
+  }
+  if (doNM1Plots) {
+    savePlotsDir(h_1d_njets_nm1,outfile_,"njets_nm1");
+    savePlotsDir(h_1d_njetsalleta_nm1,outfile_,"njetsalleta_nm1");
+    savePlotsDir(h_1d_bbmass_nm1,outfile_,"bbmass_nm1");
+    if (isWjets_) {
+      savePlotsDir(h_1d_bbmass_nobs_nm1,outfile_,"bbmass_nobs_nm1");
+      savePlotsDir(h_1d_bbmass_bs_nm1,outfile_,"bbmass_bs_nm1");
+    }
+    savePlotsDir(h_1d_lep1mt_nm1,outfile_,"lep1mt_nm1");
+    savePlotsDir(h_1d_mt2w_nm1,outfile_,"mt2w_nm1");
+    savePlotsDir(h_1d_pfmet_nm1,outfile_,"pfmet_nm1");
+    savePlotsDir(h_1d_bbpt_nm1,outfile_,"bbpt_nm1");
+    savePlotsDir(h_1d_wpt_nm1,outfile_,"wpt_nm1");
+    savePlotsDir(h_1d_bbwdphi_nm1,outfile_,"bbwdphi_nm1");
+  }
+
+  savePlotsDir(h_1d_final,outfile_,"final");
+  savePlots2Dir(h_2d_final,outfile_,"final");
+  if (isWjets_) {
+    savePlotsDir(h_1d_final_nobs,outfile_,"final_nobs");
+    savePlotsDir(h_1d_final_bs,outfile_,"final_bs");
+  }  
+
+  outfile_->Write();
+  outfile_->Close();
+  delete outfile_;
 
   already_seen.clear();
 
   gROOT->cd();
+
+  if (doMiniBaby) CloseBabyNtuple();
 
   bmark->Stop("benchmark");
   cout << endl;
@@ -299,14 +473,14 @@ std::vector<LorentzVector> WHLooper::getBJets(const csvpoint csv) {
   std::vector<LorentzVector> bjets;
   float csvcut = getCSVCut(csv);
 
-  std::vector<int> bjetIdx = getBJetIndex(csvcut,-1,-1);
+  std::vector<int> bjetIdx = getBJetIndex(csvcut,-1,-1,true);
 
   for (unsigned int i=0; i<bjetIdx.size(); ++i) {
     bjets.push_back(stopt.pfjets().at(i));
   }
 
-  // sort by pt
-  sort(bjets.begin()  , bjets.end()  , sortByPt);
+  // sort by pt -- shouldn't be needed
+  //  sort(bjets.begin()  , bjets.end()  , sortByPt);
 
   return bjets;
 
@@ -325,39 +499,148 @@ float WHLooper::getCSVCut(const csvpoint csv) {
 
 //--------------------------------------------------------------------
 
-void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight, const std::string& suffix) {
+void WHLooper::fillHists1DWrapper(std::map<std::string, TH1F*>& h_1d, const float evtweight, const std::string& dir) {
+
+  fillHists1D(h_1d, evtweight, dir);
+  if (doFlavorPlots) {
+    if (stopt.leptype() == 0) fillHists1D(h_1d,evtweight,dir,"_e");
+    else if (stopt.leptype() == 1) fillHists1D(h_1d,evtweight,dir,"_m");
+  }
+}
+
+//--------------------------------------------------------------------
+
+void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight, const std::string& dir, const std::string& suffix) {
+
+  outfile_->cd(dir.c_str());
 
   float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
-  int njets = getNJets();
+  int njets = getNJets(true);
+  int njetsalleta = getNJets(true,4.7);
   TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
   TVector2 met;
   met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
   TVector2 w = lep+met; 
 
-  plot1D(string("h_lep1pt")+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
-  plot1D(string("h_lep1eta")+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
-  plot1D(string("h_lep1mt")+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
-  plot1D(string("h_pfmet")+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
-  plot1D(string("h_njets")+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
-  plot1D(string("h_nbjets")+suffix,       myBJets_.size(),    evtweight, h_1d, 5, 0., 5.);
-  plot1D(string("h_wpt")+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_lep1pt"+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_lep1eta"+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
+  plot1D("h_lep1mt"+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_pfmet"+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_pfsumet"+suffix,      stopt.pfsumet(),    evtweight, h_1d, 1500, 0., 1500.);
+  plot1D("h_pfmetsig"+suffix,     stopt.pfmet()/sqrt(stopt.pfsumet()),   evtweight, h_1d, 500, 0., 20.);
+  plot1D("h_njets"+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
+  plot1D("h_njetsalleta"+suffix,  njetsalleta,        evtweight, h_1d, 10, 0., 10.);
+  plot1D("h_nbjets"+suffix,       myBJets_.size(),    evtweight, h_1d, 5, 0., 5.);
+  plot1D("h_wpt"+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.pfmetphi())),       evtweight, h_1d, 50, 0., TMath::Pi());
+
+  if (isWjets_) {
+    plot1D("h_nbs",       stopt.nbs(),       evtweight, h_1d, 5, 0, 5);
+  }
 
   // bjets and bbbar plots
   if (myBJets_.size() >= 2) {
-    plot1D(string("h_bjet1pt")+suffix,       myBJets_[0].pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D(string("h_bjet2pt")+suffix,       myBJets_[1].pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D(string("h_bjet1eta")+suffix,       myBJets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
-    plot1D(string("h_bjet2eta")+suffix,       myBJets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
+    plot1D("h_bjet1pt"+suffix,       myBJets_[0].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_bjet2pt"+suffix,       myBJets_[1].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_bjet1eta"+suffix,       myBJets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
+    plot1D("h_bjet2eta"+suffix,       myBJets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
 
     LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
-    plot1D(string("h_bbmass")+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
-    plot1D(string("h_bbpt")+suffix,       bb.pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D(string("h_bbdphi")+suffix,  TVector2::Phi_0_2pi(myBJets_[0].phi() - myBJets_[1].phi()), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
-    plot1D(string("h_bbdr")+suffix,  ROOT::Math::VectorUtil::DeltaR( myBJets_.at(0) , myBJets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    plot1D("h_bbmass"+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_bbpt"+suffix,       bb.pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_bbdr"+suffix,  ROOT::Math::VectorUtil::DeltaR( myBJets_.at(0) , myBJets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    plot1D("h_bbdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(myBJets_[0].phi() - myBJets_[1].phi())), evtweight, h_1d, 50, 0., TMath::Pi());
 
-    plot1D(string("h_bblep1dr")+suffix,  ROOT::Math::VectorUtil::DeltaR( bb , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    plot1D("h_bblep1dr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bb , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    plot1D("h_bblep1dphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - stopt.lep1().phi())), evtweight, h_1d, 50, 0., TMath::Pi());
 
+    plot1D("h_bbwdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())), evtweight, h_1d, 50, 0., TMath::Pi());
+    plot1D("h_bbwdpt"+suffix,   bb.pt() - w.Mod(),       evtweight, h_1d, 500, -250., 250.);
+
+    plot1D("h_bbwsumpt"+suffix,       bb.pt()+w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
+
+    plot1D("h_allsumpt"+suffix,      myBJets_[0].pt()+ myBJets_[1].pt()+stopt.lep1().pt()+stopt.pfmet() , evtweight, h_1d, 1500, 0., 1500.);
+
+    LorentzVector b1lep1 = myBJets_.at(0) + stopt.lep1();
+    plot1D("h_bjet1lep1mass"+suffix,       b1lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    float bjet1lep1dphi = fabs(TVector2::Phi_mpi_pi(myBJets_[0].phi() - stopt.lep1().phi()));
+    plot1D("h_bjet1lep1dphi"+suffix,  bjet1lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
+    LorentzVector b2lep1 = myBJets_.at(1) + stopt.lep1();
+    plot1D("h_bjet2lep1mass"+suffix,       b2lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    float bjet2lep1dphi = fabs(TVector2::Phi_mpi_pi(myBJets_[1].phi() - stopt.lep1().phi()));
+    plot1D("h_bjet2lep1dphi"+suffix,  bjet2lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
+
+    plot1D("h_bjetlep1mindphi"+suffix,  TMath::Min(bjet1lep1dphi,bjet2lep1dphi), evtweight, h_1d, 50, 0., TMath::Pi());
+
+    plot1D("h_mt2w"+suffix,  mt2w_, evtweight, h_1d, 1000, 0., 1000.);
+
+    std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1,true);
+    plot1D("h_bjet1mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(0)) , evtweight, h_1d, 40, -20., 20.);
+    plot1D("h_bjet2mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(1)) , evtweight, h_1d, 40, -20., 20.);
   }
 
   return;
 }
+
+//______________________________________________________________________________________
+void WHLooper::MakeBabyNtuple (const char* babyFileName)
+{
+
+  TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
+  rootdir->cd();
+
+  babyFile_ = new TFile(Form("%s", babyFileName), "RECREATE");
+  babyFile_->cd();
+  babyTree_ = new TTree("T1", "A Baby Ntuple");
+
+  //event stuff
+  babyTree_->Branch("run",          &run_,          "run/I"          );
+  babyTree_->Branch("lumi",         &lumi_,         "lumi/I"         );
+  babyTree_->Branch("event",        &event_,        "event/I"        );
+  babyTree_->Branch("leptype",               &leptype_,               "leptype/I");
+  babyTree_->Branch("weight",       &weight_,       "weight/F"       );
+
+  //vars
+  babyTree_->Branch("pfmet",        &pfmet_,        "pfmet/F"      );
+  babyTree_->Branch("lep1mt",       &lep1mt_,       "lep1mt/F"      );
+  babyTree_->Branch("mt2w",         &mt2w_,         "mt2w/F"      );
+  babyTree_->Branch("bbpt",         &bbpt_,         "bbpt/F"      );
+  babyTree_->Branch("wpt",          &wpt_,          "wpt/F"      );
+  babyTree_->Branch("bbwdphi",      &bbwdphi_,      "bbwdphi/F"      );
+}
+
+//______________________________________________________________________________________
+void WHLooper::FillBabyNtuple (const float evtweight)
+{
+
+  run_ = stopt.run();
+  lumi_ = stopt.lumi();
+  event_ = stopt.event();
+  leptype_ = stopt.leptype();
+  weight_ = evtweight;
+
+  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+  LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
+  TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
+  TVector2 met;
+  met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
+  TVector2 w = lep+met; 
+
+  pfmet_ = stopt.pfmet();
+  lep1mt_ = lep1mt;
+  //   mt2w_; // filled in main loop
+  bbpt_ = bb.pt();
+  wpt_ = w.Mod();
+  bbwdphi_ = fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi()));
+
+  babyTree_->Fill();
+}
+
+//______________________________________________________________________________________
+void WHLooper::CloseBabyNtuple ()
+{
+  babyFile_->cd();
+  babyTree_->Write();
+  babyFile_->Close();
+}
+
