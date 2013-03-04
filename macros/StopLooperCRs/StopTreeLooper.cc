@@ -45,6 +45,11 @@ StopTreeLooper::StopTreeLooper()
   t1metphicorr = -9999.;
   t1metphicorrphi = -9999.;
   t1metphicorrmt = -9999.;
+  t1metphicorr_lep = -9999.;
+  t1metphicorrphi_lep = -9999.;
+  t1metphicorrmt_lep = -9999.;
+  dphi_pseudometlep = -9999.;	
+  leppt = -9999.;	
   dphimjmin = -9999.;
   dphimj1 = -9999.;
   dphimj2 = -9999.;
@@ -66,7 +71,6 @@ StopTreeLooper::StopTreeLooper()
   mt2bmin_ = -9999.;
   mt2blmin_ = -9999.;
   mt2wmin_ = -9999.;
-
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -518,7 +522,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		   && n_jets >= 2 
 		   && n_bjets==0 ) {
 
-		//find positive lepton
+		//calculate pseudo met and mt
+		//find positive lepton - this is the one that is combined with the pseudomet to form the mT
 		bool isfirstp = (stopt.id1() > 0) ? true : false;
 		
 		//recalculate met
@@ -529,12 +534,25 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		metx += isfirstp ? stopt.lep1().px() : stopt.lep2().px();
 		mety += isfirstp ? stopt.lep1().py() : stopt.lep2().py();
 		
-		float t1metphicorr_lep    = sqrt(metx*metx + mety*mety);
+		t1metphicorr_lep    = sqrt(metx*metx + mety*mety);
+		t1metphicorrphi_lep = atan2( mety , metx );
 		
+		//recalculate the MT with the negative lepton
+		t1metphicorrmt_lep = isfirstp ?
+		  getMT( stopt.lep2().Pt() , stopt.lep2().Phi() , t1metphicorr_lep , t1metphicorrphi_lep ) :
+		  getMT( stopt.lep1().Pt() , stopt.lep1().Phi() , t1metphicorr_lep , t1metphicorrphi_lep );
+		//dphi between met and lepton
+		dphi_pseudometlep = isfirstp ?
+		  getdphi( stopt.lep2().Phi() , t1metphicorrphi_lep ) :
+		  getdphi( stopt.lep1().Phi() , t1metphicorrphi_lep );
+		//lepton pt 
+		leppt = isfirstp ? stopt.lep1().Pt() : stopt.lep2().Pt();
+
 		for (int im = 0; im<NMET; im++) {
 		  if ( t1metphicorr_lep < metcut[im] ) continue;
 		  makeCR2Plots( evtweight*trigweight_dl, h_1d_cr2, tag_met[im], tag_njets, tag_kbin, basic_flav_tag_dl, mtcut[im] );
 		}
+
 	      }
 	    }
 	}//end CR2 selection
@@ -710,25 +728,6 @@ void StopTreeLooper::makeCR2Plots(float evtweight, std::map<std::string, TH1F*> 
 				  string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut ) 
 {
 
-  //find positive lepton - this is the one that is combined with the pseudomet to form the mT
-  bool isfirstp = (stopt.id1() > 0) ? true : false;
-  
-  //recalculate met
-  float metx = t1metphicorr * cos( t1metphicorrphi );
-  float mety = t1metphicorr * sin( t1metphicorrphi );
-          
-  //recalculate the MET with the positive lepton
-  metx += isfirstp ? stopt.lep1().px() : stopt.lep2().px();
-  mety += isfirstp ? stopt.lep1().py() : stopt.lep2().py();
-  
-  float t1met10_lep    = sqrt(metx*metx + mety*mety);
-  float t1met10phi_lep = atan2( mety , metx );
-  
-  //recalculate the MT with the negative lepton
-  float t1met10mt_lep = isfirstp ?
-    getMT( stopt.lep2().Pt() , stopt.lep2().Phi() , t1met10_lep , t1met10phi_lep ) :
-    getMT( stopt.lep1().Pt() , stopt.lep1().Phi() , t1met10_lep , t1met10phi_lep );
-
   //binning for mT plots
   int nbins = 30;
   float h_xmin = 0.;
@@ -736,34 +735,30 @@ void StopTreeLooper::makeCR2Plots(float evtweight, std::map<std::string, TH1F*> 
   float x_ovflw = h_xmax-0.001;
   
   float pseudomt_count = -1.;
-  if ( t1met10mt_lep > min_mtpeak
-       && t1met10mt_lep < max_mtpeak )    pseudomt_count = 0.5;
-  else if ( t1met10mt_lep > mtcut ) pseudomt_count = 1.5;
+  if ( t1metphicorrmt_lep > min_mtpeak
+       && t1metphicorrmt_lep < max_mtpeak )    pseudomt_count = 0.5;
+  else if ( t1metphicorrmt_lep > mtcut ) pseudomt_count = 1.5;
   
   //default met
   plot1D("h_cr2_met"+tag_selection          +flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_met"+tag_selection+tag_njets+flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_met"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1metphicorr, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //pseudo-met
-  plot1D("h_cr2_pseudomet"+tag_selection	  +flav_tag_dl, min(t1met10_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr2_pseudomet"+tag_selection+tag_njets+flav_tag_dl, min(t1met10_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr2_pseudomet"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1met10_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomet"+tag_selection	  +flav_tag_dl, min(t1metphicorr_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomet"+tag_selection+tag_njets+flav_tag_dl, min(t1metphicorr_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomet"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1metphicorr_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //positive lepton pt - enters mT calculation
-  float leppt = isfirstp ? stopt.lep1().Pt() : stopt.lep2().Pt();
   plot1D("h_cr2_leppt"+tag_selection          +flav_tag_dl, min(leppt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_leppt"+tag_selection+tag_njets+flav_tag_dl, min(leppt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_leppt"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(leppt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   //angle between pos-lep and pseudopseudomet
-  float dphi_pseudometlep = isfirstp ?
-    getdphi( stopt.lep2().Phi() , t1met10phi_lep ) :
-    getdphi( stopt.lep1().Phi() , t1met10phi_lep );
   plot1D("h_cr2_dphi_pseudometlep"+tag_selection          +flav_tag_dl, dphi_pseudometlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr2_dphi_pseudometlep"+tag_selection+tag_njets+flav_tag_dl, dphi_pseudometlep, evtweight, h_1d, 15, 0., TMath::Pi());
   plot1D("h_cr2_dphi_pseudometlep"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, dphi_pseudometlep, evtweight, h_1d, 15, 0., TMath::Pi());
   //pseudo-mt
-  plot1D("h_cr2_pseudomt"      +tag_selection          +flav_tag_dl, min(t1met10mt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr2_pseudomt"      +tag_selection+tag_njets+flav_tag_dl, min(t1met10mt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-  plot1D("h_cr2_pseudomt"      +tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1met10mt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomt"      +tag_selection          +flav_tag_dl, min(t1metphicorrmt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomt"      +tag_selection+tag_njets+flav_tag_dl, min(t1metphicorrmt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  plot1D("h_cr2_pseudomt"      +tag_selection+tag_njets+tag_kbin+flav_tag_dl, min(t1metphicorrmt_lep, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr2_pseudomt_count"+tag_selection          +flav_tag_dl, pseudomt_count, evtweight, h_1d, 2, 0, 2);
   plot1D("h_cr2_pseudomt_count"+tag_selection+tag_njets+flav_tag_dl, pseudomt_count, evtweight, h_1d, 2, 0, 2);
   plot1D("h_cr2_pseudomt_count"+tag_selection+tag_njets+tag_kbin+flav_tag_dl, pseudomt_count, evtweight, h_1d, 2, 0, 2);
