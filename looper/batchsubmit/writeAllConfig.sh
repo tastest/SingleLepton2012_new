@@ -10,12 +10,12 @@ TAG="V00-02-19_2012"
 # DATA
 #
 # --- SINGLE MUON ---
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012A-recover-06Aug2012-v1_AOD/ ${TAG}_SingleMu2012A_recover06Aug2012v1V532
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012A-13Jul2012-v1_AOD/ ${TAG}_SingleMu2012A_13Jul2012v1V532
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012B-13Jul2012-v1_AOD/ ${TAG}_SingleMu2012B_13Jul2012v1V532
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012C-24Aug2012-v1_AOD/ ${TAG}_SingleMu2012C_24Aug2012v1V532
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012C-PromptReco-v2_AOD/ ${TAG}_SingleMu2012C_PromptRecov2V532
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012D-PromptReco-v1_AOD/ ${TAG}_SingleMu2012D_PromptRecov1V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012A-recover-06Aug2012-v1_AOD/merged/ ${TAG}_SingleMu2012A_recover06Aug2012v1V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012A-13Jul2012-v1_AOD/merged/ ${TAG}_SingleMu2012A_13Jul2012v1V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012B-13Jul2012-v1_AOD/merged/ ${TAG}_SingleMu2012B_13Jul2012v1V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012C-24Aug2012-v1_AOD/merged/ ${TAG}_SingleMu2012C_24Aug2012v1V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012C-PromptReco-v2_AOD/merged/ ${TAG}_SingleMu2012C_PromptRecov2V532
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleMu_Run2012D-PromptReco-v1_AOD/merged/ ${TAG}_SingleMu2012D_PromptRecov1V532
 
 # --- SINGLE ELECTRON ---
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Data2012/CMSSW_5_3_2_patch4_V05-03-24/SingleElectron_Run2012A-recover-06Aug2012-v1/merged/ ${TAG}_SingleElectron2012A_recover06Aug2012V532
@@ -66,7 +66,6 @@ TAG="V00-02-19_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_matchingdown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_MatchDown
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaleup_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_ScaleUp
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaledown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_ScaleDown
-#./writeConfig.sh /hadoop/cms/store/user/vimartin/CMS2_V05-03-25/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/merged ${TAG}_genfix_TTJets_Powheg
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-25/ ${TAG}_TTJets_Powheg
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_8TeV-mcatnlo_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_MCNLO
 ##SMALL POWHEG SAMPLE
