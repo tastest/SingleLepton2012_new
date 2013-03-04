@@ -324,8 +324,8 @@ void WHLooper::loop(TChain *chain, TString name) {
       // require 2 bjets
       myBJets_ = getBJets(WHLooper::CSVM);
       //      myBJets_ = getBJets(WHLooper::CSVL);
-      int njets = getNJets(true);
-      int njetsalleta = getNJets(true,4.7);
+      int njets = getNJets();
+      int njetsalleta = getNJets(4.7);
       int nbjets = myBJets_.size();
       //      if (njetsalleta != 2) continue;
       //      if (stopt.pfmet() < 150.) continue;
@@ -473,7 +473,7 @@ std::vector<LorentzVector> WHLooper::getBJets(const csvpoint csv) {
   std::vector<LorentzVector> bjets;
   float csvcut = getCSVCut(csv);
 
-  std::vector<int> bjetIdx = getBJetIndex(csvcut,-1,-1,true);
+  std::vector<int> bjetIdx = getBJetIndex(csvcut,-1,-1);
 
   for (unsigned int i=0; i<bjetIdx.size(); ++i) {
     bjets.push_back(stopt.pfjets().at(i));
@@ -515,8 +515,8 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
   outfile_->cd(dir.c_str());
 
   float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
-  int njets = getNJets(true);
-  int njetsalleta = getNJets(true,4.7);
+  int njets = getNJets();
+  int njetsalleta = getNJets(4.7);
   TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
   TVector2 met;
   met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
@@ -574,7 +574,7 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
     plot1D("h_mt2w"+suffix,  mt2w_, evtweight, h_1d, 1000, 0., 1000.);
 
-    std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1,true);
+    std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1);
     plot1D("h_bjet1mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(0)) , evtweight, h_1d, 40, -20., 20.);
     plot1D("h_bjet2mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(1)) , evtweight, h_1d, 40, -20., 20.);
   }
