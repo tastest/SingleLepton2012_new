@@ -3825,8 +3825,19 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
   outTree->Branch("pfjets_chm", "std::vector<float>", &pfjets_chm_ );
   outTree->Branch("pfjets_neu", "std::vector<float>", &pfjets_neu_ );
+  outTree->Branch("pfjets_l1corr",  "std::vector<float>", &pfjets_l1corr_   );
+  outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
+  outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
+  outTree->Branch("pfjets_mcflavorAlgo", "std::vector<int>", &pfjets_mcflavorAlgo_ ); 
+  outTree->Branch("pfjets_mcflavorPhys", "std::vector<int>", &pfjets_mcflavorPhys_ ); 
+
+  outTree->Branch("pfjets_flav",    "std::vector<int>"  , &pfjets_flav_     ); 
   outTree->Branch("pfjets_lrm", "std::vector<float>", &pfjets_lrm_ );
   outTree->Branch("pfjets_lrm2", "std::vector<float>", &pfjets_lrm2_ );
+  outTree->Branch("pfjets_qgtag",   "std::vector<float>", &pfjets_qgtag_    );
+  outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
+  outTree->Branch("pfjets_sigma",   "std::vector<float>", &pfjets_sigma_    );
+  outTree->Branch("pfjets_lepjet",  "std::vector<int>"  , &pfjets_lepjet_   );
  
   outTree->Branch("pfjets_beta",      "std::vector<float>", &pfjets_beta_      );
   outTree->Branch("pfjets_beta2",     "std::vector<float>", &pfjets_beta2_     );
@@ -3839,15 +3850,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   // outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );
   // outTree->Branch("pfjets_beta2_0p2", "std::vector<float>", &pfjets_beta2_0p2_ );
   outTree->Branch("pfjets_mvaPUid",      "std::vector<float>", &pfjets_mvaPUid_ );
+  outTree->Branch("pfjets_mvaBeta",      "std::vector<float>", &pfjets_mvaBeta_ );
 
-  outTree->Branch("pfjets_l1corr",  "std::vector<float>", &pfjets_l1corr_   );
-  outTree->Branch("pfjets_corr",    "std::vector<float>", &pfjets_corr_     );
-  outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
-  outTree->Branch("pfjets_flav",    "std::vector<int>"  , &pfjets_flav_     ); 
-  outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
-  outTree->Branch("pfjets_qgtag",   "std::vector<float>", &pfjets_qgtag_    );
-  outTree->Branch("pfjets_sigma",   "std::vector<float>", &pfjets_sigma_    );
-  outTree->Branch("pfjets_lepjet",  "std::vector<int>"  , &pfjets_lepjet_   );
+
 
 }
 
