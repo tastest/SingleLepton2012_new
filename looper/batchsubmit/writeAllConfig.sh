@@ -121,7 +121,7 @@ TAG="V00-02-19_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZJetsTo2L2Nu_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v3/V05-03-23_slim/ ${TAG}_ZZJetsTo2L2Nu
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23_slim/ ${TAG}_ZZJetsTo2L2Q
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23_slim/ ${TAG}_WZJetsTo2L2Q
-./writeConfig.sh hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WGstarToLNu2E_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_WGstarToLNu2E
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WGstarToLNu2E_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_WGstarToLNu2E
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WGstarToLNu2Mu_TuneZ2star_7TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_WGstarToLNu2Mu
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/WGstarToLNu2Tau_TuneZ2star_7TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_WGstarToLNu2Tau
 ##(note, the last two of these are in fact 8TeV samples and are incorrectly named, see here:
