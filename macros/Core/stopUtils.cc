@@ -781,6 +781,8 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 
 	// I am asumming that jets is sorted by Pt
 	assert ( jets.size() == btag.size() );
+	// require at least 2 jets
+	if ( jets.size()<2 ) return 99999.; 
 
 	// First we count the number of b-tagged jets, and separate those non b-tagged
 	std::vector<int> bjets;
@@ -798,12 +800,18 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 
 	// We do different things depending on the number of b-tagged jets
 	// arXiv:1203.4813 recipe
+
+	int nMax=-1;
+	if(jets.size()<=3) nMax=non_bjets.size();
+	else nMax=3;
+
 	if (n_btag == 0){
 	  // If no b-jets select the minimum of the mt2w from all combinations with 
 	  // the three leading jets
 	  float min_mt2w = 9999;
-	  for (int i=0; i<3; i++)
-	    for (int j=0; j<3; j++){
+
+	  for (int i=0; i<nMax; i++)
+	    for (int j=0; j<nMax; j++){
 	      if (i == j) continue;
 	      float c_mt2w = mt2wWrapper(lep, 
 					 jets[non_bjets[i]],
@@ -815,10 +823,6 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 	} else if (n_btag == 1 ){
 	  // if only one b-jet choose the three non-b leading jets and choose the smaller
 	  float min_mt2w = 9999;
-
-	  int nMax=-1;
-	  if(jets.size()==3) nMax=2;
-	  if(jets.size()>3) nMax=3;
 
 	  for (int i=0; i<nMax; i++){
 	    float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
