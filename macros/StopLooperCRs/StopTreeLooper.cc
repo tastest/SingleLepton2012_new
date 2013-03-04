@@ -13,6 +13,7 @@
 #include "../Core/mt2bl_bisect.h"
 #include "../Core/mt2w_bisect.h"
 #include "../Core/PartonCombinatorics.h"
+#include "../../Tools/BTagReshaping/BTagReshaping.h"
 
 #include "TROOT.h"
 #include "TH1F.h"
@@ -40,6 +41,7 @@ std::set<DorkyEventIdentifier> events_hcallasercalib;
 StopTreeLooper::StopTreeLooper()
 {
   m_outfilename_ = "histos.root";
+  min_njets = -9999;
   t1metphicorr = -9999.;
   t1metphicorrphi = -9999.;
   t1metphicorrmt = -9999.;
@@ -47,6 +49,7 @@ StopTreeLooper::StopTreeLooper()
   dphimj1 = -9999.;
   dphimj2 = -9999.;
   pt_b = -9999.;
+  dRleptB1 = -9999.;
   htssl = -9999.;
   htosl = -9999.;
   htratiol = -9999.;
@@ -96,6 +99,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     return;
   }
 
+  //------------------------------------------------------------------------------------------------------
+  // set csv discriminator reshaping
+  //------------------------------------------------------------------------------------------------------
+  
+  BTagShapeInterface * nominalShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 0.0);
+
   //------------------------------
   // set up histograms
   //------------------------------
@@ -135,8 +144,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   unsigned int nEvents = chain->GetEntries();
   nEventsChain = nEvents;
   ULong64_t nEventsTotal = 0;
+  int nevt_check = 0;
 
   bool isData = name.Contains("data") ? true : false;
+
+  //Define jet multiplicity requirement
+  min_njets = 4;
+  printf("[StopTreeLooper::loop] N JET min. requirement for signal %i \n", min_njets);
 
   //Define peak region 
   min_mtpeak = 50.; 
@@ -144,6 +158,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   printf("[StopTreeLooper::loop] MT PEAK definition %.0f - %.0f GeV \n", min_mtpeak, max_mtpeak);
 
   cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
+
+  // met region tags
+  const int NMET = 9;
+  float   metcut[NMET] = { 0., 50., 100., 150., 200., 250., 300., 350., 400. };
+  float    mtcut[NMET] = { 150., 150., 150., 150., 120., 120., 120., 120., 120. };
+  string tag_met[NMET] = { "", "_met50", "_met100", "_met150", "_met200", "_met250", "_met300", "_met350", "_met400" };
 
   stwatch.Start();
 
@@ -206,6 +226,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	}
       }
 
+      nevt_check++;
       //---------------------------------------------------------------------------- 
       // determine event weight
       // make 2 example histograms of nvtx and corresponding weight
@@ -248,6 +269,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       n_jets  = 0;
       n_bjets = 0;
       n_ljets = 0;
+
+      // kinematic variables
       htssl = 0.;
       htosl = 0.;
       htssm = 0.;
@@ -257,27 +280,49 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	
 	if( stopt.pfjets().at(i).pt()<30 )  continue;
 	if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
+	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
 	
 	n_jets++;
 	n_ljets++;
-      	jets.push_back( stopt.pfjets().at(i)    );
-	if (stopt.pfjets_csv().at(i) > 0.679) n_bjets++;
-      	btag.push_back( stopt.pfjets_csv().at(i) );
+	if (n_jets==1) 
+	  dphimj1 = getdphi(t1metphicorrphi, stopt.pfjets().at(i).phi() );
+	if (n_jets==2) {
+	  dphimj2 = getdphi(t1metphicorrphi, stopt.pfjets().at(i).phi() );
+	  dphimjmin = TMath::Min( dphimj1 , dphimj2 );
+	}
+      	jets.push_back( stopt.pfjets().at(i) );
+
+	float csv_nominal= stopt.pfjets_csv().at(i);
+
+	//RESHAPING -- TO DO WITH UPDATED BABIES
+	//only reshape for b jets ---> use status 3 matching information
+	//float csv_nominal=nominalShape->reshape(stopt.pfjets().at(i).Eta(),stopt.pfjets().at(i).Pt(),stopt.pfjets_csv().at(i),(stopt.pfjets_flav().at(i)==5?5:0)); 
+	//treat anything not matched to b or c as light
+	// float csv_nominal=nominalShape->reshape( stopt.pfjets().at(i).eta(),
+	// 					 stopt.pfjets().at(i).pt(),
+	// 					 stopt.pfjets_csv().at(i),
+	// 					( stopt.pfjets_mcflavorAlgo().at(i)>3 ? stopt.pfjets_mcflavorAlgo().at(i) : 1 ) ); 
+
+	if (csv_nominal > 0.679) n_bjets++;
+	if (n_bjets==1) {
+	  pt_b = stopt.pfjets().at(i).pt();
+	  dRleptB1 = ROOT::Math::VectorUtil::DeltaR( stopt.lep1(), stopt.pfjets().at(i) );
+	}
+	btag.push_back( csv_nominal );
 
       	if ( !isData ) mc.push_back  ( stopt.pfjets_mc3().at(i) );
       	else mc.push_back  ( 0 );
 
-      	float sigma_i = stopt.pfjets_sigma().at(i);
-        if ( isData ) sigma_i *= getDataMCRatio(stopt.pfjets().at(i).eta());
-      	sigma_jets.push_back(sigma_i);
+      	sigma_jets.push_back(stopt.pfjets_sigma().at(i));
 
 	float dPhiL = getdphi(stopt.lep1().Phi(), stopt.pfjets().at(i).phi() );
-	float dPhiM = getdphi(t1metphicorr, stopt.pfjets().at(i).phi() );    
-	if(dPhiL<(3.14/2))  htssl += stopt.pfjets().at(i).pt();
-	if(dPhiL>=(3.14/2)) htosl += stopt.pfjets().at(i).pt();
-	if(dPhiM<(3.14/2))  htssm += stopt.pfjets().at(i).pt();
-	if(dPhiM>=(3.14/2)) htosm += stopt.pfjets().at(i).pt();
+	float dPhiM = getdphi(t1metphicorrphi, stopt.pfjets().at(i).phi() );   
 
+	if ( dPhiL  < (TMath::Pi()/2) ) htssl=htssl+stopt.pfjets().at(i).pt();
+	else                            htosl=htosl+stopt.pfjets().at(i).pt();
+	if ( dPhiM  < (TMath::Pi()/2) ) htssm=htssm+stopt.pfjets().at(i).pt();
+	else                            htosm=htosm+stopt.pfjets().at(i).pt();
+ 
         //count jets that are not overlapping with second lepton
 	if (isData) continue;
 	if (stopt.nleps()!=2) continue;
@@ -287,43 +332,48 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       } 
 
-      dphimjmin= (n_jets>1) ? getMinDphi(t1metphicorrphi, jets.at(0),jets.at(1)) : -9999.;
-      //b-pt 
-      vector<int> indexBJets=getBJetIndex(0.679,-1,-1);
-      if(indexBJets.size()>0) pt_b = stopt.pfjets().at(indexBJets.at(0)).pt();
+      //      if (n_jets<min_njets) continue;
 
       //maria variables
       htratiol = htssl / (htosl + htssl);
       htratiom = htssm / (htosm + htssm);
 
       // get list of candidates 
-     PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), 
-			     stopt.lep1(), t1metphicorr, t1metphicorrphi, isData);
-     MT2CHI2 mt2c2 = pc.getMt2Chi2();
-
-     // chi2 and MT2 variables
-     chi2min_= mt2c2.one_chi2;               // minimum chi2 
-     chi2minprob_= TMath::Prob(chi2min_,1);   // probability of minimum chi2
-
-     mt2bmin_= mt2c2.three_mt2b;             // minimum MT2b
-     mt2blmin_= mt2c2.three_mt2bl;            // minimum MT2bl
-     mt2wmin_= mt2c2.three_mt2w;             // minimum MT2w
-
+      // PartonCombinatorics pc (stopt.pfjets(), stopt.pfjets_csv(), stopt.pfjets_sigma(), stopt.pfjets_mc3(), 
+      // 			     stopt.lep1(), t1metphicorr, t1metphicorrphi, isData);
+      // MT2CHI2 mt2c2 = pc.getMt2Chi2();
+      // PartonCombinatorics pc (myJets, myJetsTag, myJetsSigma, myJetsMC, 
+      //  stopt.lep1(), t1metphicorr, t1metphicorrphi, isData);
+      // MT2CHI2 mt2c2 = pc.getMt2Chi2();
+      // chi2 and MT2 variables
+      // chi2min_= mt2c2.one_chi2;               // minimum chi2 
+      // chi2minprob_= TMath::Prob(chi2min_,1);   // probability of minimum chi2
+      chi2min_= (float)calculateChi2SNT(jets, sigma_jets, btag);// minimum chi2 
+      chi2minprob_= TMath::Prob(chi2min_,1);   // probability of minimum chi2
+      // mt2bmin_= mt2c2.three_mt2b;             // minimum MT2b
+      // mt2blmin_= mt2c2.three_mt2bl;            // minimum MT2bl
+      // mt2wmin_= mt2c2.three_mt2w;             // minimum MT2w
+      mt2wmin_= (float)calculateMT2w(jets, btag, stopt.lep1(), t1metphicorr, t1metphicorrphi); // minimum MT2w
+      
       //----------------------------------------------------------------------------
       // histogram tags
       //----------------------------------------------------------------------------
 
       //jet multiplicity - inclusive above 4
-      string tag_njets = Form("_nj%i", (n_jets<4) ? n_jets : 4);
+      string tag_njets = Form("_nj%i", (n_jets<min_njets) ? n_jets : min_njets);
 
       //b-tagging
       string tag_btag = (n_bjets<1) ? "_bveto" : "";
 
       //iso-trk-veto
-      string tag_isotrk = passIsoTrkVeto() ? "" : "_wisotrk";
+      bool passisotrk = passIsoTrkVeto_v4();
+      string tag_isotrk = passisotrk ? "" : "_wisotrk";
 
       // tag_mt2w
       string tag_mt2w = (mt2wmin_<175) ? "_failmt2w" : "_mt2w"; 
+
+      // tag_dphi
+      string tag_dphimj1j2 = (dphimjmin>0.8) ? "_dphimj" : "_faildphimj";
 
       // tag_chi2
       string tag_chi2 = (chi2minprob_>0.1) ? "_failchi2" : "_chi2";
@@ -369,102 +419,51 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       string basic_flav_tag_dl = flav_tag_dl;
       if ( abs(stopt.id1()) != abs(stopt.id2()) ) basic_flav_tag_dl = "_mueg";
 
+      //------------------------------------------ 
+      // datasets bit
+      //------------------------------------------ 
+      
+      bool dataset_1l=false;
+
+      if((isData) && name.Contains("muo") 
+	 && (abs(stopt.id1()) == 13 ))  dataset_1l=true;
+      if((isData) && name.Contains("ele") 
+	 && (abs(stopt.id1()) == 11 ))  dataset_1l=true;
+
+      if(!isData) dataset_1l=true;
+
+      bool dataset_2l=false;
+
+      if((isData) && name.Contains("dimu") 
+	 && (abs(stopt.id1()) == 13 ) 
+	 && (abs(stopt.id2())==13)) dataset_2l=true;
+      if((isData) && name.Contains("diel") 
+	 && (abs(stopt.id1()) == 11 ) 
+	 && (abs(stopt.id2())==11)) dataset_2l=true;
+      if((isData) && name.Contains("mueg") 
+	 && abs(stopt.id1()) != abs(stopt.id2())) 
+	dataset_2l=true;
+
+      if(!isData) dataset_2l=true;
+
+      float trigweight = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
+      float trigweight_dl = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
+
       //
       // SIGNAL REGION - single lepton + b-tag
       //
-
       // selection - 1 lepton 
       // Add iso track veto
       // Add b-tag
-      if ( passSingleLeptonSelection(isData) && n_jets>=4 )
+      if ( dataset_1l && passSingleLeptonSelection(isData) 
+	   && n_jets>=min_njets )
 	{
-	  float trigweight = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
-	  //default 
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag", 	         tag_kbin, flav_tag_sl, 150. );
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag,   	         tag_kbin, flav_tag_sl, 150. );
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
-	  if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_mt2w,   	    tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_chi2,   	    tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 150. );
-
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met50",  	    tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50", 	    tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_mt2w, 	       tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_chi2, 	       tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met50"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 150. );
-
+	  for (int im = 0; im<NMET; im++) {
+	    if ( t1metphicorr < metcut[im] ) continue;
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag"+tag_met[im],tag_kbin, flav_tag_sl, mtcut[im] );
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_met[im],  tag_kbin, flav_tag_sl, mtcut[im] );
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk+tag_met[im], tag_kbin, flav_tag_sl, mtcut[im] );
 	  }
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met100",  		tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100", 		tag_kbin, flav_tag_sl, 150. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_truetrk, tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_mt2w, 	tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_chi2, 	tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met100"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 150. );
-
-	  }
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) { 
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met150",  	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150", 	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_mt2w, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_chi2, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met150"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 120. );
-
-	  }
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met200",  	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200", 	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_mt2w, 	 tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_chi2, 	 tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met200"+tag_chi2+tag_mt2w, tag_kbin, flav_tag_sl, 120. );
-	  }
-
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met250",  	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250", 	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_mt2w, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_chi2, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met250"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met300",  	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300", 	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_mt2w, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_chi2, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met300"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met350",  	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350", 	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_mt2w, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_chi2, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met350"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 120. );
-
-	  }
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) {
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag_met400",  	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400", 	     tag_kbin, flav_tag_sl, 120. );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_truetrk, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_mt2w, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_chi2, 	tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+"_met400"+tag_chi2+tag_mt2w,tag_kbin, flav_tag_sl, 120. );
-	  }
-
 	}
 
       //
@@ -473,150 +472,31 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       // selection - 1 lepton + iso track veto
       // Add b-tag veto
-      if ( passOneLeptonSelection(isData) )
+      if ( dataset_1l && passSingleLeptonSelection(isData) 
+	   && passisotrk
+	   && n_jets>=2 )
 	{
-
-	  float trigweight = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
-	  //default 
-	  makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w, tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2, tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w, tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met50", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met50", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met50", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met50", tag_njets, tag_kbin, flav_tag_sl, 150. );
+	  for (int im = 0; im<NMET; im++) {
+	    if ( t1metphicorr < metcut[im] ) continue;
+	    //pre b-tag veto
+	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_met[im], tag_njets, tag_kbin, flav_tag_sl, mtcut[im] );
+	    //b-veto
+	    if ( n_bjets==0 ) 
+	      makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_met[im], tag_njets, tag_kbin, flav_tag_sl, mtcut[im] );
 	  }
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met100", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met100", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met100", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met100", tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met150", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met150", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met150", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met150", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met200", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met200", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met200", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met200", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met250", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met250", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met250", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met250", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met300",                      tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met300",   	   tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met300", 	   tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met300", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 350 GeV requirement 
-	    if ( t1metphicorr > 350. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met350", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met350", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met350", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met350", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 400 GeV requirement 
-	    if ( t1metphicorr > 400. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto_met400", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_mt2w+"_met400", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+"_met400", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_chi2+tag_mt2w+"_met400", tag_njets, tag_kbin, flav_tag_sl, 120. );
-	    }
-	  
-	  if ( n_bjets==0 ) {
-
-	    //default 
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr1,                "", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w, tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2, tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w, tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 50 GeV requirement 
-	    if ( t1metphicorr > 50. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    }
-	    //met > 100 GeV requirement 
-	    if ( t1metphicorr > 100. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	     if (mt2wmin_>175)                      makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	     if (chi2minprob_<0.1)                  makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	     if (chi2minprob_<0.1 && mt2wmin_>175)  makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    }
-	    //met > 150 GeV requirement 
-	    if ( t1metphicorr > 150. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 200 GeV requirement 
-	    if ( t1metphicorr > 200. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 250 GeV requirement 
-	    if ( t1metphicorr > 250. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 300 GeV requirement 
-	    if ( t1metphicorr > 300. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 350 GeV requirement 
-	    if ( t1metphicorr > 350. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 400 GeV requirement 
-	    if ( t1metphicorr > 400. ) {
-	      makeCR1Plots( evtweight*trigweight, h_1d_cr1,                   "_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_mt2w+"_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr1,          tag_chi2+"_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_chi2+tag_mt2w+"_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	  }
-	}
-
+	}//end CR1 selection
+      
       //
       // CR2 - Z-peak for yields and mT resolution studies
       // 
-
+      
       // selection - SF dilepton, veto on isolated track in addition to 2 leptons, in z-peak
-      //if ( passTwoLeptonSelection(isData) )
-      if ( passDileptonSelection(isData) )
+      if ( dataset_2l && passDileptonSelection(isData) )
 	{
-	  float trigweight = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
+
 	  //invariant mass - basic check of inclusive distribution
-	  plot1D("h_z_dilmass"          +flav_tag_dl, stopt.dilmass(), evtweight*trigweight, h_1d_z,  30 , 76 , 106);
-	  plot1D("h_z_dilmass"+tag_njets+flav_tag_dl, stopt.dilmass(), evtweight*trigweight, h_1d_z,  30 , 76 , 106);
+	  plot1D("h_z_dilmass"          +flav_tag_dl, stopt.dilmass(), evtweight*trigweight_dl, h_1d_z,  30 , 76 , 106);
+	  plot1D("h_z_dilmass"+tag_njets+flav_tag_dl, stopt.dilmass(), evtweight*trigweight_dl, h_1d_z,  30 , 76 , 106);
 
 	  if ( fabs( stopt.dilmass() - 91.) < 10. ) 
 	    {
@@ -626,14 +506,17 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	      // 	    <<" run: "<<stopt.run()<<" lumi: "<<stopt.lumi()<<" event: "<<stopt.event()<<endl;
 	      
 	      //z peak plots
-	      plot1D("h_z_njets"    +flav_tag_dl, min(n_jets,4),  evtweight*trigweight, h_1d_z, 5,0,5);
-	      plot1D("h_z_njets_all"+flav_tag_dl, min(n_jets,9),  evtweight*trigweight, h_1d_z, 10, 0, 10);
-	      plot1D("h_z_nbjets"   +flav_tag_dl, min(n_bjets,3), evtweight*trigweight, h_1d_z, 4, 0, 4);
-	      makeZPlots( evtweight*trigweight, h_1d_z, "", tag_njets, flav_tag_dl );
+	      plot1D("h_z_njets"    +flav_tag_dl, min(n_jets,4),  evtweight*trigweight_dl, h_1d_z, 5,0,5);
+	      plot1D("h_z_njets_all"+flav_tag_dl, min(n_jets,9),  evtweight*trigweight_dl, h_1d_z, 10, 0, 10);
+	      plot1D("h_z_nbjets"   +flav_tag_dl, min(n_bjets,3), evtweight*trigweight_dl, h_1d_z, 4, 0, 4);
+	      makeZPlots( evtweight*trigweight_dl, h_1d_z, "", tag_njets, flav_tag_dl );
 
 	      // Add stricter 3rd lepton veto
 	      // require at least 2 jets
-	      if ( (stopt.trkpt10loose() <0.0001 || stopt.trkreliso10loose() > 0.1) && n_jets >= 2 ) {
+	      // Add b-tag veto 
+	      if ( (stopt.trkpt10loose() <0.0001 || stopt.trkreliso10loose() > 0.1) 
+		   && n_jets >= 2 
+		   && n_bjets==0 ) {
 
 		//find positive lepton
 		bool isfirstp = (stopt.id1() > 0) ? true : false;
@@ -648,65 +531,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		
 		float t1metphicorr_lep    = sqrt(metx*metx + mety*mety);
 		
-		//default 
-		makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		//pseudomet > 50 GeV requirement 
-		if ( t1metphicorr_lep > 50. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met50", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		//pseudomet > 100 GeV requirement 
-		if ( t1metphicorr_lep > 100. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met100", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		//pseudomet > 150 GeV requirement 
-		if ( t1metphicorr_lep > 150. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met150", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 200 GeV requirement 
-		if ( t1metphicorr_lep > 200. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met200", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 250 GeV requirement 
-		if ( t1metphicorr_lep > 250. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met250", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 300 GeV requirement 
-		if ( t1metphicorr_lep > 300. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met300", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 350 GeV requirement 
-		if ( t1metphicorr_lep > 350. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met350", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		//pseudomet > 400 GeV requirement 
-		if ( t1metphicorr_lep > 400. ) 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_prebveto_met400", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-
-		// Add b-tag veto 
-		if ( n_bjets==0) {
-		  //default 
-		  makeCR2Plots( evtweight*trigweight, h_1d_cr2, "", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		  //pseudomet > 50 GeV requirement 
-		  if ( t1metphicorr_lep > 50. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_met50", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		  //pseudomet > 100 GeV requirement 
-		  if ( t1metphicorr_lep > 100. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_met100", tag_njets,  tag_kbin, basic_flav_tag_dl, 150. );
-		  //pseudomet > 150 GeV requirement 
-		  if ( t1metphicorr_lep > 150. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_met150", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 200 GeV requirement 
-		  if ( t1metphicorr_lep > 200. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_met200", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 250 GeV requirement 
-		  if ( t1metphicorr_lep > 250. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2, "_met250", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 300 GeV requirement 
-		  if ( t1metphicorr_lep > 300. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2,"_met300", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 350 GeV requirement 
-		  if ( t1metphicorr_lep > 350. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2,"_met350", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
-		  //pseudomet > 400 GeV requirement 
-		  if ( t1metphicorr_lep > 400. ) 
-		    makeCR2Plots( evtweight*trigweight, h_1d_cr2,"_met400", tag_njets,  tag_kbin, basic_flav_tag_dl, 120. );
+		for (int im = 0; im<NMET; im++) {
+		  if ( t1metphicorr_lep < metcut[im] ) continue;
+		  makeCR2Plots( evtweight*trigweight_dl, h_1d_cr2, tag_met[im], tag_njets, tag_kbin, basic_flav_tag_dl, mtcut[im] );
 		}
 	      }
 	    }
-	}
+	}//end CR2 selection
 
       //
       // CR4 - ttbar dilepton sample with 2 good leptons
@@ -714,109 +545,23 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       
       // selection - all dilepton, z-veto for SF dilepton
       // Add b-tag requirement
-      if ( passDileptonSelection(isData) 
+      if ( dataset_2l && passDileptonSelection(isData) 
 	   && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. ) 
 	   && n_bjets>0 ) 
 	{
-	  float trigweight = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
-
 	  //jet multiplicity distributions 
 	  //store in separate file since this is used for njet reweighting
-	  makeNJPlots( evtweight*trigweight, h_1d_nj, "", basic_flav_tag_dl);
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met50", basic_flav_tag_dl);
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met100", basic_flav_tag_dl);
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met150", basic_flav_tag_dl);	    
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met200", basic_flav_tag_dl);	    
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met250", basic_flav_tag_dl);	    
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met300", basic_flav_tag_dl);	    
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met350", basic_flav_tag_dl);	    
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) 
-	    makeNJPlots( evtweight*trigweight, h_1d_nj, "_met400", basic_flav_tag_dl);	    
-
-	  if ( n_jets < 2 ) continue; 
-	  
-	  //default 
-	  makeCR4Plots( evtweight*trigweight, h_1d_cr4, "",                tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w,          tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2,          tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w, tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met50",                   tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met50",          tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met50",          tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met50", tag_njets,  tag_kbin, flav_tag_dl, 150. );
+	  for (int im = 0; im<NMET; im++) {
+	    if ( t1metphicorr < metcut[im] ) continue;
+	    makeNJPlots( evtweight*trigweight_dl, h_1d_nj, tag_met[im], basic_flav_tag_dl);
+	    if ( n_jets < 2 ) continue; 
+	    makeCR4Plots( evtweight*trigweight_dl, h_1d_cr4, tag_met[im], tag_njets,  tag_kbin, flav_tag_dl, mtcut[im] );
 	  }
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met100",                   tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met100",          tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met100",          tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met100", tag_njets,  tag_kbin, flav_tag_dl, 150. );
-	  }
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met150",                   tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met150",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met150",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met150", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  }
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met200",                   tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met200",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met200",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met200", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  }
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met250",                   tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met250",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met250",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met250", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  }
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met300",                   tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met300",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met300",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met300", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  }
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met350",                   tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met350",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met350",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met350", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  }
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) {
-	    makeCR4Plots( evtweight*trigweight, h_1d_cr4, "_met400",                   tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (mt2wmin_>175)                     makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_mt2w+"_met400",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+"_met400",          tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR4Plots( evtweight*trigweight, h_1d_cr4, tag_chi2+tag_mt2w+"_met400", tag_njets,  tag_kbin, flav_tag_dl, 120. );
-	  }
-	}
+	}//end CR4 selection
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////
       // Ask for at least 2 jets from now on
       if ( n_jets < 2 ) continue;
-
 
       //
       // Sample before isolated track requirement - for fake rate of requirement
@@ -824,228 +569,36 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       // selection - at least 1 lepton
       // Add b-tag requirement
-      if ( passSingleLeptonSelection(isData) 
+      if ( dataset_1l && passSingleLeptonSelection(isData) 
 	   && n_bjets>0 ) 
 	{
-	  float trigweight = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
-	  //inclusive sample
-	  //default 
-	  makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto",                   tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w,          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2,          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w, tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  //met > 50 GeV requirement  
-	  if ( t1metphicorr > 50. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met50",                      tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met50",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met50",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met100",                      tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met100",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met100",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met150",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met150",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met150",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met200",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met200",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met200",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met250",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met250",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met250",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met300",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met300",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met300",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_me3200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met350",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met350",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met350",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) {
-	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto_met400",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_mt2w+"_met400",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+"_met400",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_chi2+tag_mt2w+"_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	}
-      
-      //
-      // CR5 - lepton + isolated track
-      //
-
-      // selection - lepton + isolated track
-      // Add b-tag requirement
-      if ( passLepPlusIsoTrkSelection(isData) 
-	   && n_bjets>0 ) 
-	{
-	  float trigweight = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
-	  //inclusive sample
-	  //default 
-	  makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all",                   tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w,          tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2,          tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w, tag_njets, tag_kbin, flav_tag_sl, 150. );
-	  //met > 50 GeV requirement 
-	  if ( t1metphicorr > 50. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met50",                      tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met50",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met50",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 100 GeV requirement 
-	  if ( t1metphicorr > 100. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met100",                      tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met100",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met100",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	  }
-	  //met > 150 GeV requirement 
-	  if ( t1metphicorr > 150. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met150",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met150",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met150",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 200 GeV requirement 
-	  if ( t1metphicorr > 200. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met200",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met200",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met200",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 250 GeV requirement 
-	  if ( t1metphicorr > 250. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met250",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met250",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met250",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 300 GeV requirement 
-	  if ( t1metphicorr > 300. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met300",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met300",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met300",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 350 GeV requirement 
-	  if ( t1metphicorr > 350. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met350",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met350",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met350",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-	  //met > 400 GeV requirement 
-	  if ( t1metphicorr > 400. ) {
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all_met400",                      tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_mt2w+"_met400",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+"_met400",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_chi2+tag_mt2w+"_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	  }
-
-	  // sample with only 1 lepton - this is the true CR5
-	  if ( stopt.ngoodlep() == 1 ) {
-
-	    //default 
-	    makeCR5Plots( evtweight*trigweight, h_1d_cr5, "",                tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w,          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2,          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w, tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    //met > 50 GeV requirement 
-	    if ( t1metphicorr > 50. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met50",                   tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met50",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met50",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met50", tag_njets,  tag_kbin, flav_tag_sl, 150. );
+	  for (int im = 0; im<NMET; im++) {
+	    if ( t1metphicorr < metcut[im] ) continue;
+	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_met[im], tag_njets,  tag_kbin, flav_tag_sl, mtcut[im] );
+	    if ( !passisotrk ) {
+	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_met[im], tag_njets,  tag_kbin, flav_tag_sl, mtcut[im] );
+	      // sample with only 1 lepton - this is the true CR5
+	      if ( stopt.ngoodlep() == 1 ) 
+		makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_met[im], tag_njets,  tag_kbin, flav_tag_sl, mtcut[im] );
 	    }
-	    //met > 100 GeV requirement 
-	    if ( t1metphicorr > 100. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met100",                   tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met100",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met100",          tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met100", tag_njets,  tag_kbin, flav_tag_sl, 150. );
-	    }
-	    //met > 150 GeV requirement 
-	    if ( t1metphicorr > 150. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met150",                   tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met150",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met150",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met150", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 200 GeV requirement 
-	    if ( t1metphicorr > 200. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met200",                   tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met200",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met200",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met200", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 250 GeV requirement 
-	    if ( t1metphicorr > 250. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met250",                   tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met250",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met250",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met250", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 300 GeV requirement 
-	    if ( t1metphicorr > 300. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met300",                   tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met300",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met300",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met300", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 350 GeV requirement 
-	    if ( t1metphicorr > 350. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met350",                   tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met350",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met350",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met350", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	    //met > 400 GeV requirement 
-	    if ( t1metphicorr > 400. ) {
-	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_met400",                   tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (mt2wmin_>175)                     makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_mt2w+"_met400",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1)                 makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+"_met400",          tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	      if (chi2minprob_<0.1 && mt2wmin_>175) makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_chi2+tag_mt2w+"_met400", tag_njets,  tag_kbin, flav_tag_sl, 120. );
-	    }
-	  }
-	}
+	  }  
+	}//end CR5 selection 
 
     } // end event loop
-
-    // delete tree;
-   
+    
+   // delete tree;
+    
     stwatch.Stop();
     cout<<"time is "<<stwatch.CpuTime()<<endl;
     stwatch.Start();
-
+    
   } // end file loop
   
     //
     // finish
     //
   
+  cout<<"N EVENT CHECK "<<nevt_check<<endl;
   TFile outfile(m_outfilename_.c_str(),"RECREATE") ; 
   printf("[StopTreeLooper::loop] Saving histograms to %s\n", m_outfilename_.c_str());
   
@@ -1154,7 +707,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 
 void StopTreeLooper::makeCR2Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-				   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut ) 
+				  string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut ) 
 {
 
   //find positive lepton - this is the one that is combined with the pseudomet to form the mT

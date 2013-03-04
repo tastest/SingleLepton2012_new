@@ -45,6 +45,8 @@ class StopTreeLooper {
     private:
 
 	string m_outfilename_;
+	// njets requirement
+	int min_njets;
 	//for phi corrected met
 	float t1metphicorr;
 	float t1metphicorrphi;
@@ -55,6 +57,7 @@ class StopTreeLooper {
 	float dphimj2;
 	//b pt
 	float pt_b;
+	float dRleptB1;
 	//maria variables
 	float htssl;
 	float htosl;
