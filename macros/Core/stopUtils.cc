@@ -33,7 +33,8 @@ unsigned int getNJets(const float etacut){
     
     if( stopt.pfjets().at(i).pt()<30 )  continue;
     if( fabs(stopt.pfjets().at(i).eta())>etacut )  continue;
-    if ( stopt.pfjets_beta2_0p5().at(i) < 0.2 ) continue;
+    if ( (fabs(stopt.pfjets().at(i).eta()) < 2.5) 
+	&& (stopt.pfjets_beta2_0p5().at(i)<0.2) ) continue;
 
     njets++;
 
@@ -777,7 +778,7 @@ bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdenti
 
 
 //--------------------------------------------------------------------
-double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVector& lep, float met, float metphi){
+double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVector& lep, float met, float metphi, MT2Type mt2type){
 
 	// I am asumming that jets is sorted by Pt
 	assert ( jets.size() == btag.size() );
@@ -815,7 +816,7 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 	      if (i == j) continue;
 	      float c_mt2w = mt2wWrapper(lep, 
 					 jets[non_bjets[i]],
-					 jets[non_bjets[j]], met, metphi);
+					 jets[non_bjets[j]], met, metphi, mt2type);
 	      if (c_mt2w < min_mt2w)
 		min_mt2w = c_mt2w;
 	    }
@@ -825,12 +826,12 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 	  float min_mt2w = 9999;
 
 	  for (int i=0; i<nMax; i++){
-	    float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi);
+	    float c_mt2w = mt2wWrapper(lep, jets[bjets[0]], jets[non_bjets[i]], met, metphi, mt2type);
 	    if (c_mt2w < min_mt2w)
 	      min_mt2w = c_mt2w;
 	  }
 	  for (int i=0; i<nMax; i++){
-	    float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi);
+	    float c_mt2w = mt2wWrapper(lep, jets[non_bjets[i]], jets[bjets[0]], met, metphi, mt2type);
 	    if (c_mt2w < min_mt2w)
 	      min_mt2w = c_mt2w;
 	  }
@@ -844,7 +845,7 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 	      if (i == j) continue;
 	      float c_mt2w = mt2wWrapper(lep, 
 					 jets[bjets[i]],
-					 jets[bjets[j]], met, metphi);
+					 jets[bjets[j]], met, metphi, mt2type);
 	      if (c_mt2w < min_mt2w)
 		min_mt2w = c_mt2w;
 	    }
@@ -854,15 +855,14 @@ double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVe
 	return -1.;
 }
 
+
 //---------------------------------------------------------------------
 
 
-// This funcion is a wrapper for mt2w_bissect that take LorentzVectors instead of doubles
-double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_b, float met, float metphi){
-//	mt2_bisect::mt2 mt2_event;
-//	mt2bl_bisect::mt2bl mt2bl_event;
-	mt2w_bisect::mt2w mt2w_event;
+// This funcion is a wrapper for mt2w_bisect etc that takes LorentzVectors instead of doubles
+double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_b, float met, float metphi, MT2Type mt2type){
 
+	// same for all MT2x variables
 	float metx = met * cos( metphi );
 	float mety = met * sin( metphi );
 
@@ -875,31 +875,41 @@ double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_
 	pb2[1] = jet_b.Px();  pb2[2] = jet_b.Py();   pb2[3] = jet_b.Pz();
 	pmiss[0] = 0.; pmiss[1] = metx; pmiss[2] = mety;
 
-//	This is for mt2b and mt2bl calculation. Keep here if you want to extend the function.
-/*
-	double pmiss_lep[3];
-	pmiss_lep[0] = 0.;
-	pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
+	// specifics for each variable
+	if (mt2type == MT2b) {
+	  double pmiss_lep[3];
+	  pmiss_lep[0] = 0.;
+	  pmiss_lep[1] = pmiss[1]+pl[1]; pmiss_lep[2] = pmiss[2]+pl[2];
 
-	pb1[0] = jets_o.mass();
-	pb2[0] = jets_b.mass();
-	mt2_event.set_momenta( pb1, pb2, pmiss_lep );
-	mt2_event.set_mn( 80.385 );   // Invisible particle mass
-	double c_mt2b = mt2_event.get_mt2();
-*/
+	  pb1[0] = jet_o.mass();
+	  pb2[0] = jet_b.mass();
 
-	pb1[0] = jet_o.E();
-	pb2[0] = jet_b.E();
+	  mt2_bisect::mt2 mt2_event;
+	  mt2_event.set_momenta( pb1, pb2, pmiss_lep );
+	  mt2_event.set_mn( 80.385 );   // Invisible particle mass == W mass
+	  return mt2_event.get_mt2();
+	}
 
-//	Also for mt2bl calculation.
-//
-//	mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
-//	double c_mt2bl = mt2bl_event.get_mt2bl();
+	else {
+	  pb1[0] = jet_o.E();
+	  pb2[0] = jet_b.E();
 
-	mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
-	double c_mt2w = mt2w_event.get_mt2w();
+	  if (mt2type == MT2bl) {
+	    mt2bl_bisect::mt2bl mt2bl_event;
+	    mt2bl_event.set_momenta(pl, pb1, pb2, pmiss);
+	    return mt2bl_event.get_mt2bl();
+	  }
+	  else if (mt2type == MT2w) {
+	    mt2w_bisect::mt2w mt2w_event;
+	    mt2w_event.set_momenta(pl, pb1, pb2, pmiss);
+	    return mt2w_event.get_mt2w();
+	  }
+	}
 
-	return c_mt2w;
+	// SHOULDN'T GET HERE
+	std::cout << "ERROR: " << __FILE__ << " " << __LINE__ << ": mt2wWrapper: shouldn't get here! mt2type == " 
+		  << mt2type << std::endl;
+	return -1.;
 }
 
 

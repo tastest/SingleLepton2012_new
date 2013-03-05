@@ -79,8 +79,10 @@ struct DorkyEventIdentifier {
 bool is_duplicate (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &already_seen);
 int load_badlaserevents  (char* filename, std::set<DorkyEventIdentifier> &events_lasercalib);
 bool is_badLaserEvent (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &events_lasercalib);
-double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVector& lep, float met, float metphi);
-double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_b, float met, float metphi);
+
+enum MT2Type { MT2b, MT2bl, MT2w };
+double calculateMT2w(vector<LorentzVector>& jets, vector<float>& btag, LorentzVector& lep, float met, float metphi, MT2Type mt2type = MT2w);
+double mt2wWrapper(LorentzVector& lep, LorentzVector& jet_o, LorentzVector& jet_b, float met, float metphi, MT2Type mt2type = MT2w);
 double calculateChi2(vector<LorentzVector>& jets, vector<float>& sigma_jets);
 double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, vector<float>& btag);
 double fc2 (double c1, double m12, double m22, double m02, bool verbose);
