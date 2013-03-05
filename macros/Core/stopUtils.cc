@@ -25,7 +25,7 @@ using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-unsigned int getNJets(const bool doBeta, const float etacut){
+unsigned int getNJets(const float etacut){
 
   unsigned int njets=0;
 
