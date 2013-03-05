@@ -28,7 +28,7 @@ PartonCombinatorics::PartonCombinatorics(vector<LorentzVector> jets, vector<floa
         n_jets_ = jets.size();
 
         assert( jets_.size() == btag_.size() );
-        assert( jets_.size() == mc_.size() );
+//        assert( jets_.size() == mc_.size() );
         assert( jets_.size() == sigma_jets_.size() );
 
         if ( __debug ) cout << "PartonCombinatorics::Constructor isData = " << isData << endl;
@@ -373,6 +373,8 @@ void PartonCombinatorics::applyBConsistency(float btagcut){
 		int bi = c_it->bi;
 		int oi = c_it->oi;
 
+//		cout << "CCC: " << bi << "  " << oi << endl;
+
 		bool b_btag  = (btag_.at(bi)  > btagcut);
 		bool o_btag  = (btag_.at(oi)  > btagcut);
 
@@ -406,6 +408,8 @@ void PartonCombinatorics::applyBConsistency(float btagcut){
 			if ( not (b_btag and o_btag) )
 				continue;
 		}
+
+//		cout << "OLD: " << bi << "  " << oi << endl;
 
 		b_candidates_.push_back(*c_it);
 	}

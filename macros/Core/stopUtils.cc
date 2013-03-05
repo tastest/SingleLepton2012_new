@@ -25,7 +25,7 @@ using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-unsigned int getNJets(const float etacut){
+unsigned int getNJets(const bool doBeta, const float etacut){
 
   unsigned int njets=0;
 
@@ -518,6 +518,7 @@ bool pass_T2tt_LM(bool isData){
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
     if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
+
     myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
 
   }
@@ -560,17 +561,15 @@ bool pass_T2tt_HM(bool isData){
 
   for (int ijet =0; ijet<(int)stopt.pfjets().size(); ijet++){
 
-    if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
-    if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
-    // later add the MVA
-    if ( stopt.pfjets_beta2_0p5().at(ijet) < 0.2 ) continue;
+      if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
+      if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
+      // later add the MVA
+      if ( stopt.pfjets_beta2_0p5().at(ijet) < 0.2 ) continue;
 
-    myJets.push_back(stopt.pfjets().at(ijet));
-    myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
-    if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
-    myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
-
-
+      myJets.push_back(stopt.pfjets().at(ijet));
+      myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
+      if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
+      myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
   }
 
   if(myJets.size()<4) return false;
@@ -963,7 +962,6 @@ void minuitFunction(int&, double* , double &result, double par[], int){
 double calculateChi2(vector<LorentzVector>& jets, vector<float>& sigma_jets){
 
 	assert(jets.size() == sigma_jets.size());
-	assert(jets.size() < 15);
 
 	int n_jets = jets.size();
 

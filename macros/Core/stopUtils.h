@@ -36,7 +36,7 @@ typedef vector<Candidate> CANDIDATES;
 
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1, int iskip2);
-unsigned int getNJets(const float etacut = 2.4);
+unsigned int getNJets(const bool doBeta = true, const float etacut = 2.4);
 vector<int> getBJetIndex(double discr, int iskip1, int iskip2);
 
 float getdltrigweight(int id1, int id2);
