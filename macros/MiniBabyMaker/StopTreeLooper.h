@@ -50,6 +50,7 @@ class StopTreeLooper {
         ~StopTreeLooper();
 
         void setOutFileName(string filename); 
+        void doWHNtuple(); 
         void loop(TChain *chain, TString name);
 
 	//	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
@@ -67,13 +68,19 @@ class StopTreeLooper {
 	Int_t cr4_;
 	Int_t cr5_;   
 
+	Int_t whsig_;
+	Int_t whcr1_;   
+
 	// cut and count selections
 	Float_t t2ttLM_;
 	Float_t t2ttHM_;
 
 	// kinematic variables
+	Float_t mt_;
 	Float_t met_;
 	Float_t chi2_;
+	Float_t mt2b_;
+	Float_t mt2bl_;
 	Float_t mt2w_;
 
 	// event shapes
@@ -94,7 +101,7 @@ class StopTreeLooper {
 	Float_t dltrigeff_;
 
 	// jet counting
-	Float_t nb_;
+	Int_t nb_;
 	Int_t njets_;
 
 	// lepton variables
@@ -114,6 +121,12 @@ class StopTreeLooper {
 	Float_t pt_J1_;
 	Float_t pt_J2_;
 
+        // wh event kinematics
+	Float_t bbmass_;
+	Float_t bbpt_;
+	Float_t wpt_;
+	Float_t bbwdphi_;
+
 	// susy variables
 	Float_t mstop_;
 	Float_t mlsp_;
@@ -124,16 +137,21 @@ class StopTreeLooper {
 
     private:
 
-	static const float JET_PT = 30.;
-	static const float JET_ETA = 2.4;
+	float JET_PT;
+	float JET_ETA;
+	float BJET_ETA;
 
-	static const int N_JETS_TO_CONSIDER = 6;
-	static const int NJETS_CUT = 4;
+	int N_JETS_TO_CONSIDER;
+	int NJETS_CUT;
+
+        float MET_CUT;
 
 	string m_outfilename_;
+        string m_minibabylabel_;
 
 	//jet information
 	vector<LorentzVector> jets;
+	vector<LorentzVector> bjets;
 	vector<float> jets_btag;
 	vector<float> jets_sigma;
 	float metphi;

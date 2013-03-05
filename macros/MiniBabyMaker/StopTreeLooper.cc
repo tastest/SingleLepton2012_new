@@ -18,6 +18,7 @@
 #include "Riostream.h"
 #include "TFitter.h"
 #include "TRandom3.h"
+#include "TVector2.h"
 
 #include <algorithm>
 #include <utility>
@@ -39,6 +40,17 @@ StopTreeLooper::StopTreeLooper()
   // t1metphicorrmt = -9999.;
   // min_mtpeak = -9999.;
   // max_mtpeak = -9999.; 
+
+  JET_PT = 30.;
+  JET_ETA = 2.4;
+  BJET_ETA = 2.4;
+
+  N_JETS_TO_CONSIDER = 6;
+  NJETS_CUT = 4;
+
+  MET_CUT = 100.0;
+
+  m_minibabylabel_ = "";
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -49,9 +61,24 @@ void StopTreeLooper::setOutFileName(string filename)
 {
   m_outfilename_ = filename;
   jets.clear();
+  bjets.clear();
   jets_btag.clear();
   jets_sigma.clear();
   metphi  = -99999.;
+}
+
+void StopTreeLooper::doWHNtuple()
+{
+  JET_PT = 30.;
+  JET_ETA = 4.7;
+  BJET_ETA = 2.4;
+
+  N_JETS_TO_CONSIDER = 6;
+  NJETS_CUT = 2;
+
+  MET_CUT = 50.0;
+
+  m_minibabylabel_ = "whmet_";
 }
 
 void StopTreeLooper::loop(TChain *chain, TString name)
@@ -274,13 +301,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // >=1 lepton, rho cut, MET filters, veto 2 nearby leptons
       if ( !passEvtSelection(name) ) continue; 
 
-      // MET > 100 GeV
+      // MET > cut value (100 GeV for stop)
       met_ = stopt.t1metphicorr();
       metphi = stopt.t1metphicorrphi();
-      if ( met_ < 100.0 ) continue; 
+      if ( met_ < MET_CUT ) continue; 
 
       // jet selection
       jets.clear();
+      bjets.clear();
       jets_btag.clear();
       jets_sigma.clear();
       njets_ = 0;
@@ -295,7 +323,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       for (unsigned int i =0; i<stopt.pfjets().size(); i++){
 	if ( stopt.pfjets().at(i).pt() < JET_PT ) continue;
 	if ( fabs(stopt.pfjets().at(i).eta()) > JET_ETA ) continue;
-	if ( stopt.pfjets_beta2_0p5().at(i) < 0.2 ) continue;
+	if ( (fabs(stopt.pfjets().at(i).eta()) <= 2.5) 
+	  && (stopt.pfjets_beta2_0p5().at(i) < 0.2) ) continue;
 
 	// jet information
 	njets_++;
@@ -313,8 +342,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	// b-tagging information
 	//NOTE::need to reweight b-tagging discriminator
-	if (stopt.pfjets_csv().at(i) > 0.679) {
+	if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (stopt.pfjets_csv().at(i) > 0.679) ) {
 	  nb_++;
+	  bjets.push_back(stopt.pfjets().at(i));
 	  // leading b-jet variables
 	  if (nb_==1) {
 	    pt_b_ = stopt.pfjets().at(i).pt();
@@ -345,8 +375,24 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // kinematic variables
       //------------------------------------------ 
 
-      mt2w_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi);
+      mt_ = (float)getMT(stopt.lep1().pt(), stopt.lep1().phi(), met_, metphi );
+      mt2b_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2b);
+      mt2bl_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2bl);
+      mt2w_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2w);
       chi2_ = (float)calculateChi2SNT(jets, jets_sigma, jets_btag);
+
+      // for WH+MET ntuple
+      TVector2 lep(stopt.lep1().px(), stopt.lep1().py());
+      TVector2 met;
+      met.SetMagPhi(met_, metphi);
+      TVector2 w = lep+met; 
+      wpt_ = w.Mod();
+      if (nb_ >= 2) {
+	LorentzVector bb = bjets.at(0) + bjets.at(1);
+	bbmass_ = bb.M();
+	bbpt_ = bb.pt();
+	bbwdphi_ = fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi()));
+      }
 
       //------------------------------------------ 
       // datasets bit
@@ -401,6 +447,23 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		      && passOneLeptonSelection(isData) 
 		      && passisotrk_ == 0
 		      && nb_>=1) ? 1 : 0; 
+
+      // -- WH+MET analysis regions
+      // signal region
+      whsig_      = ( dataset_1l 
+		      && passOneLeptonSelection(isData) 
+		      && passisotrk_ == 1
+		      && nb_ == 2 
+		      && njets_ == 2
+		      && (bbmass_ >= 100. && bbmass_ <= 140.) ) ? 1 : 0; 
+
+      // pass CR1: high bbmass
+      whcr1_      = ( dataset_1l 
+		      && passOneLeptonSelection(isData) 
+		      && passisotrk_ == 1
+		      && nb_ == 2 
+		      && njets_ == 2
+		      && bbmass_ >= 150. ) ? 1 : 0; 
 
       // Cut & Count analysis Selections
       t2ttLM_     = pass_T2tt_LM(isData);
@@ -460,21 +523,27 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  string revision = "$Revision: 1.34 $";
+  string revision = "$Revision: 1.35 $";
   string revision_no = revision.substr(11, revision.length() - 13);
-  outFile_   = new TFile(Form("output/%s_mini_%s.root",prefix,revision_no.c_str()), "RECREATE");
+  outFile_   = new TFile(Form("output/%s_mini_%s%s.root",prefix,m_minibabylabel_.c_str(),revision_no.c_str()), "RECREATE");
   outFile_->cd();
 
   outTree_ = chain->CloneTree(0);
 
+  outTree_->Branch("mini_mt"        , &mt_        ,  "mini_mt/F"	 );
   outTree_->Branch("mini_met"       , &met_       ,  "mini_met/F"	 );
   				      
   outTree_->Branch("mini_sig"       , &sig_       ,  "mini_sig/I"	 );
   outTree_->Branch("mini_cr1"       , &cr1_       ,  "mini_cr1/I"	 );
   outTree_->Branch("mini_cr4"       , &cr4_       ,  "mini_cr4/I"	 );
   outTree_->Branch("mini_cr5"       , &cr5_       ,  "mini_cr5/I"	 );
+
+  outTree_->Branch("mini_whsig"     , &whsig_     ,  "mini_whsig/I"	 );
+  outTree_->Branch("mini_whcr1"     , &whcr1_     ,  "mini_whcr1/I"	 );
   				      
   outTree_->Branch("mini_chi2"      , &chi2_      ,  "mini_chi2/F"      );
+  outTree_->Branch("mini_mt2b"      , &mt2b_      ,  "mini_mt2b/F"      );
+  outTree_->Branch("mini_mt2bl"     , &mt2bl_     ,  "mini_mt2bl/F"     );
   outTree_->Branch("mini_mt2w"      , &mt2w_      ,  "mini_mt2w/F"      );
   				      
   outTree_->Branch("mini_weight"    , &weight_    ,  "mini_weight/F"	 );
@@ -508,6 +577,11 @@ void StopTreeLooper::makeTree(const char *prefix, TChain* chain){
   outTree_->Branch("mini_pt_J1"     , &pt_J1_     ,  "mini_pt_J1/F"     );
   outTree_->Branch("mini_pt_J2"     , &pt_J2_     ,  "mini_pt_J2/F"     );
   				      
+  outTree_->Branch("mini_bbmass"    , &bbmass_    ,  "mini_bbmass/F"	 );
+  outTree_->Branch("mini_bbpt"      , &bbpt_      ,  "mini_bbpt/F"	 );
+  outTree_->Branch("mini_wpt"       , &wpt_       ,  "mini_wpt/F"	 );
+  outTree_->Branch("mini_bbwdphi"   , &bbwdphi_   ,  "mini_bbwdphi/F"	 );
+
   outTree_->Branch("mini_rand"      , &rand_      ,  "mini_rand/F"      );
   				      
   outTree_->Branch("mini_t2ttLM"    , &t2ttLM_    ,  "mini_t2ttLM/F"    );
@@ -529,9 +603,15 @@ void StopTreeLooper::initBaby(){
   cr4_        = -1;
   cr5_        = -1; 
 
+  whsig_      = -1;
+  whcr1_      = -1;
+
   // kinematic variables
+  mt_         = -1.0;
   met_        = -1.0;
   chi2_       = -1.0;
+  mt2b_       = -1.0;
+  mt2bl_      = -1.0;
   mt2w_       = -1.0;
 
   // event shapes
@@ -566,6 +646,13 @@ void StopTreeLooper::initBaby(){
   pt_b_  = -1.0;
   pt_J1_ = -1.0;
   pt_J2_ = -1.0;
+
+  // wh event kinematics
+  bbmass_      = -1.0;
+  bbpt_        = -1.0;
+  wpt_         = -1.0;
+  bbwdphi_     = -1.0;
+
 
   rand_  = -1.0;
 
