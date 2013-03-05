@@ -2865,8 +2865,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       m_events.insert(pair<int,int>(evt_event(), 1));
 
       // calo met
-      calomet_ = evt_met();
-      calometphi_ = evt_metPhi() ;
+      calomet_ = evt_metMuonCorr();
+      calometphi_ = evt_metMuonCorrPhi() ;
 
       // track met
       pair<float, float> trkMET = getTrackerMET(lep1_); 
