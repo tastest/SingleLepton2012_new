@@ -71,6 +71,8 @@ class WHLooper {
 
   Float_t pfmet_;
   Float_t lep1mt_;
+  Float_t mt2b_;
+  Float_t mt2bl_;
   Float_t mt2w_;
   Float_t bbpt_;
   Float_t wpt_;

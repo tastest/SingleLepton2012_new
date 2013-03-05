@@ -283,6 +283,9 @@ void WHLooper::loop(TChain *chain, TString name) {
 	else if (name.Contains("TChiwh_250_1")) evtweight *= 0.32 * weight_lumi_br_nevents;
 	else if (name.Contains("TChiwh_300_1")) evtweight *= 0.15 * weight_lumi_br_nevents;
 	else if (name.Contains("TChiwh_350_1")) evtweight *= 0.074 * weight_lumi_br_nevents;
+
+	// divide back out nvtxweight -- shouldn't be applied to signal
+	evtweight /=  stopt.nvtxweight();
       }
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( nvtx, h_vtx_wgt, isData );
@@ -357,7 +360,9 @@ void WHLooper::loop(TChain *chain, TString name) {
       // calculate mt2w, after requiring exactly two jets
       // make dummy vector of csv values for bjets, for mt2w calc
       std::vector<float> bjets_csv(2, 0.99);
-      mt2w_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi());
+      mt2b_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi(), MT2b);
+      mt2bl_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi(), MT2bl);
+      mt2w_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi(), MT2w);
 
       // consider tightening bbmass to 110,140 for low mass sel??
       if (doNM1Plots) fillHists1DWrapper(h_1d_bbmass_nm1,evtweight,"bbmass_nm1");
@@ -397,7 +402,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d_final, 41, -4., 4.);
 
       fillHists1DWrapper(h_1d_final,evtweight,"final");
-      if (name.Contains("wjets") || name.Contains("wbb")) {
+      if (isWjets_) {
 	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_final_nobs,evtweight,"final_nobs");
 	else fillHists1DWrapper(h_1d_final_bs,evtweight,"final_bs");
       }
@@ -572,7 +577,9 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
     plot1D("h_bjetlep1mindphi"+suffix,  TMath::Min(bjet1lep1dphi,bjet2lep1dphi), evtweight, h_1d, 50, 0., TMath::Pi());
 
-    plot1D("h_mt2w"+suffix,  mt2w_, evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_mt2b"+suffix,   mt2b_,  evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_mt2bl"+suffix,  mt2bl_, evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_mt2w"+suffix,   mt2w_,  evtweight, h_1d, 1000, 0., 1000.);
 
     std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1);
     plot1D("h_bjet1mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(0)) , evtweight, h_1d, 40, -20., 20.);
