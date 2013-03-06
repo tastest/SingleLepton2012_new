@@ -1286,6 +1286,15 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTau_leadPtcand_;
 	TBranch *pfTau_leadPtcand_branch;
 	bool pfTau_leadPtcand_isLoaded;
+	int	pfTauLoose_leadPtcandID_;
+	TBranch *pfTauLoose_leadPtcandID_branch;
+	bool pfTauLoose_leadPtcandID_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauLoose_;
+	TBranch *pfTauLoose_branch;
+	bool pfTauLoose_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauLoose_leadPtcand_;
+	TBranch *pfTauLoose_leadPtcand_branch;
+	bool pfTauLoose_leadPtcand_isLoaded;
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcandOS10_;
 	TBranch *pfcandOS10_branch;
 	bool pfcandOS10_isLoaded;
@@ -1361,12 +1370,42 @@ protected:
 	vector<float> *pfjets_neu_;
 	TBranch *pfjets_neu_branch;
 	bool pfjets_neu_isLoaded;
+	vector<float> *pfjets_l1corr_;
+	TBranch *pfjets_l1corr_branch;
+	bool pfjets_l1corr_isLoaded;
+	vector<float> *pfjets_corr_;
+	TBranch *pfjets_corr_branch;
+	bool pfjets_corr_isLoaded;
+	vector<int> *pfjets_mc3_;
+	TBranch *pfjets_mc3_branch;
+	bool pfjets_mc3_isLoaded;
+	vector<int> *pfjets_mcflavorAlgo_;
+	TBranch *pfjets_mcflavorAlgo_branch;
+	bool pfjets_mcflavorAlgo_isLoaded;
+	vector<int> *pfjets_mcflavorPhys_;
+	TBranch *pfjets_mcflavorPhys_branch;
+	bool pfjets_mcflavorPhys_isLoaded;
+	vector<int> *pfjets_flav_;
+	TBranch *pfjets_flav_branch;
+	bool pfjets_flav_isLoaded;
 	vector<float> *pfjets_lrm_;
 	TBranch *pfjets_lrm_branch;
 	bool pfjets_lrm_isLoaded;
 	vector<float> *pfjets_lrm2_;
 	TBranch *pfjets_lrm2_branch;
 	bool pfjets_lrm2_isLoaded;
+	vector<float> *pfjets_qgtag_;
+	TBranch *pfjets_qgtag_branch;
+	bool pfjets_qgtag_isLoaded;
+	vector<float> *pfjets_genJetDr_;
+	TBranch *pfjets_genJetDr_branch;
+	bool pfjets_genJetDr_isLoaded;
+	vector<float> *pfjets_sigma_;
+	TBranch *pfjets_sigma_branch;
+	bool pfjets_sigma_isLoaded;
+	vector<int> *pfjets_lepjet_;
+	TBranch *pfjets_lepjet_branch;
+	bool pfjets_lepjet_isLoaded;
 	vector<float> *pfjets_beta_;
 	TBranch *pfjets_beta_branch;
 	bool pfjets_beta_isLoaded;
@@ -1388,30 +1427,9 @@ protected:
 	vector<float> *pfjets_mvaPUid_;
 	TBranch *pfjets_mvaPUid_branch;
 	bool pfjets_mvaPUid_isLoaded;
-	vector<float> *pfjets_l1corr_;
-	TBranch *pfjets_l1corr_branch;
-	bool pfjets_l1corr_isLoaded;
-	vector<float> *pfjets_corr_;
-	TBranch *pfjets_corr_branch;
-	bool pfjets_corr_isLoaded;
-	vector<int> *pfjets_mc3_;
-	TBranch *pfjets_mc3_branch;
-	bool pfjets_mc3_isLoaded;
-	vector<int> *pfjets_flav_;
-	TBranch *pfjets_flav_branch;
-	bool pfjets_flav_isLoaded;
-	vector<float> *pfjets_genJetDr_;
-	TBranch *pfjets_genJetDr_branch;
-	bool pfjets_genJetDr_isLoaded;
-	vector<float> *pfjets_qgtag_;
-	TBranch *pfjets_qgtag_branch;
-	bool pfjets_qgtag_isLoaded;
-	vector<float> *pfjets_sigma_;
-	TBranch *pfjets_sigma_branch;
-	bool pfjets_sigma_isLoaded;
-	vector<int> *pfjets_lepjet_;
-	TBranch *pfjets_lepjet_branch;
-	bool pfjets_lepjet_isLoaded;
+	vector<float> *pfjets_mvaBeta_;
+	TBranch *pfjets_mvaBeta_branch;
+	bool pfjets_mvaBeta_isLoaded;
 public: 
 void Init(TTree *tree) {
 	mclep_branch = 0;
@@ -1548,6 +1566,16 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfTau_leadPtcand") != 0) {
 		pfTau_leadPtcand_branch = tree->GetBranch("pfTau_leadPtcand");
 		if (pfTau_leadPtcand_branch) {pfTau_leadPtcand_branch->SetAddress(&pfTau_leadPtcand_);}
+	}
+	pfTauLoose_branch = 0;
+	if (tree->GetBranch("pfTauLoose") != 0) {
+		pfTauLoose_branch = tree->GetBranch("pfTauLoose");
+		if (pfTauLoose_branch) {pfTauLoose_branch->SetAddress(&pfTauLoose_);}
+	}
+	pfTauLoose_leadPtcand_branch = 0;
+	if (tree->GetBranch("pfTauLoose_leadPtcand") != 0) {
+		pfTauLoose_leadPtcand_branch = tree->GetBranch("pfTauLoose_leadPtcand");
+		if (pfTauLoose_leadPtcand_branch) {pfTauLoose_leadPtcand_branch->SetAddress(&pfTauLoose_leadPtcand_);}
 	}
 	pfcandOS10_branch = 0;
 	if (tree->GetBranch("pfcandOS10") != 0) {
@@ -3630,6 +3658,11 @@ void Init(TTree *tree) {
 		pfTau_leadPtcandID_branch = tree->GetBranch("pfTau_leadPtcandID");
 		if (pfTau_leadPtcandID_branch) {pfTau_leadPtcandID_branch->SetAddress(&pfTau_leadPtcandID_);}
 	}
+	pfTauLoose_leadPtcandID_branch = 0;
+	if (tree->GetBranch("pfTauLoose_leadPtcandID") != 0) {
+		pfTauLoose_leadPtcandID_branch = tree->GetBranch("pfTauLoose_leadPtcandID");
+		if (pfTauLoose_leadPtcandID_branch) {pfTauLoose_leadPtcandID_branch->SetAddress(&pfTauLoose_leadPtcandID_);}
+	}
 	lep_t_id_branch = 0;
 	if (tree->GetBranch("lep_t_id") != 0) {
 		lep_t_id_branch = tree->GetBranch("lep_t_id");
@@ -3655,6 +3688,36 @@ void Init(TTree *tree) {
 		pfjets_neu_branch = tree->GetBranch("pfjets_neu");
 		if (pfjets_neu_branch) {pfjets_neu_branch->SetAddress(&pfjets_neu_);}
 	}
+	pfjets_l1corr_branch = 0;
+	if (tree->GetBranch("pfjets_l1corr") != 0) {
+		pfjets_l1corr_branch = tree->GetBranch("pfjets_l1corr");
+		if (pfjets_l1corr_branch) {pfjets_l1corr_branch->SetAddress(&pfjets_l1corr_);}
+	}
+	pfjets_corr_branch = 0;
+	if (tree->GetBranch("pfjets_corr") != 0) {
+		pfjets_corr_branch = tree->GetBranch("pfjets_corr");
+		if (pfjets_corr_branch) {pfjets_corr_branch->SetAddress(&pfjets_corr_);}
+	}
+	pfjets_mc3_branch = 0;
+	if (tree->GetBranch("pfjets_mc3") != 0) {
+		pfjets_mc3_branch = tree->GetBranch("pfjets_mc3");
+		if (pfjets_mc3_branch) {pfjets_mc3_branch->SetAddress(&pfjets_mc3_);}
+	}
+	pfjets_mcflavorAlgo_branch = 0;
+	if (tree->GetBranch("pfjets_mcflavorAlgo") != 0) {
+		pfjets_mcflavorAlgo_branch = tree->GetBranch("pfjets_mcflavorAlgo");
+		if (pfjets_mcflavorAlgo_branch) {pfjets_mcflavorAlgo_branch->SetAddress(&pfjets_mcflavorAlgo_);}
+	}
+	pfjets_mcflavorPhys_branch = 0;
+	if (tree->GetBranch("pfjets_mcflavorPhys") != 0) {
+		pfjets_mcflavorPhys_branch = tree->GetBranch("pfjets_mcflavorPhys");
+		if (pfjets_mcflavorPhys_branch) {pfjets_mcflavorPhys_branch->SetAddress(&pfjets_mcflavorPhys_);}
+	}
+	pfjets_flav_branch = 0;
+	if (tree->GetBranch("pfjets_flav") != 0) {
+		pfjets_flav_branch = tree->GetBranch("pfjets_flav");
+		if (pfjets_flav_branch) {pfjets_flav_branch->SetAddress(&pfjets_flav_);}
+	}
 	pfjets_lrm_branch = 0;
 	if (tree->GetBranch("pfjets_lrm") != 0) {
 		pfjets_lrm_branch = tree->GetBranch("pfjets_lrm");
@@ -3664,6 +3727,26 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfjets_lrm2") != 0) {
 		pfjets_lrm2_branch = tree->GetBranch("pfjets_lrm2");
 		if (pfjets_lrm2_branch) {pfjets_lrm2_branch->SetAddress(&pfjets_lrm2_);}
+	}
+	pfjets_qgtag_branch = 0;
+	if (tree->GetBranch("pfjets_qgtag") != 0) {
+		pfjets_qgtag_branch = tree->GetBranch("pfjets_qgtag");
+		if (pfjets_qgtag_branch) {pfjets_qgtag_branch->SetAddress(&pfjets_qgtag_);}
+	}
+	pfjets_genJetDr_branch = 0;
+	if (tree->GetBranch("pfjets_genJetDr") != 0) {
+		pfjets_genJetDr_branch = tree->GetBranch("pfjets_genJetDr");
+		if (pfjets_genJetDr_branch) {pfjets_genJetDr_branch->SetAddress(&pfjets_genJetDr_);}
+	}
+	pfjets_sigma_branch = 0;
+	if (tree->GetBranch("pfjets_sigma") != 0) {
+		pfjets_sigma_branch = tree->GetBranch("pfjets_sigma");
+		if (pfjets_sigma_branch) {pfjets_sigma_branch->SetAddress(&pfjets_sigma_);}
+	}
+	pfjets_lepjet_branch = 0;
+	if (tree->GetBranch("pfjets_lepjet") != 0) {
+		pfjets_lepjet_branch = tree->GetBranch("pfjets_lepjet");
+		if (pfjets_lepjet_branch) {pfjets_lepjet_branch->SetAddress(&pfjets_lepjet_);}
 	}
 	pfjets_beta_branch = 0;
 	if (tree->GetBranch("pfjets_beta") != 0) {
@@ -3700,45 +3783,10 @@ void Init(TTree *tree) {
 		pfjets_mvaPUid_branch = tree->GetBranch("pfjets_mvaPUid");
 		if (pfjets_mvaPUid_branch) {pfjets_mvaPUid_branch->SetAddress(&pfjets_mvaPUid_);}
 	}
-	pfjets_l1corr_branch = 0;
-	if (tree->GetBranch("pfjets_l1corr") != 0) {
-		pfjets_l1corr_branch = tree->GetBranch("pfjets_l1corr");
-		if (pfjets_l1corr_branch) {pfjets_l1corr_branch->SetAddress(&pfjets_l1corr_);}
-	}
-	pfjets_corr_branch = 0;
-	if (tree->GetBranch("pfjets_corr") != 0) {
-		pfjets_corr_branch = tree->GetBranch("pfjets_corr");
-		if (pfjets_corr_branch) {pfjets_corr_branch->SetAddress(&pfjets_corr_);}
-	}
-	pfjets_mc3_branch = 0;
-	if (tree->GetBranch("pfjets_mc3") != 0) {
-		pfjets_mc3_branch = tree->GetBranch("pfjets_mc3");
-		if (pfjets_mc3_branch) {pfjets_mc3_branch->SetAddress(&pfjets_mc3_);}
-	}
-	pfjets_flav_branch = 0;
-	if (tree->GetBranch("pfjets_flav") != 0) {
-		pfjets_flav_branch = tree->GetBranch("pfjets_flav");
-		if (pfjets_flav_branch) {pfjets_flav_branch->SetAddress(&pfjets_flav_);}
-	}
-	pfjets_genJetDr_branch = 0;
-	if (tree->GetBranch("pfjets_genJetDr") != 0) {
-		pfjets_genJetDr_branch = tree->GetBranch("pfjets_genJetDr");
-		if (pfjets_genJetDr_branch) {pfjets_genJetDr_branch->SetAddress(&pfjets_genJetDr_);}
-	}
-	pfjets_qgtag_branch = 0;
-	if (tree->GetBranch("pfjets_qgtag") != 0) {
-		pfjets_qgtag_branch = tree->GetBranch("pfjets_qgtag");
-		if (pfjets_qgtag_branch) {pfjets_qgtag_branch->SetAddress(&pfjets_qgtag_);}
-	}
-	pfjets_sigma_branch = 0;
-	if (tree->GetBranch("pfjets_sigma") != 0) {
-		pfjets_sigma_branch = tree->GetBranch("pfjets_sigma");
-		if (pfjets_sigma_branch) {pfjets_sigma_branch->SetAddress(&pfjets_sigma_);}
-	}
-	pfjets_lepjet_branch = 0;
-	if (tree->GetBranch("pfjets_lepjet") != 0) {
-		pfjets_lepjet_branch = tree->GetBranch("pfjets_lepjet");
-		if (pfjets_lepjet_branch) {pfjets_lepjet_branch->SetAddress(&pfjets_lepjet_);}
+	pfjets_mvaBeta_branch = 0;
+	if (tree->GetBranch("pfjets_mvaBeta") != 0) {
+		pfjets_mvaBeta_branch = tree->GetBranch("pfjets_mvaBeta");
+		if (pfjets_mvaBeta_branch) {pfjets_mvaBeta_branch->SetAddress(&pfjets_mvaBeta_);}
 	}
   tree->SetMakeClass(0);
 }
@@ -4169,6 +4217,9 @@ void GetEntry(unsigned int idx)
 		pfTau_leadPtcandID_isLoaded = false;
 		pfTau_isLoaded = false;
 		pfTau_leadPtcand_isLoaded = false;
+		pfTauLoose_leadPtcandID_isLoaded = false;
+		pfTauLoose_isLoaded = false;
+		pfTauLoose_leadPtcand_isLoaded = false;
 		pfcandOS10_isLoaded = false;
 		pfcandOS10looseZ_isLoaded = false;
 		pfcand5looseZ_isLoaded = false;
@@ -4194,8 +4245,18 @@ void GetEntry(unsigned int idx)
 		pfjets_csv_isLoaded = false;
 		pfjets_chm_isLoaded = false;
 		pfjets_neu_isLoaded = false;
+		pfjets_l1corr_isLoaded = false;
+		pfjets_corr_isLoaded = false;
+		pfjets_mc3_isLoaded = false;
+		pfjets_mcflavorAlgo_isLoaded = false;
+		pfjets_mcflavorPhys_isLoaded = false;
+		pfjets_flav_isLoaded = false;
 		pfjets_lrm_isLoaded = false;
 		pfjets_lrm2_isLoaded = false;
+		pfjets_qgtag_isLoaded = false;
+		pfjets_genJetDr_isLoaded = false;
+		pfjets_sigma_isLoaded = false;
+		pfjets_lepjet_isLoaded = false;
 		pfjets_beta_isLoaded = false;
 		pfjets_beta2_isLoaded = false;
 		pfjets_beta_0p1_isLoaded = false;
@@ -4203,14 +4264,7 @@ void GetEntry(unsigned int idx)
 		pfjets_beta2_0p1_isLoaded = false;
 		pfjets_beta2_0p5_isLoaded = false;
 		pfjets_mvaPUid_isLoaded = false;
-		pfjets_l1corr_isLoaded = false;
-		pfjets_corr_isLoaded = false;
-		pfjets_mc3_isLoaded = false;
-		pfjets_flav_isLoaded = false;
-		pfjets_genJetDr_isLoaded = false;
-		pfjets_qgtag_isLoaded = false;
-		pfjets_sigma_isLoaded = false;
-		pfjets_lepjet_isLoaded = false;
+		pfjets_mvaBeta_isLoaded = false;
 	}
 
 void LoadAllBranches() 
@@ -4639,6 +4693,9 @@ void LoadAllBranches()
 	if (pfTau_leadPtcandID_branch != 0) pfTau_leadPtcandID();
 	if (pfTau_branch != 0) pfTau();
 	if (pfTau_leadPtcand_branch != 0) pfTau_leadPtcand();
+	if (pfTauLoose_leadPtcandID_branch != 0) pfTauLoose_leadPtcandID();
+	if (pfTauLoose_branch != 0) pfTauLoose();
+	if (pfTauLoose_leadPtcand_branch != 0) pfTauLoose_leadPtcand();
 	if (pfcandOS10_branch != 0) pfcandOS10();
 	if (pfcandOS10looseZ_branch != 0) pfcandOS10looseZ();
 	if (pfcand5looseZ_branch != 0) pfcand5looseZ();
@@ -4664,8 +4721,18 @@ void LoadAllBranches()
 	if (pfjets_csv_branch != 0) pfjets_csv();
 	if (pfjets_chm_branch != 0) pfjets_chm();
 	if (pfjets_neu_branch != 0) pfjets_neu();
+	if (pfjets_l1corr_branch != 0) pfjets_l1corr();
+	if (pfjets_corr_branch != 0) pfjets_corr();
+	if (pfjets_mc3_branch != 0) pfjets_mc3();
+	if (pfjets_mcflavorAlgo_branch != 0) pfjets_mcflavorAlgo();
+	if (pfjets_mcflavorPhys_branch != 0) pfjets_mcflavorPhys();
+	if (pfjets_flav_branch != 0) pfjets_flav();
 	if (pfjets_lrm_branch != 0) pfjets_lrm();
 	if (pfjets_lrm2_branch != 0) pfjets_lrm2();
+	if (pfjets_qgtag_branch != 0) pfjets_qgtag();
+	if (pfjets_genJetDr_branch != 0) pfjets_genJetDr();
+	if (pfjets_sigma_branch != 0) pfjets_sigma();
+	if (pfjets_lepjet_branch != 0) pfjets_lepjet();
 	if (pfjets_beta_branch != 0) pfjets_beta();
 	if (pfjets_beta2_branch != 0) pfjets_beta2();
 	if (pfjets_beta_0p1_branch != 0) pfjets_beta_0p1();
@@ -4673,14 +4740,7 @@ void LoadAllBranches()
 	if (pfjets_beta2_0p1_branch != 0) pfjets_beta2_0p1();
 	if (pfjets_beta2_0p5_branch != 0) pfjets_beta2_0p5();
 	if (pfjets_mvaPUid_branch != 0) pfjets_mvaPUid();
-	if (pfjets_l1corr_branch != 0) pfjets_l1corr();
-	if (pfjets_corr_branch != 0) pfjets_corr();
-	if (pfjets_mc3_branch != 0) pfjets_mc3();
-	if (pfjets_flav_branch != 0) pfjets_flav();
-	if (pfjets_genJetDr_branch != 0) pfjets_genJetDr();
-	if (pfjets_qgtag_branch != 0) pfjets_qgtag();
-	if (pfjets_sigma_branch != 0) pfjets_sigma();
-	if (pfjets_lepjet_branch != 0) pfjets_lepjet();
+	if (pfjets_mvaBeta_branch != 0) pfjets_mvaBeta();
 }
 
 	int &acc_2010()
@@ -10182,6 +10242,45 @@ void LoadAllBranches()
 		}
 		return *pfTau_leadPtcand_;
 	}
+	int &pfTauLoose_leadPtcandID()
+	{
+		if (not pfTauLoose_leadPtcandID_isLoaded) {
+			if (pfTauLoose_leadPtcandID_branch != 0) {
+				pfTauLoose_leadPtcandID_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauLoose_leadPtcandID_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauLoose_leadPtcandID_isLoaded = true;
+		}
+		return pfTauLoose_leadPtcandID_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose()
+	{
+		if (not pfTauLoose_isLoaded) {
+			if (pfTauLoose_branch != 0) {
+				pfTauLoose_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauLoose_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauLoose_isLoaded = true;
+		}
+		return *pfTauLoose_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose_leadPtcand()
+	{
+		if (not pfTauLoose_leadPtcand_isLoaded) {
+			if (pfTauLoose_leadPtcand_branch != 0) {
+				pfTauLoose_leadPtcand_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauLoose_leadPtcand_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauLoose_leadPtcand_isLoaded = true;
+		}
+		return *pfTauLoose_leadPtcand_;
+	}
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10()
 	{
 		if (not pfcandOS10_isLoaded) {
@@ -10507,6 +10606,84 @@ void LoadAllBranches()
 		}
 		return *pfjets_neu_;
 	}
+	vector<float> &pfjets_l1corr()
+	{
+		if (not pfjets_l1corr_isLoaded) {
+			if (pfjets_l1corr_branch != 0) {
+				pfjets_l1corr_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_l1corr_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_l1corr_isLoaded = true;
+		}
+		return *pfjets_l1corr_;
+	}
+	vector<float> &pfjets_corr()
+	{
+		if (not pfjets_corr_isLoaded) {
+			if (pfjets_corr_branch != 0) {
+				pfjets_corr_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_corr_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_corr_isLoaded = true;
+		}
+		return *pfjets_corr_;
+	}
+	vector<int> &pfjets_mc3()
+	{
+		if (not pfjets_mc3_isLoaded) {
+			if (pfjets_mc3_branch != 0) {
+				pfjets_mc3_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mc3_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mc3_isLoaded = true;
+		}
+		return *pfjets_mc3_;
+	}
+	vector<int> &pfjets_mcflavorAlgo()
+	{
+		if (not pfjets_mcflavorAlgo_isLoaded) {
+			if (pfjets_mcflavorAlgo_branch != 0) {
+				pfjets_mcflavorAlgo_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mcflavorAlgo_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mcflavorAlgo_isLoaded = true;
+		}
+		return *pfjets_mcflavorAlgo_;
+	}
+	vector<int> &pfjets_mcflavorPhys()
+	{
+		if (not pfjets_mcflavorPhys_isLoaded) {
+			if (pfjets_mcflavorPhys_branch != 0) {
+				pfjets_mcflavorPhys_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mcflavorPhys_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mcflavorPhys_isLoaded = true;
+		}
+		return *pfjets_mcflavorPhys_;
+	}
+	vector<int> &pfjets_flav()
+	{
+		if (not pfjets_flav_isLoaded) {
+			if (pfjets_flav_branch != 0) {
+				pfjets_flav_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_flav_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_flav_isLoaded = true;
+		}
+		return *pfjets_flav_;
+	}
 	vector<float> &pfjets_lrm()
 	{
 		if (not pfjets_lrm_isLoaded) {
@@ -10532,6 +10709,58 @@ void LoadAllBranches()
 			pfjets_lrm2_isLoaded = true;
 		}
 		return *pfjets_lrm2_;
+	}
+	vector<float> &pfjets_qgtag()
+	{
+		if (not pfjets_qgtag_isLoaded) {
+			if (pfjets_qgtag_branch != 0) {
+				pfjets_qgtag_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_qgtag_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_qgtag_isLoaded = true;
+		}
+		return *pfjets_qgtag_;
+	}
+	vector<float> &pfjets_genJetDr()
+	{
+		if (not pfjets_genJetDr_isLoaded) {
+			if (pfjets_genJetDr_branch != 0) {
+				pfjets_genJetDr_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_genJetDr_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_genJetDr_isLoaded = true;
+		}
+		return *pfjets_genJetDr_;
+	}
+	vector<float> &pfjets_sigma()
+	{
+		if (not pfjets_sigma_isLoaded) {
+			if (pfjets_sigma_branch != 0) {
+				pfjets_sigma_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_sigma_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_sigma_isLoaded = true;
+		}
+		return *pfjets_sigma_;
+	}
+	vector<int> &pfjets_lepjet()
+	{
+		if (not pfjets_lepjet_isLoaded) {
+			if (pfjets_lepjet_branch != 0) {
+				pfjets_lepjet_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_lepjet_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_lepjet_isLoaded = true;
+		}
+		return *pfjets_lepjet_;
 	}
 	vector<float> &pfjets_beta()
 	{
@@ -10624,109 +10853,18 @@ void LoadAllBranches()
 		}
 		return *pfjets_mvaPUid_;
 	}
-	vector<float> &pfjets_l1corr()
+	vector<float> &pfjets_mvaBeta()
 	{
-		if (not pfjets_l1corr_isLoaded) {
-			if (pfjets_l1corr_branch != 0) {
-				pfjets_l1corr_branch->GetEntry(index);
+		if (not pfjets_mvaBeta_isLoaded) {
+			if (pfjets_mvaBeta_branch != 0) {
+				pfjets_mvaBeta_branch->GetEntry(index);
 			} else { 
-				printf("branch pfjets_l1corr_branch does not exist!\n");
+				printf("branch pfjets_mvaBeta_branch does not exist!\n");
 				exit(1);
 			}
-			pfjets_l1corr_isLoaded = true;
+			pfjets_mvaBeta_isLoaded = true;
 		}
-		return *pfjets_l1corr_;
-	}
-	vector<float> &pfjets_corr()
-	{
-		if (not pfjets_corr_isLoaded) {
-			if (pfjets_corr_branch != 0) {
-				pfjets_corr_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_corr_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_corr_isLoaded = true;
-		}
-		return *pfjets_corr_;
-	}
-	vector<int> &pfjets_mc3()
-	{
-		if (not pfjets_mc3_isLoaded) {
-			if (pfjets_mc3_branch != 0) {
-				pfjets_mc3_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_mc3_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_mc3_isLoaded = true;
-		}
-		return *pfjets_mc3_;
-	}
-	vector<int> &pfjets_flav()
-	{
-		if (not pfjets_flav_isLoaded) {
-			if (pfjets_flav_branch != 0) {
-				pfjets_flav_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_flav_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_flav_isLoaded = true;
-		}
-		return *pfjets_flav_;
-	}
-	vector<float> &pfjets_genJetDr()
-	{
-		if (not pfjets_genJetDr_isLoaded) {
-			if (pfjets_genJetDr_branch != 0) {
-				pfjets_genJetDr_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_genJetDr_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_genJetDr_isLoaded = true;
-		}
-		return *pfjets_genJetDr_;
-	}
-	vector<float> &pfjets_qgtag()
-	{
-		if (not pfjets_qgtag_isLoaded) {
-			if (pfjets_qgtag_branch != 0) {
-				pfjets_qgtag_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_qgtag_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_qgtag_isLoaded = true;
-		}
-		return *pfjets_qgtag_;
-	}
-	vector<float> &pfjets_sigma()
-	{
-		if (not pfjets_sigma_isLoaded) {
-			if (pfjets_sigma_branch != 0) {
-				pfjets_sigma_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_sigma_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_sigma_isLoaded = true;
-		}
-		return *pfjets_sigma_;
-	}
-	vector<int> &pfjets_lepjet()
-	{
-		if (not pfjets_lepjet_isLoaded) {
-			if (pfjets_lepjet_branch != 0) {
-				pfjets_lepjet_branch->GetEntry(index);
-			} else { 
-				printf("branch pfjets_lepjet_branch does not exist!\n");
-				exit(1);
-			}
-			pfjets_lepjet_isLoaded = true;
-		}
-		return *pfjets_lepjet_;
+		return *pfjets_mvaBeta_;
 	}
 
   static void progress( int nEventsTotal, int nEventsChain ){
@@ -11179,6 +11317,9 @@ namespace Stop {
 	int &pfTau_leadPtcandID();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand();
+	int &pfTauLoose_leadPtcandID();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose_leadPtcand();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10looseZ();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5looseZ();
@@ -11204,8 +11345,18 @@ namespace Stop {
 	vector<float> &pfjets_csv();
 	vector<float> &pfjets_chm();
 	vector<float> &pfjets_neu();
+	vector<float> &pfjets_l1corr();
+	vector<float> &pfjets_corr();
+	vector<int> &pfjets_mc3();
+	vector<int> &pfjets_mcflavorAlgo();
+	vector<int> &pfjets_mcflavorPhys();
+	vector<int> &pfjets_flav();
 	vector<float> &pfjets_lrm();
 	vector<float> &pfjets_lrm2();
+	vector<float> &pfjets_qgtag();
+	vector<float> &pfjets_genJetDr();
+	vector<float> &pfjets_sigma();
+	vector<int> &pfjets_lepjet();
 	vector<float> &pfjets_beta();
 	vector<float> &pfjets_beta2();
 	vector<float> &pfjets_beta_0p1();
@@ -11213,13 +11364,6 @@ namespace Stop {
 	vector<float> &pfjets_beta2_0p1();
 	vector<float> &pfjets_beta2_0p5();
 	vector<float> &pfjets_mvaPUid();
-	vector<float> &pfjets_l1corr();
-	vector<float> &pfjets_corr();
-	vector<int> &pfjets_mc3();
-	vector<int> &pfjets_flav();
-	vector<float> &pfjets_genJetDr();
-	vector<float> &pfjets_qgtag();
-	vector<float> &pfjets_sigma();
-	vector<int> &pfjets_lepjet();
+	vector<float> &pfjets_mvaBeta();
 }
 #endif

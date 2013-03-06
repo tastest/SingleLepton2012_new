@@ -424,6 +424,9 @@ namespace Stop {
 	int &pfTau_leadPtcandID() { return stopt.pfTau_leadPtcandID(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau() { return stopt.pfTau(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand() { return stopt.pfTau_leadPtcand(); }
+	int &pfTauLoose_leadPtcandID() { return stopt.pfTauLoose_leadPtcandID(); }
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose() { return stopt.pfTauLoose(); }
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose_leadPtcand() { return stopt.pfTauLoose_leadPtcand(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10() { return stopt.pfcandOS10(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10looseZ() { return stopt.pfcandOS10looseZ(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5looseZ() { return stopt.pfcand5looseZ(); }
@@ -449,8 +452,18 @@ namespace Stop {
 	vector<float> &pfjets_csv() { return stopt.pfjets_csv(); }
 	vector<float> &pfjets_chm() { return stopt.pfjets_chm(); }
 	vector<float> &pfjets_neu() { return stopt.pfjets_neu(); }
+	vector<float> &pfjets_l1corr() { return stopt.pfjets_l1corr(); }
+	vector<float> &pfjets_corr() { return stopt.pfjets_corr(); }
+	vector<int> &pfjets_mc3() { return stopt.pfjets_mc3(); }
+	vector<int> &pfjets_mcflavorAlgo() { return stopt.pfjets_mcflavorAlgo(); }
+	vector<int> &pfjets_mcflavorPhys() { return stopt.pfjets_mcflavorPhys(); }
+	vector<int> &pfjets_flav() { return stopt.pfjets_flav(); }
 	vector<float> &pfjets_lrm() { return stopt.pfjets_lrm(); }
 	vector<float> &pfjets_lrm2() { return stopt.pfjets_lrm2(); }
+	vector<float> &pfjets_qgtag() { return stopt.pfjets_qgtag(); }
+	vector<float> &pfjets_genJetDr() { return stopt.pfjets_genJetDr(); }
+	vector<float> &pfjets_sigma() { return stopt.pfjets_sigma(); }
+	vector<int> &pfjets_lepjet() { return stopt.pfjets_lepjet(); }
 	vector<float> &pfjets_beta() { return stopt.pfjets_beta(); }
 	vector<float> &pfjets_beta2() { return stopt.pfjets_beta2(); }
 	vector<float> &pfjets_beta_0p1() { return stopt.pfjets_beta_0p1(); }
@@ -458,12 +471,5 @@ namespace Stop {
 	vector<float> &pfjets_beta2_0p1() { return stopt.pfjets_beta2_0p1(); }
 	vector<float> &pfjets_beta2_0p5() { return stopt.pfjets_beta2_0p5(); }
 	vector<float> &pfjets_mvaPUid() { return stopt.pfjets_mvaPUid(); }
-	vector<float> &pfjets_l1corr() { return stopt.pfjets_l1corr(); }
-	vector<float> &pfjets_corr() { return stopt.pfjets_corr(); }
-	vector<int> &pfjets_mc3() { return stopt.pfjets_mc3(); }
-	vector<int> &pfjets_flav() { return stopt.pfjets_flav(); }
-	vector<float> &pfjets_genJetDr() { return stopt.pfjets_genJetDr(); }
-	vector<float> &pfjets_qgtag() { return stopt.pfjets_qgtag(); }
-	vector<float> &pfjets_sigma() { return stopt.pfjets_sigma(); }
-	vector<int> &pfjets_lepjet() { return stopt.pfjets_lepjet(); }
+	vector<float> &pfjets_mvaBeta() { return stopt.pfjets_mvaBeta(); }
 }
