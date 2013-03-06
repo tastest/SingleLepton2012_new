@@ -156,7 +156,8 @@ class StopTreeLooper {
 	vector<float> jets_sigma;
 	float metphi;
 
-        static const bool __apply_mva = false; 
+    static const bool __apply_mva = false; 
+    static const bool __mini_branches = true; 
 
 };
 
