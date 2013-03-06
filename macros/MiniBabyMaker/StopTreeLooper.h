@@ -158,6 +158,7 @@ class StopTreeLooper {
 
     static const bool __apply_mva = false; 
     static const bool __mini_branches = true; 
+    static const bool __add_babies = false; 
 
 };
 

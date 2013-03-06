@@ -523,12 +523,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        string revision = "$Revision: 1.36 $";
+        string revision = "$Revision: 1.37 $";
         string revision_no = revision.substr(11, revision.length() - 13);
         outFile_   = new TFile(Form("output/%s_mini_%s%s.root",prefix,m_minibabylabel_.c_str(),revision_no.c_str()), "RECREATE");
         outFile_->cd();
 
-        outTree_ = chain->CloneTree(0);
+        if ( __add_babies )
+            outTree_ = chain->CloneTree(0);
 
         if ( __mini_branches) {
             outTree_->Branch("mini_mt"        , &mt_        ,  "mini_mt/F"	 );
