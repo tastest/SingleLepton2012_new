@@ -46,7 +46,7 @@ StopTreeLooper::StopTreeLooper()
     BJET_ETA = 2.4;
 
     N_JETS_TO_CONSIDER = 6;
-    NJETS_CUT = 4;
+    NJETS_CUT = 3;
 
     MET_CUT = 100.0;
 
@@ -78,7 +78,7 @@ void StopTreeLooper::doWHNtuple()
 
     MET_CUT = 50.0;
 
-    m_minibabylabel_ = "whmet_";
+    m_minibabylabel_ = "_whmet";
 }
 
 void StopTreeLooper::loop(TChain *chain, TString name)
@@ -197,7 +197,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TTree *tree = (TTree*)file->Get("t");
         stopt.Init(tree);
 
-        tree->CopyAddresses(outTree_);
+        if ( __add_babies )
+            tree->CopyAddresses(outTree_);
 
         //---------------------------------
         // event loop
@@ -523,13 +524,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        string revision = "$Revision: 1.37 $";
-        string revision_no = revision.substr(11, revision.length() - 13);
-        outFile_   = new TFile(Form("output/%s_mini_%s%s.root",prefix,m_minibabylabel_.c_str(),revision_no.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
         if ( __add_babies )
             outTree_ = chain->CloneTree(0);
+        else
+            outTree_ = new TTree("t","Tree"); 
 
         if ( __mini_branches) {
             outTree_->Branch("mini_mt"        , &mt_        ,  "mini_mt/F"	 );
