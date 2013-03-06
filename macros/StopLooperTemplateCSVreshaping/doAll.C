@@ -23,7 +23,7 @@ void doAll() {
   //
  
   //char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim";
-  char* path = "/nfs-3/userdata/stop/output_V00-02-16_2012";
+  char* path = "/nfs-3/userdata/stop/output_V00-02-20_2012";
 
   const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {

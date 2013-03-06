@@ -97,8 +97,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   nominalShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 0.0); 
 
   //alternative reshaping for systematics
-  //upBCShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 1.5, 0.0); 
-  //downBCShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", -1.5, 0.0); 
+  //upBCShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 1.0, 0.0); 
+  //downBCShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", -1.0, 0.0); 
   //upLShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 1.0); 
   //downLShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, -1.0); 
   //nominalShape4p = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 0.0,true,1.003,1.003); 
@@ -242,18 +242,17 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         if( fabs( stopt.pfjets()[ijet].Eta() ) > 2.4 )           continue;
 
 
-        float csv_nominal=nominalShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_nominal=nominalShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],(stopt.pfjets_flav()[ijet]==5?5:0)); //only reshape for b jets
-        //float csv_nominal=nominalShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],(stopt.pfjets_flav()[ijet]>3?stopt.pfjets_flav()[ijet]:1)); //treat anything not matched to b or c as light
+        float csv_nominal=nominalShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_nominal=nominalShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],(stopt.pfjets_mcflavorAlgo()[ijet]==5?5:0)); //only reshape for b jets
 
         //alternative reshaping for systematics
-        //float csv_upBC=upBCShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_downBC=downBCShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_upL=upLShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_downL=downLShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_nominal4p=nominalShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_upBC4p=upBCShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
-        //float csv_downBC4p=downBCShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_flav()[ijet]);
+        //float csv_upBC=upBCShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_downBC=downBCShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_upL=upLShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_downL=downLShape->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_nominal4p=nominalShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_upBC4p=upBCShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
+        //float csv_downBC4p=downBCShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
         
 
         bool isbtagcsvm = false;
@@ -268,6 +267,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         random3_->SetSeed(randseed);
         float rand = random3_->Uniform(1.);  
         
+        //use old flavour definition using status 3 matching for consistency with random upgrading/downgrading method
         int pdgid = (stopt.pfjets_flav()[ijet]==5?5:0);
 
         // btag variables: CSVM
