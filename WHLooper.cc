@@ -148,12 +148,13 @@ void WHLooper::loop(TChain *chain, TString name) {
   std::map<std::string, TH1F*> h_1d_bbmass_nm1;
   std::map<std::string, TH1F*> h_1d_bbmass_nobs_nm1;
   std::map<std::string, TH1F*> h_1d_bbmass_bs_nm1;
-  std::map<std::string, TH1F*> h_1d_lep1mt_nm1;
-  std::map<std::string, TH1F*> h_1d_mt2w_nm1;
   std::map<std::string, TH1F*> h_1d_pfmet_nm1;
-  std::map<std::string, TH1F*> h_1d_bbpt_nm1;
-  std::map<std::string, TH1F*> h_1d_wpt_nm1;
-  std::map<std::string, TH1F*> h_1d_bbwdphi_nm1;
+  std::map<std::string, TH1F*> h_1d_lep1mt_nm1;
+  std::map<std::string, TH1F*> h_1d_mt2bl_nm1;
+  // std::map<std::string, TH1F*> h_1d_mt2w_nm1;
+  // std::map<std::string, TH1F*> h_1d_bbpt_nm1;
+  // std::map<std::string, TH1F*> h_1d_wpt_nm1;
+  // std::map<std::string, TH1F*> h_1d_bbwdphi_nm1;
   std::map<std::string, TH1F*> h_1d_final;
   std::map<std::string, TH1F*> h_1d_final_nobs;
   std::map<std::string, TH1F*> h_1d_final_bs;
@@ -172,12 +173,13 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("bbmass_nobs_nm1");
       outfile_->mkdir("bbmass_bs_nm1");
     }
-    outfile_->mkdir("lep1mt_nm1");
-    outfile_->mkdir("mt2w_nm1");
     outfile_->mkdir("pfmet_nm1");
-    outfile_->mkdir("bbpt_nm1");
-    outfile_->mkdir("wpt_nm1");
-    outfile_->mkdir("bbwdphi_nm1");
+    outfile_->mkdir("lep1mt_nm1");
+    outfile_->mkdir("mt2bl_nm1");
+    // outfile_->mkdir("mt2w_nm1");
+    // outfile_->mkdir("bbpt_nm1");
+    // outfile_->mkdir("wpt_nm1");
+    // outfile_->mkdir("bbwdphi_nm1");
   }
   outfile_->mkdir("final");
   if (isWjets_) {
@@ -321,7 +323,9 @@ void WHLooper::loop(TChain *chain, TString name) {
       if (stopt.ngoodlep() != 1) continue;
       if (!passIsoTrkVeto_v3()) continue;
 
-      // set mt2w to dummy value
+      // set mt2 vars to dummy value
+      mt2b_ = -1.;
+      mt2bl_ = -1.;
       mt2w_ = -1.;
 
       // require 2 bjets
@@ -333,36 +337,32 @@ void WHLooper::loop(TChain *chain, TString name) {
       //      if (njetsalleta != 2) continue;
       //      if (stopt.pfmet() < 150.) continue;
       if (nbjets < 2) continue;
-      fillHists1DWrapper(h_1d_presel,evtweight,"presel");
-      if (isWjets_) {
-      	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_presel_nobs,evtweight,"presel_nobs");
-      	else fillHists1DWrapper(h_1d_presel_bs,evtweight,"presel_bs");
-      }
 
       // specific cuts: dummy signal region
       //      if (nbjets < 2) continue;
       std::vector<LorentzVector> bjets_csvm = getBJets(WHLooper::CSVM);
       int nbjets_csvm = bjets_csvm.size();
       LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
-      float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+      float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.t1metphicorr(), stopt.t1metphicorrphi() );
       TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
       TVector2 met;
-      met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
+      met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
       TVector2 w = lep+met; 
 
-      //      if (nbjets_csvm < 1) continue;
-      if (nbjets_csvm < 2) continue;
       if (doNM1Plots) fillHists1DWrapper(h_1d_njets_nm1,evtweight,"njets_nm1");
       if (njets > 2) continue;
       if (doNM1Plots) fillHists1DWrapper(h_1d_njetsalleta_nm1,evtweight,"njetsalleta_nm1");
       if (njetsalleta > 2) continue;
 
+      //      if (doNM1Plots) fillHists1DWrapper(h_1d_pfmet_nm1,evtweight,"pfmet_nm1");
+      if (stopt.t1metphicorr() < 50.) continue;
+
       // calculate mt2w, after requiring exactly two jets
       // make dummy vector of csv values for bjets, for mt2w calc
       std::vector<float> bjets_csv(2, 0.99);
-      mt2b_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi(), MT2b);
-      mt2bl_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi(), MT2bl);
-      mt2w_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.pfmet(), stopt.pfmetphi(), MT2w);
+      mt2b_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
+      mt2bl_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
+      mt2w_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
 
       // consider tightening bbmass to 110,140 for low mass sel??
       if (doNM1Plots) fillHists1DWrapper(h_1d_bbmass_nm1,evtweight,"bbmass_nm1");
@@ -371,29 +371,40 @@ void WHLooper::loop(TChain *chain, TString name) {
 	else fillHists1DWrapper(h_1d_bbmass_bs_nm1,evtweight,"bbmass_bs_nm1");
       }
       //           if (bb.M() < 95. || bb.M() > 150.) continue;
-      if (bb.M() < 100. || bb.M() > 140.) continue;
-      // if (bb.M() < 150.) continue;
+      //      if (bb.M() < 100. || bb.M() > 140.) continue;
+      if (bb.M() < 150.) continue;
 
-      // fill minibaby after bbmass cut
+      // --- consider above cuts preselection, fill presel histos here
+      // also fill custom minibaby if using
       if (doMiniBaby) FillBabyNtuple(evtweight);
+      fillHists1DWrapper(h_1d_presel,evtweight,"presel");
+      if (isWjets_) {
+      	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_presel_nobs,evtweight,"presel_nobs");
+      	else fillHists1DWrapper(h_1d_presel_bs,evtweight,"presel_bs");
+      }
 
-      if (doNM1Plots) fillHists1DWrapper(h_1d_lep1mt_nm1,evtweight,"lep1mt_nm1");
-      if (lep1mt < 120.) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_mt2w_nm1,evtweight,"mt2w_nm1");
-      if (mt2w_ < 175.) continue;
-      //      if (mt2w_ < 200.) continue;
       if (doNM1Plots) fillHists1DWrapper(h_1d_pfmet_nm1,evtweight,"pfmet_nm1");
-      if (stopt.pfmet() < 150.) continue;
+      if (stopt.t1metphicorr() < 175.) continue;
+      //      if (stopt.t1metphicorr() < 150.) continue;
       // if (stopt.pfmet() < 80.) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_bbpt_nm1,evtweight,"bbpt_nm1");
-      if (bb.pt() < 150.) continue;
-      //      if (bb.pt() < 175.) continue;
-      //      if (bb.pt() < 220.) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_wpt_nm1,evtweight,"wpt_nm1");
-      if (w.Mod() < 150.) continue;
-      //      if (w.Mod() < 220.) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_bbwdphi_nm1,evtweight,"bbwdphi_nm1");
-      if (fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())) < 2.95) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_lep1mt_nm1,evtweight,"lep1mt_nm1");
+      //      if (lep1mt < 120.) continue;
+      if (lep1mt < 100.) continue;
+      if (doNM1Plots) fillHists1DWrapper(h_1d_mt2bl_nm1,evtweight,"mt2bl_nm1");
+      //      if (mt2bl_ < 175.) continue;
+      if (mt2bl_ < 200.) continue;
+      // if (doNM1Plots) fillHists1DWrapper(h_1d_mt2w_nm1,evtweight,"mt2w_nm1");
+      // if (mt2w_ < 175.) continue;
+      // //      if (mt2w_ < 200.) continue;
+      // if (doNM1Plots) fillHists1DWrapper(h_1d_bbpt_nm1,evtweight,"bbpt_nm1");
+      // if (bb.pt() < 150.) continue;
+      // //      if (bb.pt() < 175.) continue;
+      // //      if (bb.pt() < 220.) continue;
+      // if (doNM1Plots) fillHists1DWrapper(h_1d_wpt_nm1,evtweight,"wpt_nm1");
+      // if (w.Mod() < 150.) continue;
+      // //      if (w.Mod() < 220.) continue;
+      // if (doNM1Plots) fillHists1DWrapper(h_1d_bbwdphi_nm1,evtweight,"bbwdphi_nm1");
+      // if (fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())) < 2.95) continue;
 
       ++nEventsPass;
 
@@ -434,12 +445,13 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_bbmass_nobs_nm1,outfile_,"bbmass_nobs_nm1");
       savePlotsDir(h_1d_bbmass_bs_nm1,outfile_,"bbmass_bs_nm1");
     }
-    savePlotsDir(h_1d_lep1mt_nm1,outfile_,"lep1mt_nm1");
-    savePlotsDir(h_1d_mt2w_nm1,outfile_,"mt2w_nm1");
     savePlotsDir(h_1d_pfmet_nm1,outfile_,"pfmet_nm1");
-    savePlotsDir(h_1d_bbpt_nm1,outfile_,"bbpt_nm1");
-    savePlotsDir(h_1d_wpt_nm1,outfile_,"wpt_nm1");
-    savePlotsDir(h_1d_bbwdphi_nm1,outfile_,"bbwdphi_nm1");
+    savePlotsDir(h_1d_lep1mt_nm1,outfile_,"lep1mt_nm1");
+    savePlotsDir(h_1d_mt2bl_nm1,outfile_,"mt2bl_nm1");
+    // savePlotsDir(h_1d_mt2w_nm1,outfile_,"mt2w_nm1");
+    // savePlotsDir(h_1d_bbpt_nm1,outfile_,"bbpt_nm1");
+    // savePlotsDir(h_1d_wpt_nm1,outfile_,"wpt_nm1");
+    // savePlotsDir(h_1d_bbwdphi_nm1,outfile_,"bbwdphi_nm1");
   }
 
   savePlotsDir(h_1d_final,outfile_,"final");
@@ -462,7 +474,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   bmark->Stop("benchmark");
   cout << endl;
   cout << nEventsTotal << " Events Processed" << endl;
-  cout << nEventsPass << " Events Passed" << endl;
+  if (!isData)  cout << nEventsPass << " Events Passed" << endl;
   cout << "------------------------------" << endl;
   cout << "CPU  Time:	" << Form( "%.01f s", bmark->GetCpuTime("benchmark")  ) << ", Rate: " << Form( "%.1f Hz", float(nEventsTotal)/bmark->GetCpuTime("benchmark")) << endl;
   cout << "Real Time:	" << Form( "%.01f s", bmark->GetRealTime("benchmark") ) << ", Rate: " << Form( "%.1f Hz", float(nEventsTotal)/bmark->GetRealTime("benchmark")) << endl;
@@ -519,25 +531,30 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   outfile_->cd(dir.c_str());
 
-  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.t1metphicorr(), stopt.t1metphicorrphi() );
   int njets = getNJets();
   int njetsalleta = getNJets(4.7);
   TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
   TVector2 met;
-  met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
+  met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
   TVector2 w = lep+met; 
 
   plot1D("h_lep1pt"+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_lep1eta"+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
   plot1D("h_lep1mt"+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
-  plot1D("h_pfmet"+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_pfmet"+suffix,        stopt.t1metphicorr(),    evtweight, h_1d, 500, 0., 500.);
   plot1D("h_pfsumet"+suffix,      stopt.pfsumet(),    evtweight, h_1d, 1500, 0., 1500.);
   plot1D("h_pfmetsig"+suffix,     stopt.pfmet()/sqrt(stopt.pfsumet()),   evtweight, h_1d, 500, 0., 20.);
   plot1D("h_njets"+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
   plot1D("h_njetsalleta"+suffix,  njetsalleta,        evtweight, h_1d, 10, 0., 10.);
   plot1D("h_nbjets"+suffix,       myBJets_.size(),    evtweight, h_1d, 5, 0., 5.);
   plot1D("h_wpt"+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
-  plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.pfmetphi())),       evtweight, h_1d, 50, 0., TMath::Pi());
+  plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.t1metphicorrphi())),  evtweight, h_1d, 50, 0., TMath::Pi());
+
+  // phi cor met validation
+  plot1D("h_metdiff"+suffix,        stopt.t1metphicorr() - stopt.pfmet(),    evtweight, h_1d, 500, -250., 250.);
+  plot1D("h_metphidiff"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.t1metphicorrphi() - stopt.pfmetphi())),    evtweight, h_1d,  50, 0., TMath::Pi());
+
 
   if (isWjets_) {
     plot1D("h_nbs",       stopt.nbs(),       evtweight, h_1d, 5, 0, 5);
@@ -564,7 +581,7 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
     plot1D("h_bbwsumpt"+suffix,       bb.pt()+w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
 
-    plot1D("h_allsumpt"+suffix,      myBJets_[0].pt()+ myBJets_[1].pt()+stopt.lep1().pt()+stopt.pfmet() , evtweight, h_1d, 1500, 0., 1500.);
+    plot1D("h_allsumpt"+suffix,      myBJets_[0].pt()+ myBJets_[1].pt()+stopt.lep1().pt()+stopt.t1metphicorr() , evtweight, h_1d, 1500, 0., 1500.);
 
     LorentzVector b1lep1 = myBJets_.at(0) + stopt.lep1();
     plot1D("h_bjet1lep1mass"+suffix,       b1lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
@@ -581,9 +598,14 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D("h_mt2bl"+suffix,  mt2bl_, evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_mt2w"+suffix,   mt2w_,  evtweight, h_1d, 1000, 0., 1000.);
 
+    // use loose btags here in case i plot before requiring 2 med
     std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1);
     plot1D("h_bjet1mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(0)) , evtweight, h_1d, 40, -20., 20.);
     plot1D("h_bjet2mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(1)) , evtweight, h_1d, 40, -20., 20.);
+
+    // need V00-02-20 or higher babies for these vars
+    //    plot1D("h_bjet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(0))) , evtweight, h_1d, 22, 0., 22.);
+    //    plot1D("h_bjet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(1))) , evtweight, h_1d, 22, 0., 22.);
   }
 
   return;
@@ -626,14 +648,14 @@ void WHLooper::FillBabyNtuple (const float evtweight)
   leptype_ = stopt.leptype();
   weight_ = evtweight;
 
-  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.pfmet(), stopt.pfmetphi() );
+  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.t1metphicorr(), stopt.t1metphicorrphi() );
   LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
   TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
   TVector2 met;
-  met.SetMagPhi(stopt.pfmet(),stopt.pfmetphi());
+  met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
   TVector2 w = lep+met; 
 
-  pfmet_ = stopt.pfmet();
+  pfmet_ = stopt.t1metphicorr();
   lep1mt_ = lep1mt;
   //   mt2w_; // filled in main loop
   bbpt_ = bb.pt();
