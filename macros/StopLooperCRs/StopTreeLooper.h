@@ -51,10 +51,18 @@ class StopTreeLooper {
 	float t1metphicorr;
 	float t1metphicorrphi;
 	float t1metphicorrmt;
-	//min dphi {j1,j2}
-	float dphimjmin;
+	//subtract lepton
+	float t1metphicorr_lep;
+	float t1metphicorrphi_lep;
+	float t1metphicorrmt_lep;
+	float dphi_pseudometlep;
+	float leppt;
+	//min dphi {j1,j2} 
+	float dphimj12min;
 	float dphimj1;
 	float dphimj2;
+	float dphimjmin;
+	float dphimjmax;
 	//b pt
 	float pt_b;
 	float dRleptB1;
