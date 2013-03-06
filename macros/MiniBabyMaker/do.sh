@@ -8,7 +8,7 @@ XPATH=/nfs-3/userdata/stop/output_V00-02-18_2012_4jskim/
 #XPATH=/nfs-3/userdata/stop/MiniBabies/V00-02-16_2012_4jskim
 
 for tag in `ls -1 $XPATH | grep root |  cut -d'.' -f1`;
-  do echo root -b -q -l doFile.C\(\"$XPATH\",\"$tag\"\) &
+  do  root -b -q -l doFile.C\(\"$XPATH\",\"$tag\"\) &
 #  sleep 10
 done
 

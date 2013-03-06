@@ -9,8 +9,8 @@ doFile(const char* pth = "/nfs-3/userdata/stop/output_V00-02-18_2012_4jskim", co
   gSystem->Load("libEG.so");
   gSystem->Load("libMathCore.so");
 
-  //gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
-  gROOT->ProcessLine(".L ../../Tools/MiniFWLite/libMiniFWLite.so");
+//  gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
+//  gROOT->ProcessLine(".L ../../Tools/MiniFWLite/libMiniFWLite.so");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
   gROOT->ProcessLine(".L ../Core/StopTree.h+");
 

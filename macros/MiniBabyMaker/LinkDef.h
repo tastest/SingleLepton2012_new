@@ -4,8 +4,8 @@
 #pragma link C++ all functions;
 
 #pragma link C++ class StopTreeLooper;
-#pragma link C++ class Candidate;
-#pragma link C++ class vector<Candidate>;
+//#pragma link C++ class Candidate;
+//#pragma link C++ class vector<Candidate>;
 
 #endif
 
