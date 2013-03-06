@@ -48,7 +48,7 @@ StopTreeLooper::StopTreeLooper()
     N_JETS_TO_CONSIDER = 6;
     NJETS_CUT = 3;
 
-    MET_CUT = 100.0;
+    MET_CUT = 50.0;
 
     m_minibabylabel_ = "";
 }
