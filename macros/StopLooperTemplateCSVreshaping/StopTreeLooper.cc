@@ -253,8 +253,19 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         //float csv_nominal4p=nominalShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
         //float csv_upBC4p=upBCShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
         //float csv_downBC4p=downBCShape4p->reshape(stopt.pfjets()[ijet].Eta(),stopt.pfjets()[ijet].Pt(),stopt.pfjets_csv()[ijet],stopt.pfjets_mcflavorAlgo()[ijet]);
-        
 
+
+        //fill csv discriminator shape histos for comparison with csvdiscr.root
+        if ( stopt.pfjets_mcflavorAlgo()[ijet] == 5 ) plot1D("hb",       stopt.pfjets_csv()[ijet],       1., h_1d, 2000, -1, 1);
+        else if ( stopt.pfjets_mcflavorAlgo()[ijet] == 4 ) plot1D("hc",       stopt.pfjets_csv()[ijet],       1., h_1d, 2000, -1, 1);
+        else if ( stopt.pfjets_mcflavorAlgo()[ijet] == 3 || stopt.pfjets_mcflavorAlgo()[ijet] == 2 || stopt.pfjets_mcflavorAlgo()[ijet] == 1 ) plot1D("hl",       stopt.pfjets_csv()[ijet],       1., h_1d, 2000, -1, 1);
+
+        //look at how the shapes are changed by the reshaping
+        if ( stopt.pfjets_mcflavorAlgo()[ijet] == 5 ) plot1D("hb_afterreshaping",       csv_nominal,       1., h_1d, 2000, -1, 1);
+        else if ( stopt.pfjets_mcflavorAlgo()[ijet] == 4 ) plot1D("hc_afterreshaping",       csv_nominal,       1., h_1d, 2000, -1, 1);
+        else if ( stopt.pfjets_mcflavorAlgo()[ijet] == 3 || stopt.pfjets_mcflavorAlgo()[ijet] == 2 || stopt.pfjets_mcflavorAlgo()[ijet] == 1 ) plot1D("hl_afterreshaping",       csv_nominal,       1., h_1d, 2000, -1, 1);
+
+        //calculate number of b-tags pre- and post-reshaping
         bool isbtagcsvm = false;
         if( stopt.pfjets_csv()[ijet]  > 0.679 ) {isbtagcsvm = true; nbtagscsvm_default++;}
         if( csv_nominal  > 0.679 ) nbtagscsvm_reshaped++;
@@ -267,13 +278,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         random3_->SetSeed(randseed);
         float rand = random3_->Uniform(1.);  
         
-        //use old flavour definition using status 3 matching for consistency with random upgrading/downgrading method
+        //start by reproducing result stored in babies
+
+        //use old flavour definition using status 3 matching for consistency with method used in babies
         int pdgid = (stopt.pfjets_flav()[ijet]==5?5:0);
-
-        // btag variables: CSVM
-
         
-        //default SFs
+        //SFs used for result in babies
         float SFb_csvm  = getBtagSF( stopt.pfjets()[ijet].Pt(), stopt.pfjets()[ijet].Eta(), "CSVM");
         float SFl_csvm  = getMistagSF( stopt.pfjets()[ijet].Pt(), stopt.pfjets()[ijet].Eta(), "CSVM");
         float Effl_csvm = getMistags( stopt.pfjets()[ijet].Pt(), stopt.pfjets()[ijet].Eta(), "CSVM");
@@ -281,7 +291,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         if (iscorrbtagcsvm) nbtagscsvm_random++;
         
 
-        //SFs used by reshaping
+        //now recalculate using SFs and flav used by reshaping method
+        pdgid = (stopt.pfjets_mcflavorAlgo()[ijet]==5?5:0);
         SFb_csvm  = beff::CSVM_SFb( stopt.pfjets()[ijet].Pt() );
         SFl_csvm  = mistag_CSVM( fabs(stopt.pfjets()[ijet].Eta()),stopt.pfjets()[ijet].Pt(),0.);
         bool iscorrbtagcsvm_new = getCorrBtag(isbtagcsvm, pdgid, SFb_csvm, SFl_csvm, Effl_csvm, rand);
