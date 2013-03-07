@@ -291,6 +291,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 //      << " weight " << evtweight << endl;
             }
 
+	    nvtxweight_ = stopt.nvtxweight();
             sltrigeff_   = isData ? 1. : 
                 getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
             dltrigeff_ = isData ? 1. : 
@@ -470,6 +471,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             t2ttLM_     = pass_T2tt_LM(isData);
             t2ttHM_     = pass_T2tt_HM(isData);
 
+	    // susy vars
+	    mstop_       = stopt.mg();                   // stop mass
+	    mlsp_        = stopt.ml();                   // LSP mass
+	    x_           = stopt.x();                    // chargino mass parameter x
+	    xsecsusy_    = stopt.xsecsusy();
+
             // number of analysis selected leptons
             nlep_       = stopt.ngoodlep();              
             lep1pt_     = stopt.lep1().pt();             // 1st lepton pt
@@ -550,6 +557,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_mt2w"      , &mt2w_      ,  "mini_mt2w/F"      );
 
             outTree_->Branch("mini_weight"    , &weight_    ,  "mini_weight/F"	 );
+            outTree_->Branch("mini_nvtxweight", &nvtxweight_,  "mini_nvtxweight/F"	 );
             outTree_->Branch("mini_sltrigeff" , &sltrigeff_ ,  "mini_sltrigeff/F" );
             outTree_->Branch("mini_dltrigeff" , &dltrigeff_ ,  "mini_dltrigeff/F" );
 
@@ -565,6 +573,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_lep2pt"    , &lep2pt_    ,  "mini_lep2pt/F"	 );
             outTree_->Branch("mini_lep2eta"   , &lep2eta_   ,  "mini_lep2eta/F"	 );
             outTree_->Branch("mini_dilmass"   , &dilmass_   ,  "mini_dilmass/F"	 );
+	    outTree_->Branch("mini_mstop"     , &mstop_     ,  "mini_mstop/F"		);
+	    outTree_->Branch("mini_mlsp"      , &mlsp_      ,  "mini_mlsp/F"		);
+	    outTree_->Branch("mini_x"         , &x_         ,  "mini_x/F"		);
+	    outTree_->Branch("mini_xsecsusy"  , &xsecsusy_  ,  "mini_xsecsusy/F"		);
 
             outTree_->Branch("mini_htssl"     , &htssl_     ,  "mini_htssl/F"     );
             outTree_->Branch("mini_htosl"     , &htosl_     ,  "mini_htosl/F"     );
@@ -629,6 +641,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         // weights
         weight_     = -1.0;
+        nvtxweight_ = -1.0;
         sltrigeff_  = -1.0;
         dltrigeff_  = -1.0;
 
@@ -646,6 +659,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         lep2pt_     = -1.0;
         lep2eta_    = -1.0;
         dilmass_    = -1.0;
+
+	// susy variables
+	mstop_      = -1.0;
+	mlsp_       = -1.0;
+	x_          = -1.0;
+	xsecsusy_   = -1.0;
 
         // jet kinematics
         pt_b_  = -1.0;

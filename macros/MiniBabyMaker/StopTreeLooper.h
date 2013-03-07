@@ -97,6 +97,7 @@ class StopTreeLooper {
 
 	// weights
 	Float_t weight_;
+	Float_t nvtxweight_;
 	Float_t sltrigeff_;
 	Float_t dltrigeff_;
 
@@ -131,6 +132,7 @@ class StopTreeLooper {
 	Float_t mstop_;
 	Float_t mlsp_;
 	Float_t x_;
+	Float_t xsecsusy_;
 
 	Float_t rand_;
 	vector<float> bdt_;
