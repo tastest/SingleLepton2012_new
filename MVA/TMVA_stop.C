@@ -1,4 +1,4 @@
-// @(#)root/tmva $Id: TMVA_stop.C,v 1.4 2013/01/29 15:40:22 magania Exp $
+// @(#)root/tmva $Id: TMVA_stop.C,v 1.5 2013/03/07 15:05:46 magania Exp $
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
@@ -72,18 +72,17 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
   // define event selection (store in TCut sel)
   //-----------------------------------------------------
 
-  TCut njets4("njets>=4");
-  TCut met100("met>=100");
-  TCut mt120("mt>=120");
-  TCut mt100("mt>=100");
-  TCut nb1("nb>=1");
-  //TCut isotrk("passisotrk==1");
-  TCut isotrk("passisotrkv2==1");
-  TCut lep_pt30("nlep>=1 && lep1pt>30.0");
+  TCut njets4("mini_njets>=4");
+  TCut met100("mini_met>=100");
+  TCut mt120("mini_mt>=120");
+  TCut nb1("mini_nb>=1");
+  TCut isotrk("mini_passisotrk==1");
+  TCut lep_pt30("mini_nlep>=1 && mini_lep1pt>30.0");
+  TCut sig("mini_sig==1");
    
-  TCut  sel  = lep_pt30 + isotrk + njets4 + mt120 + met100 + nb1;
+  TCut  sel0  = njets4 + met100 + mt120 + nb1 + isotrk + lep_pt30 + sig;
 
-  cout << "Using selection      : " << sel.GetTitle() << endl;
+  cout << "Using selection      : " << sel0.GetTitle() << endl;
   cout << "Doing signal point   : " << train_region       << endl;
 
   //-----------------------------------------------------
@@ -92,21 +91,20 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
   
   std::map<std::string,int> mvaVar;
   mvaVar[ "met" ]			= 1;
-  mvaVar[ "lep1pt" ]			= 1;
-  mvaVar[ "mt2wmin" ]			= 1;
-  mvaVar[ "htratiom" ]	                = 1;
-  mvaVar[ "chi2minprob" ]		= 1;
-  mvaVar[ "dphimjmin" ]			= 1;
-  mvaVar[ "pt_b" ]			= 1;
+  mvaVar[ "lep1pt" ]  	    = 0;
+  mvaVar[ "mt2w" ]	  		= 1;
+  mvaVar[ "htratiom" ]	    = 1;
+  mvaVar[ "chi2" ]	        = 1;
+  mvaVar[ "dphimjmin" ]		= 1;
+  mvaVar[ "pt_b" ]			= 0;
+  mvaVar[ "nb" ]			= 0;
   mvaVar[ "pt_J1" ]			= 0;
   mvaVar[ "pt_J2" ]			= 0;
   mvaVar[ "rand" ]			= 0;
 
   mvaVar[ "mt" ]			= 0;
-  mvaVar[ "mt2w" ]			= 0;
   mvaVar[ "mt2bl" ]			= 0;
   mvaVar[ "mt2b" ]			= 0;
-  mvaVar[ "chi2" ]			= 0;
   mvaVar[ "lep1eta" ]			= 0;
   mvaVar[ "thrjetlm" ]			= 0;
   mvaVar[ "apljetlm" ]			= 0;
@@ -133,24 +131,18 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
   //choose bkg samples to include
   //---------------------------------
   cout << "Background trees: " << endl;
-  int n_backgrounds = 2;
+  int n_backgrounds = 8;
 
-  TString backgrounds[] = {"ttdl_powheg", "ttsl_powheg"};
+  TString backgrounds[] = {"ttdl_powheg", "ttsl_powheg", "w1to4jets", "tW_lep", "triboson", "diboson", "ttV", "DY1to4Jtot" };
 
-  TString bkgPath = "/nfs-3/userdata/stop/MiniBabies/4jskim";
+  TString bkgPath = "/nfs-3/userdata/stop/Train/V00-02-18__V00-03-00_4jetsMET100_bkg/";
 
-  TChain* chBkgTrain = new TChain("t");
-  TChain* chBkgTest = new TChain("t");
+  TChain* chBackground = new TChain("t");
  
   for (int i = 0; i < n_backgrounds; i++) {
-     TString bkgTrainChain = bkgPath + "/" + backgrounds[i] + "_train.root";
-     TString bkgTestChain  = bkgPath + "/" + backgrounds[i] + "_test.root" ; 
-   
-     cout << "    " << bkgTrainChain << endl;
-     cout << "    " << bkgTestChain << endl;
-   
-     chBkgTrain->Add(bkgTrainChain);
-     chBkgTest ->Add(bkgTestChain );
+     TString backgroundChain = bkgPath + "/" + backgrounds[i] + ".root";
+     cout << "    " << backgroundChain << endl;
+     chBackground ->Add(backgroundChain );
   }
 
   //---------------------------------
@@ -162,21 +154,18 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
   TString s_x_parameter = "";
   s_x_parameter = Form("%.2f",x_parameter);
 
-  TString signalPath = "/nfs-3/userdata/stop/MiniBabies";
+  TString signalPath = "/nfs-3/userdata/stop/Train/";
+  TString signalVersion = "V00-02-18__V00-03-00_4jetsMET100_";
 
-  TChain *chSignalTrain = new TChain("t");
-  TChain *chSignalTest = new TChain("t");
+  TChain *chSignal = new TChain("t");
 
-  TString base_name = signalPath + "/" + signal_name + "/" + signal_name + "_" + s_train_region;
+  TString base_name = signalPath + "/" + signalVersion + signal_name + "/" + signal_name + "_" + s_train_region;
   if (signal_name == "T2bw") base_name = base_name + "_" + s_x_parameter;
-  TString signalTestChain  = base_name + "_test.root" ;
-  TString signalTrainChain = base_name + "_train.root" ;
+  TString signalChain  = base_name + ".root" ;
 
-  cout << "    " << signalTrainChain << endl;
-  cout << "    " << signalTestChain  << endl;
+  cout << "    " << signalChain << endl;
 
-  chSignalTrain->Add(signalTrainChain);
-  chSignalTest ->Add(signalTestChain);
+  chSignal->Add(signalChain);
 
   //-----------------------------------------------------
   // choose backgrounds to include for multiple outputs
@@ -255,7 +244,7 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    // 
    // --- Boosted Decision Trees
    Use["BDT"]             = 1; // uses Adaptive Boost
-   Use["BDT1"]            = 1; // uses Adaptive Boost
+   Use["BDT1"]            = 0; // uses Adaptive Boost
    Use["BDTG"]            = 0; // uses Gradient Boost
    Use["BDTB"]            = 0; // uses Bagging
    Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
@@ -329,41 +318,42 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    // choose which variables to include in training
    //--------------------------------------------------------
 
-   if( mvaVar[ "met"           ]  == 1 ) factory->AddVariable( "met"                    ,  "E_{T}^{miss}"               ,       "GeV", 'F' );
-   if( mvaVar[ "mt"            ]  == 1 ) factory->AddVariable( "mt"                     ,  "M_{T}"                      ,       "GeV", 'F' );
-   if( mvaVar[ "mt2w"          ]  == 1 ) factory->AddVariable( "mt2w"                   ,  "MT2W"                       ,       "GeV", 'F' );
-   if( mvaVar[ "mt2bl"         ]  == 1 ) factory->AddVariable( "mt2bl"                  ,  "MT2bl"                      ,       "GeV", 'F' );
-   if( mvaVar[ "mt2b"          ]  == 1 ) factory->AddVariable( "mt2b"                   ,  "MT2b"                       ,       "GeV", 'F' );
-   if( mvaVar[ "chi2"          ]  == 1 ) factory->AddVariable( "min(chi2,100)"          ,  "chi2"                       ,       ""   , 'F' );
-   if( mvaVar[ "lep1pt"        ]  == 1 ) factory->AddVariable( "lep1pt"                 ,  "lepton pt"                  ,       ""   , 'F' );
-   if( mvaVar[ "lep1eta"       ]  == 1 ) factory->AddVariable( "lep1eta"                ,  "lepton eta"                 ,       ""   , 'F' );
-   if( mvaVar[ "thrjetlm"      ]  == 1 ) factory->AddVariable( "thrjetlm"               ,  "thrust"                     ,       ""   , 'F' );
-   if( mvaVar[ "apljetlm"      ]  == 1 ) factory->AddVariable( "apljetlm"               ,  "aplanarity"                 ,       ""   , 'F' );
-   if( mvaVar[ "sphjetlm"      ]  == 1 ) factory->AddVariable( "sphjetlm"               ,  "sphericity"                 ,       ""   , 'F' );
-   if( mvaVar[ "cirjetlm"      ]  == 1 ) factory->AddVariable( "cirjetlm"               ,  "circularity"                ,       ""   , 'F' );
-   if( mvaVar[ "chi2min"       ]  == 1 ) factory->AddVariable( "min(chi2min,100)"       ,  "#chi^{2}_{min}"             ,       ""   , 'F' );
-   if( mvaVar[ "chi2minprob"   ]  == 1 ) factory->AddVariable( "chi2minprob"            ,  "Prob(#chi^{2}_{min})"       ,       ""   , 'F' );
-   if( mvaVar[ "chi2min_mt2b"  ]  == 1 ) factory->AddVariable( "chi2min_mt2b"           ,  "MT2b(#chi^{2}_{min})"       ,       ""   , 'F' );
-   if( mvaVar[ "chi2min_mt2bl" ]  == 1 ) factory->AddVariable( "chi2min_mt2bl"          ,  "MT2bl(#chi^{2}_{min})"      ,       ""   , 'F' );
-   if( mvaVar[ "chi2min_mt2w"  ]  == 1 ) factory->AddVariable( "chi2min_mt2w"           ,  "MT2W(#chi^{2}_{min})"       ,       ""   , 'F' );
-   if( mvaVar[ "mt2bmin"       ]  == 1 ) factory->AddVariable( "mt2bmin"                ,  "MT2b_{min}"                 ,       ""   , 'F' );
-   if( mvaVar[ "mt2blmin"      ]  == 1 ) factory->AddVariable( "mt2blmin"               ,  "MT2bl_{min}"                ,       ""   , 'F' );
-   if( mvaVar[ "mt2wmin"       ]  == 1 ) factory->AddVariable( "mt2wmin"                ,  "MT2W_{min}"                 ,       ""   , 'F' );
+   if( mvaVar[ "met"           ]  == 1 ) factory->AddVariable( "mini_met"                    ,  "E_{T}^{miss}"               ,       "GeV", 'F' );
+   if( mvaVar[ "mt"            ]  == 1 ) factory->AddVariable( "mini_mt"                     ,  "M_{T}"                      ,       "GeV", 'F' );
+   if( mvaVar[ "mt2w"          ]  == 1 ) factory->AddVariable( "mini_mt2w"                   ,  "MT2W"                       ,       "GeV", 'F' );
+   if( mvaVar[ "mt2bl"         ]  == 1 ) factory->AddVariable( "mini_mt2bl"                  ,  "MT2bl"                      ,       "GeV", 'F' );
+   if( mvaVar[ "mt2b"          ]  == 1 ) factory->AddVariable( "mini_mt2b"                   ,  "MT2b"                       ,       "GeV", 'F' );
+   if( mvaVar[ "chi2"          ]  == 1 ) factory->AddVariable( "mini_chi2"                   ,  "chi2"                       ,       ""   , 'F' );
+   if( mvaVar[ "lep1pt"        ]  == 1 ) factory->AddVariable( "mini_lep1pt"                 ,  "lepton pt"                  ,       ""   , 'F' );
+   if( mvaVar[ "lep1eta"       ]  == 1 ) factory->AddVariable( "mini_lep1eta"                ,  "lepton eta"                 ,       ""   , 'F' );
+   if( mvaVar[ "thrjetlm"      ]  == 1 ) factory->AddVariable( "mini_thrjetlm"               ,  "thrust"                     ,       ""   , 'F' );
+   if( mvaVar[ "apljetlm"      ]  == 1 ) factory->AddVariable( "mini_apljetlm"               ,  "aplanarity"                 ,       ""   , 'F' );
+   if( mvaVar[ "sphjetlm"      ]  == 1 ) factory->AddVariable( "mini_sphjetlm"               ,  "sphericity"                 ,       ""   , 'F' );
+   if( mvaVar[ "cirjetlm"      ]  == 1 ) factory->AddVariable( "mini_cirjetlm"               ,  "circularity"                ,       ""   , 'F' );
+   if( mvaVar[ "chi2min"       ]  == 1 ) factory->AddVariable( "mini_min(chi2min,100)"       ,  "#chi^{2}_{min}"             ,       ""   , 'F' );
+   if( mvaVar[ "chi2minprob"   ]  == 1 ) factory->AddVariable( "mini_chi2minprob"            ,  "Prob(#chi^{2}_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "chi2min_mt2b"  ]  == 1 ) factory->AddVariable( "mini_chi2min_mt2b"           ,  "MT2b(#chi^{2}_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "chi2min_mt2bl" ]  == 1 ) factory->AddVariable( "mini_chi2min_mt2bl"          ,  "MT2bl(#chi^{2}_{min})"      ,       ""   , 'F' );
+   if( mvaVar[ "chi2min_mt2w"  ]  == 1 ) factory->AddVariable( "mini_chi2min_mt2w"           ,  "MT2W(#chi^{2}_{min})"       ,       ""   , 'F' );
+   if( mvaVar[ "mt2bmin"       ]  == 1 ) factory->AddVariable( "mini_mt2bmin"                ,  "MT2b_{min}"                 ,       ""   , 'F' );
+   if( mvaVar[ "mt2blmin"      ]  == 1 ) factory->AddVariable( "mini_mt2blmin"               ,  "MT2bl_{min}"                ,       ""   , 'F' );
+   if( mvaVar[ "mt2wmin"       ]  == 1 ) factory->AddVariable( "mini_mt2wmin"                ,  "MT2W_{min}"                 ,       ""   , 'F' );
    if( mvaVar[ "mt2bmin_chi2"  ]  == 1 ) factory->AddVariable( "min(mt2bmin_chi2,100)"  ,  "#chi^{2}(MT2b_{min})"       ,       ""   , 'F' );
    if( mvaVar[ "mt2blmin_chi2" ]  == 1 ) factory->AddVariable( "min(mt2blmin_chi2,100)" ,  "#chi^{2}(MT2bl_{min})"      ,       ""   , 'F' );
    if( mvaVar[ "mt2wmin_chi2"  ]  == 1 ) factory->AddVariable( "min(mt2wmin_chi2,100)"  ,  "#chi^{2}(MT2W_{min})"       ,       ""   , 'F' );
    if( mvaVar[ "mt2bmin_chi2prob"  ]  == 1 ) factory->AddVariable( "mt2bmin_chi2prob"   ,  "Prob(#chi^{2}(MT2b_{min}))"       ,       ""   , 'F' );
    if( mvaVar[ "mt2blmin_chi2prob" ]  == 1 ) factory->AddVariable( "mt2blmin_chi2prob"  ,  "Prob(#chi^{2}(MT2bl_{min}))"      ,       ""   , 'F' );
    if( mvaVar[ "mt2wmin_chi2prob"  ]  == 1 ) factory->AddVariable( "mt2wmin_chi2prob"   ,  "Prob(#chi^{2}(MT2W_{min}))"       ,       ""   , 'F' );
-   if( mvaVar[ "htratiol"      ]  == 1 ) factory->AddVariable( "htssl/(htosl+htssl)"    ,  "H_{T}^{SSL}/H_{T}"          ,       ""   , 'F' );
-   if( mvaVar[ "htratiom"      ]  == 1 ) factory->AddVariable( "htssm/(htosm+htssm)"    ,  "H_{T}^{SSM}/H_{T}"          ,       ""   , 'F' );
-   if( mvaVar[ "dphimj1"       ]  == 1 ) factory->AddVariable( "dphimj1"                ,  "#Delta#phi(j1,E_{T}^{miss})",       ""   , 'F' );
-   if( mvaVar[ "dphimj2"       ]  == 1 ) factory->AddVariable( "dphimj2"                ,  "#Delta#phi(j2,E_{T}^{miss})",       ""   , 'F' );
-   if( mvaVar[ "dphimjmin"     ]  == 1 ) factory->AddVariable( "dphimjmin"              ,  "min(#Delta#phi(j_{1,2},E_{T}^{miss}))",       ""   , 'F' );
-   if( mvaVar[ "rand"          ]  == 1 ) factory->AddVariable( "rand"                   ,  "random(0,1)"                ,       ""   , 'F' );
+   if( mvaVar[ "htratiol"      ]  == 1 ) factory->AddVariable( "mini_htssl/(mini_htosl+mini_htssl)"    ,  "H_{T}^{SSL}/H_{T}"          ,       ""   , 'F' );
+   if( mvaVar[ "htratiom"      ]  == 1 ) factory->AddVariable( "mini_htssm/(mini_htosm+mini_htssm)"    ,  "H_{T}^{SSM}/H_{T}"          ,       ""   , 'F' );
+   if( mvaVar[ "dphimj1"       ]  == 1 ) factory->AddVariable( "mini_dphimj1"                ,  "#Delta#phi(j1,E_{T}^{miss})",       ""   , 'F' );
+   if( mvaVar[ "dphimj2"       ]  == 1 ) factory->AddVariable( "mini_dphimj2"                ,  "#Delta#phi(j2,E_{T}^{miss})",       ""   , 'F' );
+   if( mvaVar[ "dphimjmin"     ]  == 1 ) factory->AddVariable( "mini_dphimjmin"              ,  "min(#Delta#phi(j_{1,2},E_{T}^{miss}))",       ""   , 'F' );
+   if( mvaVar[ "rand"          ]  == 1 ) factory->AddVariable( "mini_rand"                   ,  "random(0,1)"                ,       ""   , 'F' );
    if( mvaVar[ "metsig"        ]  == 1 ) factory->AddVariable( "met/sqrt(htosl+htssl)"  ,  "E_{T}^{miss}/#sqrt{H_{T}}"  ,       "#sqrt{GeV}"   , 'F' )
 ;
-   if( mvaVar[ "pt_b"          ]  == 1 ) factory->AddVariable( "pt_b"  ,       "P_T(b) GeV"   , 'F' );
+   if( mvaVar[ "pt_b"          ]  == 1 ) factory->AddVariable( "mini_pt_b"  ,       "P_T(b) GeV"   , 'F' );
+   if( mvaVar[ "nb"            ]  == 1 ) factory->AddVariable( "mini_nb"  ,       "P_T(b) GeV"   , 'F' );
    if( mvaVar[ "pt_J1"          ]  == 1 ) factory->AddVariable( "pt_J1"  ,       "P_T(J1) GeV"   , 'F' );
    if( mvaVar[ "pt_J2"          ]  == 1 ) factory->AddVariable( "pt_J2"  ,       "P_T(J2) GeV"   , 'F' );
    
@@ -393,11 +383,11 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    //factory->AddSpectator( "spec1 := var1*2",  "Spectator 1", "units", 'F' );
    //factory->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
 
-   TTree* signalTrainingTree =  (TTree*) chSignalTrain;
-   TTree* signalTestTree =  (TTree*) chSignalTest;
-
-   TTree* bkgTrainingTree =  (TTree*) chBkgTrain;
-   TTree* bkgTestTree =  (TTree*) chBkgTest;
+//   TTree* signalTrainingTree =  (TTree*) chSignalTrain;
+//   TTree* signalTestTree =  (TTree*) chSignalTest;
+//
+//   TTree* bkgTrainingTree =  (TTree*) chBkgTrain;
+//   TTree* bkgTestTree =  (TTree*) chBkgTest;
    
 //    std::cout << "--- TMVAClassification       : Using bkg input files: -------------------" <<  std::endl;
 // 
@@ -422,13 +412,22 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
    Double_t backgroundWeight = 1.0;
+
+   // You can add an arbitrary number of signal or background trees
+//   factory->AddSignalTree    ( chSignal,     signalWeight     );
+//   factory->AddBackgroundTree( chBackground, backgroundWeight );
+
+   factory->AddTree(chSignal, "Signal", signalWeight, sel0+"mini_rand < 0.5", "train");
+   factory->AddTree(chSignal, "Signal", signalWeight, sel0+"mini_rand >= 0.5", "test");
+   factory->AddTree(chBackground, "Background", backgroundWeight, sel0+"mini_rand < 0.5", "train");
+   factory->AddTree(chBackground, "Background", backgroundWeight, sel0+"mini_rand >= 0.5", "test");
    
    // To give different trees for training and testing, do as follows:
-   factory->AddSignalTree( signalTrainingTree, signalWeight, "Training" );
-   factory->AddSignalTree( signalTestTree,     signalWeight,  "Test" );
+   //factory->AddSignalTree( signalTrainingTree, signalWeight, "Training" );
+   //factory->AddSignalTree( signalTestTree,     signalWeight,  "Test" );
 
-   factory->AddBackgroundTree( bkgTrainingTree, backgroundWeight, "Training" );
-   factory->AddBackgroundTree( bkgTestTree,     backgroundWeight,  "Test" );
+   //factory->AddBackgroundTree( bkgTrainingTree, backgroundWeight, "Training" );
+   //factory->AddBackgroundTree( bkgTestTree,     backgroundWeight,  "Test" );
    
    // Use the following code instead of the above two or four lines to add signal and background
    // training and test events "by hand"
@@ -461,13 +460,13 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    //        if (i < background->GetEntries()/2) factory->AddBackgroundTrainingEvent( vars, backgroundWeight*weight );
    //        else                                factory->AddBackgroundTestEvent    ( vars, backgroundWeight*weight );
    //     }
-         // --- end ------------------------------------------------------------
+   //      // --- end ------------------------------------------------------------
    //
    // --- end of tree registration 
    
    // Set individual event weights (the variables must exist in the original TTree)
-   factory->SetSignalWeightExpression    ("weight");
-   factory->SetBackgroundWeightExpression("weight");
+   factory->SetSignalWeightExpression    ("mini_weight");
+   factory->SetBackgroundWeightExpression("mini_weight");
 
    /*
    if( doMultipleOutputs ){
@@ -495,8 +494,8 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    */
 
    // Apply additional cuts on the signal and background samples (can be different)
-   TCut mycuts = sel; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-   TCut mycutb = sel; // for example: TCut mycutb = "abs(var1)<0.5";
+   TCut mycuts = sel0; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   TCut mycutb = sel0; // for example: TCut mycutb = "abs(var1)<0.5";
 
    // Tell the factory how to use the training and testing events
    //
@@ -508,8 +507,10 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
    //                                         "NSigTrain=3000:NBkgTrain=3000:NSigTest=3000:NBkgTest=3000:SplitMode=Random:!V" );
    
    //Use random splitting
-   factory->PrepareTrainingAndTestTree( mycuts, mycutb,
-                                        "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
+//   factory->PrepareTrainingAndTestTree( mycuts, mycutb,
+//                                        "nTrain_Signal=100000:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
+   factory->PrepareTrainingAndTestTree( "", "",
+                                        "nTrain_Signal=0:nTrain_Background=0:NormMode=None:!V" );
 
    // if( doMultipleOutputs ){
    //   multifactory->PrepareTrainingAndTestTree( mycuts, mycutb,
@@ -652,7 +653,9 @@ void TMVA_stop( TString signal_name = "T2tt", int train_region = 1, float x_para
 
    // TMVA ANN: MLP (recommended ANN) -- all ANNs in TMVA are Multilayer Perceptrons
    if (Use["MLP"])
-      factory->BookMethod( TMVA::Types::kMLP, "MLP", "!H:!V:NeuronType=tanh:VarTransform=N:NCycles=1000:HiddenLayers=N+N:TestRate=5:!UseRegulator:LearningRate=0.2:DecayRate=0.001:BPMode=batch:BatchSize=500"); 
+      factory->BookMethod( TMVA::Types::kMLP, "MLP", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:!UseRegulator" );
+
+//      factory->BookMethod( TMVA::Types::kMLP, "MLP", "!H:!V:NeuronType=tanh:VarTransform=N:NCycles=1000:HiddenLayers=N+N:TestRate=5:!UseRegulator:LearningRate=0.2:DecayRate=0.001:BPMode=batch:BatchSize=500"); 
 
    if (Use["MLPBFGS"])
       factory->BookMethod( TMVA::Types::kMLP, "MLPBFGS", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:TrainingMethod=BFGS:!UseRegulator" );
