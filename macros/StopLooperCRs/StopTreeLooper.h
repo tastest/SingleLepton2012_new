@@ -28,19 +28,19 @@ class StopTreeLooper {
 
 	//plotting
 	void makeSIGPlots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_kbin, string flav_tag, float mtcut ); 
+			   string tag_selection, string flav_tag, float mtcut ); 
 	void makeCR1Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag, float mtcut ); 
+			   string tag_selection, string flav_tag, float mtcut ); 
 	void makeCR2Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
+			   string tag_selection, string flav_tag_dl, float mtcut );
 	void makeCR4Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
+			   string tag_selection, string flav_tag_dl, float mtcut );
 	void makeCR5Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string tag_kbin, string flav_tag_dl, float mtcut );
+			   string tag_selection, string flav_tag_dl, float mtcut );
 	void makeNJPlots( float evtweight, std::map<std::string, TH1F*> &h_1d, 
 			   string tag_selection, string flav_tag ); 
 	void makeZPlots(  float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string tag_njets, string flav_tag );
+			   string tag_selection, string flav_tag );
 
     private:
 
@@ -85,11 +85,15 @@ class StopTreeLooper {
 	vector<float> sigma_jets;
 	vector<int> mc;
 
-	float chi2min_;
-	float chi2minprob_;
-	float mt2bmin_;
-	float mt2blmin_;
-	float mt2wmin_;
+	float chi2min;
+	float chi2minprob;
+	float mt2bmin;
+	float mt2blmin;
+	float mt2wmin;
+
+	float pfcalo_metratio;
+	float pfcalo_metdphi;
+
 
 };
 
