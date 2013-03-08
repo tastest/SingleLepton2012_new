@@ -63,17 +63,20 @@ class WHLooper {
   float met_;
   float metphi_;
   float mt_;
-  Float_t mt2b_;
-  Float_t mt2bl_;
-  Float_t mt2w_;
+  float mt2b_;
+  float mt2bl_;
+  float mt2w_;
   LorentzVector bb_;
 
   // for CR3 (with two leptons)
+  LorentzVector lep_;
   float pseudomet_lep_;
   float pseudometphi_lep_;
   float pseudomt_lep_;
   float dphi_pseudomet_lep_;
-  float leppt_;
+  float pseudomt2b_;
+  float pseudomt2bl_;
+  float pseudomt2w_;
 
   // internal flags
   bool isWjets_;

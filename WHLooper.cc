@@ -635,10 +635,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	//calculate pseudo met and mt
 	//find positive lepton - this is the one that is combined with the pseudomet to form the mT
 	bool isfirstp = (stopt.id1() > 0) ? true : false;
+	lep_ = isfirstp ? stopt.lep1() : stopt.lep2();
 		
 	//recalculate met
-	float metx = stopt.t1metphicorr() * cos( stopt.t1metphicorrphi() );
-	float mety = stopt.t1metphicorr() * sin( stopt.t1metphicorrphi() );
+	float metx = met_ * cos( metphi_ );
+	float mety = met_ * sin( metphi_ );
 		
 	//recalculate the MET with the positive lepton
 	metx += isfirstp ? stopt.lep1().px() : stopt.lep2().px();
@@ -648,17 +649,15 @@ void WHLooper::loop(TChain *chain, TString name) {
 	pseudometphi_lep_ = atan2( mety , metx );
 		
 	//recalculate the MT with the negative lepton
-	pseudomt_lep_ = isfirstp ?
-	  getMT( stopt.lep2().Pt() , stopt.lep2().Phi() , pseudomet_lep_ , pseudometphi_lep_ ) :
-	  getMT( stopt.lep1().Pt() , stopt.lep1().Phi() , pseudomet_lep_ , pseudometphi_lep_ );
+	pseudomt_lep_ = getMT( lep_.pt() , lep_.phi() , pseudomet_lep_ , pseudometphi_lep_ );
 	//dphi between met and lepton
-	dphi_pseudomet_lep_ = isfirstp ?
-	  TVector2::Phi_mpi_pi( stopt.lep2().Phi() - pseudometphi_lep_ ) :
-	  TVector2::Phi_mpi_pi( stopt.lep1().Phi() - pseudometphi_lep_ );
-	//lepton pt 
-	leppt_ = isfirstp ? stopt.lep1().Pt() : stopt.lep2().Pt();
+	dphi_pseudomet_lep_ = TVector2::Phi_mpi_pi( lep_.phi() - pseudometphi_lep_ );
 
-	// recalculate mt2 vars also??........
+	// recalculate mt2 vars also..
+	pseudomt2b_ = calculateMT2w(jets_, jets_csv_, lep_, pseudomet_lep_, pseudometphi_lep_, MT2b);
+	pseudomt2bl_ = calculateMT2w(jets_, jets_csv_, lep_, pseudomet_lep_, pseudometphi_lep_, MT2bl);
+	pseudomt2w_ = calculateMT2w(jets_, jets_csv_, lep_, pseudomet_lep_, pseudometphi_lep_, MT2w);
+
 
 	bool fail = false;
 	if ( pseudomet_lep_ > CUT_MET_PRESEL_ ) {
@@ -682,7 +681,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 	else fail = true;
 
 	// probably need to fix MT2 vars as well....
-	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	if (!fail && (pseudomt2bl_ > CUT_MT2BL_) ) {
 	  fillHists1DWrapper(h_1d_cr3_final,evtweight2l,"cr3_final");
 	}
 
@@ -1026,10 +1025,13 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   // plots for CR3 (2 leptons)
   if (dir.find("cr3") != std::string::npos) {
-    plot1D("h_leppt_cr3"+suffix,       leppt_,       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_leppt_cr3"+suffix,       lep_.pt(),       evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_pseudomt_lep_cr3"+suffix,       pseudomt_lep_,       evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_pseudomet_lep_cr3"+suffix,        pseudomet_lep_,    evtweight, h_1d, 500, 0., 500.);
     plot1D("h_dphi_pseudomet_lep_cr3"+suffix,  fabs(dphi_pseudomet_lep_),  evtweight, h_1d, 50, 0., TMath::Pi());
+    plot1D("h_pseudomt2b"+suffix,   pseudomt2b_,  evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_pseudomt2bl"+suffix,  pseudomt2bl_, evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_pseudomt2w"+suffix,   pseudomt2w_,  evtweight, h_1d, 1000, 0., 1000.);
   }
 
   return;
