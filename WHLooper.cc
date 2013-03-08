@@ -40,7 +40,7 @@ const bool blindSignal = true;
 const bool doSignal = true;
 const bool doCR1 = true;
 const bool doCR2 = false;
-const bool doCR3 = false;
+const bool doCR3 = true;
 const bool doCR4 = true;
 const bool doCR5 = true;
 const bool doStopSel = true;
@@ -152,22 +152,22 @@ void WHLooper::loop(TChain *chain, TString name) {
   // signal region hists
   std::map<std::string, TH1F*> h_1d_sig_presel, h_1d_sig_final;
   // signal region nm1 hists
-  std::map<std::string, TH1F*> h_1d_sig_nbjets_nm1, h_1d_sig_met_nm1, h_1d_sig_mt_nm1, h_1d_sig_mt2bl_nm1;
+  std::map<std::string, TH1F*> h_1d_sig_met_nm1, h_1d_sig_mt_nm1, h_1d_sig_mt2bl_nm1;
 
   // cr1 hists
   std::map<std::string, TH1F*> h_1d_cr1_presel, h_1d_cr1_final;
   // cr1 nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr1_nbjets_nm1, h_1d_cr1_met_nm1, h_1d_cr1_mt_nm1, h_1d_cr1_mt2bl_nm1;
+  std::map<std::string, TH1F*> h_1d_cr1_met_nm1, h_1d_cr1_mt_nm1, h_1d_cr1_mt2bl_nm1;
 
   // cr2 hists
   std::map<std::string, TH1F*> h_1d_cr2_presel, h_1d_cr2_final;
   // cr2 nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr2_nbjets_nm1, h_1d_cr2_met_nm1, h_1d_cr2_mt_nm1, h_1d_cr2_mt2bl_nm1;
+  std::map<std::string, TH1F*> h_1d_cr2_met_nm1, h_1d_cr2_mt_nm1, h_1d_cr2_mt2bl_nm1;
 
   // cr3 hists
   std::map<std::string, TH1F*> h_1d_cr3_presel, h_1d_cr3_final;
   // cr3 nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr3_nbjets_nm1, h_1d_cr3_met_nm1, h_1d_cr3_mt_nm1, h_1d_cr3_mt2bl_nm1;
+  std::map<std::string, TH1F*> h_1d_cr3_met_nm1, h_1d_cr3_mt_nm1, h_1d_cr3_mt2bl_nm1;
 
   // cr4 hists
   std::map<std::string, TH1F*> h_1d_cr4_presel, h_1d_cr4_final;
@@ -186,7 +186,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doSignal) {
     outfile_->mkdir("sig_presel");
     if (doNM1Plots) {
-      outfile_->mkdir("sig_nbjets_nm1");
       outfile_->mkdir("sig_met_nm1");
       outfile_->mkdir("sig_mt_nm1");
       outfile_->mkdir("sig_mt2bl_nm1");
@@ -197,7 +196,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doCR1) {
     outfile_->mkdir("cr1_presel");
     if (doNM1Plots) {
-      outfile_->mkdir("cr1_nbjets_nm1");
       outfile_->mkdir("cr1_met_nm1");
       outfile_->mkdir("cr1_mt_nm1");
       outfile_->mkdir("cr1_mt2bl_nm1");
@@ -208,7 +206,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doCR2) {
     outfile_->mkdir("cr2_presel");
     if (doNM1Plots) {
-      outfile_->mkdir("cr2_nbjets_nm1");
       outfile_->mkdir("cr2_met_nm1");
       outfile_->mkdir("cr2_mt_nm1");
       outfile_->mkdir("cr2_mt2bl_nm1");
@@ -219,7 +216,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doCR3) {
     outfile_->mkdir("cr3_presel");
     if (doNM1Plots) {
-      outfile_->mkdir("cr3_nbjets_nm1");
       outfile_->mkdir("cr3_met_nm1");
       outfile_->mkdir("cr3_mt_nm1");
       outfile_->mkdir("cr3_mt2bl_nm1");
@@ -459,30 +455,34 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       } // loop over pfjets
 
+      met_ = stopt.t1metphicorr();
+      metphi_ = stopt.t1metphicorrphi();
+      mt_ = stopt.t1metphicorrmt();
+
       // calculate mt2 vars after selecting jets -- require at least 2 bjets here to avoid wasting time..
-      LorentzVector bb;
+      bb_ = LorentzVector();
       mt2b_ = -1.;
       mt2bl_ = -1.;
       mt2w_ = -1.;
       if (nbjets_ >= 2) {
-	bb = bjets_.at(0) + bjets_.at(1);
-	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
-	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
-	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
+	bb_ = bjets_.at(0) + bjets_.at(1);
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
       }
       else if ((nbjets_ == 1) && (njets_ >= 2)) {
 	// 1 bjet: use bjet + highest pt other jet for dijet mass
-	if (bjets_idx_.at(0) == jets_idx_.at(0)) bb = bjets_.at(0) + jets_.at(1);
-	else bb = bjets_.at(0) + jets_.at(1);
+	if (bjets_idx_.at(0) == jets_idx_.at(0)) bb_ = bjets_.at(0) + jets_.at(1);
+	else bb_ = bjets_.at(0) + jets_.at(1);
       }
       else if (njets_ >= 2) {
 	// 0 bjets: use two highest pt jets for invariant mass
-	bb = jets_.at(0) + jets_.at(1);
+	bb_ = jets_.at(0) + jets_.at(1);
       }
 
       // TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
       // TVector2 met;
-      // met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
+      // met.SetMagPhi(stopt.t1metphicorr(), metphi_);
       // TVector2 w = lep+met; 
 
       // end variables --------------------------------------
@@ -549,29 +549,24 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ >= 2)
-	   && (bb.M() > CUT_BBMASS_LOW_) && (bb.M() < CUT_BBMASS_HIGH_)
-	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) 
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
+	   && (met_ > CUT_MET_PRESEL_) 
 	   && (!isData || !blindSignal) ) {
 
         fillHists1DWrapper(h_1d_sig_presel,evtweight1l,"sig_presel");
 
 	bool fail = false;
 	if ( !fail && (njetsalleta_ == 2) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_nbjets_nm1,evtweight1l,"sig_nbjets_nm1");
-	} 
-	else fail = true;
-
-	if (!fail && (nbjets_ == 2) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_met_nm1,evtweight1l,"sig_met_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
+	if (!fail && (met_ > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_mt_nm1,evtweight1l,"sig_mt_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
+	if (!fail && (mt_ > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_mt2bl_nm1,evtweight1l,"sig_mt2bl_nm1");
 	}
 	else fail = true;
@@ -586,32 +581,27 @@ void WHLooper::loop(TChain *chain, TString name) {
       // *** CR1: m(bb) > 150 (can also put upper bound)
       //  otherwise same as signal region
 
-      if ( doStopSel
+      if ( doCR1
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ >= 2)
-	   && (bb.M() > CUT_BBMASS_CR1_)
-	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) ) {
+	   && (bb_.M() > CUT_BBMASS_CR1_)
+	   && (met_ > CUT_MET_PRESEL_) ) {
 
         fillHists1DWrapper(h_1d_cr1_presel,evtweight1l,"cr1_presel");
 
 	bool fail = false;
 	if ( !fail && (njetsalleta_ == 2) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_nbjets_nm1,evtweight1l,"cr1_nbjets_nm1");
-	} 
-	else fail = true;
-
-	if (!fail && (nbjets_ == 2) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_met_nm1,evtweight1l,"cr1_met_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
+	if (!fail && (met_ > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_mt_nm1,evtweight1l,"cr1_mt_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
+	if (!fail && (mt_ > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_mt2bl_nm1,evtweight1l,"cr1_mt2bl_nm1");
 	}
 	else fail = true;
@@ -628,9 +618,75 @@ void WHLooper::loop(TChain *chain, TString name) {
       //   otherwise same as signal region
       //   !! should be careful here not to look at ZH+MET - lep+track inv mass veto?
 
+
       // -------------------------------------------
-      // *** CR3: 2 leptons, Z mass veto
+      // *** CR3: 2 leptons, Z mass veto for same flavor, no iso track veto
       //   otherwise same as signal region
+      //   !!! modified MET/MT defs to emulate losing 2nd lepton
+
+      if ( doCR3
+	   && passDileptonSelection(isData) 
+	   && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. )
+	   && (nbjets_ >= 2)
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_) ) {
+
+	//	      if ( (stopt.trkpt10loose() <0.0001 || stopt.trkreliso10loose() > 0.1) 
+
+	//calculate pseudo met and mt
+	//find positive lepton - this is the one that is combined with the pseudomet to form the mT
+	bool isfirstp = (stopt.id1() > 0) ? true : false;
+		
+	//recalculate met
+	float metx = stopt.t1metphicorr() * cos( stopt.t1metphicorrphi() );
+	float mety = stopt.t1metphicorr() * sin( stopt.t1metphicorrphi() );
+		
+	//recalculate the MET with the positive lepton
+	metx += isfirstp ? stopt.lep1().px() : stopt.lep2().px();
+	mety += isfirstp ? stopt.lep1().py() : stopt.lep2().py();
+		
+	pseudomet_lep_    = sqrt(metx*metx + mety*mety);
+	pseudometphi_lep_ = atan2( mety , metx );
+		
+	//recalculate the MT with the negative lepton
+	pseudomt_lep_ = isfirstp ?
+	  getMT( stopt.lep2().Pt() , stopt.lep2().Phi() , pseudomet_lep_ , pseudometphi_lep_ ) :
+	  getMT( stopt.lep1().Pt() , stopt.lep1().Phi() , pseudomet_lep_ , pseudometphi_lep_ );
+	//dphi between met and lepton
+	dphi_pseudomet_lep_ = isfirstp ?
+	  TVector2::Phi_mpi_pi( stopt.lep2().Phi() - pseudometphi_lep_ ) :
+	  TVector2::Phi_mpi_pi( stopt.lep1().Phi() - pseudometphi_lep_ );
+	//lepton pt 
+	leppt_ = isfirstp ? stopt.lep1().Pt() : stopt.lep2().Pt();
+
+	// recalculate mt2 vars also??........
+
+	bool fail = false;
+	if ( pseudomet_lep_ > CUT_MET_PRESEL_ ) {
+          fillHists1DWrapper(h_1d_cr3_presel,evtweight2l,"cr3_presel");
+	}
+	else fail = true;
+
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr3_met_nm1,evtweight2l,"cr3_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (pseudomet_lep_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr3_mt_nm1,evtweight2l,"cr3_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (pseudomt_lep_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr3_mt2bl_nm1,evtweight2l,"cr3_mt2bl_nm1");
+	}
+	else fail = true;
+
+	// probably need to fix MT2 vars as well....
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr3_final,evtweight2l,"cr3_final");
+	}
+
+      } // CR3 region sel
 
 
       // -------------------------------------------
@@ -641,15 +697,15 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ == 0)
-	   && (bb.M() > CUT_BBMASS_LOW_) && (bb.M() < CUT_BBMASS_HIGH_)
-	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) ) {
-
-        fillHists1DWrapper(h_1d_cr4_presel,evtweight1l,"cr4_presel");
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
+	   && (met_ > CUT_MET_PRESEL_) ) {
 
 	// compute MT2 vars for 0 b events passing this presel
-	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
-	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
-	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
+
+        fillHists1DWrapper(h_1d_cr4_presel,evtweight1l,"cr4_presel");
 
 	bool fail = false;
 	if ( !fail && (njetsalleta_ == 2) ) {
@@ -657,12 +713,12 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
+	if (!fail && (met_ > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt_nm1,evtweight1l,"cr4_mt_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
+	if (!fail && (mt_ > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt2bl_nm1,evtweight1l,"cr4_mt2bl_nm1");
 	}
 	else fail = true;
@@ -681,15 +737,15 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ == 1)
-	   && (bb.M() > CUT_BBMASS_LOW_) && (bb.M() < CUT_BBMASS_HIGH_)
-	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) ) {
-
-        fillHists1DWrapper(h_1d_cr5_presel,evtweight1l,"cr5_presel");
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
+	   && (met_ > CUT_MET_PRESEL_) ) {
 
 	// compute MT2 vars for 1 b events passing this presel
-	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
-	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
-	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
+
+        fillHists1DWrapper(h_1d_cr5_presel,evtweight1l,"cr5_presel");
 
 	bool fail = false;
 	if ( !fail && (njetsalleta_ == 2) ) {
@@ -697,12 +753,12 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
+	if (!fail && (met_ > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt_nm1,evtweight1l,"cr5_mt_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
+	if (!fail && (mt_ > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt2bl_nm1,evtweight1l,"cr5_mt2bl_nm1");
 	}
 	else fail = true;
@@ -737,12 +793,12 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && passIsoTrkVeto_v2()
 	   && (njets_ >= 4)
 	   && (nbjets_ >= 1)
-	   && (stopt.t1metphicorr() > 100.) 
+	   && (met_ > 100.) 
 	   && !isData ) {
 
         fillHists1DWrapper(h_1d_stop_presel,evtweight1l,"stop_presel");
 
-	if ( (stopt.t1metphicorr() > 150.) && (stopt.t1metphicorrmt() > 120.) ) {
+	if ( (met_ > 150.) && (mt_ > 120.) ) {
 	  fillHists1DWrapper(h_1d_stop_comp,evtweight1l,"stop_comp");
 	} 
 
@@ -766,7 +822,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doSignal) {
     savePlotsDir(h_1d_sig_presel,outfile_,"sig_presel");
     if (doNM1Plots) {
-      savePlotsDir(h_1d_sig_nbjets_nm1,outfile_,"sig_nbjets_nm1");
       savePlotsDir(h_1d_sig_met_nm1,outfile_,"sig_met_nm1");
       savePlotsDir(h_1d_sig_mt_nm1,outfile_,"sig_mt_nm1");
       savePlotsDir(h_1d_sig_mt2bl_nm1,outfile_,"sig_mt2bl_nm1");
@@ -777,7 +832,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doCR1) {
     savePlotsDir(h_1d_cr1_presel,outfile_,"cr1_presel");
     if (doNM1Plots) {
-      savePlotsDir(h_1d_cr1_nbjets_nm1,outfile_,"cr1_nbjets_nm1");
       savePlotsDir(h_1d_cr1_met_nm1,outfile_,"cr1_met_nm1");
       savePlotsDir(h_1d_cr1_mt_nm1,outfile_,"cr1_mt_nm1");
       savePlotsDir(h_1d_cr1_mt2bl_nm1,outfile_,"cr1_mt2bl_nm1");
@@ -788,7 +842,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doCR2) {
     savePlotsDir(h_1d_cr2_presel,outfile_,"cr2_presel");
     if (doNM1Plots) {
-      savePlotsDir(h_1d_cr2_nbjets_nm1,outfile_,"cr2_nbjets_nm1");
       savePlotsDir(h_1d_cr2_met_nm1,outfile_,"cr2_met_nm1");
       savePlotsDir(h_1d_cr2_mt_nm1,outfile_,"cr2_mt_nm1");
       savePlotsDir(h_1d_cr2_mt2bl_nm1,outfile_,"cr2_mt2bl_nm1");
@@ -799,7 +852,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doCR3) {
     savePlotsDir(h_1d_cr3_presel,outfile_,"cr3_presel");
     if (doNM1Plots) {
-      savePlotsDir(h_1d_cr3_nbjets_nm1,outfile_,"cr3_nbjets_nm1");
       savePlotsDir(h_1d_cr3_met_nm1,outfile_,"cr3_met_nm1");
       savePlotsDir(h_1d_cr3_mt_nm1,outfile_,"cr3_mt_nm1");
       savePlotsDir(h_1d_cr3_mt2bl_nm1,outfile_,"cr3_mt2bl_nm1");
@@ -880,26 +932,38 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   outfile_->cd(dir.c_str());
 
+  // events histogram: bin 1: raw, bin 2: weighted
+  plot1D("h_events"+suffix,       0.5,       1., h_1d, 2, 0., 2.);
+  plot1D("h_events"+suffix,       1.5,       evtweight, h_1d, 2, 0., 2.);
+
   TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
   TVector2 met;
-  met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
+  met.SetMagPhi(met_, metphi_);
   TVector2 w = lep+met; 
 
   plot1D("h_lep1pt"+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_lep1eta"+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
-  plot1D("h_lep1mt"+suffix,       stopt.t1metphicorrmt(),       evtweight, h_1d, 1000, 0., 1000.);
-  plot1D("h_pfmet"+suffix,        stopt.t1metphicorr(),    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_lep1mt"+suffix,       mt_,       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_pfmet"+suffix,        met_,    evtweight, h_1d, 500, 0., 500.);
   // plot1D("h_pfsumet"+suffix,      stopt.pfsumet(),    evtweight, h_1d, 1500, 0., 1500.);
   // plot1D("h_pfmetsig"+suffix,     stopt.pfmet()/sqrt(stopt.pfsumet()),   evtweight, h_1d, 500, 0., 20.);
   plot1D("h_njets"+suffix,        njets_,              evtweight, h_1d, 10, 0., 10.);
   plot1D("h_njetsalleta"+suffix,  njetsalleta_,        evtweight, h_1d, 10, 0., 10.);
   plot1D("h_nbjets"+suffix,       nbjets_,    evtweight, h_1d, 5, 0., 5.);
   plot1D("h_wpt"+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
-  plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.t1metphicorrphi())),  evtweight, h_1d, 50, 0., TMath::Pi());
+  plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - metphi_)),  evtweight, h_1d, 50, 0., TMath::Pi());
 
   // phi cor met validation
-  // plot1D("h_metdiff"+suffix,        stopt.t1metphicorr() - stopt.pfmet(),    evtweight, h_1d, 500, -250., 250.);
-  // plot1D("h_metphidiff"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.t1metphicorrphi() - stopt.pfmetphi())),    evtweight, h_1d,  50, 0., TMath::Pi());
+  // plot1D("h_metdiff"+suffix,        met_ - stopt.pfmet(),    evtweight, h_1d, 500, -250., 250.);
+  // plot1D("h_metphidiff"+suffix,  fabs(TVector2::Phi_mpi_pi(metphi_ - stopt.pfmetphi())),    evtweight, h_1d,  50, 0., TMath::Pi());
+
+  plot1D("h_bbmass"+suffix,       bb_.M(),       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_bbpt"+suffix,       bb_.pt(),       evtweight, h_1d, 500, 0., 500.);
+  // plot1D("h_bblep1dr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bb_ , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+  // plot1D("h_bblep1dphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb_.phi() - stopt.lep1().phi())), evtweight, h_1d, 50, 0., TMath::Pi());
+
+  plot1D("h_bbwdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb_.phi() - w.Phi())), evtweight, h_1d, 50, 0., TMath::Pi());
+  // plot1D("h_bbwdpt"+suffix,   bb_.pt() - w.Mod(),       evtweight, h_1d, 500, -250., 250.);
 
 
   if (isWjets_) {
@@ -913,21 +977,8 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D("h_bjet1eta"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
     plot1D("h_bjet2eta"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
 
-    LorentzVector bb = bjets_.at(0) + bjets_.at(1);
-    plot1D("h_bbmass"+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
-    plot1D("h_bbpt"+suffix,       bb.pt(),       evtweight, h_1d, 500, 0., 500.);
     // plot1D("h_bbdr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bjets_.at(0) , bjets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
     // plot1D("h_bbdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bjets_[0].phi() - bjets_[1].phi())), evtweight, h_1d, 50, 0., TMath::Pi());
-
-    // plot1D("h_bblep1dr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bb , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
-    // plot1D("h_bblep1dphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - stopt.lep1().phi())), evtweight, h_1d, 50, 0., TMath::Pi());
-
-    plot1D("h_bbwdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())), evtweight, h_1d, 50, 0., TMath::Pi());
-    // plot1D("h_bbwdpt"+suffix,   bb.pt() - w.Mod(),       evtweight, h_1d, 500, -250., 250.);
-
-    // plot1D("h_bbwsumpt"+suffix,       bb.pt()+w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
-
-    // plot1D("h_allsumpt"+suffix,      bjets_[0].pt()+ bjets_[1].pt()+stopt.lep1().pt()+stopt.t1metphicorr() , evtweight, h_1d, 1500, 0., 1500.);
 
     // LorentzVector b1lep1 = bjets_.at(0) + stopt.lep1();
     // plot1D("h_bjet1lep1mass"+suffix,       b1lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
@@ -972,6 +1023,14 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   plot1D("h_nvtx",      stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
   plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
+
+  // plots for CR3 (2 leptons)
+  if (dir.find("cr3") != std::string::npos) {
+    plot1D("h_leppt_cr3"+suffix,       leppt_,       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_pseudomt_lep_cr3"+suffix,       pseudomt_lep_,       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_pseudomet_lep_cr3"+suffix,        pseudomet_lep_,    evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_dphi_pseudomet_lep_cr3"+suffix,  fabs(dphi_pseudomet_lep_),  evtweight, h_1d, 50, 0., TMath::Pi());
+  }
 
   return;
 }
