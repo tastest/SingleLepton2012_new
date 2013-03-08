@@ -181,9 +181,9 @@ float getsltrigweight(int id1, float pt, float eta)
       if ( pt>=150 && pt<200 ) return 0.83; 
       if ( pt>=200           ) return 0.85; 
     }
-    else{
-      std::cout << "WARNING: electron eta " << eta << " is out of range. Return trigger efficiency = 1" << std::endl;
-    }
+//     else{
+//       std::cout << "WARNING: electron eta " << eta << " is out of range. Return trigger efficiency = 1" << std::endl;
+//     }
   } 
   //muon efficiencies
   else if ( abs(id1)==13 ) {
@@ -244,9 +244,9 @@ float getsltrigweight(int id1, float pt, float eta)
       if (pt>=150 && pt<200 ) return 0.82;
       if (pt>=200           ) return 0.83;
     }
-    else{
-      std::cout << "WARNING: muon eta " << eta << " is out of range. Return trigger efficiency = 1" << std::endl;
-    }
+//     else{
+//       std::cout << "WARNING: muon eta " << eta << " is out of range. Return trigger efficiency = 1" << std::endl;
+//     }
   }
   else{
     std::cout << "WARNING: unrecognized lepton id " << id1 << ". Return trigger efficiency = 1" << std::endl;
