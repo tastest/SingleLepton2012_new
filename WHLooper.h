@@ -32,12 +32,8 @@ class WHLooper {
 
   void fillHists1DWrapper(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "");
   void fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
-  std::vector<LorentzVector> getBJets(const csvpoint csv = WHLooper::CSVM);
-  float getCSVCut(const csvpoint csv = WHLooper::CSVM);
 
-  void MakeBabyNtuple (const char *);
-  void FillBabyNtuple (const float evtweight);
-  void CloseBabyNtuple ();
+  float getCSVCut(const csvpoint csv = WHLooper::CSVM);
 
   string m_outfilename_;
   TFile* outfile_;
@@ -45,38 +41,24 @@ class WHLooper {
   float t1metphicorr;
   float t1metphicorrphi;
   float t1metphicorrmt;
-  //for mt peak definition
-  float min_mtpeak;
-  float max_mtpeak; 
-  // for storing mt2 values
-  //  float mt2w_;
 
-  std::vector<LorentzVector> myJets_;
-  std::vector<LorentzVector> myBJets_;
-  std::vector<int> myBJetsIdx_;
+  // internal vars to store
+  std::vector<LorentzVector> jets_;
+  std::vector<LorentzVector> bjets_;
+  std::vector<float> jets_csv_;
+  std::vector<int> jets_idx_;
+  std::vector<int> bjets_idx_;
+  int njets_;
+  int njetsalleta_;
+  int nbjets_;
+  Float_t mt2b_;
+  Float_t mt2bl_;
+  Float_t mt2w_;
 
   // internal flags
   bool isWjets_;
   bool isTChiwh_;
 
-  // for output minibaby
-  TFile *babyFile_;
-  TTree *babyTree_;
-
-  UInt_t  run_;
-  UInt_t  lumi_;
-  UInt_t  event_;
-  Int_t   leptype_;
-  Float_t weight_;
-
-  Float_t pfmet_;
-  Float_t lep1mt_;
-  Float_t mt2b_;
-  Float_t mt2bl_;
-  Float_t mt2w_;
-  Float_t bbpt_;
-  Float_t wpt_;
-  Float_t bbwdphi_;
 
 };
 

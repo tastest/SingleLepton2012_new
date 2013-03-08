@@ -34,7 +34,12 @@ using namespace Stop;
 
 const bool doFlavorPlots = false;
 const bool doNM1Plots = true;
-const bool doMiniBaby = false;
+
+// regions to do
+const bool blindSignal = true;
+const bool doSignal = true;
+const bool doCR1 = true;
+const bool doStopSel = true;
 
 std::set<DorkyEventIdentifier> already_seen; 
 std::set<DorkyEventIdentifier> events_lasercalib; 
@@ -66,8 +71,6 @@ WHLooper::WHLooper()
   t1metphicorr = -9999.;
   t1metphicorrphi = -9999.;
   t1metphicorrmt = -9999.;
-  min_mtpeak = -9999.;
-  max_mtpeak = -9999.; 
 }
 
 //--------------------------------------------------------------------
@@ -125,13 +128,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   // set up histograms
   //------------------------------
 
-  if (doMiniBaby) {
-    string outbabyfile = m_outfilename_;
-    replace(outbabyfile,"histos","minibaby");
-    cout << "[WHLooper::loop] creating minibaby file: " << outbabyfile << endl;
-    MakeBabyNtuple(outbabyfile.c_str());
-  }
-
   gROOT->cd();
 
   cout << "[WHLooper::loop] creating output file: " << m_outfilename_ << endl;
@@ -140,53 +136,48 @@ void WHLooper::loop(TChain *chain, TString name) {
 
   cout << "[WHLooper::loop] setting up histos" << endl;
 
-  std::map<std::string, TH1F*> h_1d_presel;
-  std::map<std::string, TH1F*> h_1d_presel_nobs;
-  std::map<std::string, TH1F*> h_1d_presel_bs;
-  std::map<std::string, TH1F*> h_1d_njets_nm1;
-  std::map<std::string, TH1F*> h_1d_njetsalleta_nm1;
-  std::map<std::string, TH1F*> h_1d_bbmass_nm1;
-  std::map<std::string, TH1F*> h_1d_bbmass_nobs_nm1;
-  std::map<std::string, TH1F*> h_1d_bbmass_bs_nm1;
-  std::map<std::string, TH1F*> h_1d_pfmet_nm1;
-  std::map<std::string, TH1F*> h_1d_lep1mt_nm1;
-  std::map<std::string, TH1F*> h_1d_mt2bl_nm1;
-  // std::map<std::string, TH1F*> h_1d_mt2w_nm1;
-  // std::map<std::string, TH1F*> h_1d_bbpt_nm1;
-  // std::map<std::string, TH1F*> h_1d_wpt_nm1;
-  // std::map<std::string, TH1F*> h_1d_bbwdphi_nm1;
-  std::map<std::string, TH1F*> h_1d_final;
-  std::map<std::string, TH1F*> h_1d_final_nobs;
-  std::map<std::string, TH1F*> h_1d_final_bs;
-  std::map<std::string, TH2F*> h_2d_final;
+  // signal region hists
+  std::map<std::string, TH1F*> h_1d_sig_presel, h_1d_sig_final;
+  // signal region nm1 hists
+  std::map<std::string, TH1F*> h_1d_sig_nbjets_nm1, h_1d_sig_met_nm1, h_1d_sig_mt_nm1, h_1d_sig_mt2bl_nm1;
 
-  outfile_->mkdir("presel");
-  if (isWjets_) {
-    outfile_->mkdir("presel_nobs");
-    outfile_->mkdir("presel_bs");
-  }
-  if (doNM1Plots) {
-    outfile_->mkdir("njets_nm1");
-    outfile_->mkdir("njetsalleta_nm1");
-    outfile_->mkdir("bbmass_nm1");
-    if (isWjets_) {
-      outfile_->mkdir("bbmass_nobs_nm1");
-      outfile_->mkdir("bbmass_bs_nm1");
+  // cr1 hists
+  std::map<std::string, TH1F*> h_1d_cr1_presel, h_1d_cr1_final;
+  // cr1 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr1_nbjets_nm1, h_1d_cr1_met_nm1, h_1d_cr1_mt_nm1, h_1d_cr1_mt2bl_nm1;
+
+  // stop region hists
+  std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
+
+
+  if (doSignal) {
+    outfile_->mkdir("sig_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("sig_nbjets_nm1");
+      outfile_->mkdir("sig_met_nm1");
+      outfile_->mkdir("sig_mt_nm1");
+      outfile_->mkdir("sig_mt2bl_nm1");
     }
-    outfile_->mkdir("pfmet_nm1");
-    outfile_->mkdir("lep1mt_nm1");
-    outfile_->mkdir("mt2bl_nm1");
-    // outfile_->mkdir("mt2w_nm1");
-    // outfile_->mkdir("bbpt_nm1");
-    // outfile_->mkdir("wpt_nm1");
-    // outfile_->mkdir("bbwdphi_nm1");
+    outfile_->mkdir("sig_final");
   }
-  outfile_->mkdir("final");
-  if (isWjets_) {
-    outfile_->mkdir("final_nobs");
-    outfile_->mkdir("final_bs");
+
+  if (doCR1) {
+    outfile_->mkdir("cr1_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr1_nbjets_nm1");
+      outfile_->mkdir("cr1_met_nm1");
+      outfile_->mkdir("cr1_mt_nm1");
+      outfile_->mkdir("cr1_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr1_final");
   }
-  outfile_->cd("presel");
+
+  if (doStopSel) {
+    outfile_->mkdir("stop_presel");
+    outfile_->mkdir("stop_comp");
+  }
+
+  outfile_->cd();
 
   //------------------------------
   // vtx reweighting
@@ -280,20 +271,30 @@ void WHLooper::loop(TChain *chain, TString name) {
       //  xsec (pb) * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.58 / nevents (10000)
       float weight_lumi_br_nevents = 1.914E-02;
       if (isTChiwh_) {
-	if (name.Contains("TChiwh_150_1")) evtweight *= 2.4 * 0.5 * weight_lumi_br_nevents; // now 20k events
-	else if (name.Contains("TChiwh_200_1")) evtweight *= 0.79 * 0.5 * weight_lumi_br_nevents; // now 20k events
-	else if (name.Contains("TChiwh_250_1")) evtweight *= 0.32 * weight_lumi_br_nevents;
-	else if (name.Contains("TChiwh_300_1")) evtweight *= 0.15 * weight_lumi_br_nevents;
-	else if (name.Contains("TChiwh_350_1")) evtweight *= 0.074 * weight_lumi_br_nevents;
+	float xsecweight = 1.;
+	if (name.Contains("TChiwh_150")) xsecweight = 2.4 * 0.5 * weight_lumi_br_nevents; // now 20k events
+	else if (name.Contains("TChiwh_200")) xsecweight = 0.79 * 0.5 * weight_lumi_br_nevents; // now 20k events
+	else if (name.Contains("TChiwh_250")) xsecweight = 0.32 * weight_lumi_br_nevents;
+	else if (name.Contains("TChiwh_300")) xsecweight = 0.15 * weight_lumi_br_nevents;
+	else if (name.Contains("TChiwh_350")) xsecweight = 0.074 * weight_lumi_br_nevents;
 
-	// divide back out nvtxweight -- shouldn't be applied to signal
-	evtweight /=  stopt.nvtxweight();
+	// reset weight here for signal MC. Ignore weight, nvtxweight, mgcor
+	evtweight = xsecweight * 19.5;
       }
       // to reweight from file - also need to comment stuff before
       //      float vtxweight = vtxweight_n( nvtx, h_vtx_wgt, isData );
 
-      plot1D("h_nvtx_nosel",       stopt.nvtx(),       evtweight, h_1d_presel, 40, 0, 40);
-      plot1D("h_vtxweight_nosel", stopt.nvtxweight(), evtweight, h_1d_presel, 41, -4., 4.);
+      plot1D("h_nvtx_nosel",       stopt.nvtx(),       evtweight, h_1d_sig_presel, 40, 0, 40);
+      plot1D("h_vtxweight_nosel", stopt.nvtxweight(), evtweight, h_1d_sig_presel, 41, -4., 4.);
+
+      // trigger effs
+      float sltrigeff = isData ? 1. : 
+	getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
+      float dltrigeff = isData ? 1. : 
+	getdltrigweight(stopt.id1(), stopt.id2());
+
+      float evtweight1l = evtweight * sltrigeff;
+      float evtweight2l = evtweight * dltrigeff;
 
       //----------------------------------------------------------------------------
       // apply preselection:
@@ -318,107 +319,261 @@ void WHLooper::loop(TChain *chain, TString name) {
       // ADD CODE BELOW THIS LINE
       //----------------------------------------------------------------------------
 
-      // require 1 lepton sel + iso track veto
-      if (!passSingleLeptonSelection(isData)) continue;
-      if (stopt.ngoodlep() != 1) continue;
-      if (!passIsoTrkVeto_v3()) continue;
+      // ----------------------------------------------------
+      // gather all required variables to make all selections
 
-      // set mt2 vars to dummy value
+      jets_.clear();
+      bjets_.clear();
+      jets_csv_.clear();
+      jets_idx_.clear();
+      bjets_idx_.clear();
+      njets_ = 0;
+      njetsalleta_ = 0;
+      nbjets_ = 0;
+
+      for( unsigned int i = 0 ; i < stopt.pfjets().size() ; ++i ){
+	
+	// basic jet selection
+	if( stopt.pfjets().at(i).pt()<30 )  continue;
+	if( fabs(stopt.pfjets().at(i).eta())>4.7 )  continue;
+	if ( (fabs(stopt.pfjets().at(i).eta()) < 2.5) 
+	     && (stopt.pfjets_beta2_0p5().at(i)<0.2) ) continue;
+	
+	++njetsalleta_;
+	if (fabs(stopt.pfjets().at(i).eta()) <= 2.4) ++njets_;
+
+      	jets_.push_back( stopt.pfjets().at(i) );
+	jets_idx_.push_back(i);
+	// if (n_jets==1) 
+	//   dphimj1 = getdphi(t1metphicorrphi, stopt.pfjets().at(i).phi() );
+	// if (n_jets==2) {
+	//   dphimj2 = getdphi(t1metphicorrphi, stopt.pfjets().at(i).phi() );
+	//   dphimjmin = TMath::Min( dphimj1 , dphimj2 );
+	// }
+
+	float csv_nominal= stopt.pfjets_csv().at(i);
+
+	//RESHAPING -- TO DO WITH UPDATED BABIES
+	//only reshape for b jets ---> use status 3 matching information
+	//float csv_nominal=nominalShape->reshape(stopt.pfjets().at(i).Eta(),stopt.pfjets().at(i).Pt(),stopt.pfjets_csv().at(i),(stopt.pfjets_flav().at(i)==5?5:0)); 
+	//treat anything not matched to b or c as light
+	// float csv_nominal=nominalShape->reshape( stopt.pfjets().at(i).eta(),
+	// 					 stopt.pfjets().at(i).pt(),
+	// 					 stopt.pfjets_csv().at(i),
+	// 					( stopt.pfjets_mcflavorAlgo().at(i)>3 ? stopt.pfjets_mcflavorAlgo().at(i) : 1 ) ); 
+
+	jets_csv_.push_back( csv_nominal );
+
+	if( (fabs(stopt.pfjets().at(i).eta()) <= 2.4) && (csv_nominal > getCSVCut(WHLooper::CSVM)) ) {
+	  bjets_.push_back( stopt.pfjets().at(i) );
+	  bjets_idx_.push_back(i);
+	  ++nbjets_;
+	}
+
+	//      	sigma_jets.push_back(stopt.pfjets_sigma().at(i));
+
+        // //count jets that are not overlapping with second lepton
+	// if (isData) continue;
+	// if (stopt.nleps()!=2) continue;
+	// if (stopt.mclep2().pt() < 30.) continue;
+	// if (ROOT::Math::VectorUtil::DeltaR(stopt.mclep2(), stopt.pfjets().at(i)) > 0.4 ) continue;
+	// n_ljets--;
+
+      } // loop over pfjets
+
+      // calculate mt2 vars after selecting jets -- require at least 2 bjets
+      LorentzVector bb;
       mt2b_ = -1.;
       mt2bl_ = -1.;
       mt2w_ = -1.;
-
-      // require 2 bjets
-      myBJets_ = getBJets(WHLooper::CSVM);
-      //      myBJets_ = getBJets(WHLooper::CSVL);
-      int njets = getNJets();
-      int njetsalleta = getNJets(4.7);
-      int nbjets = myBJets_.size();
-      //      if (njetsalleta != 2) continue;
-      //      if (stopt.pfmet() < 150.) continue;
-      if (nbjets < 2) continue;
-
-      // specific cuts: dummy signal region
-      //      if (nbjets < 2) continue;
-      std::vector<LorentzVector> bjets_csvm = getBJets(WHLooper::CSVM);
-      int nbjets_csvm = bjets_csvm.size();
-      LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
-      float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.t1metphicorr(), stopt.t1metphicorrphi() );
-      TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
-      TVector2 met;
-      met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
-      TVector2 w = lep+met; 
-
-      if (doNM1Plots) fillHists1DWrapper(h_1d_njets_nm1,evtweight,"njets_nm1");
-      if (njets > 2) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_njetsalleta_nm1,evtweight,"njetsalleta_nm1");
-      if (njetsalleta > 2) continue;
-
-      //      if (doNM1Plots) fillHists1DWrapper(h_1d_pfmet_nm1,evtweight,"pfmet_nm1");
-      if (stopt.t1metphicorr() < 50.) continue;
-
-      // calculate mt2w, after requiring exactly two jets
-      // make dummy vector of csv values for bjets, for mt2w calc
-      std::vector<float> bjets_csv(2, 0.99);
-      mt2b_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
-      mt2bl_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
-      mt2w_ = calculateMT2w(bjets_csvm, bjets_csv, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
-
-      // consider tightening bbmass to 110,140 for low mass sel??
-      if (doNM1Plots) fillHists1DWrapper(h_1d_bbmass_nm1,evtweight,"bbmass_nm1");
-      if (doNM1Plots && isWjets_) {
-	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_bbmass_nobs_nm1,evtweight,"bbmass_nobs_nm1");
-	else fillHists1DWrapper(h_1d_bbmass_bs_nm1,evtweight,"bbmass_bs_nm1");
-      }
-      //           if (bb.M() < 95. || bb.M() > 150.) continue;
-      //      if (bb.M() < 100. || bb.M() > 140.) continue;
-      if (bb.M() < 150.) continue;
-
-      // --- consider above cuts preselection, fill presel histos here
-      // also fill custom minibaby if using
-      if (doMiniBaby) FillBabyNtuple(evtweight);
-      fillHists1DWrapper(h_1d_presel,evtweight,"presel");
-      if (isWjets_) {
-      	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_presel_nobs,evtweight,"presel_nobs");
-      	else fillHists1DWrapper(h_1d_presel_bs,evtweight,"presel_bs");
+      if (nbjets_ >= 2) {
+	bb = bjets_.at(0) + bjets_.at(1);
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
       }
 
-      if (doNM1Plots) fillHists1DWrapper(h_1d_pfmet_nm1,evtweight,"pfmet_nm1");
-      if (stopt.t1metphicorr() < 175.) continue;
-      //      if (stopt.t1metphicorr() < 150.) continue;
-      // if (stopt.pfmet() < 80.) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_lep1mt_nm1,evtweight,"lep1mt_nm1");
-      //      if (lep1mt < 120.) continue;
-      if (lep1mt < 100.) continue;
-      if (doNM1Plots) fillHists1DWrapper(h_1d_mt2bl_nm1,evtweight,"mt2bl_nm1");
-      //      if (mt2bl_ < 175.) continue;
-      if (mt2bl_ < 200.) continue;
-      // if (doNM1Plots) fillHists1DWrapper(h_1d_mt2w_nm1,evtweight,"mt2w_nm1");
-      // if (mt2w_ < 175.) continue;
-      // //      if (mt2w_ < 200.) continue;
-      // if (doNM1Plots) fillHists1DWrapper(h_1d_bbpt_nm1,evtweight,"bbpt_nm1");
-      // if (bb.pt() < 150.) continue;
-      // //      if (bb.pt() < 175.) continue;
-      // //      if (bb.pt() < 220.) continue;
-      // if (doNM1Plots) fillHists1DWrapper(h_1d_wpt_nm1,evtweight,"wpt_nm1");
-      // if (w.Mod() < 150.) continue;
-      // //      if (w.Mod() < 220.) continue;
-      // if (doNM1Plots) fillHists1DWrapper(h_1d_bbwdphi_nm1,evtweight,"bbwdphi_nm1");
-      // if (fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())) < 2.95) continue;
+      // TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
+      // TVector2 met;
+      // met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
+      // TVector2 w = lep+met; 
+
+      // end variables --------------------------------------
+      // ----------------------------------------------------
+
+      // ----------------------------------------------------
+      // selections bits
+
+      // should replace string comps with enums..
+
+      bool dataset_1l=false;
+
+      if((isData) && name.Contains("muo") 
+	 && (abs(stopt.id1()) == 13 ))  dataset_1l=true;
+      if((isData) && name.Contains("ele") 
+	 && (abs(stopt.id1()) == 11 ))  dataset_1l=true;
+
+      if(!isData) dataset_1l=true;
+
+      bool dataset_2l=false;
+
+      if((isData) && name.Contains("dimu") 
+	 && (abs(stopt.id1()) == 13 ) 
+	 && (abs(stopt.id2())==13)) dataset_2l=true;
+      if((isData) && name.Contains("diel") 
+	 && (abs(stopt.id1()) == 11 ) 
+	 && (abs(stopt.id2())==11)) dataset_2l=true;
+      if((isData) && name.Contains("mueg") 
+	 && abs(stopt.id1()) != abs(stopt.id2())) 
+	dataset_2l=true;
+
+      if(!isData) dataset_2l=true;
+
+      //      bool passisotrk = passIsoTrkVeto_v2();
+      bool passisotrk = passIsoTrkVeto_v3() && (stopt.ngoodlep() == 1);
+      //      bool passisotrk = passIsoTrkVeto_v4() && passTauVeto();
+
+      // end selections bits --------------------------------
+      // ----------------------------------------------------
+
+      // ----------------------------------------------------
+      // region selection and plots
+
+      // always require at least 2 (central) jets
+      if (njets_ < 2) continue;
+
+      // -------------------------------------------
+      // *** presel for signal region:
+      //   == 1 lepton, iso track veto
+      //   >= 2 bjets
+      //   100 < m(bb) < 140
+      //   met > 50
+
+      // *** signal region:
+      //   == 1 lepton, iso track veto
+      //   == 2 jets, all eta
+      //   == 2 bjets
+      //   100 < m(bb) < 140
+      //   met > 175 (cut at 50 for presel)
+      //   mt > 100
+      //   mt2bl > 200
+
+      if ( doSignal
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ >= 2)
+	   && (bb.M() > 100.) && (bb.M() < 140.)
+	   && (stopt.t1metphicorr() > 50.) 
+	   && (!isData || !blindSignal) ) {
+
+        fillHists1DWrapper(h_1d_sig_presel,evtweight1l,"sig_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_nbjets_nm1,evtweight1l,"sig_nbjets_nm1");
+	} 
+	else fail = true;
+
+	if (!fail && (nbjets_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_met_nm1,evtweight1l,"sig_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorr() > 175.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_mt_nm1,evtweight1l,"sig_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorrmt() > 120.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_mt2bl_nm1,evtweight1l,"sig_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > 200.) ) {
+	  fillHists1DWrapper(h_1d_sig_final,evtweight1l,"sig_final");
+	}
+
+      } // signal region sel
+
+      // -------------------------------------------
+      // *** CR1: m(bb) > 150 (can also put upper bound)
+      //  otherwise same as signal region
+
+      if ( doStopSel
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ >= 2)
+	   && (bb.M() > 150.)
+	   && (stopt.t1metphicorr() > 50.) ) {
+
+        fillHists1DWrapper(h_1d_cr1_presel,evtweight1l,"cr1_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_nbjets_nm1,evtweight1l,"cr1_nbjets_nm1");
+	} 
+	else fail = true;
+
+	if (!fail && (nbjets_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_met_nm1,evtweight1l,"cr1_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorr() > 175.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_mt_nm1,evtweight1l,"cr1_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorrmt() > 120.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_mt2bl_nm1,evtweight1l,"cr1_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > 200.) ) {
+	  fillHists1DWrapper(h_1d_cr1_final,evtweight1l,"cr1_final");
+	}
+
+      } // cr1 region sel
+
+
+      // -------------------------------------------
+      // *** Stop Presel region
+      //   >= 1 lepton
+      //   iso track veto v2
+      //   >= 4 jets
+      //   >= 1 bjet
+      //   met > 100
+      //   blind data (includes stop signal region)
+
+      // *** Stop Presel comparison region
+      //   >= 1 lepton
+      //   iso track veto v2
+      //   >= 4 jets
+      //   >= 1 bjet
+      //   met > 150
+      //   mt > 120
+      //   blind data (includes stop signal region)
+
+      if ( doStopSel
+	   && passSingleLeptonSelection(isData) 
+	   && passIsoTrkVeto_v2()
+	   && (njets_ >= 4)
+	   && (nbjets_ >= 1)
+	   && (stopt.t1metphicorr() > 100.) 
+	   && !isData ) {
+
+        fillHists1DWrapper(h_1d_stop_presel,evtweight1l,"stop_presel");
+
+	if ( (stopt.t1metphicorr() > 150.) && (stopt.t1metphicorrmt() > 120.) ) {
+	  fillHists1DWrapper(h_1d_stop_comp,evtweight1l,"stop_comp");
+	} 
+
+      } // stop region sel
+
+      // end regions ----------------------------------------
+      // ----------------------------------------------------
 
       ++nEventsPass;
-
-      // fill hists
-      plot1D("h_nvtx",       stopt.nvtx(),       evtweight, h_1d_final, 40, 0, 40);
-      plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d_final, 41, -4., 4.);
-
-      fillHists1DWrapper(h_1d_final,evtweight,"final");
-      if (isWjets_) {
-	if (stopt.nbs() == 0) fillHists1DWrapper(h_1d_final_nobs,evtweight,"final_nobs");
-	else fillHists1DWrapper(h_1d_final_bs,evtweight,"final_bs");
-      }
-
-      plot2D("h_wpt_vs_bbpt", w.Mod(), bb.pt(), evtweight, h_2d_final, 500, 0, 1000, 500, 0, 1000);
 
     } // end event loop
 
@@ -430,36 +585,32 @@ void WHLooper::loop(TChain *chain, TString name) {
     // finish
     //
 
-  //  savePlots12(h_1d, h_2d, (char*)m_outfilename_.c_str());
-
-  savePlotsDir(h_1d_presel,outfile_,"presel");
-  if (isWjets_) {
-    savePlotsDir(h_1d_presel_nobs,outfile_,"presel_nobs");
-    savePlotsDir(h_1d_presel_bs,outfile_,"presel_bs");
-  }
-  if (doNM1Plots) {
-    savePlotsDir(h_1d_njets_nm1,outfile_,"njets_nm1");
-    savePlotsDir(h_1d_njetsalleta_nm1,outfile_,"njetsalleta_nm1");
-    savePlotsDir(h_1d_bbmass_nm1,outfile_,"bbmass_nm1");
-    if (isWjets_) {
-      savePlotsDir(h_1d_bbmass_nobs_nm1,outfile_,"bbmass_nobs_nm1");
-      savePlotsDir(h_1d_bbmass_bs_nm1,outfile_,"bbmass_bs_nm1");
+  if (doSignal) {
+    savePlotsDir(h_1d_sig_presel,outfile_,"sig_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_sig_nbjets_nm1,outfile_,"sig_nbjets_nm1");
+      savePlotsDir(h_1d_sig_met_nm1,outfile_,"sig_met_nm1");
+      savePlotsDir(h_1d_sig_mt_nm1,outfile_,"sig_mt_nm1");
+      savePlotsDir(h_1d_sig_mt2bl_nm1,outfile_,"sig_mt2bl_nm1");
     }
-    savePlotsDir(h_1d_pfmet_nm1,outfile_,"pfmet_nm1");
-    savePlotsDir(h_1d_lep1mt_nm1,outfile_,"lep1mt_nm1");
-    savePlotsDir(h_1d_mt2bl_nm1,outfile_,"mt2bl_nm1");
-    // savePlotsDir(h_1d_mt2w_nm1,outfile_,"mt2w_nm1");
-    // savePlotsDir(h_1d_bbpt_nm1,outfile_,"bbpt_nm1");
-    // savePlotsDir(h_1d_wpt_nm1,outfile_,"wpt_nm1");
-    // savePlotsDir(h_1d_bbwdphi_nm1,outfile_,"bbwdphi_nm1");
+    savePlotsDir(h_1d_sig_final,outfile_,"sig_final");
   }
 
-  savePlotsDir(h_1d_final,outfile_,"final");
-  savePlots2Dir(h_2d_final,outfile_,"final");
-  if (isWjets_) {
-    savePlotsDir(h_1d_final_nobs,outfile_,"final_nobs");
-    savePlotsDir(h_1d_final_bs,outfile_,"final_bs");
-  }  
+  if (doCR1) {
+    savePlotsDir(h_1d_cr1_presel,outfile_,"cr1_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr1_nbjets_nm1,outfile_,"cr1_nbjets_nm1");
+      savePlotsDir(h_1d_cr1_met_nm1,outfile_,"cr1_met_nm1");
+      savePlotsDir(h_1d_cr1_mt_nm1,outfile_,"cr1_mt_nm1");
+      savePlotsDir(h_1d_cr1_mt2bl_nm1,outfile_,"cr1_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr1_final,outfile_,"cr1_final");
+  }
+
+  if (doStopSel) {
+    savePlotsDir(h_1d_stop_presel,outfile_,"stop_presel");
+    savePlotsDir(h_1d_stop_comp,outfile_,"stop_comp");
+  }
 
   outfile_->Write();
   outfile_->Close();
@@ -468,8 +619,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   already_seen.clear();
 
   gROOT->cd();
-
-  if (doMiniBaby) CloseBabyNtuple();
 
   bmark->Stop("benchmark");
   cout << endl;
@@ -480,26 +629,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   cout << "Real Time:	" << Form( "%.01f s", bmark->GetRealTime("benchmark") ) << ", Rate: " << Form( "%.1f Hz", float(nEventsTotal)/bmark->GetRealTime("benchmark")) << endl;
   cout << endl;
   delete bmark;
-
-}
-
-//--------------------------------------------------------------------
-
-std::vector<LorentzVector> WHLooper::getBJets(const csvpoint csv) {
-
-  std::vector<LorentzVector> bjets;
-  float csvcut = getCSVCut(csv);
-
-  std::vector<int> bjetIdx = getBJetIndex(csvcut,-1,-1);
-
-  for (unsigned int i=0; i<bjetIdx.size(); ++i) {
-    bjets.push_back(stopt.pfjets().at(i));
-  }
-
-  // sort by pt -- shouldn't be needed
-  //  sort(bjets.begin()  , bjets.end()  , sortByPt);
-
-  return bjets;
 
 }
 
@@ -531,9 +660,6 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   outfile_->cd(dir.c_str());
 
-  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.t1metphicorr(), stopt.t1metphicorrphi() );
-  int njets = getNJets();
-  int njetsalleta = getNJets(4.7);
   TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
   TVector2 met;
   met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
@@ -541,19 +667,19 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   plot1D("h_lep1pt"+suffix,       stopt.lep1().pt(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_lep1eta"+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
-  plot1D("h_lep1mt"+suffix,       lep1mt,       evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_lep1mt"+suffix,       stopt.t1metphicorrmt(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_pfmet"+suffix,        stopt.t1metphicorr(),    evtweight, h_1d, 500, 0., 500.);
-  plot1D("h_pfsumet"+suffix,      stopt.pfsumet(),    evtweight, h_1d, 1500, 0., 1500.);
-  plot1D("h_pfmetsig"+suffix,     stopt.pfmet()/sqrt(stopt.pfsumet()),   evtweight, h_1d, 500, 0., 20.);
-  plot1D("h_njets"+suffix,        njets,              evtweight, h_1d, 10, 0., 10.);
-  plot1D("h_njetsalleta"+suffix,  njetsalleta,        evtweight, h_1d, 10, 0., 10.);
-  plot1D("h_nbjets"+suffix,       myBJets_.size(),    evtweight, h_1d, 5, 0., 5.);
+  // plot1D("h_pfsumet"+suffix,      stopt.pfsumet(),    evtweight, h_1d, 1500, 0., 1500.);
+  // plot1D("h_pfmetsig"+suffix,     stopt.pfmet()/sqrt(stopt.pfsumet()),   evtweight, h_1d, 500, 0., 20.);
+  plot1D("h_njets"+suffix,        njets_,              evtweight, h_1d, 10, 0., 10.);
+  plot1D("h_njetsalleta"+suffix,  njetsalleta_,        evtweight, h_1d, 10, 0., 10.);
+  plot1D("h_nbjets"+suffix,       nbjets_,    evtweight, h_1d, 5, 0., 5.);
   plot1D("h_wpt"+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.t1metphicorrphi())),  evtweight, h_1d, 50, 0., TMath::Pi());
 
   // phi cor met validation
-  plot1D("h_metdiff"+suffix,        stopt.t1metphicorr() - stopt.pfmet(),    evtweight, h_1d, 500, -250., 250.);
-  plot1D("h_metphidiff"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.t1metphicorrphi() - stopt.pfmetphi())),    evtweight, h_1d,  50, 0., TMath::Pi());
+  // plot1D("h_metdiff"+suffix,        stopt.t1metphicorr() - stopt.pfmet(),    evtweight, h_1d, 500, -250., 250.);
+  // plot1D("h_metphidiff"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.t1metphicorrphi() - stopt.pfmetphi())),    evtweight, h_1d,  50, 0., TMath::Pi());
 
 
   if (isWjets_) {
@@ -561,115 +687,71 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
   }
 
   // bjets and bbbar plots
-  if (myBJets_.size() >= 2) {
-    plot1D("h_bjet1pt"+suffix,       myBJets_[0].pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D("h_bjet2pt"+suffix,       myBJets_[1].pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D("h_bjet1eta"+suffix,       myBJets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
-    plot1D("h_bjet2eta"+suffix,       myBJets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
+  if (nbjets_ >= 2) {
+    plot1D("h_bjet1pt"+suffix,       bjets_[0].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_bjet2pt"+suffix,       bjets_[1].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_bjet1eta"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
+    plot1D("h_bjet2eta"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
 
-    LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
+    LorentzVector bb = bjets_.at(0) + bjets_.at(1);
     plot1D("h_bbmass"+suffix,       bb.M(),       evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_bbpt"+suffix,       bb.pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D("h_bbdr"+suffix,  ROOT::Math::VectorUtil::DeltaR( myBJets_.at(0) , myBJets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
-    plot1D("h_bbdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(myBJets_[0].phi() - myBJets_[1].phi())), evtweight, h_1d, 50, 0., TMath::Pi());
+    // plot1D("h_bbdr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bjets_.at(0) , bjets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    // plot1D("h_bbdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bjets_[0].phi() - bjets_[1].phi())), evtweight, h_1d, 50, 0., TMath::Pi());
 
-    plot1D("h_bblep1dr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bb , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
-    plot1D("h_bblep1dphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - stopt.lep1().phi())), evtweight, h_1d, 50, 0., TMath::Pi());
+    // plot1D("h_bblep1dr"+suffix,  ROOT::Math::VectorUtil::DeltaR( bb , stopt.lep1() ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    // plot1D("h_bblep1dphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - stopt.lep1().phi())), evtweight, h_1d, 50, 0., TMath::Pi());
 
     plot1D("h_bbwdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi())), evtweight, h_1d, 50, 0., TMath::Pi());
-    plot1D("h_bbwdpt"+suffix,   bb.pt() - w.Mod(),       evtweight, h_1d, 500, -250., 250.);
+    // plot1D("h_bbwdpt"+suffix,   bb.pt() - w.Mod(),       evtweight, h_1d, 500, -250., 250.);
 
-    plot1D("h_bbwsumpt"+suffix,       bb.pt()+w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
+    // plot1D("h_bbwsumpt"+suffix,       bb.pt()+w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
 
-    plot1D("h_allsumpt"+suffix,      myBJets_[0].pt()+ myBJets_[1].pt()+stopt.lep1().pt()+stopt.t1metphicorr() , evtweight, h_1d, 1500, 0., 1500.);
+    // plot1D("h_allsumpt"+suffix,      bjets_[0].pt()+ bjets_[1].pt()+stopt.lep1().pt()+stopt.t1metphicorr() , evtweight, h_1d, 1500, 0., 1500.);
 
-    LorentzVector b1lep1 = myBJets_.at(0) + stopt.lep1();
-    plot1D("h_bjet1lep1mass"+suffix,       b1lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
-    float bjet1lep1dphi = fabs(TVector2::Phi_mpi_pi(myBJets_[0].phi() - stopt.lep1().phi()));
-    plot1D("h_bjet1lep1dphi"+suffix,  bjet1lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
-    LorentzVector b2lep1 = myBJets_.at(1) + stopt.lep1();
-    plot1D("h_bjet2lep1mass"+suffix,       b2lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
-    float bjet2lep1dphi = fabs(TVector2::Phi_mpi_pi(myBJets_[1].phi() - stopt.lep1().phi()));
-    plot1D("h_bjet2lep1dphi"+suffix,  bjet2lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
+    // LorentzVector b1lep1 = bjets_.at(0) + stopt.lep1();
+    // plot1D("h_bjet1lep1mass"+suffix,       b1lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    // float bjet1lep1dphi = fabs(TVector2::Phi_mpi_pi(bjets_[0].phi() - stopt.lep1().phi()));
+    // plot1D("h_bjet1lep1dphi"+suffix,  bjet1lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
+    // LorentzVector b2lep1 = bjets_.at(1) + stopt.lep1();
+    // plot1D("h_bjet2lep1mass"+suffix,       b2lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
+    // float bjet2lep1dphi = fabs(TVector2::Phi_mpi_pi(bjets_[1].phi() - stopt.lep1().phi()));
+    // plot1D("h_bjet2lep1dphi"+suffix,  bjet2lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
 
-    plot1D("h_bjetlep1mindphi"+suffix,  TMath::Min(bjet1lep1dphi,bjet2lep1dphi), evtweight, h_1d, 50, 0., TMath::Pi());
+    // plot1D("h_bjetlep1mindphi"+suffix,  TMath::Min(bjet1lep1dphi,bjet2lep1dphi), evtweight, h_1d, 50, 0., TMath::Pi());
 
     plot1D("h_mt2b"+suffix,   mt2b_,  evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_mt2bl"+suffix,  mt2bl_, evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_mt2w"+suffix,   mt2w_,  evtweight, h_1d, 1000, 0., 1000.);
 
     // use loose btags here in case i plot before requiring 2 med
-    std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1);
-    plot1D("h_bjet1mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(0)) , evtweight, h_1d, 40, -20., 20.);
-    plot1D("h_bjet2mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(1)) , evtweight, h_1d, 40, -20., 20.);
+    // std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1);
+    // plot1D("h_bjet1mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(0)) , evtweight, h_1d, 40, -20., 20.);
+    // plot1D("h_bjet2mc3"+suffix, stopt.pfjets_mc3().at(bjetIdx.at(1)) , evtweight, h_1d, 40, -20., 20.);
 
     // need V00-02-20 or higher babies for these vars
-    //    plot1D("h_bjet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(0))) , evtweight, h_1d, 22, 0., 22.);
-    //    plot1D("h_bjet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(1))) , evtweight, h_1d, 22, 0., 22.);
-  }
+    // plot1D("h_bjet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
+    // plot1D("h_bjet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
+  } // if nbjets >= 2
+
+  // if (njets >= 2) {
+  //   std::vector<int> jetIdx = getJetIndex();
+  //   // need V00-02-20 or higher babies for these vars
+  //   plot1D("h_jet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
+  //   plot1D("h_jet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
+
+  //   if (stopt.nbs() == 0) {
+  //     plot1D("h_jet1flavor_nobs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
+  //     plot1D("h_jet2flavor_nobs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
+  //   } else {
+  //     plot1D("h_jet1flavor_bs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
+  //     plot1D("h_jet2flavor_bs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
+  //   }
+
+  // }
+
+  plot1D("h_nvtx",      stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
+  plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
 
   return;
 }
-
-//______________________________________________________________________________________
-void WHLooper::MakeBabyNtuple (const char* babyFileName)
-{
-
-  TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
-  rootdir->cd();
-
-  babyFile_ = new TFile(Form("%s", babyFileName), "RECREATE");
-  babyFile_->cd();
-  babyTree_ = new TTree("T1", "A Baby Ntuple");
-
-  //event stuff
-  babyTree_->Branch("run",          &run_,          "run/I"          );
-  babyTree_->Branch("lumi",         &lumi_,         "lumi/I"         );
-  babyTree_->Branch("event",        &event_,        "event/I"        );
-  babyTree_->Branch("leptype",               &leptype_,               "leptype/I");
-  babyTree_->Branch("weight",       &weight_,       "weight/F"       );
-
-  //vars
-  babyTree_->Branch("pfmet",        &pfmet_,        "pfmet/F"      );
-  babyTree_->Branch("lep1mt",       &lep1mt_,       "lep1mt/F"      );
-  babyTree_->Branch("mt2w",         &mt2w_,         "mt2w/F"      );
-  babyTree_->Branch("bbpt",         &bbpt_,         "bbpt/F"      );
-  babyTree_->Branch("wpt",          &wpt_,          "wpt/F"      );
-  babyTree_->Branch("bbwdphi",      &bbwdphi_,      "bbwdphi/F"      );
-}
-
-//______________________________________________________________________________________
-void WHLooper::FillBabyNtuple (const float evtweight)
-{
-
-  run_ = stopt.run();
-  lumi_ = stopt.lumi();
-  event_ = stopt.event();
-  leptype_ = stopt.leptype();
-  weight_ = evtweight;
-
-  float lep1mt = getMT(stopt.lep1().pt(), stopt.lep1().phi(), stopt.t1metphicorr(), stopt.t1metphicorrphi() );
-  LorentzVector bb = myBJets_.at(0) + myBJets_.at(1);
-  TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
-  TVector2 met;
-  met.SetMagPhi(stopt.t1metphicorr(), stopt.t1metphicorrphi());
-  TVector2 w = lep+met; 
-
-  pfmet_ = stopt.t1metphicorr();
-  lep1mt_ = lep1mt;
-  //   mt2w_; // filled in main loop
-  bbpt_ = bb.pt();
-  wpt_ = w.Mod();
-  bbwdphi_ = fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi()));
-
-  babyTree_->Fill();
-}
-
-//______________________________________________________________________________________
-void WHLooper::CloseBabyNtuple ()
-{
-  babyFile_->cd();
-  babyTree_->Write();
-  babyFile_->Close();
-}
-
