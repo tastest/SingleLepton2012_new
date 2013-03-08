@@ -39,7 +39,7 @@ const bool doNM1Plots = true;
 const bool blindSignal = true;
 const bool doSignal = true;
 const bool doCR1 = true;
-const bool doCR2 = false;
+const bool doCR2 = true;
 const bool doCR3 = true;
 const bool doCR4 = true;
 const bool doCR5 = true;
@@ -614,15 +614,45 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 
       // -------------------------------------------
-      // *** CR2: 1 lepton + iso track, i.e. inverted iso track veto
+      // *** CR2: 1 lepton + iso track, i.e. inverted iso track veto, require exactly 1 lep
       //   otherwise same as signal region
-      //   !! should be careful here not to look at ZH+MET - lep+track inv mass veto?
+
+      if ( doCR2
+	   && passSingleLeptonSelection(isData) 
+	   && !passisotrk && (stopt.ngoodlep() == 1) 
+	   && (nbjets_ >= 2)
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
+	   && (met_ > CUT_MET_PRESEL_) ) {
+
+        fillHists1DWrapper(h_1d_cr2_presel,evtweight1l,"cr2_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr2_met_nm1,evtweight1l,"cr2_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr2_mt_nm1,evtweight1l,"cr2_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr2_mt2bl_nm1,evtweight1l,"cr2_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr2_final,evtweight1l,"cr2_final");
+	}
+
+      } // CR2 region sel
 
 
       // -------------------------------------------
       // *** CR3: 2 leptons, Z mass veto for same flavor, no iso track veto
       //   otherwise same as signal region
-      //   !!! modified MET/MT defs to emulate losing 2nd lepton
+      //   !!! modified MET/MT etc defs to emulate losing 2nd lepton
 
       if ( doCR3
 	   && passDileptonSelection(isData) 
@@ -630,6 +660,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && (nbjets_ >= 2)
 	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_) ) {
 
+	// tight 3rd track veto used by stop people -- necessary?
 	//	      if ( (stopt.trkpt10loose() <0.0001 || stopt.trkreliso10loose() > 0.1) 
 
 	//calculate pseudo met and mt
@@ -680,7 +711,6 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
-	// probably need to fix MT2 vars as well....
 	if (!fail && (pseudomt2bl_ > CUT_MT2BL_) ) {
 	  fillHists1DWrapper(h_1d_cr3_final,evtweight2l,"cr3_final");
 	}
