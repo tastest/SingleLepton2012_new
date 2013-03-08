@@ -39,6 +39,10 @@ const bool doNM1Plots = true;
 const bool blindSignal = true;
 const bool doSignal = true;
 const bool doCR1 = true;
+const bool doCR2 = false;
+const bool doCR3 = false;
+const bool doCR4 = true;
+const bool doCR5 = true;
 const bool doStopSel = true;
 
 std::set<DorkyEventIdentifier> already_seen; 
@@ -71,6 +75,15 @@ WHLooper::WHLooper()
   t1metphicorr = -9999.;
   t1metphicorrphi = -9999.;
   t1metphicorrmt = -9999.;
+
+  CUT_BBMASS_LOW_ = 100.0;
+  CUT_BBMASS_HIGH_ = 140.0;
+  CUT_BBMASS_CR1_ = 150.0;
+  CUT_MET_PRESEL_ = 50.0;
+  CUT_MET_ = 175.0;
+  CUT_MT_ = 100.0;
+  CUT_MT2BL_ = 200.0;
+
 }
 
 //--------------------------------------------------------------------
@@ -146,6 +159,26 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr1 nm1 hists
   std::map<std::string, TH1F*> h_1d_cr1_nbjets_nm1, h_1d_cr1_met_nm1, h_1d_cr1_mt_nm1, h_1d_cr1_mt2bl_nm1;
 
+  // cr2 hists
+  std::map<std::string, TH1F*> h_1d_cr2_presel, h_1d_cr2_final;
+  // cr2 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr2_nbjets_nm1, h_1d_cr2_met_nm1, h_1d_cr2_mt_nm1, h_1d_cr2_mt2bl_nm1;
+
+  // cr3 hists
+  std::map<std::string, TH1F*> h_1d_cr3_presel, h_1d_cr3_final;
+  // cr3 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr3_nbjets_nm1, h_1d_cr3_met_nm1, h_1d_cr3_mt_nm1, h_1d_cr3_mt2bl_nm1;
+
+  // cr4 hists
+  std::map<std::string, TH1F*> h_1d_cr4_presel, h_1d_cr4_final;
+  // cr4 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr4_met_nm1, h_1d_cr4_mt_nm1, h_1d_cr4_mt2bl_nm1;
+
+  // cr5 hists
+  std::map<std::string, TH1F*> h_1d_cr5_presel, h_1d_cr5_final;
+  // cr5 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr5_met_nm1, h_1d_cr5_mt_nm1, h_1d_cr5_mt2bl_nm1;
+
   // stop region hists
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
 
@@ -170,6 +203,48 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr1_mt2bl_nm1");
     }
     outfile_->mkdir("cr1_final");
+  }
+
+  if (doCR2) {
+    outfile_->mkdir("cr2_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr2_nbjets_nm1");
+      outfile_->mkdir("cr2_met_nm1");
+      outfile_->mkdir("cr2_mt_nm1");
+      outfile_->mkdir("cr2_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr2_final");
+  }
+
+  if (doCR3) {
+    outfile_->mkdir("cr3_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr3_nbjets_nm1");
+      outfile_->mkdir("cr3_met_nm1");
+      outfile_->mkdir("cr3_mt_nm1");
+      outfile_->mkdir("cr3_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr3_final");
+  }
+
+  if (doCR4) {
+    outfile_->mkdir("cr4_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr4_met_nm1");
+      outfile_->mkdir("cr4_mt_nm1");
+      outfile_->mkdir("cr4_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr4_final");
+  }
+
+  if (doCR5) {
+    outfile_->mkdir("cr5_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr5_met_nm1");
+      outfile_->mkdir("cr5_mt_nm1");
+      outfile_->mkdir("cr5_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr5_final");
   }
 
   if (doStopSel) {
@@ -339,11 +414,14 @@ void WHLooper::loop(TChain *chain, TString name) {
 	if ( (fabs(stopt.pfjets().at(i).eta()) < 2.5) 
 	     && (stopt.pfjets_beta2_0p5().at(i)<0.2) ) continue;
 	
+	// count jets from all eta, save jets within |eta| < 2.4
 	++njetsalleta_;
-	if (fabs(stopt.pfjets().at(i).eta()) <= 2.4) ++njets_;
+	if (fabs(stopt.pfjets().at(i).eta()) > 2.4) continue;
 
-      	jets_.push_back( stopt.pfjets().at(i) );
+	++njets_;
+	jets_.push_back( stopt.pfjets().at(i) );
 	jets_idx_.push_back(i);
+
 	// if (n_jets==1) 
 	//   dphimj1 = getdphi(t1metphicorrphi, stopt.pfjets().at(i).phi() );
 	// if (n_jets==2) {
@@ -381,7 +459,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       } // loop over pfjets
 
-      // calculate mt2 vars after selecting jets -- require at least 2 bjets
+      // calculate mt2 vars after selecting jets -- require at least 2 bjets here to avoid wasting time..
       LorentzVector bb;
       mt2b_ = -1.;
       mt2bl_ = -1.;
@@ -391,6 +469,15 @@ void WHLooper::loop(TChain *chain, TString name) {
 	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
 	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
 	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
+      }
+      else if ((nbjets_ == 1) && (njets_ >= 2)) {
+	// 1 bjet: use bjet + highest pt other jet for dijet mass
+	if (bjets_idx_.at(0) == jets_idx_.at(0)) bb = bjets_.at(0) + jets_.at(1);
+	else bb = bjets_.at(0) + jets_.at(1);
+      }
+      else if (njets_ >= 2) {
+	// 0 bjets: use two highest pt jets for invariant mass
+	bb = jets_.at(0) + jets_.at(1);
       }
 
       // TVector2 lep(stopt.lep1().px(),stopt.lep1().py());
@@ -462,8 +549,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ >= 2)
-	   && (bb.M() > 100.) && (bb.M() < 140.)
-	   && (stopt.t1metphicorr() > 50.) 
+	   && (bb.M() > CUT_BBMASS_LOW_) && (bb.M() < CUT_BBMASS_HIGH_)
+	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) 
 	   && (!isData || !blindSignal) ) {
 
         fillHists1DWrapper(h_1d_sig_presel,evtweight1l,"sig_presel");
@@ -479,17 +566,17 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorr() > 175.) ) {
+	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_mt_nm1,evtweight1l,"sig_mt_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorrmt() > 120.) ) {
+	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_mt2bl_nm1,evtweight1l,"sig_mt2bl_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (mt2bl_ > 200.) ) {
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
 	  fillHists1DWrapper(h_1d_sig_final,evtweight1l,"sig_final");
 	}
 
@@ -503,8 +590,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ >= 2)
-	   && (bb.M() > 150.)
-	   && (stopt.t1metphicorr() > 50.) ) {
+	   && (bb.M() > CUT_BBMASS_CR1_)
+	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) ) {
 
         fillHists1DWrapper(h_1d_cr1_presel,evtweight1l,"cr1_presel");
 
@@ -519,21 +606,112 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorr() > 175.) ) {
+	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_mt_nm1,evtweight1l,"cr1_mt_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (stopt.t1metphicorrmt() > 120.) ) {
+	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_mt2bl_nm1,evtweight1l,"cr1_mt2bl_nm1");
 	}
 	else fail = true;
 
-	if (!fail && (mt2bl_ > 200.) ) {
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
 	  fillHists1DWrapper(h_1d_cr1_final,evtweight1l,"cr1_final");
 	}
 
       } // cr1 region sel
+
+
+      // -------------------------------------------
+      // *** CR2: 1 lepton + iso track, i.e. inverted iso track veto
+      //   otherwise same as signal region
+      //   !! should be careful here not to look at ZH+MET - lep+track inv mass veto?
+
+      // -------------------------------------------
+      // *** CR3: 2 leptons, Z mass veto
+      //   otherwise same as signal region
+
+
+      // -------------------------------------------
+      // *** CR4: require exactly 0 btags
+      //  otherwise same as signal
+
+      if ( doCR4
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ == 0)
+	   && (bb.M() > CUT_BBMASS_LOW_) && (bb.M() < CUT_BBMASS_HIGH_)
+	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) ) {
+
+        fillHists1DWrapper(h_1d_cr4_presel,evtweight1l,"cr4_presel");
+
+	// compute MT2 vars for 0 b events passing this presel
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_met_nm1,evtweight1l,"cr4_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt_nm1,evtweight1l,"cr4_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt2bl_nm1,evtweight1l,"cr4_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr4_final,evtweight1l,"cr4_final");
+	}
+
+      } // CR4 region sel
+
+      // -------------------------------------------
+      // *** CR5: require exactly 1 btag
+      //  otherwise same as signal
+
+      if ( doCR5
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ == 1)
+	   && (bb.M() > CUT_BBMASS_LOW_) && (bb.M() < CUT_BBMASS_HIGH_)
+	   && (stopt.t1metphicorr() > CUT_MET_PRESEL_) ) {
+
+        fillHists1DWrapper(h_1d_cr5_presel,evtweight1l,"cr5_presel");
+
+	// compute MT2 vars for 1 b events passing this presel
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi(), MT2w);
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_met_nm1,evtweight1l,"cr5_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorr() > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt_nm1,evtweight1l,"cr5_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (stopt.t1metphicorrmt() > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt2bl_nm1,evtweight1l,"cr5_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr5_final,evtweight1l,"cr5_final");
+	}
+
+      } // CR5 region sel
 
 
       // -------------------------------------------
@@ -605,6 +783,48 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr1_mt2bl_nm1,outfile_,"cr1_mt2bl_nm1");
     }
     savePlotsDir(h_1d_cr1_final,outfile_,"cr1_final");
+  }
+
+  if (doCR2) {
+    savePlotsDir(h_1d_cr2_presel,outfile_,"cr2_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr2_nbjets_nm1,outfile_,"cr2_nbjets_nm1");
+      savePlotsDir(h_1d_cr2_met_nm1,outfile_,"cr2_met_nm1");
+      savePlotsDir(h_1d_cr2_mt_nm1,outfile_,"cr2_mt_nm1");
+      savePlotsDir(h_1d_cr2_mt2bl_nm1,outfile_,"cr2_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr2_final,outfile_,"cr2_final");
+  }
+
+  if (doCR3) {
+    savePlotsDir(h_1d_cr3_presel,outfile_,"cr3_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr3_nbjets_nm1,outfile_,"cr3_nbjets_nm1");
+      savePlotsDir(h_1d_cr3_met_nm1,outfile_,"cr3_met_nm1");
+      savePlotsDir(h_1d_cr3_mt_nm1,outfile_,"cr3_mt_nm1");
+      savePlotsDir(h_1d_cr3_mt2bl_nm1,outfile_,"cr3_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr3_final,outfile_,"cr3_final");
+  }
+
+  if (doCR4) {
+    savePlotsDir(h_1d_cr4_presel,outfile_,"cr4_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr4_met_nm1,outfile_,"cr4_met_nm1");
+      savePlotsDir(h_1d_cr4_mt_nm1,outfile_,"cr4_mt_nm1");
+      savePlotsDir(h_1d_cr4_mt2bl_nm1,outfile_,"cr4_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr4_final,outfile_,"cr4_final");
+  }
+
+  if (doCR5) {
+    savePlotsDir(h_1d_cr5_presel,outfile_,"cr5_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr5_met_nm1,outfile_,"cr5_met_nm1");
+      savePlotsDir(h_1d_cr5_mt_nm1,outfile_,"cr5_mt_nm1");
+      savePlotsDir(h_1d_cr5_mt2bl_nm1,outfile_,"cr5_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr5_final,outfile_,"cr5_final");
   }
 
   if (doStopSel) {

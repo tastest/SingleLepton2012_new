@@ -42,6 +42,15 @@ class WHLooper {
   float t1metphicorrphi;
   float t1metphicorrmt;
 
+  // store main cut values
+  float CUT_BBMASS_LOW_;
+  float CUT_BBMASS_HIGH_;
+  float CUT_BBMASS_CR1_;
+  float CUT_MET_PRESEL_;
+  float CUT_MET_;
+  float CUT_MT_;
+  float CUT_MT2BL_;
+
   // internal vars to store
   std::vector<LorentzVector> jets_;
   std::vector<LorentzVector> bjets_;
