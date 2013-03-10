@@ -292,7 +292,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	if( stopt.pfjets().at(i).pt()<30 )  continue;
 	if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
 	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
-	
+
+	/*	
+	bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
+        bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),0);
+
+	if(!passTightPUid) continue;
+	*/
+
 	n_jets++;
 	n_ljets++;
 	if (n_jets==1) 
