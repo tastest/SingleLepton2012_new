@@ -45,6 +45,7 @@ float getsltrigweight(int id1, float pt, float eta);
 bool passEvtSelection(TString name);
 bool passOneLeptonSelection(bool isData);
 bool passTwoLeptonSelection(bool isData);
+bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int tightness);
 bool passTauVeto();
 bool passIsoTrkVeto();
 bool passIsoTrkVeto_v2();
