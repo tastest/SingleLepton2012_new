@@ -452,7 +452,9 @@ bool passSingleLeptonSelection(bool isData)
   if ( stopt.ngoodlep() < 1 ) return false;
 
   //lepton flavor - trigger, pt and eta requirements
-  if ( stopt.lep1().Pt() < 30 )          return false;
+  if ( stopt.leptype() == 0 && stopt.lep1().Pt() < 30 )          return false;
+  if ( stopt.leptype() == 1 && stopt.lep1().Pt() < 25 )          return false;
+
   if ( fabs( stopt.pflep1().Pt() - stopt.lep1().Pt() ) > 10. )  return false;
   if ( ( stopt.isopf1() * stopt.lep1().Pt() ) > 5. )  return false; 
 
