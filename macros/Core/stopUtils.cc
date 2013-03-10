@@ -287,6 +287,56 @@ bool passEvtSelection(TString name)
 
 }
 
+
+// tightness : 2=loose 1=medium 0=tight
+bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int tightness)         
+{
+  if(tightness<0 || tightness>2)
+    {
+      cout << "ERROR : tightness should be 0, 1, or 2. " << endl;
+      return false;
+    }
+
+  // working points from full_53x_wp defined in 
+  // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CMG/CMGTools/External/python/JetIdParams_cfi.py?revision=1.12&view=markup
+
+  double fMVACut[3][4][4];
+
+  // These cuts are for 42X but used for 52X jet Id
+  //Tight Id
+  fMVACut[0][0][0] = -0.83; fMVACut[0][0][1] = -0.81; fMVACut[0][0][2] = -0.74; fMVACut[0][0][3] = -0.81;
+  fMVACut[0][1][0] = -0.83; fMVACut[0][1][1] = -0.81; fMVACut[0][1][2] = -0.74; fMVACut[0][1][3] = -0.81;
+  fMVACut[0][2][0] = -0.38; fMVACut[0][2][1] = -0.32; fMVACut[0][2][2] = -0.14; fMVACut[0][2][3] = -0.48;
+  fMVACut[0][3][0] = -0.38; fMVACut[0][3][1] = -0.32; fMVACut[0][3][2] = -0.14; fMVACut[0][3][3] = -0.48;
+  //Medium id
+  fMVACut[1][0][0] = -0.83; fMVACut[1][0][1] = -0.92; fMVACut[1][0][2] = -0.90; fMVACut[1][0][3] = -0.92;
+  fMVACut[1][1][0] = -0.83; fMVACut[1][1][1] = -0.92; fMVACut[1][1][2] = -0.90; fMVACut[1][1][3] = -0.92;
+  fMVACut[1][2][0] = -0.40; fMVACut[1][2][1] = -0.49; fMVACut[1][2][2] = -0.50; fMVACut[1][2][3] = -0.65;
+  fMVACut[1][3][0] = -0.40; fMVACut[1][3][1] = -0.49; fMVACut[1][3][2] = -0.50; fMVACut[1][3][3] = -0.65;
+  //Loose Id 
+  fMVACut[2][0][0] = -0.95; fMVACut[2][0][1] = -0.96; fMVACut[2][0][2] = -0.94; fMVACut[2][0][3] = -0.95;
+  fMVACut[2][1][0] = -0.95; fMVACut[2][1][1] = -0.96; fMVACut[2][1][2] = -0.94; fMVACut[2][1][3] = -0.95;
+  fMVACut[2][2][0] = -0.80; fMVACut[2][2][1] = -0.74; fMVACut[2][2][2] = -0.68; fMVACut[2][2][3] = -0.77;
+  fMVACut[2][3][0] = -0.80; fMVACut[2][3][1] = -0.74; fMVACut[2][3][2] = -0.68; fMVACut[2][3][3] = -0.77;
+
+
+  // pT categorization
+  int ptId = 0;
+  if( corjetpt > 10 && corjetpt < 20 ) ptId = 1;
+  if( corjetpt > 20 && corjetpt < 30 ) ptId = 2;
+  if( corjetpt > 30                  ) ptId = 3;
+
+  // eta categorization
+  int etaId = 0;
+  if( fabs(jeteta) > 2.5  && fabs(jeteta) < 2.75 ) etaId = 1;
+  if( fabs(jeteta) > 2.75 && fabs(jeteta) < 3.0  ) etaId = 2;
+  if( fabs(jeteta) > 3.0  && fabs(jeteta) < 5.0  ) etaId = 3;
+
+  // return  
+  if( mvavalue > fMVACut[tightness][ptId][etaId] ) return true;
+  return false;
+}
+
 //-------------------------------------------
 // the isolated track veto used at HCP
 //-------------------------------------------
