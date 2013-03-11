@@ -267,7 +267,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       t1metphicorrmt  = getMT( stopt.lep1().Pt() , stopt.lep1().Phi() , t1metphicorr , t1metphicorrphi );  
 
       pfcalo_metratio = t1metphicorr/stopt.calomet();
-      pfcalo_metdphi  = getdphi(t1metphicorrphi, stopt.t1metphicorrphi());
+      pfcalo_metdphi  = getdphi(t1metphicorrphi, stopt.calometphi());
 
       //----------------------------------------------------------------------------
       // get jet information
@@ -291,14 +291,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	
 	if( stopt.pfjets().at(i).pt()<30 )  continue;
 	if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
-	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
+	//	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
 
-	/*	
-	bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
+	//	bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
         bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),0);
 
 	if(!passTightPUid) continue;
-	*/
 
 	n_jets++;
 	n_ljets++;
@@ -758,7 +756,7 @@ void StopTreeLooper::makeCR2Plots(float evtweight, std::map<std::string, TH1F*> 
 
   //check HO and TOB/TEC cleanup cut variables
   plot1D("h_cr2_pfcaloMET"+tag_selection+flav_tag_dl, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
-  plot1D("h_cr2_pfcalodPhi"+tag_selection+flav_tag_dl, pfcalo_metdphi , evtweight, h_1d, 100, 0, 6.4);
+  plot1D("h_cr2_pfcalodPhi"+tag_selection+flav_tag_dl, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());
 
 }
 
@@ -824,7 +822,7 @@ void StopTreeLooper::makeCR4Plots( float evtweight, std::map<std::string, TH1F*>
 
   //check HO and TOB/TEC cleanup cut variables
   plot1D("h_cr4_pfcaloMET"+tag_selection+flav_tag_dl, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
-  plot1D("h_cr4_pfcalodPhi"+tag_selection+flav_tag_dl, pfcalo_metdphi , evtweight, h_1d, 100, 0, 6.4);
+  plot1D("h_cr4_pfcalodPhi"+tag_selection+flav_tag_dl, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());
 
 }
 
@@ -886,7 +884,7 @@ void StopTreeLooper::makeCR5Plots( float evtweight, std::map<std::string, TH1F*>
 
   //check HO and TOB/TEC cleanup cut variables
   plot1D("h_cr5_pfcaloMET"+tag_selection+flav_tag, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
-  plot1D("h_cr5_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, 6.4);
+  plot1D("h_cr5_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());
 
 }
 
@@ -943,7 +941,7 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
 
   //check HO and TOB/TEC cleanup cut variables
   plot1D("h_sig_pfcaloMET"+tag_selection+flav_tag, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
-  plot1D("h_sig_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, 6.4);
+  plot1D("h_sig_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());
 
 }
 
@@ -958,9 +956,20 @@ void StopTreeLooper::makeCR1Plots( float evtweight, std::map<std::string, TH1F*>
 
   float mt_count = -1.;
   if ( t1metphicorrmt > min_mtpeak 
-       && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
-  else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
+       && t1metphicorrmt < max_mtpeak ) {
+    mt_count = 0.5;
+
+  plot1D("h_cr1_mtpeak_pfcaloMET"+tag_selection+flav_tag, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
+  plot1D("h_cr1_mtpeak_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());
+
+  } else if ( t1metphicorrmt > mtcut ) {
+    mt_count = 1.5;
   
+    plot1D("h_cr1_mttail_pfcaloMET"+tag_selection+flav_tag, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
+    plot1D("h_cr1_mttail_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());
+
+  }
+
   plot1D("h_cr1_njets"    +tag_selection+flav_tag, min(n_jets,4),  evtweight, h_1d, 5,0,5);
   plot1D("h_cr1_njets_all"+tag_selection+flav_tag, min(n_jets,9),  evtweight, h_1d, 10, 0, 10);
   //default met
@@ -997,7 +1006,7 @@ void StopTreeLooper::makeCR1Plots( float evtweight, std::map<std::string, TH1F*>
 
   //check HO and TOB/TEC cleanup cut variables
   plot1D("h_cr1_pfcaloMET"+tag_selection+flav_tag, min(pfcalo_metratio, (float)3.9999) , evtweight, h_1d, 100, 0, 4.);
-  plot1D("h_cr1_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, 6.4);
+  plot1D("h_cr1_pfcalodPhi"+tag_selection+flav_tag, pfcalo_metdphi , evtweight, h_1d, 100, 0, TMath::Pi());  
 
 }
 

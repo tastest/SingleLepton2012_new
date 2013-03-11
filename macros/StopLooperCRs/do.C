@@ -1,4 +1,4 @@
-void do(char* path = "/nfs-3/userdata/stop/output_V00-02-20_2012_2jskim", char* sample = "ttdl_powheg"){
+void do(char* path = "/nfs-3/userdata/stop/output_V00-02-20_2012_4jskim", char* sample = "ttdl_powheg"){
   //------------------------------ 
   // load stuff
   //------------------------------ 
