@@ -38,6 +38,7 @@ TChain *t2bwB;
 TChain *qcd;
 TChain *tW;
 TChain *ttV;
+TChain *rare;
 
 vector<TChain*> mc;
 vector<TChain*> sigmc;
