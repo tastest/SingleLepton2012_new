@@ -450,6 +450,8 @@ void singleLeptonLooper::InitBaby(){
   // pfjets_beta2_0p2_.clear();
   pfjets_mvaBeta_.clear();
 
+  genbs_.clear();
+
 }
 
 //--------------------------------------------------------------------
@@ -1254,7 +1256,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  int pid = abs( genps_id().at(igen) );
 	  int mothid = abs(genps_id_mother().at(igen));
 
-	  if ( abs(id) == 5 ) ++nbs_;
+	  if ( abs(id) == 5 ) {
+	    ++nbs_;
+	    genbs_.push_back(genps_p4().at(igen));
+	  }
 
 	  if( id == 6 ){
 	    t_         = &(genps_p4().at(igen));
@@ -3852,6 +3857,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_mvaPUid",      "std::vector<float>", &pfjets_mvaPUid_ );
   outTree->Branch("pfjets_mvaBeta",      "std::vector<float>", &pfjets_mvaBeta_ );
 
+  outTree->Branch("genbs"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &genbs_ );
 
 
 }
