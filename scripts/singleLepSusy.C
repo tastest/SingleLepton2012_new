@@ -150,26 +150,9 @@ void initialize(char* path){
 
   cout << endl;
   cout << "Loading babies at       : " << path << endl;
-  
+
+  // data: use dummy histogram
   data->	Add(Form("%s/dummy.root",path));
-  // ttall->	Add(Form("%s/ttall_smallTree*root",path));
-  // ttfake->	Add(Form("%s/ttfake_smallTree.root",path));
-  // ttl->		Add(Form("%s/ttl_smallTree.root",path));
-  // ttll->	Add(Form("%s/ttll_smallTree.root",path));
-  // ttltau->	Add(Form("%s/ttltau_smallTree.root",path));
-  // tttau->	Add(Form("%s/tttau_smallTree.root",path));
-  // tttautau->	Add(Form("%s/tttautau_smallTree.root",path));
-  // ttotr->	Add(Form("%s/ttotr_smallTree.root",path));
-  // ttdllost->	Add(Form("%s/ttdllost_smallTree.root",path));
-  // ttdllep->	Add(Form("%s/ttdllep_smallTree.root",path));
-  // ttdltauh->	Add(Form("%s/ttdltauh_smallTree.root",path));
-  // ttdltauh1->	Add(Form("%s/ttdltauh1_smallTree.root",path));
-  // ttdltauhm->	Add(Form("%s/ttdltauhm_smallTree.root",path));
-  // ttdltaul->	Add(Form("%s/ttdltaul_smallTree.root",path));
-  // wjets->	Add(Form("%s/wjets_smallTree*root",path));
-  // qcd->		Add(Form("%s/qcd_smallTree.root",path));
-  // tW->		Add(Form("%s/tW_smallTree*root",path));
-  // ttV->		Add(Form("%s/ttV.root",path));
 
   // dilepton ttbar
   ttdl->	Add(Form("%s/ttdl_powheg.root",path));
@@ -186,72 +169,21 @@ void initialize(char* path){
   rare->        Add(Form("%s/triboson.root",path));
 
   // W+jets
-  wjets->	Add(Form("%s/w1to4jets.root",path));
+  wjets->	Add(Form("%s/w1to4jets*root",path));
 
   // signal points
   t2ttA->	Add("T2tt/T2ttPoint_550_0.root");
   t2ttB->	Add("T2tt/T2ttPoint_650_50.root");
   t2ttC->	Add("T2tt/T2ttPoint_750_100.root");
 
-
-  //t2tt->	Add(Form("%s/T2tt_few_smallTree.root",path));
-  //t2tt->	Add("T2tt/T2ttPoint_400_150.root");
-  //t2ttB->	Add(Form("%s/T2tt_450_100_smallTree.root",path));
-  //t2ttC->	Add(Form("%s/T2tt_200_50_smallTree.root",path));
-  //t2ttA->	Add(Form("%s/T2tt_300_50_smallTree.root",path));
-  //t2ttB->	Add(Form("%s/T2tt_400_50_smallTree.root",path));
-  //t2ttA->	Add(Form("%s/T2tt_300_50_smallTree.root","../output/V00-04-08/skim"));
-  //t2ttB->	Add(Form("%s/T2tt_400_50_smallTree.root","../output/V00-04-08/skim"));
-  //t2ttA->	Add(Form("%s/T2tt_250_50_smallTree.root","../output/V00-04-08/skim"));
-  //t2ttB->	Add(Form("%s/T2tt_300_50_smallTree.root","../output/V00-04-08/skim"));
-  //t2ttC->	Add(Form("%s/T2tt_350_50_smallTree.root","../output/V00-04-08/skim"));
-  //t2ttC->	Add(Form("%s/T2tt_400_50_smallTree.root",path));
-  //t2ttC->	Add(Form("%s/T2tt_450_50_smallTree.root",path));
-  //t2bwA->	Add(Form("%s/T2bw_250_50_0.50_smallTree.root",path));
-  //t2bwB->	Add(Form("%s/T2bw_250_50_0.75_smallTree.root",path));
-
   //------------------------------
   // DECLARE SM MC SAMPLES
   //------------------------------
 
-  mc.push_back(ttdl);         mclabels.push_back("ttdl");
-  mc.push_back(ttsl);         mclabels.push_back("ttsl");
-  mc.push_back(rare);         mclabels.push_back("rare");
   mc.push_back(wjets);        mclabels.push_back("wjets");
-
-  // mc.push_back(ttV);         mclabels.push_back("rare");   
-  // mc.push_back(tW);          mclabels.push_back("single top");   
-  // mc.push_back(wjets);       mclabels.push_back("wjets");   
-  // mc.push_back(ttall);       mclabels.push_back("ttall");
-
-  //----------------------------------
-  // ttbar: 0 vs. 1 vs. 2 leptons
-  //----------------------------------
-
-  // mc.push_back(ttfake);      mclabels.push_back("ttfake");
-  // mc.push_back(ttsl);        mclabels.push_back("ttsl");    
-  // mc.push_back(ttdl);        mclabels.push_back("ttdl");    
-
-  //---------------------------------------------------
-  // ttbar: 0 vs. 1 vs. 2 leptons (in sub-components)
-  //---------------------------------------------------
- 
-  // mc.push_back(ttfake);      mclabels.push_back("ttfake");
-  // mc.push_back(ttdllost);    mclabels.push_back("ttdl_lost");    
-  // mc.push_back(ttdllep);     mclabels.push_back("ttdl_lep");    
-  // mc.push_back(ttdltaul);    mclabels.push_back("ttdl_taul"); 
-  // mc.push_back(ttdltauh1);   mclabels.push_back("ttdl_tauh1");    
-  // mc.push_back(ttdltauhm);   mclabels.push_back("ttdl_tauhm");    
-  // mc.push_back(ttsl);        mclabels.push_back("ttsl");    
-
-  //mc.push_back(ttdltauh);    mclabels.push_back("ttdl_tauh");    
-  //mc.push_back(ttl);         mclabels.push_back("ttl");    
-  //mc.push_back(ttll);        mclabels.push_back("ttll");    
-  //mc.push_back(ttltau);      mclabels.push_back("ttltau");   
-  //mc.push_back(tttau);       mclabels.push_back("tttau");   
-  //mc.push_back(tttautau);    mclabels.push_back("tttautau");   
-  //mc.push_back(ttotr);       mclabels.push_back("ttotr");   
-  //mc.push_back(qcd);         mclabels.push_back("QCD");   
+  mc.push_back(rare);         mclabels.push_back("rare");
+  mc.push_back(ttsl);         mclabels.push_back("ttsl");
+  mc.push_back(ttdl);         mclabels.push_back("ttdl");
 
 
   //------------------------------
@@ -261,22 +193,6 @@ void initialize(char* path){
   mc.push_back(t2ttA);         mclabels.push_back("T2tt(550/0)");   
   mc.push_back(t2ttB);         mclabels.push_back("T2tt(650/50)");   
   mc.push_back(t2ttC);         mclabels.push_back("T2tt(750/100)");   
-  //mc.push_back(t2ttA);       mclabels.push_back("T2tt 300/50");   
-  //mc.push_back(t2ttB);       mclabels.push_back("T2tt 400/50");   
-
-  //mc.push_back(t2ttA);       mclabels.push_back("T2tt 250/50");   
-  //mc.push_back(t2ttB);       mclabels.push_back("T2tt 300/50");   
-  //mc.push_back(t2ttC);       mclabels.push_back("T2tt 350/50");   
-  //mc.push_back(t2ttA);       mclabels.push_back("T2tt 250/50");   
-  //mc.push_back(t2ttB);       mclabels.push_back("T2tt 300/50");   
-  //mc.push_back(t2ttC);       mclabels.push_back("T2tt 350/50");   
-  
-  //mc.push_back(t2ttA);       mclabels.push_back("T2tt 250/50 X5");   
-  //mc.push_back(t2ttB);       mclabels.push_back("T2tt 350/50");   
-  //mc.push_back(t2ttC);       mclabels.push_back("T2tt 400/50");   
-  //mc.push_back(t2ttC);       mclabels.push_back("T2tt 450/50");   
-  //mc.push_back(t2bwA);       mclabels.push_back("T2bw 250/50 0.5");   
-  //mc.push_back(t2bwB);       mclabels.push_back("T2bw 250/50 0.75");   
 
   alreadyInitialized_ = true;
 

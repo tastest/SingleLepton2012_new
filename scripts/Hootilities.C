@@ -354,8 +354,8 @@ void printYields( vector<TChain*> chmc , vector<char*> labels , TChain* chdata ,
 
 TLegend *getLegend( vector<TChain*> chmc , vector<char*> labels , bool overlayData, float x1, float y1, float x2, float y2){
 
-  int colors[]={6,2,7,4,5,8,9,15,12};
-  int sigcolors[]={1,1,7,4,5,8,9,15,12};
+  int colors[]={5,8,kYellow-10,kMagenta-10,8,9,15,12};
+  int sigcolors[]={1,2,4,4,5,8,9,15,12};
   int isigmc = 0;
 
   TLegend *leg = new TLegend(x1,y1,x2,y2);
@@ -383,10 +383,11 @@ TLegend *getLegend( vector<TChain*> chmc , vector<char*> labels , bool overlayDa
 
     if( TString( labels.at(imc) ).Contains("T2") ){
       mchist[imc]->SetFillColor( 0 );
-      mchist[imc]->SetLineStyle(2);
+      //mchist[imc]->SetLineStyle(7);
       mchist[imc]->SetLineColor( sigcolors[imc] );
     }else{
       mchist[imc]->SetFillColor( colors[imc] );
+      mchist[imc]->SetLineWidth(0);
     }
 
 
@@ -435,8 +436,8 @@ TLegend *getLegend( vector<TChain*> chmc , vector<char*> labels , bool overlayDa
 
     if( TString( labels.at(imc) ).Contains("T2") ){
       mchist[imc]->SetFillColor( 0 );
-      //mchist[imc]->SetLineStyle(2);
-      mchist[imc]->SetLineWidth(2);
+      mchist[imc]->SetLineStyle(1);
+      mchist[imc]->SetLineWidth(3);
       mchist[imc]->SetLineColor( sigcolors[isigmc++] );
     }else{
       mchist[imc]->SetFillColor( colors[imc] );
@@ -492,8 +493,9 @@ void compareDataMC( vector<TChain*> chmc , vector<char*> labels , TChain* chdata
 
   cout << "Plotting var " << myvar << " flavor " << flavor << endl;
 
-  int colors[]={6,2,7,4,5,8,9,15,12};
-  int sigcolors[]={1,1,7,4,5,8,9,15,12};
+  int colors[]={5,8,kYellow-10,kMagenta-10,8,9,15,12};
+  //int colors[]={6,2,7,4,5,8,9,15,12};
+  int sigcolors[]={1,2,4,4,5,8,9,15,12};
   int isigmc = 0;
 
   assert( chmc.size() == labels.size() );
@@ -527,8 +529,8 @@ void compareDataMC( vector<TChain*> chmc , vector<char*> labels , TChain* chdata
 
     if( isSignal ){
       mchist[imc]->SetFillColor( 0 );
-      mchist[imc]->SetLineStyle(2);
-      mchist[imc]->SetLineWidth(2);
+      mchist[imc]->SetLineStyle(1);
+      mchist[imc]->SetLineWidth(3);
       mchist[imc]->SetLineColor( sigcolors[isigmc++] );
       if( TString( labels.at(imc) ).Contains("X5") ){
 	mchist[imc]->Scale(5);
@@ -543,9 +545,9 @@ void compareDataMC( vector<TChain*> chmc , vector<char*> labels , TChain* chdata
 	cout << "Scaling signal MC by 10" << endl;
       }
     }else{
-      mchist[imc]->SetLineWidth(1);
+      mchist[imc]->SetLineWidth(0);
       mchist[imc]->SetFillColor( colors[imc] );
-      mchist[imc]->SetLineColor( 1 );
+      mchist[imc]->SetLineColor( colors[imc] );
     }
 
     //mcstack->Add( mchist[imc] );

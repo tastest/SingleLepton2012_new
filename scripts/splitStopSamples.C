@@ -56,9 +56,13 @@ void splitStopSamples(){
   // mg.push_back(450);   ml.push_back(100);
   //mg.push_back(250);   ml.push_back(75);
   //mg.push_back(250);   ml.push_back(100);
-  mg.push_back(400);   ml.push_back(150);
-  mg.push_back(500);   ml.push_back(100);
-  mg.push_back(600);   ml.push_back(0);
+  // mg.push_back(400);   ml.push_back(150);
+  // mg.push_back(500);   ml.push_back(100);
+  // mg.push_back(600);   ml.push_back(0);
+  // mg.push_back(550);   ml.push_back(0);
+  // mg.push_back(650);   ml.push_back(50);
+  // mg.push_back(750);   ml.push_back(100);
+  mg.push_back(75000);   ml.push_back(100);
   //mg.push_back(350);   ml.push_back(50);
   //mg.push_back(450);   ml.push_back(50);
   //mg.push_back(500);   ml.push_back(50);
