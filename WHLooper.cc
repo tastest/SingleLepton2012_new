@@ -37,12 +37,12 @@ const bool doNM1Plots = true;
 
 // regions to do
 const bool blindSignal = true;
-const bool doSignal = true;
-const bool doCR1 = true;
-const bool doCR2 = true;
-const bool doCR3 = true;
-const bool doCR4 = true;
-const bool doCR5 = true;
+const bool doSignal = false;
+const bool doCR1 = false;
+const bool doCR2 = false;
+const bool doCR3 = false;
+const bool doCR4 = false;
+const bool doCR5 = false;
 const bool doStopSel = true;
 
 std::set<DorkyEventIdentifier> already_seen; 
@@ -181,6 +181,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 
   // stop region hists
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
+  std::map<std::string, TH1F*> h_1d_stop_met_nm1, h_1d_stop_mt_nm1, h_1d_stop_isotrk_nm1, h_1d_stop_tauveto_nm1 ;
 
 
   if (doSignal) {
@@ -245,6 +246,10 @@ void WHLooper::loop(TChain *chain, TString name) {
 
   if (doStopSel) {
     outfile_->mkdir("stop_presel");
+    outfile_->mkdir("stop_met_nm1");
+    outfile_->mkdir("stop_mt_nm1");
+    outfile_->mkdir("stop_isotrk_nm1");
+    outfile_->mkdir("stop_tauveto_nm1");
     outfile_->mkdir("stop_comp");
   }
 
@@ -337,7 +342,8 @@ void WHLooper::loop(TChain *chain, TString name) {
       // make 2 example histograms of nvtx and corresponding weight
       //---------------------------------------------------------------------------- 
 
-      float evtweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
+      float evtweight_novtxweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.mgcor() );
+      float evtweight = isData ? 1. : evtweight_novtxweight * stopt.nvtxweight();
       // cross section weights for TChiwh samples:
       //  xsec (pb) * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.58 / nevents (10000)
       float weight_lumi_br_nevents = 1.914E-02;
@@ -610,7 +616,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 	  fillHists1DWrapper(h_1d_cr1_final,evtweight1l,"cr1_final");
 	}
 
-      } // cr1 region sel
+      } // CR1 region sel
 
 
       // -------------------------------------------
@@ -802,34 +808,54 @@ void WHLooper::loop(TChain *chain, TString name) {
       // -------------------------------------------
       // *** Stop Presel region
       //   >= 1 lepton
-      //   iso track veto v2
       //   >= 4 jets
-      //   >= 1 bjet
-      //   met > 100
       //   blind data (includes stop signal region)
 
       // *** Stop Presel comparison region
       //   >= 1 lepton
-      //   iso track veto v2
+      //   iso track veto v4
       //   >= 4 jets
       //   >= 1 bjet
       //   met > 150
       //   mt > 120
+      //   tau veto
       //   blind data (includes stop signal region)
 
       if ( doStopSel
 	   && passSingleLeptonSelection(isData) 
-	   && passIsoTrkVeto_v2()
 	   && (njets_ >= 4)
-	   && (nbjets_ >= 1)
-	   && (met_ > 100.) 
 	   && !isData ) {
 
-        fillHists1DWrapper(h_1d_stop_presel,evtweight1l,"stop_presel");
+	float weight = evtweight_novtxweight;
+	//	float weight = evtweight1l;
 
-	if ( (met_ > 150.) && (mt_ > 120.) ) {
-	  fillHists1DWrapper(h_1d_stop_comp,evtweight1l,"stop_comp");
+        fillHists1DWrapper(h_1d_stop_presel,weight,"stop_presel");
+
+	bool fail = false;
+	if ( !fail && (nbjets_ >= 1) ) {
+	  fillHists1DWrapper(h_1d_stop_met_nm1,weight,"stop_met_nm1");
 	} 
+	else fail = true;
+
+	if ( !fail && (met_ >= 150.) ) {
+	  fillHists1DWrapper(h_1d_stop_mt_nm1,weight,"stop_mt_nm1");
+	} 
+	else fail = true;
+
+	if ( !fail && (mt_ > 120.) ) {
+	  fillHists1DWrapper(h_1d_stop_isotrk_nm1,weight,"stop_isotrk_nm1");
+	} 
+	else fail = true;
+
+	if ( !fail && passIsoTrkVeto_v4() ) {
+	  fillHists1DWrapper(h_1d_stop_tauveto_nm1,weight,"stop_tauveto_nm1");
+	} 
+	else fail = true;
+
+	if ( !fail && passTauVeto() ) {
+	  fillHists1DWrapper(h_1d_stop_comp,weight,"stop_comp");
+	} 
+	else fail = true;
 
       } // stop region sel
 
@@ -910,6 +936,10 @@ void WHLooper::loop(TChain *chain, TString name) {
 
   if (doStopSel) {
     savePlotsDir(h_1d_stop_presel,outfile_,"stop_presel");
+    savePlotsDir(h_1d_stop_met_nm1,outfile_,"stop_met_nm1");
+    savePlotsDir(h_1d_stop_mt_nm1,outfile_,"stop_mt_nm1");
+    savePlotsDir(h_1d_stop_isotrk_nm1,outfile_,"stop_isotrk_nm1");
+    savePlotsDir(h_1d_stop_tauveto_nm1,outfile_,"stop_tauveto_nm1");
     savePlotsDir(h_1d_stop_comp,outfile_,"stop_comp");
   }
 
