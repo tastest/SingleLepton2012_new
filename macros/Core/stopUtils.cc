@@ -1323,3 +1323,14 @@ double getChi2(LorentzVector& jets_b, LorentzVector& jets_j1, LorentzVector& jet
 }
 
 
+int getRegionNumber(float mstop, float mlsp) {
+    float delta = mstop - mlsp;
+
+    if ( delta < 173.5 ) return 5;
+    if ( mstop < 350 ) return 1;
+    if ( delta < 300 ) return 2;
+    if ( delta < 500 ) return 3;
+
+    return 4;
+}
+

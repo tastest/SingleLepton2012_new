@@ -23,14 +23,14 @@
 using namespace std;
 
 class Candidate : public TObject {
- public:
-  float chi2, mt2w, mt2bl, mt2b;
-  int j1, j2, bi, oi;
-  float k1, k2;
-  bool match;
-  
-  ClassDef(Candidate, 2)
-    };
+    public:
+        float chi2, mt2w, mt2bl, mt2b;
+        int j1, j2, bi, oi;
+        float k1, k2;
+        bool match;
+
+        ClassDef(Candidate, 2)
+};
 
 typedef vector<Candidate> CANDIDATES;
 
@@ -71,10 +71,10 @@ float getMinDphi(float metPhi, LorentzVector& vec1, LorentzVector& vec2 );
 float getMT( float pt1 , float phi1 , float pt2 , float phi2 );
 
 struct DorkyEventIdentifier {
-  // this is a workaround for not having unique event id's in MC
-  unsigned long int run, event,lumi;
-  bool operator < (const DorkyEventIdentifier &) const;
-  bool operator == (const DorkyEventIdentifier &) const;
+    // this is a workaround for not having unique event id's in MC
+    unsigned long int run, event,lumi;
+    bool operator < (const DorkyEventIdentifier &) const;
+    bool operator == (const DorkyEventIdentifier &) const;
 };
 
 bool is_duplicate (const DorkyEventIdentifier &id, std::set<DorkyEventIdentifier> &already_seen);
@@ -90,6 +90,9 @@ double fc2 (double c1, double m12, double m22, double m02, bool verbose);
 double fchi2 (double c1, double pt1, double sigma1, double pt2, double sigma2, double m12, double m22, double m02);
 void minuitFunction(int&, double* , double &result, double par[], int);
 double getChi2(LorentzVector& jets_b, LorentzVector& jets_j1, LorentzVector& jets_j2, float sigma_b, float sigma_j1, float sigma_j2);
+
+int getRegionNumber(float mstep, float mlsp);
+
 
 static const float BTAG_MED = 0.679;
 static const float PDG_TOP_MASS = 173.5;
