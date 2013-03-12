@@ -7,10 +7,10 @@
 #include "../Core/STOPT.h"
 #include "../Core/stopUtils.h"
 #include "../Plotting/PlotUtilities.h"
-#include "../Core/MT2Utility.h"
-#include "../Core/mt2bl_bisect.h"
-#include "../Core/mt2w_bisect.h"
-#include "../Core/PartonCombinatorics.h"
+// #include "../Core/MT2Utility.h"
+// #include "../Core/mt2bl_bisect.h"
+// #include "../Core/mt2w_bisect.h"
+// #include "../Core/PartonCombinatorics.h"
 
 #include "TROOT.h"
 #include "TH1F.h"
@@ -32,18 +32,18 @@
 
 using namespace Stop;
 
-const bool doFlavorPlots = false;
+const bool doFlavorPlots = true;
 const bool doNM1Plots = true;
 
 // regions to do
 const bool blindSignal = true;
-const bool doSignal = false;
-const bool doCR1 = false;
-const bool doCR2 = false;
-const bool doCR3 = false;
-const bool doCR4 = false;
-const bool doCR5 = false;
-const bool doStopSel = true;
+const bool doSignal = true;
+const bool doCR1 = true;
+const bool doCR2 = true;
+const bool doCR3 = true;
+const bool doCR4 = true;
+const bool doCR5 = true;
+const bool doStopSel = false;
 
 std::set<DorkyEventIdentifier> already_seen; 
 std::set<DorkyEventIdentifier> events_lasercalib; 
@@ -120,6 +120,12 @@ void WHLooper::loop(TChain *chain, TString name) {
     isTChiwh_ = false;
   }
 
+  if (name.Contains("ttbar_mg")) {
+    isttmg_ = true;
+  } else {
+    isttmg_ = false;
+  }
+
 
   //------------------------------
   // check for valid chain
@@ -152,7 +158,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // signal region hists
   std::map<std::string, TH1F*> h_1d_sig_presel, h_1d_sig_final;
   // signal region nm1 hists
-  std::map<std::string, TH1F*> h_1d_sig_met_nm1, h_1d_sig_mt_nm1, h_1d_sig_mt2bl_nm1;
+  std::map<std::string, TH1F*> h_1d_sig_tauveto_nm1, h_1d_sig_met_nm1, h_1d_sig_mt_nm1, h_1d_sig_mt2bl_nm1;
 
   // cr1 hists
   std::map<std::string, TH1F*> h_1d_cr1_presel, h_1d_cr1_final;
@@ -187,6 +193,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doSignal) {
     outfile_->mkdir("sig_presel");
     if (doNM1Plots) {
+      outfile_->mkdir("sig_tauveto_nm1");
       outfile_->mkdir("sig_met_nm1");
       outfile_->mkdir("sig_mt_nm1");
       outfile_->mkdir("sig_mt2bl_nm1");
@@ -344,6 +351,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       float evtweight_novtxweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.mgcor() );
       float evtweight = isData ? 1. : evtweight_novtxweight * stopt.nvtxweight();
+      // remove mgcor for ttbar mg samples
+      if (isttmg_) evtweight /= stopt.mgcor();
       // cross section weights for TChiwh samples:
       //  xsec (pb) * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.58 / nevents (10000)
       float weight_lumi_br_nevents = 1.914E-02;
@@ -407,6 +416,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       njets_ = 0;
       njetsalleta_ = 0;
       nbjets_ = 0;
+      nbjetsl_ = 0;
 
       for( unsigned int i = 0 ; i < stopt.pfjets().size() ; ++i ){
 	
@@ -448,6 +458,9 @@ void WHLooper::loop(TChain *chain, TString name) {
 	  bjets_.push_back( stopt.pfjets().at(i) );
 	  bjets_idx_.push_back(i);
 	  ++nbjets_;
+	}
+	else if( (fabs(stopt.pfjets().at(i).eta()) <= 2.4) && (csv_nominal > getCSVCut(WHLooper::CSVL)) ) {
+	  ++nbjetsl_;
 	}
 
 	//      	sigma_jets.push_back(stopt.pfjets_sigma().at(i));
@@ -499,32 +512,32 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       // should replace string comps with enums..
 
-      bool dataset_1l=false;
+      // bool dataset_1l=false;
 
-      if((isData) && name.Contains("muo") 
-	 && (abs(stopt.id1()) == 13 ))  dataset_1l=true;
-      if((isData) && name.Contains("ele") 
-	 && (abs(stopt.id1()) == 11 ))  dataset_1l=true;
+      // if((isData) && name.Contains("muo") 
+      // 	 && (abs(stopt.id1()) == 13 ))  dataset_1l=true;
+      // if((isData) && name.Contains("ele") 
+      // 	 && (abs(stopt.id1()) == 11 ))  dataset_1l=true;
 
-      if(!isData) dataset_1l=true;
+      // if(!isData) dataset_1l=true;
 
-      bool dataset_2l=false;
+      // bool dataset_2l=false;
 
-      if((isData) && name.Contains("dimu") 
-	 && (abs(stopt.id1()) == 13 ) 
-	 && (abs(stopt.id2())==13)) dataset_2l=true;
-      if((isData) && name.Contains("diel") 
-	 && (abs(stopt.id1()) == 11 ) 
-	 && (abs(stopt.id2())==11)) dataset_2l=true;
-      if((isData) && name.Contains("mueg") 
-	 && abs(stopt.id1()) != abs(stopt.id2())) 
-	dataset_2l=true;
+      // if((isData) && name.Contains("dimu") 
+      // 	 && (abs(stopt.id1()) == 13 ) 
+      // 	 && (abs(stopt.id2())==13)) dataset_2l=true;
+      // if((isData) && name.Contains("diel") 
+      // 	 && (abs(stopt.id1()) == 11 ) 
+      // 	 && (abs(stopt.id2())==11)) dataset_2l=true;
+      // if((isData) && name.Contains("mueg") 
+      // 	 && abs(stopt.id1()) != abs(stopt.id2())) 
+      // 	dataset_2l=true;
 
-      if(!isData) dataset_2l=true;
+      // if(!isData) dataset_2l=true;
 
       //      bool passisotrk = passIsoTrkVeto_v2();
-      bool passisotrk = passIsoTrkVeto_v3() && (stopt.ngoodlep() == 1);
-      //      bool passisotrk = passIsoTrkVeto_v4() && passTauVeto();
+      //      bool passisotrk = passIsoTrkVeto_v3() && (stopt.ngoodlep() == 1);
+      bool passisotrk = passIsoTrkVeto_v4();
 
       // end selections bits --------------------------------
       // ----------------------------------------------------
@@ -563,6 +576,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	bool fail = false;
 	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_tauveto_nm1,evtweight1l,"sig_tauveto_nm1");
+	}
+	else fail = true;
+
+	if (!fail && passTauVeto() ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_met_nm1,evtweight1l,"sig_met_nm1");
 	}
 	else fail = true;
@@ -766,12 +784,14 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       // -------------------------------------------
       // *** CR5: require exactly 1 btag
+      //  veto on 2nd loose btag
       //  otherwise same as signal
 
       if ( doCR5
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ == 1)
+	   && (nbjetsl_ == 1)
 	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
 	   && (met_ > CUT_MET_PRESEL_) ) {
 
@@ -877,6 +897,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doSignal) {
     savePlotsDir(h_1d_sig_presel,outfile_,"sig_presel");
     if (doNM1Plots) {
+      savePlotsDir(h_1d_sig_tauveto_nm1,outfile_,"sig_tauveto_nm1");
       savePlotsDir(h_1d_sig_met_nm1,outfile_,"sig_met_nm1");
       savePlotsDir(h_1d_sig_mt_nm1,outfile_,"sig_mt_nm1");
       savePlotsDir(h_1d_sig_mt2bl_nm1,outfile_,"sig_mt2bl_nm1");
@@ -1009,6 +1030,7 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
   plot1D("h_njets"+suffix,        njets_,              evtweight, h_1d, 10, 0., 10.);
   plot1D("h_njetsalleta"+suffix,  njetsalleta_,        evtweight, h_1d, 10, 0., 10.);
   plot1D("h_nbjets"+suffix,       nbjets_,    evtweight, h_1d, 5, 0., 5.);
+  plot1D("h_ngoodlep"+suffix,       stopt.ngoodlep(),    evtweight, h_1d, 5, 0., 5.);
   plot1D("h_wpt"+suffix,          w.Mod(),       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_lep1metdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - metphi_)),  evtweight, h_1d, 50, 0., TMath::Pi());
 
@@ -1024,6 +1046,9 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
   plot1D("h_bbwdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bb_.phi() - w.Phi())), evtweight, h_1d, 50, 0., TMath::Pi());
   // plot1D("h_bbwdpt"+suffix,   bb_.pt() - w.Mod(),       evtweight, h_1d, 500, -250., 250.);
 
+  plot1D("h_mt2b"+suffix,   mt2b_,  evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_mt2bl"+suffix,  mt2bl_, evtweight, h_1d, 1000, 0., 1000.);
+  plot1D("h_mt2w"+suffix,   mt2w_,  evtweight, h_1d, 1000, 0., 1000.);
 
   if (isWjets_) {
     plot1D("h_nbs",       stopt.nbs(),       evtweight, h_1d, 5, 0, 5);
@@ -1049,10 +1074,6 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     // plot1D("h_bjet2lep1dphi"+suffix,  bjet2lep1dphi, evtweight, h_1d, 50, 0., TMath::Pi());
 
     // plot1D("h_bjetlep1mindphi"+suffix,  TMath::Min(bjet1lep1dphi,bjet2lep1dphi), evtweight, h_1d, 50, 0., TMath::Pi());
-
-    plot1D("h_mt2b"+suffix,   mt2b_,  evtweight, h_1d, 1000, 0., 1000.);
-    plot1D("h_mt2bl"+suffix,  mt2bl_, evtweight, h_1d, 1000, 0., 1000.);
-    plot1D("h_mt2w"+suffix,   mt2w_,  evtweight, h_1d, 1000, 0., 1000.);
 
     // use loose btags here in case i plot before requiring 2 med
     // std::vector<int> bjetIdx = getBJetIndex(WHLooper::CSVL,-1,-1);
@@ -1092,6 +1113,15 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D("h_pseudomt2b"+suffix,   pseudomt2b_,  evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_pseudomt2bl"+suffix,  pseudomt2bl_, evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_pseudomt2w"+suffix,   pseudomt2w_,  evtweight, h_1d, 1000, 0., 1000.);
+  }
+
+  // plots for 2 lep events (large overlap with cr3 above, obviously)
+  if (stopt.ngoodlep() >= 2) {
+    plot1D("h_lep2pt"+suffix,       stopt.lep2().pt(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_lep2eta"+suffix,      stopt.lep2().eta(),       evtweight, h_1d, 100, -3., 3.);
+    plot1D("h_dildphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.lep2().phi())),  evtweight, h_1d, 50, 0., TMath::Pi());
+    plot1D("h_dilmass"+suffix,       stopt.dilmass(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_dilpt"+suffix,       stopt.dilpt(),       evtweight, h_1d, 1000, 0., 1000.);
   }
 
   return;

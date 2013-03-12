@@ -60,6 +60,7 @@ class WHLooper {
   int njets_;
   int njetsalleta_;
   int nbjets_;
+  int nbjetsl_;
   float met_;
   float metphi_;
   float mt_;
@@ -81,6 +82,7 @@ class WHLooper {
   // internal flags
   bool isWjets_;
   bool isTChiwh_;
+  bool isttmg_;
 
 
 };
