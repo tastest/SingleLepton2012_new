@@ -674,8 +674,8 @@ bool pass_T2tt_HM(bool isData){
 
   // mt2w                                                                                                                                                                            
   double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
-
-  if(x_mt2w<175) return false;
+  // cut a the top mass + some resoultion effect
+  if(x_mt2w<200) return false;
 
   return true;
 
