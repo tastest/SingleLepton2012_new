@@ -1258,9 +1258,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  // only count/store massive b quarks
 	  // - in massless b samples, final state b's will have the mass set to 4.8 GeV
 	  //    while initial state b's have mass 0
-	  if ( abs(id) == 5 && genps_p4().at(igen).M() > 0. ) {
-	    ++nbs_;
-	    genbs_.push_back(genps_p4().at(igen));
+	  if ( abs(id) == 5 ) {
+	    // mass (from dumpDocLines)
+	    float m2 = cms2.genps_p4().at(igen).M2();
+	    float m  = m2 >= 0 ? sqrt(m2) : 0.0;
+	    if (m > 0.) {
+	      ++nbs_;
+	      genbs_.push_back(genps_p4().at(igen));
+	    }
 	  }
 
 	  if( id == 6 ){
