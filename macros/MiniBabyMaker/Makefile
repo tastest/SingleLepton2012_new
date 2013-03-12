@@ -15,7 +15,7 @@ OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libStopTreeLooper.so
 
 $(LIB):	$(OBJECTS) 
-	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@  $(shell root-config --libs) -lMinuit -lTMVA
+	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@  $(shell root-config --libs) -lMinuit -lMathMore -lTMVA
 
 LinkDef_out.cxx: LinkDef.h StopTreeLooper.h  
 	rootcint -f $@ -c $(INCLUDE) StopTreeLooper.h  $<

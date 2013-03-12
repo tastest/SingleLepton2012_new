@@ -107,6 +107,7 @@ class StopTreeLooper {
 
 	// lepton variables
 	Int_t passisotrk_;
+	Int_t passtauveto_;
 	Int_t nlep_;
 
 	Float_t lep1pt_;

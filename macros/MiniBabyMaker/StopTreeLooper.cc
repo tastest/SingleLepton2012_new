@@ -7,6 +7,8 @@
 //#include "../Core/STOPT.h"
 #include "../Core/stopUtils.h"
 #include "../Plotting/PlotUtilities.h"
+#include "../../Tools/BTagReshaping/BTagReshaping.h"
+
 
 #include "TROOT.h"
 #include "TH1F.h"
@@ -100,6 +102,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         cout << "[StopTreeLooper::loop] no files in chain" << endl;
         return;
     }
+
+    //------------------------------------------------------------------------------------------------------
+    // set csv discriminator reshaping
+    //------------------------------------------------------------------------------------------------------
+  
+    BTagShapeInterface * nominalShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 0.0);
 
     //---------------------------------
     // set up histograms
@@ -323,6 +331,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             htosm_ = 0.;
 
             for (unsigned int i =0; i<stopt.pfjets().size(); i++){
+
+
                 if ( stopt.pfjets().at(i).pt() < JET_PT ) continue;
                 if ( fabs(stopt.pfjets().at(i).eta()) > JET_ETA ) continue;
                 if ( (fabs(stopt.pfjets().at(i).eta()) <= 2.5) 
@@ -343,8 +353,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 jets_sigma.push_back(stopt.pfjets_sigma().at(i));
 
                 // b-tagging information
-                //NOTE::need to reweight b-tagging discriminator
-                if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (stopt.pfjets_csv().at(i) > 0.679) ) {
+	       
+		float csv_nominal=isData ? stopt.pfjets_csv().at(i)
+		  : nominalShape->reshape( stopt.pfjets().at(i).eta(),
+					   stopt.pfjets().at(i).pt(),
+					   stopt.pfjets_csv().at(i),
+					   stopt.pfjets_mcflavorAlgo().at(i) ); 
+
+                if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_nominal > 0.679) ) {
                     nb_++;
                     bjets.push_back(stopt.pfjets().at(i));
                     // leading b-jet variables
@@ -355,7 +371,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                                 stopt.lep1().eta(), stopt.lep1().phi());
                     }
                 }
-                jets_btag.push_back(stopt.pfjets_csv().at(i));
+
+		jets_btag.push_back(csv_nominal);
 
                 float dPhiL = getdphi( stopt.lep1().Phi(), stopt.pfjets().at(i).phi() );
                 float dPhiM = getdphi(             metphi, stopt.pfjets().at(i).phi() );
@@ -365,9 +382,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 if ( dPhiM  < (TMath::Pi()/2) ) htssm_=htssm_+stopt.pfjets().at(i).pt();
                 else htosm_=htosm_+stopt.pfjets().at(i).pt();
 
+
+
             }
 
             if ( njets_ < NJETS_CUT ) continue; 
+
 
             // event shapes: HT in hemispheres
             htratiol_   = htssl_ / (htosl_ + htssl_);
@@ -395,6 +415,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 bbpt_ = bb.pt();
                 bbwdphi_ = fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi()));
             }
+
 
             //------------------------------------------ 
             // datasets bit
@@ -428,6 +449,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             // isolated track veto selection
             passisotrk_   = passIsoTrkVeto_v4() ? 1 : 0; 
+            // tau veto selection ( not availabel to the for now ) 
+	    passtauveto_  = (!name.Contains("T2") && passTauVeto()) ? 1 : 0;
 
             // which selections are passed
             // pass signal region preselection
@@ -501,6 +524,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             nEventsPass++;
             outTree_->Fill();
 
+
             } // end event loop
 
             delete tree;
@@ -565,6 +589,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_njets"     , &njets_     ,  "mini_njets/I"	 );
 
             outTree_->Branch("mini_passisotrk", &passisotrk_,  "mini_passisotrk/I");
+	    outTree_->Branch("mini_passtauveto", &passtauveto_,  "mini_passtauveto/I");
 
             outTree_->Branch("mini_nlep"      , &nlep_      ,  "mini_nlep/I"	 );
             outTree_->Branch("mini_dRleptB1"  , &dRleptB1_  ,  "mini_dRleptB1/F"	 );
@@ -651,6 +676,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         // lepton variables
         passisotrk_ = -1;
+        passtauveto_ = -1;
 
         nlep_       = -1;
         dRleptB1_   = -1;
