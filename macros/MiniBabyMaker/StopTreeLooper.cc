@@ -123,10 +123,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         char* h_nsig_filename = "";
 
         if( name.Contains("T2tt") )
-            h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3/myMassDB_T2tt.root";
+            h_nsig_filename = "myMassDB_T2tt_MG.root";
 
         if( name.Contains("T2bw") )
-            h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_3/myMassDB_T2bw_fine.root";
+            h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw_coarse/myMassDB_T2bw.root";
 
         cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
 
@@ -143,14 +143,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     }
 
-    const int NREG = 5;
+    const int NREG = 6;
     TMVA::Reader* reader[NREG];
     if ( __apply_mva ) {
         for (int i=1; i < NREG ; i++){
             reader[i] = new TMVA::Reader( "!Color:!Silent" );
             reader[i]->AddVariable("mini_met", &met_);
-            reader[i]->AddVariable("mini_chi2minprob", &chi2_);
-            reader[i]->AddVariable("mini_mt2wmin", &mt2w_);
+            reader[i]->AddVariable("mini_mt2w", &mt2w_);
+            reader[i]->AddVariable("mini_chi2", &chi2_);
             reader[i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
             reader[i]->AddVariable("mini_dphimjmin", &dphimjmin_);
             //		  reader[i]->AddVariable("mini_pt_b", &pt_b_);

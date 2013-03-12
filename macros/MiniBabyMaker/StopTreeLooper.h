@@ -147,10 +147,10 @@ class StopTreeLooper {
 	int N_JETS_TO_CONSIDER;
 	int NJETS_CUT;
 
-        float MET_CUT;
+    float MET_CUT;
 
 	string m_outfilename_;
-        string m_minibabylabel_;
+    string m_minibabylabel_;
 
 	//jet information
 	vector<LorentzVector> jets;
@@ -160,7 +160,7 @@ class StopTreeLooper {
 	float metphi;
 
     static const bool __apply_mva = false; 
-    static const bool __mini_branches = true; 
+    static const bool __mini_branches = true;
     static const bool __add_babies = true; 
 
 };
