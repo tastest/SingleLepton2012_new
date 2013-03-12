@@ -1229,9 +1229,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	// this is a weight which corrects for the wrong MG W->lnu BF
 	if( TString(prefix).Contains("ttall") ||
-	    TString(prefix).Contains("tt_") ||
-	    TString(prefix).Contains("ttsl_") ||
-	    TString(prefix).Contains("ttdl_") ){
+	    TString(prefix).Contains("tt_") ){
 	  if( nleps == 0 ) mgcor_ = 1.028;
 	  if( nleps == 1 ) mgcor_ = 0.986;
 	  if( nleps == 2 ) mgcor_ = 0.945;
