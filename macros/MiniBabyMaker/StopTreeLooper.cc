@@ -48,7 +48,7 @@ StopTreeLooper::StopTreeLooper()
     BJET_ETA = 2.4;
 
     N_JETS_TO_CONSIDER = 6;
-    NJETS_CUT = 3;
+    NJETS_CUT = 4;
 
     MET_CUT = 50.0;
 
@@ -364,7 +364,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
                 // b-tagging information
 	       
-		float csv_nominal=isData ? stopt.pfjets_csv().at(i)
+		float csv_nominal=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
 		  : nominalShape->reshape( stopt.pfjets().at(i).eta(),
 					   stopt.pfjets().at(i).pt(),
 					   stopt.pfjets_csv().at(i),
@@ -380,6 +380,16 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                                 stopt.pfjets().at(i).phi() , 
                                 stopt.lep1().eta(), stopt.lep1().phi());
                     }
+		    // for the cr1 we use the leading jet
+                    if (nb_==0) {
+                        pt_b_ = stopt.pfjets().at(0).pt();
+                        dRleptB1_ = deltaR(stopt.pfjets().at(0).eta() , 
+                                stopt.pfjets().at(0).phi() , 
+                                stopt.lep1().eta(), stopt.lep1().phi());
+                    }
+
+
+
                 }
 
 		jets_btag.push_back(csv_nominal);
