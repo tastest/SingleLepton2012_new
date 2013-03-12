@@ -1,4 +1,11 @@
-{
+#ifndef __CINT__
+#include "TChain.h"
+#include "TSystem.h"
+#include "TROOT.h"
+#include "StopTreeLooper.h"
+#endif
+
+void doAll() {
 
   //------------------------------ 
   // load stuff
@@ -9,9 +16,11 @@
   gSystem->Load("libEG.so");
   gSystem->Load("libMathCore.so");
 
-  gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
+  gSystem->Load("../../Tools/MiniFWLite/libMiniFWLite.so");
+
+  //  gROOT->ProcessLine(".L ../../CORE/libCMS2NtupleMacrosCORE.so");
   gROOT->ProcessLine(".L libStopTreeLooper.so");
-  gROOT->ProcessLine(".L ../Core/StopTree.h+");
+  //  gROOT->ProcessLine(".L ../Core/StopTree.h+");
 
   StopTreeLooper *looper = new StopTreeLooper();
 
@@ -19,13 +28,13 @@
   // samples to run over
   //------------------------------ 
  
-  char* path = "/nfs-3/userdata/stop/output_V00-02-04_2012_4jskim";
-
+  char* path = "/nfs-3/userdata/stop/output_V00-02-20_2012_4jskim";
+ 
   char* path_T2tt        = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2tt_3/";
   char* path_T2bw_fine   = "/tas/benhoob/StopBabies/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_1/res";
   //char* path_T2bw_coarse = "/tas/benhoob/StopBabies/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse/res";
   char* path_T2bw_coarse = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse_3/res/";
-
+  
 
   const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
@@ -34,12 +43,13 @@
     // "T2tt_450_0",
     // "T2tt_300_50",
     // "T2tt_300_100",
-    // "ttdl_powheg",
+    "ttdl_powheg",
     // "ttsl_powheg",
 
     //"T2bw_fine_scan",
     //"T2bw_coarse_scan",
-    "T2tt_scan",
+    //"T2tt_scan",
+    //    "ttdl_lmg"
 
     // "w1to4jets",
     // "data_muo",
