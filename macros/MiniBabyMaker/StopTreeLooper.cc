@@ -168,18 +168,23 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         }
     }
 
-    // TFile* vtx_file = TFile::Open("vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
-    // if( vtx_file == 0 ){
-    //   cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
-    //   exit(0);
-    // }
+    //-----------------------------------
+    // PU reweighting based on true PU
+    //-----------------------------------
 
-    // TH1F* h_vtx_wgt = (TH1F*)vtx_file->Get("hratio");
-    // h_vtx_wgt->SetName("h_vtx_wgt");
+    TFile* pu_file = TFile::Open("../vtxreweight/puWeights_Summer12_53x_True_19p5ifb.root");
+    if( pu_file == 0 ){
+      cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
+      exit(0);
+    }
 
-    //
+    TH1F* h_pu_wgt = (TH1F*)pu_file->Get("puWeights");
+    h_pu_wgt->SetName("h_pu_wgt");
+
+
+    //------------------------------
     // file loop
-    //
+    //------------------------------
 
     unsigned int nEventsPass=0;
     unsigned int nEventsChain=0;
@@ -259,8 +264,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             //------------------------------------------ 
             // event weight
             //------------------------------------------ 
+
+	    float puweight = vtxweight_n( stopt.ntruepu(), h_pu_wgt, isData );
+
             weight_ = isData ? 1. : 
-                ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
+                ( stopt.weight() * 19.5 * puweight * stopt.mgcor() );
 
             if( name.Contains("T2tt") ) {
                 int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
@@ -299,7 +307,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 //      << " weight " << evtweight << endl;
             }
 
-	    nvtxweight_ = stopt.nvtxweight();
+	    //	    nvtxweight_ = stopt.nvtxweight();
+	    nvtxweight_ = puweight;
+
             sltrigeff_   = isData ? 1. : 
                 getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
             dltrigeff_ = isData ? 1. : 
