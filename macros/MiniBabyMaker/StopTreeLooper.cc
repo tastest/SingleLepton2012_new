@@ -380,17 +380,16 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                                 stopt.pfjets().at(i).phi() , 
                                 stopt.lep1().eta(), stopt.lep1().phi());
                     }
-		    // for the cr1 we use the leading jet
-                    if (nb_==0) {
-                        pt_b_ = stopt.pfjets().at(0).pt();
-                        dRleptB1_ = deltaR(stopt.pfjets().at(0).eta() , 
-                                stopt.pfjets().at(0).phi() , 
-                                stopt.lep1().eta(), stopt.lep1().phi());
-                    }
-
-
-
                 }
+		
+		// for the cr1 we use the leading jet
+		if (nb_==0) {
+		  pt_b_ = stopt.pfjets().at(0).pt();
+		  dRleptB1_ = deltaR(stopt.pfjets().at(0).eta() , 
+				     stopt.pfjets().at(0).phi() , 
+				     stopt.lep1().eta(), stopt.lep1().phi());
+		}
+		
 
 		jets_btag.push_back(csv_nominal);
 
