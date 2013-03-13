@@ -43,6 +43,7 @@ const bool doCR2 = true;
 const bool doCR3 = true;
 const bool doCR4 = true;
 const bool doCR5 = true;
+const bool doCR6 = true;
 const bool doStopSel = false;
 
 std::set<DorkyEventIdentifier> already_seen; 
@@ -78,7 +79,8 @@ WHLooper::WHLooper()
 
   CUT_BBMASS_LOW_ = 100.0;
   CUT_BBMASS_HIGH_ = 140.0;
-  CUT_BBMASS_CR1_ = 150.0;
+  CUT_BBMASS_CR1_LOW_ = 150.0;
+  CUT_BBMASS_CR1_HIGH_ = 250.0;
   CUT_MET_PRESEL_ = 50.0;
   CUT_MET_ = 175.0;
   CUT_MT_ = 100.0;
@@ -185,6 +187,11 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr5 nm1 hists
   std::map<std::string, TH1F*> h_1d_cr5_met_nm1, h_1d_cr5_mt_nm1, h_1d_cr5_mt2bl_nm1;
 
+  // cr6 hists
+  std::map<std::string, TH1F*> h_1d_cr6_presel, h_1d_cr6_final;
+  // cr6 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr6_met_nm1, h_1d_cr6_mt_nm1, h_1d_cr6_mt2bl_nm1;
+
   // stop region hists
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
   std::map<std::string, TH1F*> h_1d_stop_met_nm1, h_1d_stop_mt_nm1, h_1d_stop_isotrk_nm1, h_1d_stop_tauveto_nm1 ;
@@ -249,6 +256,16 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr5_mt2bl_nm1");
     }
     outfile_->mkdir("cr5_final");
+  }
+
+  if (doCR6) {
+    outfile_->mkdir("cr6_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr6_met_nm1");
+      outfile_->mkdir("cr6_mt_nm1");
+      outfile_->mkdir("cr6_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr6_final");
   }
 
   if (doStopSel) {
@@ -602,14 +619,14 @@ void WHLooper::loop(TChain *chain, TString name) {
       } // signal region sel
 
       // -------------------------------------------
-      // *** CR1: m(bb) > 150 (can also put upper bound)
+      // *** CR1: 150 < m(bb) < 250 
       //  otherwise same as signal region
 
       if ( doCR1
 	   && passSingleLeptonSelection(isData) 
 	   && passisotrk 
 	   && (nbjets_ >= 2)
-	   && (bb_.M() > CUT_BBMASS_CR1_)
+	   && (bb_.M() > CUT_BBMASS_CR1_LOW_) && (bb_.M() < CUT_BBMASS_CR1_HIGH_) 
 	   && (met_ > CUT_MET_PRESEL_) ) {
 
         fillHists1DWrapper(h_1d_cr1_presel,evtweight1l,"cr1_presel");
@@ -826,6 +843,76 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 
       // -------------------------------------------
+      // *** CR6: 2 leptons, Z mass veto for same flavor, no iso track veto
+      //   high mass: 150 < m(bb) < 250
+      //   otherwise same as signal region
+      //   !!! modified MET/MT etc defs to emulate losing 2nd lepton
+
+      if ( doCR6
+	   && passDileptonSelection(isData) 
+	   && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. )
+	   && (nbjets_ >= 2)
+	   && (bb_.M() > CUT_BBMASS_CR1_LOW_) && (bb_.M() < CUT_BBMASS_CR1_HIGH_) ) {
+
+	// tight 3rd track veto used by stop people -- necessary?
+	//	      if ( (stopt.trkpt10loose() <0.0001 || stopt.trkreliso10loose() > 0.1) 
+
+	//calculate pseudo met and mt
+	//find positive lepton - this is the one that is combined with the pseudomet to form the mT
+	bool isfirstp = (stopt.id1() > 0) ? true : false;
+	lep_ = isfirstp ? stopt.lep1() : stopt.lep2();
+		
+	//recalculate met
+	float metx = met_ * cos( metphi_ );
+	float mety = met_ * sin( metphi_ );
+		
+	//recalculate the MET with the positive lepton
+	metx += isfirstp ? stopt.lep1().px() : stopt.lep2().px();
+	mety += isfirstp ? stopt.lep1().py() : stopt.lep2().py();
+		
+	pseudomet_lep_    = sqrt(metx*metx + mety*mety);
+	pseudometphi_lep_ = atan2( mety , metx );
+		
+	//recalculate the MT with the negative lepton
+	pseudomt_lep_ = getMT( lep_.pt() , lep_.phi() , pseudomet_lep_ , pseudometphi_lep_ );
+	//dphi between met and lepton
+	dphi_pseudomet_lep_ = TVector2::Phi_mpi_pi( lep_.phi() - pseudometphi_lep_ );
+
+	// recalculate mt2 vars also..
+	pseudomt2b_ = calculateMT2w(jets_, jets_csv_, lep_, pseudomet_lep_, pseudometphi_lep_, MT2b);
+	pseudomt2bl_ = calculateMT2w(jets_, jets_csv_, lep_, pseudomet_lep_, pseudometphi_lep_, MT2bl);
+	pseudomt2w_ = calculateMT2w(jets_, jets_csv_, lep_, pseudomet_lep_, pseudometphi_lep_, MT2w);
+
+
+	bool fail = false;
+	if ( pseudomet_lep_ > CUT_MET_PRESEL_ ) {
+          fillHists1DWrapper(h_1d_cr6_presel,evtweight2l,"cr6_presel");
+	}
+	else fail = true;
+
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_met_nm1,evtweight2l,"cr6_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (pseudomet_lep_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_mt_nm1,evtweight2l,"cr6_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (pseudomt_lep_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_mt2bl_nm1,evtweight2l,"cr6_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (pseudomt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr6_final,evtweight2l,"cr6_final");
+	}
+
+      } // CR6 region sel
+
+
+      // -------------------------------------------
       // *** Stop Presel region
       //   >= 1 lepton
       //   >= 4 jets
@@ -955,6 +1042,16 @@ void WHLooper::loop(TChain *chain, TString name) {
     savePlotsDir(h_1d_cr5_final,outfile_,"cr5_final");
   }
 
+  if (doCR6) {
+    savePlotsDir(h_1d_cr6_presel,outfile_,"cr6_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr6_met_nm1,outfile_,"cr6_met_nm1");
+      savePlotsDir(h_1d_cr6_mt_nm1,outfile_,"cr6_mt_nm1");
+      savePlotsDir(h_1d_cr6_mt2bl_nm1,outfile_,"cr6_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr6_final,outfile_,"cr6_final");
+  }
+
   if (doStopSel) {
     savePlotsDir(h_1d_stop_presel,outfile_,"stop_presel");
     savePlotsDir(h_1d_stop_met_nm1,outfile_,"stop_met_nm1");
@@ -1056,8 +1153,8 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   // bjets and bbbar plots
   if (nbjets_ >= 2) {
-    plot1D("h_bjet1pt"+suffix,       bjets_[0].pt(),       evtweight, h_1d, 500, 0., 500.);
-    plot1D("h_bjet2pt"+suffix,       bjets_[1].pt(),       evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_bjet1pt"+suffix,       bjets_[0].pt(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_bjet2pt"+suffix,       bjets_[1].pt(),       evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_bjet1eta"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
     plot1D("h_bjet2eta"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
 
@@ -1085,7 +1182,14 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     // plot1D("h_bjet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
   } // if nbjets >= 2
 
-  // if (njets >= 2) {
+  if (njets_ >= 2) {
+    plot1D("h_jet1pt"+suffix,       jets_[0].pt(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_jet2pt"+suffix,       jets_[1].pt(),       evtweight, h_1d, 1000, 0., 1000.);
+
+    plot1D("h_jet1csv"+suffix, abs(jets_csv_.at(0)) , evtweight, h_1d, 100, 0., 1.);
+    plot1D("h_jet2csv"+suffix, abs(jets_csv_.at(1)) , evtweight, h_1d, 100, 0., 1.);
+  }
+
   //   std::vector<int> jetIdx = getJetIndex();
   //   // need V00-02-20 or higher babies for these vars
   //   plot1D("h_jet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
@@ -1103,6 +1207,13 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   plot1D("h_nvtx",      stopt.nvtx(),       evtweight, h_1d, 40, 0, 40);
   plot1D("h_vtxweight", stopt.nvtxweight(), evtweight, h_1d, 41, -4., 4.);
+
+  // plots for CR2 (1 lepton + iso track/pfcand)
+  if (dir.find("cr2") != std::string::npos) {
+    plot1D("h_isotrkpt"+suffix,       stopt.pfcandOS10looseZ().pt(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_isotrketa"+suffix,      stopt.pfcandOS10looseZ().eta(),       evtweight, h_1d, 100, -3., 3.);
+    plot1D("h_lep1isotrkdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.pfcandOS10looseZ().phi())),  evtweight, h_1d, 50, 0., TMath::Pi());
+  }
 
   // plots for CR3 (2 leptons)
   if (dir.find("cr3") != std::string::npos) {

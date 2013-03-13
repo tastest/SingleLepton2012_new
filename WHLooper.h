@@ -45,7 +45,8 @@ class WHLooper {
   // store main cut values
   float CUT_BBMASS_LOW_;
   float CUT_BBMASS_HIGH_;
-  float CUT_BBMASS_CR1_;
+  float CUT_BBMASS_CR1_LOW_;
+  float CUT_BBMASS_CR1_HIGH_;
   float CUT_MET_PRESEL_;
   float CUT_MET_;
   float CUT_MT_;
