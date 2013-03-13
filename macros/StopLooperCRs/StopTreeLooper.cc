@@ -493,8 +493,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    if ( t1metphicorr < metcut[im] ) continue;
 	    //pre b-tag veto
 	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_met[im], flav_tag_sl, mtcut[im] );
-      //separate events depending on whether the gen-level MT is in the tail, for SFRtop estimate from CR1
-      makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_met[im]+tag_mttruth[im], flav_tag_sl, mtcut[im] );
+	    //separate events depending on whether the gen-level MT is in the tail, for SFRtop estimate from CR1
+	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_met[im]+tag_mttruth[im], flav_tag_sl, mtcut[im] );
 	    //b-veto
 	    if ( n_bjets==0 ) 
 	      makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_met[im], flav_tag_sl, mtcut[im] );
