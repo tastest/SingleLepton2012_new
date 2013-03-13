@@ -168,7 +168,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   // met region tags
   const int NMET = 9;
   float   metcut[NMET] = { 0., 50., 100., 150., 200., 250., 300., 350., 400. };
-  float    mtcut[NMET] = { 150., 150., 150., 150., 120., 120., 120., 120., 120. };
+  float    mtcut[NMET] = { 150., 150., 150., 120., 120., 120., 120., 120., 120. };
   string tag_met[NMET] = { "", "_met50", "_met100", "_met150", "_met200", "_met250", "_met300", "_met350", "_met400" };
 
   stwatch.Start();
