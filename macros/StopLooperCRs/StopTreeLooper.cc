@@ -425,6 +425,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       string basic_flav_tag_dl = flav_tag_dl;
       if ( abs(stopt.id1()) != abs(stopt.id2()) ) basic_flav_tag_dl = "_mueg";
 
+      //tag for gen-level MT
+      string tag_mttruth[NMET];
+      double genmt  = getMT( stopt.mclep1().Pt() , stopt.mclep1().Phi() , stopt.genmet() , stopt.genmetphi() );
+      for (int im = 0; im<NMET; im++) {
+        tag_mttruth[im] = (genmt>mtcut[im]) ? "_genMTtail" : "_genMTnottail";
+      }
+
       //------------------------------------------ 
       // datasets bit
       //------------------------------------------ 
@@ -486,6 +493,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    if ( t1metphicorr < metcut[im] ) continue;
 	    //pre b-tag veto
 	    makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_met[im], flav_tag_sl, mtcut[im] );
+      //separate events depending on whether the gen-level MT is in the tail, for SFRtop estimate from CR1
+      makeCR1Plots( evtweight*trigweight, h_1d_cr1, "_prebveto"+tag_met[im]+tag_mttruth[im], flav_tag_sl, mtcut[im] );
 	    //b-veto
 	    if ( n_bjets==0 ) 
 	      makeCR1Plots( evtweight*trigweight, h_1d_cr1, tag_met[im], flav_tag_sl, mtcut[im] );
