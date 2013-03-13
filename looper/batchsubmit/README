@@ -30,6 +30,9 @@ now submit to condor
 check status 
 > condor_q <USERNAME>
 
+if jobs are listed as held ("H"):
+> condor_release <USERNAME>
+
 select datasets to run on in writeAllConfig.sh and execute
 > ./writeAllConfig.sh
 This should create a set of .cmd files and a submit script submitAll.sh
@@ -38,10 +41,29 @@ This should create a set of .cmd files and a submit script submitAll.sh
 the job .out and .err files should be located in the job_logs directory 
 the submission log should be in submit_logs
 
-to resubmit some jobs
+4) To verify that jobs ran and produced all the output files, first run sweepRoot to check all output root files.
+
+> cvs co -d NtupleTools UserCode/JRibnik/CMS2/NtupleMacros/NtupleTools
+> cd NtupleTools
+> make
+> ./sweepRoot -b -o "t" /hadoop/cms/store/user/${USERNAME}/babies/<BABYDIRS>/*.root
+
+where <BABYDIRS> is something like V00-02-21_2012_*
+
+Delete the files reported as bad, then run checkAllConfig to see which output files are missing:
+
+> ./checkAllConfig.sh <CONFIGDIR>
+
+where <CONFIGDIR> is something like configs_V00-02-21_2012/
+
+This creates resubmit configs for just the missing jobs, with names *_resubmit.cmd, in <CONFIGDIR>.  
+
+To resubmit jobs:
 > ./resubmitConfig.sh <CMDFILE>
 
-4) Once the jobs are done, merge the output with the mergeHadoopOutput script
+You may have to iterate this process to get all jobs to converge..
+
+5) Once the jobs are done, merge the output with the mergeHadoopOutput script
 set the output directory where the babies are located to the COPYDIR location from before
 pass as argument the output tag name
 > ./mergeHadoopFiles.sh <TAGNAME> 
