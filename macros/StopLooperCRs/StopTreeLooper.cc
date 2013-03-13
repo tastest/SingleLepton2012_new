@@ -243,7 +243,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // 	( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
       float puweight = vtxweight_n( stopt.ntruepu(), h_pu_wgt, isData );
       float evtweight = isData ? 1. : 
-	( stopt.weight() * 19.5 * puweight * stopt.mgcor() );
+	( stopt.weight() * 19.5 * puweight );
+      if (!name.Contains("lmg")) evtweight *= stopt.mgcor();
 
       plot1D("h_vtx",       stopt.nvtx(), evtweight, h_1d, 40, 0, 40);
       plot1D("h_vtxweight",     puweight, evtweight, h_1d, 41, -4., 4.);
@@ -291,12 +292,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	
 	if( stopt.pfjets().at(i).pt()<30 )  continue;
 	if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
-	//	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
+	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
 
 	//	bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
-        bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),0);
+	//      bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),0);
 
-	if(!passTightPUid) continue;
+	//	if(!passTightPUid) continue;
 
 	n_jets++;
 	n_ljets++;
