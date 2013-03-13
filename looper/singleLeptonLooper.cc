@@ -278,6 +278,10 @@ void singleLeptonLooper::InitBaby(){
   pfTau_leadPtcand_  = 0;
   pfTau_leadPtcandID_ = -1;
 
+  pfTau15_       = 0;
+  pfTau15_leadPtcand_  = 0;
+  pfTau15_leadPtcandID_ = -1;
+
   pfTauLoose_       = 0;
   pfTauLoose_leadPtcand_  = 0;
   pfTauLoose_leadPtcandID_ = -1;
@@ -2100,9 +2104,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       int indexTauLooseMax=-1;
       double ptTauLooseMax=0.;
 
+      int indexTauMax15=-1;
+      double ptTauMax15=0.;
+
+
       for (unsigned int itau=0; itau < taus_pf_p4().size(); itau++) {
 
-	if(taus_pf_p4().at(itau).pt()<20) continue;
+	if(taus_pf_p4().at(itau).pt()<15) continue;
 	/// Use only OS charge
 	if((taus_pf_charge().at(itau)*id1_)>0) continue;
 
@@ -2113,7 +2121,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if(isLeadLepton) continue;
 	if(!taus_pf_byDecayModeFinding().at(itau)) continue;
 
-	// isolation
+
+	// isolation Medium ; pt > 15
+	if(taus_pf_byMediumIsolationMVA2().at(itau)) {
+	  if(taus_pf_p4().at(itau).pt()>ptTauMax15) {
+	    ptTauMax15 = taus_pf_p4().at(itau).pt();
+	    indexTauMax15 = itau;
+	  }	
+	}
+
+
+	if(taus_pf_p4().at(itau).pt()<20) continue;
+
+	// isolation Medium ; pt > 20    
 	if(taus_pf_byMediumIsolationMVA2().at(itau)) {
 	  if(taus_pf_p4().at(itau).pt()>ptTauMax) {
 	    ptTauMax = taus_pf_p4().at(itau).pt();
@@ -2121,7 +2141,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  }	
 	}
 
-	// isolation
+	// isolation Loose ; pt > 20
 	if(taus_pf_byLooseIsolationMVA2().at(itau)) {
 	  if(taus_pf_p4().at(itau).pt()>ptTauLooseMax) {
 	    ptTauLooseMax = taus_pf_p4().at(itau).pt();
@@ -2136,6 +2156,26 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	*/
 
       }
+
+
+      if(indexTauMax15!=-1) {
+
+	pfTau15_=&taus_pf_p4().at(indexTauMax15);
+	for(int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauMax15).size(); ipf ++) {	  
+
+	  int index=(taus_pf_pfcandIndicies().at(indexTauMax15)).at(ipf);
+	  //	  cout << "part  " << ipf << " with pt " << pfcands_p4().at(index).pt() << " eta " << pfcands_p4().at(index).eta()  << endl;
+
+	}	
+
+	if(taus_pf_pfcandIndicies().at(indexTauMax15).size()>0) {
+	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauMax15)).at(0);
+	  pfTau15_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
+	  pfTau15_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
+
+	}
+      }
+
 
       if(indexTauMax!=-1) {
 
@@ -3797,6 +3837,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pftaud"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pftaud_	);
   outTree->Branch("pfcand5"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand5_	);
   outTree->Branch("pfcand10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcand10_	);
+
+  outTree->Branch("pfTau15_leadPtcandID",        &pfTau15_leadPtcandID_,        "pfTau15_leadPtcandID/I");
+  outTree->Branch("pfTau15"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau15_	);
+  outTree->Branch("pfTau15_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau15_leadPtcand_	);
 
   outTree->Branch("pfTau_leadPtcandID",        &pfTau_leadPtcandID_,        "pfTau_leadPtcandID/I");
   outTree->Branch("pfTau"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_	);
