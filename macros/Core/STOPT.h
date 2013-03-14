@@ -1427,9 +1427,15 @@ protected:
 	vector<float> *pfjets_mvaPUid_;
 	TBranch *pfjets_mvaPUid_branch;
 	bool pfjets_mvaPUid_isLoaded;
+	vector<float> *pfjets_mva5xPUid_;
+	TBranch *pfjets_mva5xPUid_branch;
+	bool pfjets_mva5xPUid_isLoaded;
 	vector<float> *pfjets_mvaBeta_;
 	TBranch *pfjets_mvaBeta_branch;
 	bool pfjets_mvaBeta_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *genbs_;
+	TBranch *genbs_branch;
+	bool genbs_isLoaded;
 public: 
 void Init(TTree *tree) {
 	mclep_branch = 0;
@@ -1676,6 +1682,11 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfjets_genJet_") != 0) {
 		pfjets_genJet__branch = tree->GetBranch("pfjets_genJet_");
 		if (pfjets_genJet__branch) {pfjets_genJet__branch->SetAddress(&pfjets_genJet__);}
+	}
+	genbs_branch = 0;
+	if (tree->GetBranch("genbs") != 0) {
+		genbs_branch = tree->GetBranch("genbs");
+		if (genbs_branch) {genbs_branch->SetAddress(&genbs_);}
 	}
   tree->SetMakeClass(1);
 	acc_2010_branch = 0;
@@ -3783,6 +3794,11 @@ void Init(TTree *tree) {
 		pfjets_mvaPUid_branch = tree->GetBranch("pfjets_mvaPUid");
 		if (pfjets_mvaPUid_branch) {pfjets_mvaPUid_branch->SetAddress(&pfjets_mvaPUid_);}
 	}
+	pfjets_mva5xPUid_branch = 0;
+	if (tree->GetBranch("pfjets_mva5xPUid") != 0) {
+		pfjets_mva5xPUid_branch = tree->GetBranch("pfjets_mva5xPUid");
+		if (pfjets_mva5xPUid_branch) {pfjets_mva5xPUid_branch->SetAddress(&pfjets_mva5xPUid_);}
+	}
 	pfjets_mvaBeta_branch = 0;
 	if (tree->GetBranch("pfjets_mvaBeta") != 0) {
 		pfjets_mvaBeta_branch = tree->GetBranch("pfjets_mvaBeta");
@@ -4264,7 +4280,9 @@ void GetEntry(unsigned int idx)
 		pfjets_beta2_0p1_isLoaded = false;
 		pfjets_beta2_0p5_isLoaded = false;
 		pfjets_mvaPUid_isLoaded = false;
+		pfjets_mva5xPUid_isLoaded = false;
 		pfjets_mvaBeta_isLoaded = false;
+		genbs_isLoaded = false;
 	}
 
 void LoadAllBranches() 
@@ -4740,7 +4758,9 @@ void LoadAllBranches()
 	if (pfjets_beta2_0p1_branch != 0) pfjets_beta2_0p1();
 	if (pfjets_beta2_0p5_branch != 0) pfjets_beta2_0p5();
 	if (pfjets_mvaPUid_branch != 0) pfjets_mvaPUid();
+	if (pfjets_mva5xPUid_branch != 0) pfjets_mva5xPUid();
 	if (pfjets_mvaBeta_branch != 0) pfjets_mvaBeta();
+	if (genbs_branch != 0) genbs();
 }
 
 	int &acc_2010()
@@ -10853,6 +10873,19 @@ void LoadAllBranches()
 		}
 		return *pfjets_mvaPUid_;
 	}
+	vector<float> &pfjets_mva5xPUid()
+	{
+		if (not pfjets_mva5xPUid_isLoaded) {
+			if (pfjets_mva5xPUid_branch != 0) {
+				pfjets_mva5xPUid_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mva5xPUid_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mva5xPUid_isLoaded = true;
+		}
+		return *pfjets_mva5xPUid_;
+	}
 	vector<float> &pfjets_mvaBeta()
 	{
 		if (not pfjets_mvaBeta_isLoaded) {
@@ -10865,6 +10898,19 @@ void LoadAllBranches()
 			pfjets_mvaBeta_isLoaded = true;
 		}
 		return *pfjets_mvaBeta_;
+	}
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs()
+	{
+		if (not genbs_isLoaded) {
+			if (genbs_branch != 0) {
+				genbs_branch->GetEntry(index);
+			} else { 
+				printf("branch genbs_branch does not exist!\n");
+				exit(1);
+			}
+			genbs_isLoaded = true;
+		}
+		return *genbs_;
 	}
 
   static void progress( int nEventsTotal, int nEventsChain ){
@@ -11364,6 +11410,8 @@ namespace Stop {
 	vector<float> &pfjets_beta2_0p1();
 	vector<float> &pfjets_beta2_0p5();
 	vector<float> &pfjets_mvaPUid();
+	vector<float> &pfjets_mva5xPUid();
 	vector<float> &pfjets_mvaBeta();
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs();
 }
 #endif

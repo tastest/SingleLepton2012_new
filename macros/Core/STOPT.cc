@@ -471,5 +471,7 @@ namespace Stop {
 	vector<float> &pfjets_beta2_0p1() { return stopt.pfjets_beta2_0p1(); }
 	vector<float> &pfjets_beta2_0p5() { return stopt.pfjets_beta2_0p5(); }
 	vector<float> &pfjets_mvaPUid() { return stopt.pfjets_mvaPUid(); }
+	vector<float> &pfjets_mva5xPUid() { return stopt.pfjets_mva5xPUid(); }
 	vector<float> &pfjets_mvaBeta() { return stopt.pfjets_mvaBeta(); }
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs() { return stopt.genbs(); }
 }
