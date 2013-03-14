@@ -470,6 +470,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             passisotrk_   = passIsoTrkVeto_v4() ? 1 : 0; 
             // tau veto selection ( not availabel to the for now ) 
 	    passtauveto_  = (!name.Contains("T2") && passTauVeto()) ? 1 : 0;
+	    if(name.Contains("T2")) passtauveto_=1;
 
             // which selections are passed
             // pass signal region preselection
@@ -510,8 +511,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                     && bbmass_ >= 150. ) ? 1 : 0; 
 
             // Cut & Count analysis Selections
-            t2ttLM_     = pass_T2tt_LM(isData);
-            t2ttHM_     = pass_T2tt_HM(isData);
+            t2ttLM_     = pass_T2tt_LM(isData,name);
+            t2ttHM_     = pass_T2tt_HM(isData,name);
 
 	    // susy vars
 	    mstop_       = stopt.mg();                   // stop mass
