@@ -7,6 +7,7 @@
 #include "../Core/STOPT.h"
 #include "../Core/stopUtils.h"
 #include "../Plotting/PlotUtilities.h"
+#include "../../Tools/BTagReshaping/BTagReshaping.h"
 // #include "../Core/MT2Utility.h"
 // #include "../Core/mt2bl_bisect.h"
 // #include "../Core/mt2w_bisect.h"
@@ -32,11 +33,14 @@
 
 using namespace Stop;
 
+const bool doReshaping = true;
+
 const bool doFlavorPlots = true;
 const bool doNM1Plots = true;
 
 // regions to do
 const bool blindSignal = true;
+const bool doInclusive = true;
 const bool doSignal = true;
 const bool doCR1 = true;
 const bool doCR2 = true;
@@ -145,6 +149,8 @@ void WHLooper::loop(TChain *chain, TString name) {
     return;
   }
 
+  BTagShapeInterface * nominalShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 0.0);
+
   //------------------------------
   // set up histograms
   //------------------------------
@@ -156,6 +162,9 @@ void WHLooper::loop(TChain *chain, TString name) {
   outfile_ = new TFile(m_outfilename_.c_str(),"RECREATE") ; 
 
   cout << "[WHLooper::loop] setting up histos" << endl;
+
+  // inclusive region hists
+  std::map<std::string, TH1F*> h_1d_inc_presel, h_1d_inc_1b, h_1d_inc_2b;
 
   // signal region hists
   std::map<std::string, TH1F*> h_1d_sig_presel, h_1d_sig_final;
@@ -196,6 +205,12 @@ void WHLooper::loop(TChain *chain, TString name) {
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
   std::map<std::string, TH1F*> h_1d_stop_met_nm1, h_1d_stop_mt_nm1, h_1d_stop_isotrk_nm1, h_1d_stop_tauveto_nm1 ;
 
+
+  if (doInclusive) {
+    outfile_->mkdir("inc_presel");
+    outfile_->mkdir("inc_1b");
+    outfile_->mkdir("inc_2b");
+  }
 
   if (doSignal) {
     outfile_->mkdir("sig_presel");
@@ -460,14 +475,14 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	float csv_nominal= stopt.pfjets_csv().at(i);
 
-	//RESHAPING -- TO DO WITH UPDATED BABIES
-	//only reshape for b jets ---> use status 3 matching information
-	//float csv_nominal=nominalShape->reshape(stopt.pfjets().at(i).Eta(),stopt.pfjets().at(i).Pt(),stopt.pfjets_csv().at(i),(stopt.pfjets_flav().at(i)==5?5:0)); 
-	//treat anything not matched to b or c as light
-	// float csv_nominal=nominalShape->reshape( stopt.pfjets().at(i).eta(),
-	// 					 stopt.pfjets().at(i).pt(),
-	// 					 stopt.pfjets_csv().at(i),
-	// 					( stopt.pfjets_mcflavorAlgo().at(i)>3 ? stopt.pfjets_mcflavorAlgo().at(i) : 1 ) ); 
+	//RESHAPING -- requires babies V20 or higher
+	//  -- may need to validate for non-b-jets
+	if (doReshaping && !isData && !isTChiwh_) {
+	  csv_nominal = nominalShape->reshape( stopt.pfjets().at(i).eta(),
+					       stopt.pfjets().at(i).pt(),
+					       stopt.pfjets_csv().at(i),
+					       stopt.pfjets_mcflavorAlgo().at(i) ); 
+	}
 
 	jets_csv_.push_back( csv_nominal );
 
@@ -564,6 +579,33 @@ void WHLooper::loop(TChain *chain, TString name) {
 
       // always require at least 2 (central) jets
       if (njets_ < 2) continue;
+
+      // -------------------------------------------
+      // *** inclusive preselection:
+      //   >= 1 lepton
+      //   >= 2 (central) jets
+      //   met > 50
+      //
+      //   then add btags
+
+      if ( doInclusive
+	   && passSingleLeptonSelection(isData) 
+	   && (njets_ >= 2)
+	   && (met_ > CUT_MET_PRESEL_) ) {
+
+        fillHists1DWrapper(h_1d_inc_presel,evtweight1l,"inc_presel");
+
+	bool fail = false;
+	if ( !fail && (nbjets_ >= 1) ) {
+	  fillHists1DWrapper(h_1d_inc_1b,evtweight1l,"inc_1b");
+	}
+	else fail = true;
+
+	if (!fail && (nbjets_ >= 2 ) ) {
+	  fillHists1DWrapper(h_1d_inc_2b,evtweight1l,"inc_2b");
+	}
+	else fail = true;
+      }
 
       // -------------------------------------------
       // *** presel for signal region:
@@ -693,7 +735,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       // -------------------------------------------
       // *** CR3: 2 leptons, Z mass veto for same flavor, no iso track veto
       //   otherwise same as signal region
-      //   !!! modified MET/MT etc defs to emulate losing 2nd lepton
+      //   !!! pesudo MET/MT etc defs to emulate losing 2nd lepton
 
       if ( doCR3
 	   && passDileptonSelection(isData) 
@@ -733,6 +775,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	bool fail = false;
 	if ( pseudomet_lep_ > CUT_MET_PRESEL_ ) {
+	//	if ( met_ > CUT_MET_PRESEL_ ) {
           fillHists1DWrapper(h_1d_cr3_presel,evtweight2l,"cr3_presel");
 	}
 	else fail = true;
@@ -743,16 +786,19 @@ void WHLooper::loop(TChain *chain, TString name) {
 	else fail = true;
 
 	if (!fail && (pseudomet_lep_ > CUT_MET_) ) {
+	//	if (!fail && (met_ > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr3_mt_nm1,evtweight2l,"cr3_mt_nm1");
 	}
 	else fail = true;
 
 	if (!fail && (pseudomt_lep_ > CUT_MT_) ) {
+	//	if (!fail && (mt_ > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr3_mt2bl_nm1,evtweight2l,"cr3_mt2bl_nm1");
 	}
 	else fail = true;
 
 	if (!fail && (pseudomt2bl_ > CUT_MT2BL_) ) {
+	//	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
 	  fillHists1DWrapper(h_1d_cr3_final,evtweight2l,"cr3_final");
 	}
 
@@ -760,95 +806,12 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 
       // -------------------------------------------
-      // *** CR4: require exactly 0 btags
-      //  otherwise same as signal
-
-      if ( doCR4
-	   && passSingleLeptonSelection(isData) 
-	   && passisotrk 
-	   && (nbjets_ == 0)
-	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
-	   && (met_ > CUT_MET_PRESEL_) ) {
-
-	// compute MT2 vars for 0 b events passing this presel
-	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
-	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
-	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
-
-        fillHists1DWrapper(h_1d_cr4_presel,evtweight1l,"cr4_presel");
-
-	bool fail = false;
-	if ( !fail && (njetsalleta_ == 2) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_met_nm1,evtweight1l,"cr4_met_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (met_ > CUT_MET_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt_nm1,evtweight1l,"cr4_mt_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (mt_ > CUT_MT_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt2bl_nm1,evtweight1l,"cr4_mt2bl_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
-	  fillHists1DWrapper(h_1d_cr4_final,evtweight1l,"cr4_final");
-	}
-
-      } // CR4 region sel
-
-      // -------------------------------------------
-      // *** CR5: require exactly 1 btag
-      //  veto on 2nd loose btag
-      //  otherwise same as signal
-
-      if ( doCR5
-	   && passSingleLeptonSelection(isData) 
-	   && passisotrk 
-	   && (nbjets_ == 1)
-	   && (nbjetsl_ == 1)
-	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
-	   && (met_ > CUT_MET_PRESEL_) ) {
-
-	// compute MT2 vars for 1 b events passing this presel
-	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
-	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
-	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
-
-        fillHists1DWrapper(h_1d_cr5_presel,evtweight1l,"cr5_presel");
-
-	bool fail = false;
-	if ( !fail && (njetsalleta_ == 2) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_met_nm1,evtweight1l,"cr5_met_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (met_ > CUT_MET_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt_nm1,evtweight1l,"cr5_mt_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (mt_ > CUT_MT_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt2bl_nm1,evtweight1l,"cr5_mt2bl_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
-	  fillHists1DWrapper(h_1d_cr5_final,evtweight1l,"cr5_final");
-	}
-
-      } // CR5 region sel
-
-
-      // -------------------------------------------
-      // *** CR6: 2 leptons, Z mass veto for same flavor, no iso track veto
+      // *** CR4: 2 leptons, Z mass veto for same flavor, no iso track veto
       //   high mass: 150 < m(bb) < 250
       //   otherwise same as signal region
       //   !!! modified MET/MT etc defs to emulate losing 2nd lepton
 
-      if ( doCR6
+      if ( doCR4
 	   && passDileptonSelection(isData) 
 	   && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. )
 	   && (nbjets_ >= 2)
@@ -886,27 +849,114 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	bool fail = false;
 	if ( pseudomet_lep_ > CUT_MET_PRESEL_ ) {
-          fillHists1DWrapper(h_1d_cr6_presel,evtweight2l,"cr6_presel");
+	//	if ( met_ > CUT_MET_PRESEL_ ) {
+          fillHists1DWrapper(h_1d_cr4_presel,evtweight2l,"cr4_presel");
 	}
 	else fail = true;
 
 	if ( !fail && (njetsalleta_ == 2) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_met_nm1,evtweight2l,"cr6_met_nm1");
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_met_nm1,evtweight2l,"cr4_met_nm1");
 	}
 	else fail = true;
 
 	if (!fail && (pseudomet_lep_ > CUT_MET_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_mt_nm1,evtweight2l,"cr6_mt_nm1");
+	//	if (!fail && (met_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt_nm1,evtweight2l,"cr4_mt_nm1");
 	}
 	else fail = true;
 
 	if (!fail && (pseudomt_lep_ > CUT_MT_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_mt2bl_nm1,evtweight2l,"cr6_mt2bl_nm1");
+	//	if (!fail && (mt_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_mt2bl_nm1,evtweight2l,"cr4_mt2bl_nm1");
 	}
 	else fail = true;
 
 	if (!fail && (pseudomt2bl_ > CUT_MT2BL_) ) {
-	  fillHists1DWrapper(h_1d_cr6_final,evtweight2l,"cr6_final");
+	//	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr4_final,evtweight2l,"cr4_final");
+	}
+
+      } // CR4 region sel
+
+
+      // -------------------------------------------
+      // *** CR5: require exactly 0 btags
+      //  otherwise same as signal
+
+      if ( doCR5
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ == 0)
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
+	   && (met_ > CUT_MET_PRESEL_) ) {
+
+	// compute MT2 vars for 0 b events passing this presel
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
+
+        fillHists1DWrapper(h_1d_cr5_presel,evtweight1l,"cr5_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_met_nm1,evtweight1l,"cr5_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt_nm1,evtweight1l,"cr5_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_mt2bl_nm1,evtweight1l,"cr5_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr5_final,evtweight1l,"cr5_final");
+	}
+
+      } // CR5 region sel
+
+      // -------------------------------------------
+      // *** CR6: require exactly 1 btag
+      //  veto on 2nd loose btag
+      //  otherwise same as signal
+
+      if ( doCR6
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ == 1)
+	   && (nbjetsl_ == 1)
+	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_)
+	   && (met_ > CUT_MET_PRESEL_) ) {
+
+	// compute MT2 vars for 1 b events passing this presel
+	mt2b_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2b);
+	mt2bl_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2bl);
+	mt2w_ = calculateMT2w(jets_, jets_csv_, stopt.lep1(), met_, metphi_, MT2w);
+
+        fillHists1DWrapper(h_1d_cr6_presel,evtweight1l,"cr6_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_met_nm1,evtweight1l,"cr6_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_mt_nm1,evtweight1l,"cr6_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr6_mt2bl_nm1,evtweight1l,"cr6_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr6_final,evtweight1l,"cr6_final");
 	}
 
       } // CR6 region sel
@@ -980,6 +1030,12 @@ void WHLooper::loop(TChain *chain, TString name) {
     //
     // finish
     //
+
+  if (doSignal) {
+    savePlotsDir(h_1d_inc_presel,outfile_,"inc_presel");
+    savePlotsDir(h_1d_inc_1b,outfile_,"inc_1b");
+    savePlotsDir(h_1d_inc_2b,outfile_,"inc_2b");
+  }
 
   if (doSignal) {
     savePlotsDir(h_1d_sig_presel,outfile_,"sig_presel");
@@ -1098,9 +1154,28 @@ void WHLooper::fillHists1DWrapper(std::map<std::string, TH1F*>& h_1d, const floa
 
   fillHists1D(h_1d, evtweight, dir);
   if (doFlavorPlots) {
-    if (stopt.leptype() == 0) fillHists1D(h_1d,evtweight,dir,"_e");
-    else if (stopt.leptype() == 1) fillHists1D(h_1d,evtweight,dir,"_m");
+    // single lepton regions: separate into e, m
+    if ((dir.find("cr3_") == std::string::npos) && (dir.find("cr4_") == std::string::npos)) {
+      if (stopt.leptype() == 0) fillHists1D(h_1d,evtweight,dir,"_e");
+      else if (stopt.leptype() == 1) fillHists1D(h_1d,evtweight,dir,"_m");
+    }
+
+    // for dilepton regions (cr3/4), separate into ee, mm, em
+    else {
+      int id1 = fabs(stopt.id1());
+      int id2 = fabs(stopt.id2());
+      if (id1 == 11 && id2 == 11) fillHists1D(h_1d,evtweight,dir,"_ee");
+      else if (id1 == 11 && id2 == 13) fillHists1D(h_1d,evtweight,dir,"_mm");
+      else fillHists1D(h_1d,evtweight,dir,"_em");
+    }
   }
+
+  if (isWjets_ && (dir.find("inc_") != std::string::npos)) {
+    if (stopt.nbs() == 0) fillHists1D(h_1d,evtweight,dir,"_0genb");
+    else if (stopt.nbs() == 1) fillHists1D(h_1d,evtweight,dir,"_1genb");
+    else if (stopt.nbs() == 2) fillHists1D(h_1d,evtweight,dir,"_2genb");
+  }
+
 }
 
 //--------------------------------------------------------------------
@@ -1149,6 +1224,34 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   if (isWjets_) {
     plot1D("h_nbs",       stopt.nbs(),       evtweight, h_1d, 5, 0, 5);
+
+    // requires babies V20 or higher
+    if (stopt.nbs() == 0) {
+      plot1D("h_jet1flavor_0b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(0))) , evtweight, h_1d, 23, -1., 22.);
+      plot1D("h_jet2flavor_0b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(1))) , evtweight, h_1d, 23, -1., 22.);
+    } else if (stopt.nbs() == 1) {
+      plot1D("h_jet1flavor_1b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(0))) , evtweight, h_1d, 23, -1., 22.);
+      plot1D("h_jet2flavor_1b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(1))) , evtweight, h_1d, 23, -1., 22.);
+    } else if (stopt.nbs() == 2) {
+      plot1D("h_jet1flavor_2b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(0))) , evtweight, h_1d, 23, -1., 22.);
+      plot1D("h_jet2flavor_2b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(1))) , evtweight, h_1d, 23, -1., 22.);
+    }
+
+    // requires babies V21 or higher
+    // if (stopt.nbs() == 1) plot1D("h_genbjet1pt_1b"+suffix,       stopt.genbs().at(0).pt(),       evtweight, h_1d, 1000, 0., 1000.);
+    // if (stopt.nbs() == 2) {
+    //   // the genbs vector in the babies isn't presorted by pt..
+    //   float genb1pt = stopt.genbs().at(0).pt();
+    //   float genb2pt = 0.;
+    //   if (stopt.genbs().at(1).pt() > genb1pt) {
+    // 	genb1pt = stopt.genbs().at(1).pt();
+    // 	genb2pt = stopt.genbs().at(0).pt();
+    //   } else {
+    // 	genb2pt = stopt.genbs().at(1).pt();
+    //   }
+    //   plot1D("h_genbjet1pt"+suffix,       genb1pt,       evtweight, h_1d, 1000, 0., 1000.);
+    //   plot1D("h_genbjet2pt"+suffix,       genb2pt,       evtweight, h_1d, 1000, 0., 1000.);
+    // }
   }
 
   // bjets and bbbar plots
@@ -1188,19 +1291,13 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
     plot1D("h_jet1csv"+suffix, abs(jets_csv_.at(0)) , evtweight, h_1d, 100, 0., 1.);
     plot1D("h_jet2csv"+suffix, abs(jets_csv_.at(1)) , evtweight, h_1d, 100, 0., 1.);
+
+    // need V00-02-20 or higher babies for these vars
+    plot1D("h_jet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(0))) , evtweight, h_1d, 23, -1., 22.);
+    plot1D("h_jet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(1))) , evtweight, h_1d, 23, -1., 22.);
+
   }
 
-  //   std::vector<int> jetIdx = getJetIndex();
-  //   // need V00-02-20 or higher babies for these vars
-  //   plot1D("h_jet1flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
-  //   plot1D("h_jet2flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
-
-  //   if (stopt.nbs() == 0) {
-  //     plot1D("h_jet1flavor_nobs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
-  //     plot1D("h_jet2flavor_nobs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
-  //   } else {
-  //     plot1D("h_jet1flavor_bs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(0))) , evtweight, h_1d, 23, -1., 22.);
-  //     plot1D("h_jet2flavor_bs"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jetIdx.at(1))) , evtweight, h_1d, 23, -1., 22.);
   //   }
 
   // }
@@ -1215,12 +1312,12 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D("h_lep1isotrkdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(stopt.lep1().phi() - stopt.pfcandOS10looseZ().phi())),  evtweight, h_1d, 50, 0., TMath::Pi());
   }
 
-  // plots for CR3 (2 leptons)
-  if (dir.find("cr3") != std::string::npos) {
-    plot1D("h_leppt_cr3"+suffix,       lep_.pt(),       evtweight, h_1d, 1000, 0., 1000.);
-    plot1D("h_pseudomt_lep_cr3"+suffix,       pseudomt_lep_,       evtweight, h_1d, 1000, 0., 1000.);
-    plot1D("h_pseudomet_lep_cr3"+suffix,        pseudomet_lep_,    evtweight, h_1d, 500, 0., 500.);
-    plot1D("h_dphi_pseudomet_lep_cr3"+suffix,  fabs(dphi_pseudomet_lep_),  evtweight, h_1d, 50, 0., TMath::Pi());
+  // plots for CR3/CR4 (2 leptons)
+  if ((dir.find("cr3") != std::string::npos) || (dir.find("cr4") != std::string::npos)) {
+    plot1D("h_leppt"+suffix,       lep_.pt(),       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_pseudomt_lep"+suffix,       pseudomt_lep_,       evtweight, h_1d, 1000, 0., 1000.);
+    plot1D("h_pseudomet_lep"+suffix,        pseudomet_lep_,    evtweight, h_1d, 500, 0., 500.);
+    plot1D("h_dphi_pseudomet_lep"+suffix,  fabs(dphi_pseudomet_lep_),  evtweight, h_1d, 50, 0., TMath::Pi());
     plot1D("h_pseudomt2b"+suffix,   pseudomt2b_,  evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_pseudomt2bl"+suffix,  pseudomt2bl_, evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_pseudomt2w"+suffix,   pseudomt2w_,  evtweight, h_1d, 1000, 0., 1000.);
