@@ -579,11 +579,14 @@ bool passLepPlusIsoTrkSelection(bool isData)
 
 }
 
-bool pass_T2tt_LM(bool isData){
+bool pass_T2tt_LM(bool isData, TString name){
 
   if ( !passSingleLeptonSelection(isData) ) return false;
 
   if ( !passIsoTrkVeto_v4() ) return false;
+
+  // this is temporary waiting for the new babies                                                                                                                                    
+  if(!name.Contains("T2") && !passTauVeto()) return false;
 
   // this is just a preselection
   if(stopt.t1metphicorr()<100) return false;
@@ -605,6 +608,7 @@ bool pass_T2tt_LM(bool isData){
 
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
+
     if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
 
     myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
@@ -629,12 +633,14 @@ bool pass_T2tt_LM(bool isData){
 }
 
 
-bool pass_T2tt_HM(bool isData){
+bool pass_T2tt_HM(bool isData,TString name){
 
   if ( !passSingleLeptonSelection(isData) ) return false;
 
-  // this is temporary waiting for the new babies                                                                                                                                    
   if ( !passIsoTrkVeto_v4() ) return false;
+
+  // this is temporary waiting for the new babies                                                                                                                                    
+  if(!name.Contains("T2") && !passTauVeto()) return false;
 
   // this is just a preselection                                                                                                                                                     
   if(stopt.t1metphicorr()<100) return false;
@@ -656,6 +662,7 @@ bool pass_T2tt_HM(bool isData){
 
       myJets.push_back(stopt.pfjets().at(ijet));
       myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
+
       if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
       myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
   }
