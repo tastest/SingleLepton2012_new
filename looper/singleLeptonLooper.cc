@@ -2,6 +2,7 @@
 #include "singleLeptonLooper.h"
 #include "TTreeCache.h"
 #include "TDatabasePDG.h"
+#include "TLorentzVector.h"
 
 #include "../Tools/goodrun.h"
 #include "../Tools/vtxreweight.h"
@@ -17,6 +18,93 @@ bool useOldIsolation      = false;
 
 using namespace std;
 using namespace tas;
+
+//--------------------------------------------------------------------
+
+struct SUSYGenParticle { // To be filled with status-3 genParticles
+      int pdgId; // PDG identifier (with sign, please)
+      int firstMother; // first mother, set to <0 if no mothers
+      double energy; // energy [GeV]
+      double pt; // pt [GeV]
+      double eta; // eta
+      double phi; // phi
+};
+
+//--------------------------------------------------------------------
+
+int getMotherIndex(int motherid){
+  for(int i = 0; i < genps_id().size() ; i++){
+    if( motherid == genps_id().at(i) ) return i;
+  }
+
+  return -1;
+}
+
+// The following reweighting only makes sense for on-shell stop, top and chi0
+// In the off-shell case top and anti-top may get very different polarizations
+double Reweight_Stop_to_TopChi0 (std::vector<SUSYGenParticle> genParticles, double referenceTopPolarization, double requestedTopPolarization, char* prefix) {
+
+  if( !TString(prefix).Contains("T2") ) return 1.0;
+
+  double weight = 1.;
+  int nFoundStops = 0;
+
+  unsigned int ngen = genParticles.size();
+
+  for (unsigned int ig=0; ig<ngen; ++ig) {
+    const SUSYGenParticle& gen = genParticles[ig];
+    if (gen.firstMother<0) continue;
+    if (abs(gen.pdgId)>20) continue; // expect quarks or leptons from W decay
+
+    // Navigate upwards in the stop->top->W->fermion decay chain
+    const SUSYGenParticle& genW = genParticles[gen.firstMother];
+    if (genW.firstMother<0) continue;
+    if (abs(genW.pdgId)!=24) continue;
+    const SUSYGenParticle& genTop = genParticles[genW.firstMother];
+    if (abs(genTop.pdgId)!=6) continue;
+
+    // We only care about the down-type fermion
+    if (genTop.pdgId*gen.pdgId>0) continue;
+
+    // We also need a stop
+    if (genTop.firstMother<0) continue;
+    const SUSYGenParticle& genStop = genParticles[genTop.firstMother];
+    if (abs(genStop.pdgId)!=1000006) continue;
+
+    // Move top and fermion to the stop center-of-mass frame
+    TLorentzVector stop4;
+    stop4.SetPtEtaPhiE(genStop.pt, genStop.eta, genStop.phi, genStop.energy);
+    TVector3 betaV(-stop4.Px()/stop4.Energy(),-stop4.Py()/stop4.Energy(),-stop4.Pz()/stop4.Energy());
+
+    TLorentzVector top4;
+    top4.SetPtEtaPhiE(genTop.pt, genTop.eta, genTop.phi, genTop.energy);
+    top4.Boost(betaV);
+
+    TLorentzVector ferm4;
+    ferm4.SetPtEtaPhiE(gen.pt, gen.eta, gen.phi, gen.energy);
+    ferm4.Boost(betaV);
+
+    // Do not reweight if by any reason top/fermion directions are undefined
+    // This should be pathological if things are fine
+    if (top4.P()<=0 || ferm4.P()<=0) {
+      printf("Warning: particles at rest, no weight applied: ptop: %.3e, pf: %.3e\n", top4.P(), ferm4.P());
+      continue; 
+    }
+
+    double costh = (top4.Px()*ferm4.Px()+top4.Py()*ferm4.Py()+top4.Pz()*ferm4.Pz())/top4.P()/ferm4.P();
+      
+    double weight_L = (top4.Energy()+top4.P())*(1-costh);
+    double weight_R = (top4.Energy()-top4.P())*(1+costh);
+    weight *= ((1+requestedTopPolarization)*weight_R+(1-requestedTopPolarization)*weight_L)/((1+referenceTopPolarization)*weight_R+(1-referenceTopPolarization)*weight_L);
+
+    nFoundStops++;
+  }
+
+  if( nFoundStops!=2 ) cout << __FILE__ << " " << __LINE__ << " WARNING: found " << nFoundStops << " stops, should be 2." << endl;
+
+  return weight;
+
+};
 
 //--------------------------------------------------------------------
 
@@ -76,6 +164,9 @@ bool is_duplicate (const DorkyEventIdentifier &id) {
 //--------------------------------------------------------------------
 
 void singleLeptonLooper::InitBaby(){
+
+  weightleft_  = -1.0;
+  weightright_ = -1.0;
 
   //pdf variables
   pdfid1_ = -999;
@@ -454,6 +545,13 @@ void singleLeptonLooper::InitBaby(){
   // pfjets_beta_0p2_.clear();
   // pfjets_beta2_0p2_.clear();
   pfjets_mvaBeta_.clear();
+
+  genps_pdgId_.clear();
+  genps_firstMother_.clear();
+  genps_energy_.clear();
+  genps_pt_.clear();
+  genps_eta_.clear();
+  genps_phi_.clear();
 
   genbs_.clear();
 
@@ -927,7 +1025,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ngoodel_  = 0;
       ngoodmu_  = 0;
             
-      if( TString(prefix).Contains("T2") ) useOldIsolation = true;
+      //if( TString(prefix).Contains("T2") ) useOldIsolation = true;
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
 
 	//-------------------------------------------
@@ -1696,8 +1794,39 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	else if( nleps_ < 0 || nleps_ > 2 ){
 	  cout << "ERROR nleptons = " << nleps_ << endl;
 	}
-*/
+	*/
 
+
+	//------------------------------------------
+	// stop reweighting code
+	//------------------------------------------
+
+	std::vector<SUSYGenParticle> genParticles;
+
+	
+	for (unsigned int ig=0; ig<genps_id().size(); ++ig) {
+
+	  if( genps_status().at(ig) != 3 ) continue;
+
+	  SUSYGenParticle part;
+	  part.pdgId       = genps_id().at(ig);
+	  part.energy      = genps_p4().at(ig).E();
+	  part.pt          = genps_p4().at(ig).pt();
+	  part.eta         = genps_p4().at(ig).eta();
+	  part.phi         = genps_p4().at(ig).phi();
+	  part.firstMother = getMotherIndex( genps_id_mother().at(ig) );
+	  genParticles.push_back(part);
+
+	  genps_pdgId_      .push_back(part.pdgId);
+	  genps_firstMother_.push_back(part.firstMother);
+	  genps_energy_     .push_back(part.energy);
+	  genps_pt_         .push_back(part.pt);
+	  genps_eta_        .push_back(part.eta);
+	  genps_phi_        .push_back(part.phi);
+	}
+
+	weightleft_  = Reweight_Stop_to_TopChi0 (genParticles, 0., -1, prefix);
+	weightright_ = Reweight_Stop_to_TopChi0 (genParticles, 0.,  1, prefix);
       }
 
       /*
@@ -3403,6 +3532,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("njetsuncor",      &njetsuncor_,       "njetsuncor/I");
   outTree->Branch("costhetaweight",  &costhetaweight_,   "costhetaweight/F");
   outTree->Branch("weight",          &weight_,           "weight/F");
+  outTree->Branch("weightleft",      &weightleft_,       "weightleft/F");
+  outTree->Branch("weightright",     &weightright_,      "weightright/F");
   outTree->Branch("mutrigweight",    &mutrigweight_,     "mutrigweight/F");
   outTree->Branch("mutrigweight2",   &mutrigweight2_,    "mutrigweight2/F");
   outTree->Branch("sltrigweight",    &sltrigweight_,     "sltrigweight/F");
@@ -3912,6 +4043,12 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
   outTree->Branch("genbs"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &genbs_ );
 
+  outTree->Branch("genps_pdgId"        ,   "std::vector<int>"    , &genps_pdgId_         );
+  outTree->Branch("genps_firstMother"  ,   "std::vector<int>"    , &genps_firstMother_   );
+  outTree->Branch("genps_energy"       ,   "std::vector<float>"  , &genps_energy_        );
+  outTree->Branch("genps_pt"           ,   "std::vector<float>"  , &genps_pt_            );
+  outTree->Branch("genps_eta"          ,   "std::vector<float>"  , &genps_eta_           );
+  outTree->Branch("genps_phi"          ,   "std::vector<float>"  , &genps_phi_           );
 
 }
 
