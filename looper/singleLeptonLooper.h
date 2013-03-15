@@ -244,6 +244,9 @@ class singleLeptonLooper
         Float_t pfcandvetomindrj10_;
         Float_t pfcandvetoLmindrj10_;
 
+	Float_t weightleft_;
+	Float_t weightright_;
+
 	Float_t pfcandpt10pt0p1_;
 	Float_t pfcandiso10pt0p1_;
 	Float_t pfcandpt10pt0p2_;
@@ -433,6 +436,13 @@ class singleLeptonLooper
         LorentzVector*  jet_; 
 	LorentzVector*  mcnu_;
 	LorentzVector*  mclep_;
+
+	std::vector<int>   genps_pdgId_;
+	std::vector<int>   genps_firstMother_;
+	std::vector<float> genps_energy_;
+	std::vector<float> genps_pt_;
+	std::vector<float> genps_eta_;
+	std::vector<float> genps_phi_;
 
 	//        std::vector<Candidate>  candidates_;
         VofP4 jets_;
