@@ -1,6 +1,6 @@
 #! /bin/bash
 
-RPATH=/nfs-3/userdata/stop/output_V00-02-20_2012_4jskim
+RPATH=/nfs-3/userdata/stop/MiniBabies/V00-02-20__V00-03-01__BDT005__4jetsMET50_bkg
 
 #declare -a Samples=(ttdl_powheg ttsl_powheg w1to4jets tW_lepsl tW_lepdl)
 declare -a Samples=(ttdl_lmg ttsl_lmg ttdl_powheg ttsl_powheg w1to4jets data_muo data_ele data_diel data_dimu ttV diboson triboson tWall_lep data_mueg DY1to4Jtot tW_lepsl tW_lepdl)

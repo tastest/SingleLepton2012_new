@@ -34,9 +34,15 @@
 
 using namespace Stop;
 
-std::set<DorkyEventIdentifier> already_seen; 
-std::set<DorkyEventIdentifier> events_lasercalib; 
-std::set<DorkyEventIdentifier> events_hcallasercalib; 
+std::set<DorkyEventIdentifier> already_seen;
+std::set<DorkyEventIdentifier> events_lasercalib;
+std::set<DorkyEventIdentifier> events_hcallasercalib;
+
+bool dobdt = false;
+string tag_bdt[6] = {"0", "1", "2", "3", "4", "5"};
+float bdt_cut_lm[6] = {0.3, 0.2, 0.35, 0.45, 0.2, 0.2};
+float bdt_cut[6]    = {0.3, 0.3, 0.45, 0.55, 0.3, 0.3};
+float bdt_cut_hm[6] = {0.3, 0.4, 0.55, 0.65, 0.5, 0.5};
 
 StopTreeLooper::StopTreeLooper()
 {
@@ -168,7 +174,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   // met region tags
   const int NMET = 9;
   float   metcut[NMET] = { 0., 50., 100., 150., 200., 250., 300., 350., 400. };
-  float    mtcut[NMET] = { 150., 150., 150., 120., 120., 120., 120., 120., 120. };
+  float    mtcut[NMET] = { 150., 150., 120., 120., 120., 120., 120., 120., 120. };
   string tag_met[NMET] = { "", "_met50", "_met100", "_met150", "_met200", "_met250", "_met300", "_met350", "_met400" };
 
   stwatch.Start();
@@ -338,7 +344,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
  
         //count jets that are not overlapping with second lepton
 	if (isData) continue;
-	if (stopt.nleps()!=2) continue;
+	if (stopt.nleps()<2) continue;
 	if (stopt.mclep2().pt() < 30.) continue;
 	if (ROOT::Math::VectorUtil::DeltaR(stopt.mclep2(), stopt.pfjets().at(i)) > 0.4 ) continue;
 	n_ljets--;
@@ -374,17 +380,17 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       //b-tagging
       string tag_btag = (n_bjets<1) ? "_bveto" : "";
-
+ 
       //iso-trk-veto & tau veto
       bool passisotrk = passIsoTrkVeto_v4() && passTauVeto();
       string tag_isotrk = passisotrk ? "" : "_wisotrk";
 
-      // tag_T2tt_LM
-      bool passT2ttLM = pass_T2tt_LM(isData);
+      // tag_T2tt_LM -- dphi and chi2 selection
+      bool passT2ttLM = (dphimjmin>0.8 && chi2min<5) ? true : false;
       string tag_T2tt_LM = passT2ttLM ? "_passT2ttLM" : "_failT2ttLM"; 
 
-      // tag_T2tt_HM
-      bool passT2ttHM = pass_T2tt_HM(isData);
+      // tag_T2tt_HM -- add mt2w requirement
+      bool passT2ttHM = (passT2ttLM && mt2wmin>200) ? true : false;
       string tag_T2tt_HM = passT2ttHM ? "_passT2ttHM" : "_failT2ttHM"; 
 
       //z-peak/veto
@@ -396,16 +402,22 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //event with true truth-level track
       bool hastruetrk = false;
       if (stopt.nleps()==2 && abs(stopt.mclep2().Eta())<2.5)  {
-	//check if second lepton is e/mu pT>10GeV
-	if (abs(stopt.mcid2())<14 && stopt.mclep2().Pt()>10.) hastruetrk = true;
+	//check if second lepton is e/mu pT>5GeV
+	if (abs(stopt.mcid2())<14 && stopt.mclep2().Pt()>5.) hastruetrk = true;
 	//if second lepton is tau 
 	//check if daughter lepton or single track has pT>10GeV
-	if (abs(stopt.mcid2())>14 && stopt.mctaudpt2()>10.) {  
-	  if (stopt.mcdecay2()==2) hastruetrk = true;
-	  if (stopt.mcdecay2()==1 && stopt.mcndec2()==1) hastruetrk = true;
+	if (abs(stopt.mcid2())>14) {  
+	  if (stopt.mcdecay2()==2 && stopt.mctaudpt2()>5.) hastruetrk = true;
+	  if (stopt.mcdecay2()==1 && stopt.mcndec2()==1 && stopt.mctaudpt2()>10.) hastruetrk = true;
 	}
       }
       string tag_truetrk = hastruetrk ? "_wtruetrk" : "_notruetrk";
+
+      //event with true truth-level tau
+      bool hastruetau = false;
+      //pt requirement on hadronic tau veto is 20 GeV
+      if (abs(stopt.mcid2())>14 && stopt.mclep2().Pt()>20.) hastruetau = true;
+      string tag_truetau = hastruetau ? "_wtruetau" : "_notruetau";
 
       //flavor types
       string flav_tag_sl;
@@ -475,7 +487,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    if ( t1metphicorr < metcut[im] ) continue;
 	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+"_prebtag"+tag_met[im], flav_tag_sl, mtcut[im] );
 	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_met[im]  , flav_tag_sl, mtcut[im] );
-	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk+tag_met[im], flav_tag_sl, mtcut[im] );
+	    //store information to determine fraction of events with true iso. trk or a tau
+	    if ( name.Contains("tt") && stopt.nleps()>1 ) {
+	      makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk+tag_met[im], flav_tag_sl, mtcut[im] );
+	      makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetau+tag_met[im], flav_tag_sl, mtcut[im] );
+	      makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk+tag_truetau+tag_met[im], 
+			    flav_tag_sl, mtcut[im] );
+	    }
 	  }
 	}
 
@@ -808,7 +826,28 @@ void StopTreeLooper::makeCR4Plots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_cr4_mt2blmin"+tag_selection+flav_tag_dl, min(mt2blmin, (float)499.99),  evtweight, h_1d, 100, 0., 500);
   plot1D("h_cr4_chi2min" +tag_selection+flav_tag_dl, min(chi2min , (float)19.999) , evtweight, h_1d, 100, 0., 20.);
   //BDT
-  //plot1D("h_cr4_bdt"+tag_selection+flav_tag_dl, stopt.mini_bdt(), evtweight, h_1d, 50, -0.5, 1.);
+  if (dobdt) {
+    for (int ibdt = 0; ibdt<(int)stopt.mini_bdt().size(); ++ibdt) {
+      float bdtval = stopt.mini_bdt().at(ibdt);
+      if (bdtval<-0.9990) bdtval = -0.9999;
+      if (bdtval >0.9999) bdtval =  0.9999;
+      plot1D("h_cr4_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag_dl, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (t1metphicorrmt>mtcut)
+	plot1D("h_cr4_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag_dl, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (bdtval>bdt_cut[ibdt]) {
+	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_mt"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_hm[ibdt]) {
+	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_hm_mt"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_lm[ibdt]) {
+	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_lm_mt"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+    }
+  }
 
   //MT
   //binning for mT plots
@@ -873,8 +912,28 @@ void StopTreeLooper::makeCR5Plots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_cr5_mt2blmin"+tag_selection+flav_tag, min(mt2blmin, (float)499.99),  evtweight, h_1d, 100, 0., 500);
   plot1D("h_cr5_chi2min" +tag_selection+flav_tag, min(chi2min , (float)19.999) , evtweight, h_1d, 100, 0., 20.);
   //BDT
-  //plot1D("h_cr5_bdt"+tag_selection+flav_tag, stopt.mini_bdt(), evtweight, h_1d, 50, -0.5, 1.);
-
+  if (dobdt) {
+    for (int ibdt = 0; ibdt<(int)stopt.mini_bdt().size(); ++ibdt) {
+      float bdtval = stopt.mini_bdt().at(ibdt);
+      if (bdtval<-0.9990) bdtval = -0.9999;
+      if (bdtval >0.9999) bdtval =  0.9999;
+      plot1D("h_cr5_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (t1metphicorrmt>mtcut)
+	plot1D("h_cr5_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (bdtval>bdt_cut[ibdt]) {
+	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_hm[ibdt]) {
+	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_hm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_lm[ibdt]) {
+	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_lm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+    }
+  }
   //MT
   //binning for mT plots
   nbins = 30;
@@ -933,8 +992,28 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_sig_mt2blmin"+tag_selection+flav_tag, min(mt2blmin, (float)499.99),  evtweight, h_1d, 100, 0., 500);
   plot1D("h_sig_chi2min" +tag_selection+flav_tag, min(chi2min , (float)19.999) , evtweight, h_1d, 100, 0., 20.);
   //BDT
-  //plot1D("h_sig_bdt"+tag_selection+flav_tag, stopt.mini_bdt(), evtweight, h_1d, 50, -0.5, 1.);
-
+  if (dobdt) {
+    for (int ibdt = 0; ibdt<(int)stopt.mini_bdt().size(); ++ibdt) {
+      float bdtval = stopt.mini_bdt().at(ibdt);
+      if (bdtval<-0.9990) bdtval = -0.9999;
+      if (bdtval >0.9999) bdtval =  0.9999;
+      plot1D("h_sig_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (t1metphicorrmt>mtcut)
+	plot1D("h_sig_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (bdtval>bdt_cut[ibdt]) {
+	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_hm[ibdt]) {
+	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_hm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_lm[ibdt]) {
+	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_lm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+    }
+  }
   //MT
   //binning for mT plots
   nbins = 30;
@@ -1003,8 +1082,28 @@ void StopTreeLooper::makeCR1Plots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_cr1_mt2blmin"+tag_selection+flav_tag, min(mt2blmin, (float)499.99),  evtweight, h_1d, 100, 0., 500);
   plot1D("h_cr1_chi2min" +tag_selection+flav_tag, min(chi2min , (float)19.999) , evtweight, h_1d, 100, 0., 20.);
   //BDT
-  //plot1D("h_cr1_bdt"+tag_selection+flav_tag, stopt.mini_bdt(), evtweight, h_1d, 50, -0.5, 1.);
-
+  if (dobdt) {
+    for (int ibdt = 0; ibdt<(int)stopt.mini_bdt().size(); ++ibdt) {
+      float bdtval = stopt.mini_bdt().at(ibdt);
+      if (bdtval<-0.9990) bdtval = -0.9999;
+      if (bdtval >0.9999) bdtval =  0.9999;
+      plot1D("h_cr1_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (t1metphicorrmt>mtcut)
+	plot1D("h_cr1_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
+      if (bdtval>bdt_cut[ibdt]) {
+	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      }
+      if (bdtval>bdt_cut_hm[ibdt]) {
+	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_hm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      } 
+      if (bdtval>bdt_cut_lm[ibdt]) {
+	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_lm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+      } 
+    }
+  }
   //MT
   //binning for mT plots
   nbins = 30;
@@ -1072,3 +1171,4 @@ void StopTreeLooper::makeZPlots( float evtweight, std::map<std::string, TH1F*> &
 }
 
 
+  
