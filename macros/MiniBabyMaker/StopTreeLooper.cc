@@ -143,19 +143,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     }
 
-    const int NREG = 6;
-    TMVA::Reader* reader[NREG];
+    const int NREG_T2tt = 6;
+    const int NREG_T2bw = 5;
+    TMVA::Reader* reader_T2tt[NREG_T2tt];
+    TMVA::Reader* reader_T2bw[3][NREG_T2bw];
     if ( __apply_mva ) {
-        for (int i=1; i < NREG ; i++){
-            reader[i] = new TMVA::Reader( "!Color:!Silent" );
-            reader[i]->AddVariable("mini_met", &met_);
-            reader[i]->AddVariable("mini_mt2w", &mt2w_);
-            reader[i]->AddVariable("mini_chi2", &chi2_);
-            reader[i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
-            reader[i]->AddVariable("mini_dphimjmin", &dphimjmin_);
-            //		  reader[i]->AddVariable("mini_pt_b", &pt_b_);
-            //		  reader[i]->AddVariable("mini_lep1pt", &lep1pt_);
-            //		  reader[i]->AddVariable("mini_nb", &nb_);
+        for (int i=1; i < NREG_T2tt ; i++){
+            reader_T2tt[i] = new TMVA::Reader( "!Color:!Silent" );
+            reader_T2tt[i]->AddVariable("mini_met", &met_);
+            reader_T2tt[i]->AddVariable("mini_mt2w", &mt2w_);
+            if ( i != 5 )
+                reader_T2tt[i]->AddVariable("mini_chi2", &chi2_);
+            reader_T2tt[i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
+            reader_T2tt[i]->AddVariable("mini_dphimjmin", &dphimjmin_);
+            if ( i == 5 )
+                reader_T2tt[i]->AddVariable("mini_pt_b", &pt_b_);
 
             TString dir, prefix;
             dir    = "/home/users/magania/stop/SingleLepton2012/MVA/weights/";
@@ -164,8 +166,35 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             prefix += "_BDT";
 
             TString weightfile = dir + prefix + TString(".weights.xml");
-            reader[i]->BookMVA( "BDT" , weightfile );
+            reader_T2tt[i]->BookMVA( "BDT" , weightfile );
         }
+
+        for (int j=0; j < 3; j++){
+            float x;
+            switch(j){
+                case 0: x=0.25;break;
+                case 1: x=0.50;break;
+                case 2: x=0.75;break;
+                default: x=0.;
+            }
+            for (int i=1; i < NREG_T2bw ; i++){
+                if ( j==0 && i==1 ) continue;
+                if ( j!=2 && i==4 ) continue;
+                reader_T2bw[j][i] = new TMVA::Reader( "!Color:!Silent" );
+                reader_T2bw[j][i]->AddVariable("mini_met", &met_);
+                reader_T2bw[j][i]->AddVariable("mini_mt2w", &mt2w_);
+                reader_T2bw[j][i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
+                reader_T2bw[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
+                reader_T2bw[j][i]->AddVariable("mini_pt_b", &pt_b_);
+                reader_T2bw[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
+
+                TString dir    = "/home/users/magania/stop/SingleLepton2012/MVA/weights/";
+                TString weightfile = Form("classification_T2bw_%d_%.2f_BDT.weights.xml",i,x);
+
+                reader_T2bw[j][i]->BookMVA( "BDT" , dir+weightfile );
+            }
+        }
+
     }
 
     //-----------------------------------
@@ -533,12 +562,20 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             rand_       = aleatorio.Uniform(0.0,1.0);
 
-            for ( int i=0; i < NREG; i++){
+            for ( int i=0; i < NREG_T2tt; i++){
                 float bdtval = 0;
                 if ( __apply_mva && i>0 )
-                    bdtval = reader[i]->EvaluateMVA( "BDT" );
+                    bdtval = reader_T2tt[i]->EvaluateMVA( "BDT" );
                 bdt_.push_back(bdtval);
             }
+
+            for ( int j=0; j < 3; j++)
+                for ( int i=0; i < NREG_T2bw; i++){
+                    float bdtval = 0;
+                    if ( __apply_mva && i>0 && !(j==0&&i==1) && !(j!=2 && i==4))
+                        bdtval = reader_T2bw[j][i]->EvaluateMVA( "BDT" );
+                    bdt_.push_back(bdtval);
+                }
 
             // fill me up
             nEventsPass++;
