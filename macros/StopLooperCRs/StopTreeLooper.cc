@@ -835,16 +835,16 @@ void StopTreeLooper::makeCR4Plots( float evtweight, std::map<std::string, TH1F*>
       if (t1metphicorrmt>mtcut)
 	plot1D("h_cr4_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag_dl, bdtval, evtweight, h_1d, 50, -1., 1.);
       if (bdtval>bdt_cut[ibdt]) {
-	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_mt"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr4_mt_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr4_mt_count_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_hm[ibdt]) {
-	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_hm_mt"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr4_mt_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr4_mt_count_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_lm[ibdt]) {
-	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_lm_mt"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr4_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr4_mt_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag_dl, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr4_mt_count_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag_dl, mt_count, evtweight, h_1d, 2, 0, 2);
       }
     }
   }
@@ -921,16 +921,16 @@ void StopTreeLooper::makeCR5Plots( float evtweight, std::map<std::string, TH1F*>
       if (t1metphicorrmt>mtcut)
 	plot1D("h_cr5_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
       if (bdtval>bdt_cut[ibdt]) {
-	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr5_mt_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr5_mt_count_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_hm[ibdt]) {
-	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_hm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr5_mt_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr5_mt_count_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_lm[ibdt]) {
-	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_lm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr5_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr5_mt_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr5_mt_count_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
     }
   }
@@ -1001,16 +1001,16 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
       if (t1metphicorrmt>mtcut)
 	plot1D("h_sig_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
       if (bdtval>bdt_cut[ibdt]) {
-	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_sig_mt_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_sig_mt_count_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_hm[ibdt]) {
-	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_hm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_sig_mt_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_sig_mt_count_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_lm[ibdt]) {
-	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_lm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_sig_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_sig_mt_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_sig_mt_count_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
     }
   }
@@ -1091,16 +1091,16 @@ void StopTreeLooper::makeCR1Plots( float evtweight, std::map<std::string, TH1F*>
       if (t1metphicorrmt>mtcut)
 	plot1D("h_cr1_mttail_bdt"+tag_bdt[ibdt]+tag_selection+flav_tag, bdtval, evtweight, h_1d, 50, -1., 1.);
       if (bdtval>bdt_cut[ibdt]) {
-	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr1_mt_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr1_mt_count_bdtcut"+tag_bdt[ibdt]+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       }
       if (bdtval>bdt_cut_hm[ibdt]) {
-	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_hm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_hm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr1_mt_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr1_mt_count_bdtcut"+tag_bdt[ibdt]+"_hm"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       } 
       if (bdtval>bdt_cut_lm[ibdt]) {
-	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_lm_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
-	plot1D("h_cr1_bdtcut"+tag_bdt[ibdt]+"_lm_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+	plot1D("h_cr1_mt_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+	plot1D("h_cr1_mt_count_bdtcut"+tag_bdt[ibdt]+"_lm"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
       } 
     }
   }
