@@ -572,8 +572,10 @@ bool passLepPlusIsoTrkSelection(bool isData)
 
   //pass isolated track requirement
   //unfortunately changed default value to 9999.
-  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
-  //  if ( passIsoTrkVeto_v4() ) return false;
+  //  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
+  if ( passIsoTrkVeto_v4() ) return false;
+  if ( stopt.pfcandpt5looseZ()  > 9990.) return false;
+  if ( stopt.pfcandptOS10looseZ()  > 9990.) return false;
 
   return true;
 
