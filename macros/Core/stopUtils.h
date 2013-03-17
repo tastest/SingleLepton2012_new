@@ -53,7 +53,7 @@ bool passIsoTrkVeto_v3();
 bool passIsoTrkVeto_v4();
 bool passSingleLeptonSelection(bool isData);
 bool passDileptonSelection(bool isData);
-bool passLepPlusTauSelection(bool isData)
+bool passLepPlusTauSelection(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
 bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
 
