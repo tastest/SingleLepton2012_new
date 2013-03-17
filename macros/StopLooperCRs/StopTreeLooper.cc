@@ -400,8 +400,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       else tag_zcut = "_ignore";
 
       //event with true truth-level track
+      //and events with true truth-level tau
       bool hastruetrk = false;
-      if (stopt.nleps()==2 && abs(stopt.mclep2().Eta())<2.5)  {
+      bool hastruetau = false;
+      if (stopt.nleps()>1 && abs(stopt.mclep2().Eta())<2.5)  {
 	//check if second lepton is e/mu pT>5GeV
 	if (abs(stopt.mcid2())<14 && stopt.mclep2().Pt()>5.) hastruetrk = true;
 	//if second lepton is tau 
@@ -409,14 +411,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	if (abs(stopt.mcid2())>14) {  
 	  if (stopt.mcdecay2()==2 && stopt.mctaudpt2()>5.) hastruetrk = true;
 	  if (stopt.mcdecay2()==1 && stopt.mcndec2()==1 && stopt.mctaudpt2()>10.) hastruetrk = true;
+	  //pt requirement on tau veto is 20 GeV
+	  if (stopt.mctaudvis2().Pt()>20.) hastruetau = true;
 	}
       }
       string tag_truetrk = hastruetrk ? "_wtruetrk" : "_notruetrk";
-
-      //event with true truth-level tau
-      bool hastruetau = false;
-      //pt requirement on hadronic tau veto is 20 GeV
-      if (abs(stopt.mcid2())>14 && stopt.mclep2().Pt()>20.) hastruetau = true;
       string tag_truetau = hastruetau ? "_wtruetau" : "_notruetau";
 
       //flavor types
