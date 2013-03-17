@@ -488,6 +488,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_met[im]  , flav_tag_sl, mtcut[im] );
 	    //store information to determine fraction of events with true iso. trk or a tau
 	    if ( name.Contains("tt") && stopt.nleps()>1 ) {
+	      //truth track information
 	      makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk+tag_met[im], flav_tag_sl, mtcut[im] );
 	      makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetau+tag_met[im], flav_tag_sl, mtcut[im] );
 	      makeSIGPlots( evtweight*trigweight, h_1d_sig, tag_isotrk+tag_btag+tag_truetrk+tag_truetau+tag_met[im], 
@@ -1021,7 +1022,12 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   x_ovflw = h_xmax-0.001;
   plot1D("h_sig_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
-
+  //Corrected jet counting with simple overlap removal
+  if ( stopt.nleps()>1 ) {
+    string tag_kbin = (n_ljets<4) ? "_K3" : "_K4";
+    plot1D("h_sig_mt"      +tag_kbin+tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+    plot1D("h_sig_mt_count"+tag_kbin+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  }
   if(dphimjmin>0.8) {
     plot1D("h_sig_mt_mindPhiJ12"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
     plot1D("h_sig_mt_count_mindPhiJ12"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);    
