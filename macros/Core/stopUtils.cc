@@ -274,6 +274,7 @@ bool passEvtSelection(TString name)
     if ( stopt.trkfail()  != 1 ) return false;
     if ( stopt.eebadsc()  != 1 ) return false;
     if ( stopt.hbhenew()  != 1 ) return false;
+    if (getdphi(stopt.t1metphicorrphi(), stopt.calometphi())>1.5) return false;
   }
 
   //at least 1 lepton
