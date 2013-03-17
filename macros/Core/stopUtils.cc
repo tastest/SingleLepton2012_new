@@ -581,6 +581,24 @@ bool passLepPlusIsoTrkSelection(bool isData)
 
 }
 
+//-------------------------------------------
+// lepton + taus selection CR5
+//-------------------------------------------
+
+bool passLepPlusTauSelection(bool isData)
+{
+
+  //at least one lepton                                                                                                                                      
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  //pass tauVeto                                                                                                                                             
+  if ( passTauVeto() ) return false;
+
+  return true;
+
+}
+
+
 bool pass_T2tt_LM(bool isData, TString name){
 
   if ( !passSingleLeptonSelection(isData) ) return false;
