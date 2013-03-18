@@ -88,7 +88,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   std::map<std::string, TH1F*> h_1d;
   std::map<std::string, TH2F*> h_2d;
   std::map<std::string, TH1F*> h_1d_cr1;
+  std::map<std::string, TH1F*> h_1d_cr2;
   std::map<std::string, TH1F*> h_1d_cr4;
+  std::map<std::string, TH1F*> h_1d_cr3;
   std::map<std::string, TH1F*> h_1d_cr5;
   std::map<std::string, TH1F*> h_1d_qg;
   std::map<std::string, TH2F*> h_2d_qg;
@@ -334,7 +336,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
          && n_ljets>=4) {
 
         float mt2_standard = MT2( stopt.t1metphicorr(), stopt.t1metphicorrphi(), stopt.lep1() , stopt.lep2() );
-
        
 	vector<int> indexLooseB=getBJetIndex(0.240, -1., -1., jetsP4, csv,lrm, 40.,2.1,false);
 
@@ -364,7 +365,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       /// CONTROL REGION OS + 3b                                                                                                                                
       /// 
       if ( dataset_CR4
-           //      && stopt.mt2wmin()<175                                                                                                                                               && stopt.t1metphicorr()>50
+           && stopt.t1metphicorr()>50
            && stopt.ngoodlep()==2
            && passDileptonSelection(isData)
            && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. )
@@ -380,7 +381,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  if(indexMediumB.size()>0)    plotCR4(evtweight*trigweight, "_1bM", h_1d_cr4, isData);
 
 	  if(indexLooseB.size()>2) {
-	    plot1D("h_TABLE_1l",  1  ,       evtweight, h_1d, 5, 0, 5);
 	    
 	    vector<int> indexFirstTight=getBJetIndex(0.898, indexLooseB.at(0), indexLooseB.at(1),jetsP4, csv,lrm , 40.,2.1,false);
 	    if(indexFirstTight.size()>0 && indexFirstTight.size()==(indexLooseB.size()-2)) {
@@ -462,6 +462,62 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  }
 	}
 
+      ///////                                                                                                                                                  
+      /// CONTROL REGION CR3 + 3b                                                                                                                                
+      /// 
+
+      if ( dataset_CR4
+           && stopt.t1metphicorr()>50
+           && stopt.ngoodlep()==2
+           && passDileptonSelection(isData)
+           && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. )
+           && n_ljets>=4
+           )
+	{
+
+          float trigweight = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
+
+	  vector<int> indexLooseB=getBJetIndex(0.240, -1., -1., jetsP4, csv, lrm , 40.,2.1, false);
+
+	  if(indexLooseB.size()>0 && indexLooseB.size()<3) plotCR3(evtweight*trigweight, "_12bL", h_1d_cr3, isData); 
+
+
+	}
+
+
+      ///////                                                                                                                                                  
+      /// CONTROL REGION CR2 + 3b                                                                                                                                
+      /// 
+
+      if ( dataset_CR4
+           && stopt.t1metphicorr()>50
+           && stopt.ngoodlep()==2
+           && passDileptonSelection(isData)
+           && (abs(stopt.id1()) != abs(stopt.id2()) || fabs( stopt.dilmass() - 91.) > 15. )
+           && n_ljets>=4
+           )
+	{
+
+	  float mt2_standard = MT2( stopt.t1metphicorr(), stopt.t1metphicorrphi(), stopt.lep1() , stopt.lep2() );
+	  if(mt2_standard>80) continue;
+
+          float trigweight = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
+
+	  vector<int> indexLooseB=getBJetIndex(0.240, -1., -1., jetsP4, csv, lrm , 40.,2.1, false);
+
+	  if(indexLooseB.size()>2) {
+	    
+	    vector<int> indexFirstTight=getBJetIndex(0.898, indexLooseB.at(0), indexLooseB.at(1),jetsP4, csv,lrm , 40.,2.1,false);
+	    if(indexFirstTight.size()>0 && indexFirstTight.size()==(indexLooseB.size()-2)) {
+	      plotCR2(evtweight*trigweight, "_3bLT", h_1d_cr2, isData);
+	      //	      plotCR5(evtweight*trigweight, "_3bLT", h_1d_cr5, isData);
+	    }
+	  }
+
+
+
+	}
+
 
 
 
@@ -505,10 +561,28 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   /////
   /////
 
+  outfile.mkdir("CR2");
+  outfile.cd("CR2");
+
+  for(it1d=h_1d_cr2.begin(); it1d!=h_1d_cr2.end(); it1d++) {
+
+    it1d->second->Write();
+    delete it1d->second;
+  }
+
   outfile.mkdir("CR1");
   outfile.cd("CR1");
 
   for(it1d=h_1d_cr1.begin(); it1d!=h_1d_cr1.end(); it1d++) {
+
+    it1d->second->Write();
+    delete it1d->second;
+  }
+
+  outfile.mkdir("CR3");
+  outfile.cd("CR3");
+
+  for(it1d=h_1d_cr3.begin(); it1d!=h_1d_cr3.end(); it1d++) {
 
     it1d->second->Write();
     delete it1d->second;
@@ -623,6 +697,29 @@ void StopTreeLooper::classify3B(float evtweight, string tag_selection, std::map<
   if(nUnk!=0) myClass=15;
 
   plot1D("h_myclass"+tag_selection,    myClass,       evtweight, h_1d, 16, 0, 16);
+
+}
+
+void StopTreeLooper::plotCR2(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData) {
+
+
+  float mt2_standard = MT2( stopt.t1metphicorr(), stopt.t1metphicorrphi(), stopt.lep1() , stopt.lep2() );
+
+  plot1D("cr2_mt2"+tag_selection,   mt2_standard ,       evtweight, h_1d, 100,  0, 200);
+  plot1D("cr2_met"+tag_selection,   stopt.t1metphicorr() ,       evtweight, h_1d, 100, 0, 300);
+  plot1D("cr2_njets"+tag_selection,  jetsP4.size() ,       evtweight, h_1d, 10,  1., 11.);
+
+}
+
+
+void StopTreeLooper::plotCR3(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData) {
+
+
+  float mt2_standard = MT2( stopt.t1metphicorr(), stopt.t1metphicorrphi(), stopt.lep1() , stopt.lep2() );
+
+  plot1D("cr3_mt2"+tag_selection,   mt2_standard ,       evtweight, h_1d, 100,  0, 200);
+  plot1D("cr3_met"+tag_selection,   stopt.t1metphicorr() ,       evtweight, h_1d, 100, 0, 300);
+  plot1D("cr3_njets"+tag_selection,  jetsP4.size() ,       evtweight, h_1d, 10,  1., 11.);
 
 }
 

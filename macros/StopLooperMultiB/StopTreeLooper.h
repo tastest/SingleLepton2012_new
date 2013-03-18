@@ -27,10 +27,11 @@ class StopTreeLooper {
 	void studyIsoTaus(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
 	void classify3B(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData, bool doLRM);
 
-	void plotCR2(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
+	void plotCR2(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
         void plotCR4(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
         void plotCR5(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
         void plotCR1(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
+	void plotCR3(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
 
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
