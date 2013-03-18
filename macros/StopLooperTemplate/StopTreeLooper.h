@@ -23,6 +23,15 @@ class StopTreeLooper {
         StopTreeLooper();
         ~StopTreeLooper();
 
+	void studyIsoTrack(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
+	void studyIsoTaus(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
+	void classify3B(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData, bool doLRM);
+
+	void plotCR2(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
+        void plotCR4(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
+        void plotCR5(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
+        void plotCR1(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, bool isData);
+
         void setOutFileName(string filename); 
         void loop(TChain *chain, TString name);
 
@@ -37,7 +46,12 @@ class StopTreeLooper {
 	float min_mtpeak;
 	float max_mtpeak; 
 
-	std::vector<LorentzVector> * myPfJets;
+	vector<LorentzVector> jetsP4;
+        vector<float> csv;
+        vector<float> mc3;
+        vector<float> mc1;
+        vector<float> sigma;
+        vector<float> lrm;
 
 };
 
