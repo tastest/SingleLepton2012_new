@@ -216,6 +216,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // remove the runs that are bad for the pixel alignement
       //      if(stopt.run()>=207883 && stopt.run()<=208307) continue;
 
+      if(stopt.indexfirstGoodVertex_()) continue;
+
       //---------------------------------------------------------------------------- 
       // determine event weight
       // make 2 example histograms of nvtx and corresponding weight
@@ -258,6 +260,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       mc3.clear();
       mc1.clear();
       lrm.clear();
+      chm.clear();
+      neu.clear();
 
       int n_ljets=0;
       int n_taujets=0;
@@ -266,7 +270,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         if( stopt.pfjets().at(i).pt()<30 )  continue;
         if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
-	if( stopt.pfjets_beta2_0p5().at(i) < 0.2) continue;
+
+	//	if( stopt.pfjets_beta2_0p5().at(i) < 0.2) continue;
+	bool pass5xPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mva5xPUid().at(i),0);
+        if(!pass5xPUid) continue;              
 
 	
 	float csv_nominal=isData ? stopt.pfjets_csv().at(i)
@@ -282,6 +289,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         mc1.push_back( stopt.pfjets_mcflavorAlgo().at(i) );
         sigma.push_back( stopt.pfjets_sigma().at(i) );
         lrm.push_back( stopt.pfjets_lrm().at(i));
+        chm.push_back( stopt.pfjets_chm().at(i));
+        neu.push_back( stopt.pfjets_neu().at(i));
 
 	n_ljets++;
 	n_taujets++;
@@ -378,13 +387,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  vector<int> indexLooseB=getBJetIndex(0.240, -1., -1., jetsP4, csv, lrm , 40.,2.1, false);
 	  vector<int> indexMediumB=getBJetIndex(0.679, -1., -1., jetsP4, csv, lrm , 40.,2.1, false);
 	  
-	  if(indexMediumB.size()>0)    plotCR4(evtweight*trigweight, "_1bM", h_1d_cr4, isData);
+	  if(indexMediumB.size()>0)    {
+	    plotCR4(evtweight*trigweight, "_1bM", h_1d_cr4, isData);
+	    if((abs(stopt.id1()) == 11 )) plotCR4(evtweight*trigweight, "_el_1bM", h_1d_cr4, isData);
+	    if((abs(stopt.id1()) == 13 )) plotCR4(evtweight*trigweight, "_mu_1bM", h_1d_cr4, isData);
+	  }
 
 	  if(indexLooseB.size()>2) {
 	    
 	    vector<int> indexFirstTight=getBJetIndex(0.898, indexLooseB.at(0), indexLooseB.at(1),jetsP4, csv,lrm , 40.,2.1,false);
 	    if(indexFirstTight.size()>0 && indexFirstTight.size()==(indexLooseB.size()-2)) {
 	      plotCR4(evtweight*trigweight, "_3bLT", h_1d_cr4, isData);
+
+	      if((abs(stopt.id1()) == 11 )) plotCR4(evtweight*trigweight, "_el_3bLT", h_1d_cr4, isData);
+	      if((abs(stopt.id1()) == 13 )) plotCR4(evtweight*trigweight, "_mu_3bLT", h_1d_cr4, isData);
+
 	    }
 
 	  }
@@ -717,6 +734,8 @@ void StopTreeLooper::plotCR3(float evtweight, string tag_selection , std::map<st
 
   float mt2_standard = MT2( stopt.t1metphicorr(), stopt.t1metphicorrphi(), stopt.lep1() , stopt.lep2() );
 
+  //  if(mt2_standard>120)  cout << "RUN " << stopt.run() << " lumi " << stopt.lumi() << " event " << stopt.event() << endl;
+
   plot1D("cr3_mt2"+tag_selection,   mt2_standard ,       evtweight, h_1d, 100,  0, 200);
   plot1D("cr3_met"+tag_selection,   stopt.t1metphicorr() ,       evtweight, h_1d, 100, 0, 300);
   plot1D("cr3_njets"+tag_selection,  jetsP4.size() ,       evtweight, h_1d, 10,  1., 11.);
@@ -733,19 +752,33 @@ void StopTreeLooper::plotCR4(float evtweight, string tag_selection , std::map<st
     if( jetsP4.at(i).pt()<30 )  continue;
     if( fabs(jetsP4.at(i).eta())>2.4 )  continue;
 
-    if (csv.at(i) > 0.240) btagLoose++; 
-    if (csv.at(i) > 0.240) plot1D("cr4_eta_jets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
-    if (csv.at(i) > 0.240) plot1D("cr4_pt_jets"+tag_selection,  jetsP4.at(i).pt() ,       evtweight, h_1d, 100,  0., 300.);
-    if (csv.at(i) > 0.240) plot1D("cr4_discr_jets"+tag_selection,  csv.at(i),       evtweight, h_1d, 100,  0., 1.);
+    if (csv.at(i) > 0.240 && jetsP4.at(i).pt()>40 && fabs(jetsP4.at(i).eta())<2.1) {
+      btagLoose++; 
 
-    if (csv.at(i) < 0.240) plot1D("cr4_eta_nonbjets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
-
-    if (csv.at(i) > 0.240) {
+      plot1D("cr4_eta_jets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
+      plot1D("cr4_pt_jets"+tag_selection,  jetsP4.at(i).pt() ,       evtweight, h_1d, 100,  0., 300.);
+      plot1D("cr4_discr_jets"+tag_selection,  csv.at(i),       evtweight, h_1d, 100,  0., 1.);    
+      plot1D("cr4_lrm_jets"+tag_selection,  lrm.at(i),       evtweight, h_1d, 100,  0., 0.5);
+      plot1D("cr4_chm_jets"+tag_selection,  chm.at(i),       evtweight, h_1d, 100,  0., 100.);
+      plot1D("cr4_neu_jets"+tag_selection,  neu.at(i),       evtweight, h_1d, 100,  0., 100.);
 
       float yProd= stopt.lep1().Rapidity()*jetsP4.at(i).Rapidity() ;
       plot1D("cr4_yProd"+tag_selection,  yProd ,       evtweight, h_1d, 100, -5., 5.);
-
     }
+
+    if (csv.at(i) < 0.240) {
+      if(stopt.id2()!=(-1)) {
+	if(deltaR(stopt.pfjets().at(i).eta() , stopt.pfjets().at(i).phi() , stopt.lep2().eta(), stopt.lep2().phi())<0.4) continue; 
+     
+	plot1D("cr4_eta_nonbjets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
+	plot1D("cr4_discr_nonbjets"+tag_selection,  csv.at(i),       evtweight, h_1d, 100,  -1.5, 1.);
+	plot1D("cr4_lrm_nonbjets"+tag_selection,  lrm.at(i),       evtweight, h_1d, 100,  0., 0.5);
+	plot1D("cr4_chm_nonbjets"+tag_selection,  chm.at(i),       evtweight, h_1d, 100,  0., 100.);
+	plot1D("cr4_neu_nonbjets"+tag_selection,  neu.at(i),       evtweight, h_1d, 100,  0., 100.);
+      }
+    }
+
+    //  if(isData)  cout << "RUN " << stopt.run() << " lumi " << stopt.lumi() << " event " << stopt.event() << endl;
 
   }
 
@@ -768,6 +801,12 @@ void StopTreeLooper::plotCR4(float evtweight, string tag_selection , std::map<st
   plot1D("cr4_dilep_dr"+tag_selection,  dr ,       evtweight, h_1d, 100, 0, 6.);
   plot1D("cr4_dilep_dphi"+tag_selection,  dphi ,       evtweight, h_1d, 100, 0., 3.14);
 
+  plot1D("cr4_lep1_pt"+tag_selection,  stopt.lep1().pt() ,       evtweight, h_1d, 150, 0, 150.);
+  plot1D("cr4_lep2_pt"+tag_selection,  stopt.lep2().pt() ,       evtweight, h_1d, 100, 0, 100.);
+
+  plot1D("cr4_lep1_eta"+tag_selection,  stopt.lep1().eta() ,       evtweight, h_1d, 100, -3, 3.);
+  plot1D("cr4_lep2_eta"+tag_selection,  stopt.lep2().eta() ,       evtweight, h_1d, 100, -3, 3.);
+
 
 }
 
@@ -780,10 +819,12 @@ void StopTreeLooper::plotCR1(float evtweight, string tag_selection , std::map<st
     if( jetsP4.at(i).pt()<30 )  continue;
     if( fabs(jetsP4.at(i).eta())>2.4 )  continue;
 
-    if (csv.at(i) > 0.240) btagLoose++; 
-    if (csv.at(i) > 0.240) plot1D("cr1_eta_jets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
-    if (csv.at(i) > 0.240) plot1D("cr1_pt_jets"+tag_selection,  jetsP4.at(i).pt() ,       evtweight, h_1d, 100,  0., 300.);
-    if (csv.at(i) > 0.240) plot1D("cr1_discr_jets"+tag_selection,  csv.at(i),       evtweight, h_1d, 100,  0., 1.);
+    if (csv.at(i) > 0.240 && jetsP4.at(i).pt()>40 && fabs(jetsP4.at(i).eta())<2.1) {
+      btagLoose++;
+      plot1D("cr1_eta_jets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
+      plot1D("cr1_pt_jets"+tag_selection,  jetsP4.at(i).pt() ,       evtweight, h_1d, 100,  0., 300.);
+      plot1D("cr1_discr_jets"+tag_selection,  csv.at(i),       evtweight, h_1d, 100,  0., 1.);
+    }
 
     if (csv.at(i) < 0.240) plot1D("cr1_eta_nonbjets"+tag_selection,  jetsP4.at(i).eta() ,       evtweight, h_1d, 100,  -5., 5.);
 
