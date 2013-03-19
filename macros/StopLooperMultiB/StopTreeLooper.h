@@ -53,6 +53,8 @@ class StopTreeLooper {
         vector<float> mc1;
         vector<float> sigma;
         vector<float> lrm;
+        vector<float> chm;
+        vector<float> neu;
 
 };
 
