@@ -349,6 +349,8 @@ void singleLeptonLooper::InitBaby(){
   pflep_        = 0;
   pftaud_       = 0;
   mbb_		= -9999.;
+  mcnu_       =  0;
+  mclep_      =  0;
   mcmln_	= -9999.;
   mcmtln_	= -9999.;
   pflepmindrj_   = 9999.;
@@ -1531,9 +1533,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	mctaudvis2_   =  0;
 	mctaudid1_  = -1;
 	mctaudid2_  = -1;
-	//variables for single lepton studies
-	mcnu_       =  0;
-	mclep_      =  0;
 
 	//-----------------------------------------------------
 	// store single gen lepton info
