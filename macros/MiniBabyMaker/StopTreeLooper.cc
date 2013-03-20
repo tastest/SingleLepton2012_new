@@ -522,10 +522,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		     && nb_>=1) ? 1 : 0; 
             // pass CR1 (lepton+isotrack) control region preselection
             cr5_ = ( dataset_1l 
-		     && passOneLeptonSelection(isData) 
-		     && (passisotrk_ == 0 || passtauveto_ == 0 )
+		     && ( passLepPlusIsoTrkSelection(isData) || passLepPlusTauSelection(isData) )
 		     && nb_>=1) ? 1 : 0; 
-
             // -- WH+MET analysis regions
             // signal region
             whsig_      = ( dataset_1l 
