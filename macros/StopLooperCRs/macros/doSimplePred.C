@@ -96,15 +96,32 @@ void doSimplePred() {
   float e_2ndtauveto = 0.07;
 
   //dil uncertainty from MC variations - to cover the range of variations from scale up/down
-  float e_dl_vars[NSR] = {0.25, 0.40, 0.40, 0.40};		
+  //high mass values
+  //  float e_dl_vars[NSR] = {0.25, 0.40, 0.50, 0.60};		
+  //low mass values
+  float e_dl_vars[NSR] = {0.15, 0.20, 0.35, 0.50};
 
   //from closure tests in CR1 - W+Jets control sample
   //THESE NUMBERS NEED TO BE UPDATED
-  float in_ttp_wj_sf[NSR] = { 1.3, 1.3, 1.3, 1.3 };
-  float in_ttp_wjets_aunc[NSR] = { 0.3, 0.3, 0.3, 0.3 };
+  //constant numbers
+  // float in_ttp_wj_sf[NSR] = { 1.3, 1.3, 1.3, 1.3 };
+  // float in_ttp_wjets_aunc[NSR] = { 0.3, 0.3, 0.3, 0.3 };
+  //low mass numbers --- repeat the last one
+  // float in_ttp_wj_sf[NSR] = { 1.102,  1.442,  1.439,  1.439};
+  // float in_ttp_wjets_aunc[NSR] = { 0.280,  0.508,  0.673,  0.673};
+  //high mass numbers --- repeat the last one
+  float in_ttp_wj_sf[NSR] = { 1.220,  1.310,  1.351,  1.351};
+  float in_ttp_wjets_aunc[NSR] = { 0.414,  0.542,  0.687,  0.687}; 
+
   //ftop/fW numbers used to obtain ttp_ttsl_sf from in_ttp_wj_sf
- float in_ftopW[NSR] = { 2.887,  4.579,  10.163,  20.};
- float in_ftopW_aunc[NSR] = { 0.562,  1.521,  5.826, 10.}; 
+  //note last number is cooked up -- no entries in MC
+  //High mass values
+ // float in_ftopW[NSR] = { 2.887,  4.579,  10.163,  20.};
+ // float in_ftopW_aunc[NSR] = { 0.562,  1.521,  5.826, 10.}; 
+ //low mass values
+ float in_ftopW[NSR] = { 3.894,  5.501,  9.873,  20.};
+ float in_ftopW_aunc[NSR] = { 0.591,  1.537,  4.942,  10.};
+
   //calculate SFRtop and its uncertainties (correlated part is 100% correlated with SFRwjets uncertainty)
   float ttp_ttsl_sf[NSR];
   float ttp_ttsl_sf_aunc[NSR];
