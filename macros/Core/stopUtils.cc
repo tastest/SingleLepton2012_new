@@ -605,9 +605,7 @@ bool pass_T2tt_LM(bool isData, TString name){
   if ( !passSingleLeptonSelection(isData) ) return false;
 
   if ( !passIsoTrkVeto_v4() ) return false;
-
-  // this is temporary waiting for the new babies                                                                                                                                    
-  if(!name.Contains("T2") && !passTauVeto()) return false;
+  if ( !passTauVeto() ) return false;
 
   // this is just a preselection
   if(stopt.t1metphicorr()<100) return false;
@@ -624,8 +622,10 @@ bool pass_T2tt_LM(bool isData, TString name){
 
     if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
     if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
-    // later add the MVA
-    if ( stopt.pfjets_beta2_0p5().at(ijet) < 0.2 ) continue;
+    // if( stopt.pfjets_beta2_0p5().at(ijet)<0.2 )  continue;
+    // bool passMediumPUid = passMVAJetId(stopt.pfjets().at(ijet).pt(), stopt.pfjets().at(ijet).eta(),stopt.pfjets_mvaPUid().at(ijet),1);
+    bool passTightPUid = passMVAJetId(stopt.pfjets().at(ijet).pt(), stopt.pfjets().at(ijet).eta(),stopt.pfjets_mva5xPUid().at(ijet),0);
+    if(!passTightPUid) continue;
 
     myJets.push_back(stopt.pfjets().at(ijet));
     myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
@@ -659,10 +659,8 @@ bool pass_T2tt_HM(bool isData,TString name){
   if ( !passSingleLeptonSelection(isData) ) return false;
 
   if ( !passIsoTrkVeto_v4() ) return false;
-
-  // this is temporary waiting for the new babies                                                                                                                                    
-  if(!name.Contains("T2") && !passTauVeto()) return false;
-
+  if ( !passTauVeto() ) return false;
+  
   // this is just a preselection                                                                                                                                                     
   if(stopt.t1metphicorr()<100) return false;
 
@@ -678,8 +676,10 @@ bool pass_T2tt_HM(bool isData,TString name){
 
       if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
       if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
-      // later add the MVA
-      if ( stopt.pfjets_beta2_0p5().at(ijet) < 0.2 ) continue;
+      // if( stopt.pfjets_beta2_0p5().at(ijet)<0.2 )  continue;
+      // bool passMediumPUid = passMVAJetId(stopt.pfjets().at(ijet).pt(), stopt.pfjets().at(ijet).eta(),stopt.pfjets_mvaPUid().at(ijet),1);
+      bool passTightPUid = passMVAJetId(stopt.pfjets().at(ijet).pt(), stopt.pfjets().at(ijet).eta(),stopt.pfjets_mva5xPUid().at(ijet),0);
+      if(!passTightPUid) continue;
 
       myJets.push_back(stopt.pfjets().at(ijet));
       myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
