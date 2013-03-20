@@ -298,12 +298,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	
 	if( stopt.pfjets().at(i).pt()<30 )  continue;
 	if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
-	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
+	//	if( stopt.pfjets_beta2_0p5().at(i)<0.2 )  continue;
 
 	//	bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
-	//      bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),0);
+	bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mva5xPUid().at(i),0);
 
-	//	if(!passTightPUid) continue;
+	if(!passTightPUid) continue;
 
 	n_jets++;
 	n_ljets++;
@@ -388,7 +388,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // tag_T2tt_LM -- dphi and chi2 selection
       bool passT2ttLM = (dphimjmin>0.8 && chi2min<5) ? true : false;
       string tag_T2tt_LM = passT2ttLM ? "_passT2ttLM" : "_failT2ttLM"; 
-
+      
       // tag_T2tt_HM -- add mt2w requirement
       bool passT2ttHM = (passT2ttLM && mt2wmin>200) ? true : false;
       string tag_T2tt_HM = passT2ttHM ? "_passT2ttHM" : "_failT2ttHM"; 
@@ -621,11 +621,20 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  for (int im = 0; im<NMET; im++) {
 	    if ( t1metphicorr < metcut[im] ) continue;
 	    makeCR1Plots( evtweight*trigweight, h_1d_cr5, "_preveto"+tag_met[im], flav_tag_sl, mtcut[im] );
-	    if ( !passisotrk ) {
+	    if ( passLepPlusIsoTrkSelection(isData) || passLepPlusTauSelection(isData) ) {
 	      makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_all"+tag_met[im], flav_tag_sl, mtcut[im] );
 	      // sample with only 1 lepton - this is the true CR5
 	      if ( stopt.ngoodlep() == 1 ) 
 		makeCR5Plots( evtweight*trigweight, h_1d_cr5, tag_met[im], flav_tag_sl, mtcut[im] );
+	      if ( !passTauVeto() ) 
+		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtau"+tag_met[im], flav_tag_sl, mtcut[im] );
+	      if ( passIsoTrkVeto_v4() && !passTauVeto() )
+		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtau_notrk"+tag_met[im], flav_tag_sl, mtcut[im] );
+	      if ( !passIsoTrkVeto_v4() && passTauVeto() )
+		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtrk_notau"+tag_met[im], flav_tag_sl, mtcut[im] );
+	      if ( !passIsoTrkVeto_v4() )
+		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtrk"+tag_met[im], flav_tag_sl, mtcut[im] );
+
 	    }
 	  }  
 	}//end CR5 selection 
