@@ -80,7 +80,7 @@ void doSimplePred() {
   string selection[NSR] = {"_met150", "_met200", "_met250", "_met300"};    
   string trkiso_tag = "_wisotrk";
   string ttbar_tag = "";
-  string samplename[NSR] = {"LM SRB", "LM SRC", "LM SRD", "LM SRF"};
+  string samplename[NSR] = {"HM SRB", "HM SRC", "HM SRD", "HM SRF"};
 
   //Inputs
   //uncertainty on the w+jets and rare background normalization - the same for all signal regions
@@ -93,18 +93,18 @@ void doSimplePred() {
   //unc on 2nd lep veto for dil -from the T&P studies (applies only to those where it matter)
   float e_2ndlepveto = 0.06;
   //unc on tau veto - guess for now
-  float e_2ndtauveto = 0.10;
+  float e_2ndtauveto = 0.07;
 
   //dil uncertainty from MC variations - to cover the range of variations from scale up/down
-  float e_dl_vars[NSR] = {0.1, 0.15, 0.25, 0.30};		
+  float e_dl_vars[NSR] = {0.25, 0.40, 0.40, 0.40};		
 
   //from closure tests in CR1 - W+Jets control sample
   //THESE NUMBERS NEED TO BE UPDATED
   float in_ttp_wj_sf[NSR] = { 1.3, 1.3, 1.3, 1.3 };
   float in_ttp_wjets_aunc[NSR] = { 0.3, 0.3, 0.3, 0.3 };
   //ftop/fW numbers used to obtain ttp_ttsl_sf from in_ttp_wj_sf
-  float in_ftopW[NSR] = { 4.276,  5.731,  9.297, 10.}; 
-  float in_ftopW_aunc[NSR] = { 0.637,  1.568,  4.625, 5.}; 
+ float in_ftopW[NSR] = { 2.887,  4.579,  10.163,  20.};
+ float in_ftopW_aunc[NSR] = { 0.562,  1.521,  5.826, 10.}; 
   //calculate SFRtop and its uncertainties (correlated part is 100% correlated with SFRwjets uncertainty)
   float ttp_ttsl_sf[NSR];
   float ttp_ttsl_sf_aunc[NSR];
@@ -241,6 +241,28 @@ void doSimplePred() {
     e_ttp_wjets_comb[isr] = sqrt( pow( (h_wjets_tmp->GetBinError(TAIL)/h_wjets_tmp->GetBinContent(TAIL)), 2) +
 				  pow( (h_wjets_tmp->GetBinError(PEAK)/h_wjets_tmp->GetBinContent(PEAK)), 2) ) * 
       ttp_wjets_comb[isr];
+    //to check what we get before the b-tagging requirement
+    // TH1F *h_mc_wj_prebtag[NLEP];
+
+    // for (int il=0; il<NLEP; ++il) {
+    //   h_mc_wj_prebtag[il] = (TH1F*)mc_sl[WJETS]->Get(Form("%s_prebtag%s%s",histoname.c_str(),
+    // 							selection[isr].c_str(),
+    // 							leptag[il].c_str()));
+    //   if (h_mc_wj_prebtag[il]==0) {
+    // 	h_mc_wj_prebtag[il] = (TH1F*)mc_sl[0]->Get(Form("%s_prebtag%s%s",histoname.c_str(),
+    // 							selection[isr].c_str(),
+    // 							leptag[il].c_str()));
+    // 	h_mc_wj_prebtag[il]->SetName(Form("h_mc_wj_prebtag%s", leptag[il].c_str()));
+    // 	zeroHist(h_mc_wj_prebtag[il]);
+    //   }    
+    // }
+
+    // float n_wj = h_mc_wj_prebtag[MUO]->GetBinContent(TAIL) + h_mc_wj_prebtag[ELE]->GetBinContent(TAIL) 
+    //   + h_mc_wj_prebtag[MUO]->GetBinContent(TAIL) + h_mc_wj_prebtag[ELE]->GetBinContent(TAIL);
+    // float d_wj = h_mc_wj_prebtag[MUO]->GetBinContent(PEAK) + h_mc_wj_prebtag[ELE]->GetBinContent(PEAK) 
+    //   + h_mc_wj_prebtag[MUO]->GetBinContent(PEAK) + h_mc_wj_prebtag[ELE]->GetBinContent(PEAK);
+    // float ttp_prebtag_wj = n_wj/d_wj;
+    // cout<<ttp_prebtag_wj<<" "<<ttp_wjets_comb[isr]<<endl;
     float ttp_wjets[NLEP] = {ttp_wjets_comb[isr],ttp_wjets_comb[isr]};
     if (doverbose) cout<<"WJETS TTP "<<ttp_wjets_comb[isr]<<endl;
     //from b-veto control sample - fully correlated with electron 
@@ -448,7 +470,8 @@ void doSimplePred() {
       //sig/ctrl dominates but include scale factor unc because it matters in low stat regions
       e_pred_top1l[il][isr] = pred_top1l[il][isr]*sqrt( pow(ttp_tt_runc[il],2) + pow(e_sf_rel[il],2) );
       pred_wjets[il][isr] = sf[il][isr]*ttp_wjets_corr[il]*wjets[il];
-      e_pred_wjets[il][isr] = pred_wjets[il][isr]*sqrt( pow(ttp_wjets_runc[il],2) + pow(e_sf_rel[il],2) );
+      e_pred_wjets[il][isr] = pred_wjets[il][isr]>0. ? pred_wjets[il][isr]*sqrt( pow(ttp_wjets_runc[il],2) + pow(e_sf_rel[il],2) )
+	: 0.4;
       pred_rare[il][isr] = mc_rare[il];
       e_pred_rare[il][isr] = pred_rare[il][isr]*xs_unc_rare;
       pred_ttdl[il][isr] = pv_sf[il][isr]*mc_dl[il];
@@ -593,10 +616,11 @@ void doSimplePred() {
     			    pow( (pred_top1l[ELE][isr]*e_sf_rel[ELE]), 2) + 
     			    pow( (pred_top1l[MUO][isr]*e_sf_rel[MUO]), 2) ); 
     pred_wjets_comb[isr] = pred_wjets[MUO][isr] + pred_wjets[ELE][isr];
-    e_pred_wjets_comb[isr] = sqrt( pow( ((pred_wjets[ELE][isr]*ttp_wjets_runc[ELE])+
-					 (pred_wjets[MUO][isr]*ttp_wjets_runc[MUO])), 2) +
-				   pow( (pred_wjets[ELE][isr]*e_sf_rel[ELE]), 2) + 
-				   pow( (pred_wjets[MUO][isr]*e_sf_rel[MUO]), 2) ); 
+    e_pred_wjets_comb[isr] = pred_wjets_comb[isr]>0. ? sqrt( pow( ((pred_wjets[ELE][isr]*ttp_wjets_runc[ELE])+
+								   (pred_wjets[MUO][isr]*ttp_wjets_runc[MUO])), 2) +
+							     pow( (pred_wjets[ELE][isr]*e_sf_rel[ELE]), 2) + 
+							     pow( (pred_wjets[MUO][isr]*e_sf_rel[MUO]), 2) ) 
+      : 0.6; 
     pred_rare_comb[isr] = pred_rare[MUO][isr] + pred_rare[ELE][isr];
     e_pred_rare_comb[isr] = e_pred_rare[MUO][isr] + e_pred_rare[ELE][isr];
     pred_ttdl_comb[isr] = pred_ttdl[MUO][isr] + pred_ttdl[ELE][isr];
@@ -690,12 +714,12 @@ void doSimplePred() {
   cout<<endl;
   cout<<"\\hline"<<endl;
   cout<<"\\hline"<<endl;
-  printf("%s \t ","$TTP_{wjet}$");
+  printf("%s \t ","$R_{wjet}$");
   for (int isr=0; isr<NSR; ++isr) 
     printf(" & $%.3f \\pm %.3f$ ", ttp_wjets_comb[isr], e_ttp_wjets_comb[isr]);
   printf(" \\\\\n");
   cout<<"\\hline"<<endl;
-  printf("%s \t ","$TTP_{ttsl}$");
+  printf("%s \t ","$R_{top}$");
   for (int isr=0; isr<NSR; ++isr) 
     printf(" & $%.3f \\pm %.3f$ ", ttp_ttsl_comb[isr], e_ttp_ttsl_comb[isr]);
   printf(" \\\\\n");
@@ -714,12 +738,12 @@ void doSimplePred() {
     printf(" & $%.3f \\pm %.3f$ ", ttp_ttsl_sf[isr], ttp_ttsl_sf_aunc[isr]);
   printf(" \\\\\n");
   cout<<"\\hline"<<endl;
-  printf("%s \t ","$SF_{top}*ttp_tt$ (from decomp. method)");
+  printf("%s \t ","$SF_{top}*R_{top}$ (from decomp. method)");
   for (int isr=0; isr<NSR; ++isr) 
     printf(" & $%.3f \\pm %.3f$ ", ttp_tt_corr[MUO][isr], ttp_tt_sf_runc[MUO][isr]*ttp_tt_corr[MUO][isr]);
   printf(" \\\\\n");
   cout<<"\\hline"<<endl;
-  printf("%s \t ","$SF_{top}*ttp_tt$ (from pess-opt av.)");
+  printf("%s \t ","$SF_{top}*R_{top}$ (from pess-opt av.)");
   for (int isr=0; isr<NSR; ++isr) 
     printf(" & $%.3f \\pm %.3f$ ", ttp_tt_av[MUO][isr], ttp_tt_av_runc[MUO][isr]*ttp_tt_av[MUO][isr]);
   printf(" \\\\\n");
@@ -800,10 +824,10 @@ void doSimplePred() {
   for (int isr=0; isr<NSR; ++isr) {
     if (isr==NSR-1) printf("\t & $%.1f \\pm %.1f$ ($%.0f$\\%%) \\\\ \n",
 			   pred_wjets[MUO][isr],e_pred_wjets[MUO][isr],
-			   e_pred_wjets[MUO][isr]/pred_wjets[MUO][isr]*100.);
+			   pred_wjets[MUO][isr]>0. ? e_pred_wjets[MUO][isr]/pred_wjets[MUO][isr]*100. : 100.);
     else printf("\t & $%.1f \\pm %.1f$ ($%.0f$\\%%) ",
 		pred_wjets[MUO][isr],e_pred_wjets[MUO][isr],
-		e_pred_wjets[MUO][isr]/pred_wjets[MUO][isr]*100.);
+		pred_wjets[MUO][isr]>0. ? e_pred_wjets[MUO][isr]/pred_wjets[MUO][isr]*100. : 100.);
   }
   printf("Rare \t ");
   for (int isr=0; isr<NSR; ++isr) {
@@ -855,10 +879,10 @@ void doSimplePred() {
   for (int isr=0; isr<NSR; ++isr) {
     if (isr==NSR-1) printf("\t & $%.1f \\pm %.1f$ ($%.0f$\\%%) \\\\ \n",
 			   pred_wjets[ELE][isr],e_pred_wjets[ELE][isr],
-			   e_pred_wjets[ELE][isr]/pred_wjets[ELE][isr]*100.);
+			   pred_wjets[ELE][isr]>0. ? e_pred_wjets[ELE][isr]/pred_wjets[ELE][isr]*100. : 100.);
     else printf("\t & $%.1f \\pm %.1f$ ($%.0f$\\%%) ",
 		pred_wjets[ELE][isr],e_pred_wjets[ELE][isr],
-		e_pred_wjets[ELE][isr]/pred_wjets[ELE][isr]*100.);
+		pred_wjets[ELE][isr]>0. ? e_pred_wjets[ELE][isr]/pred_wjets[ELE][isr]*100. : 100.);
   }
   printf("Rare \t ");
   for (int isr=0; isr<NSR; ++isr) {
@@ -909,10 +933,10 @@ void doSimplePred() {
   for (int isr=0; isr<NSR; ++isr) {
     if (isr==NSR-1) printf("\t & $%.1f \\pm %.1f$ ($%.0f$\\%%) \\\\ \n",
 			   pred_wjets_comb[isr],e_pred_wjets_comb[isr],
-			   e_pred_wjets_comb[isr]/pred_wjets_comb[isr]*100.);
+			   pred_wjets_comb[isr]>0. ? e_pred_wjets_comb[isr]/pred_wjets_comb[isr]*100. : 100.);
     else printf("\t & $%.1f \\pm %.1f$ ($%.0f$\\%%) ",
 		pred_wjets_comb[isr],e_pred_wjets_comb[isr],
-		e_pred_wjets_comb[isr]/pred_wjets_comb[isr]*100.);
+		pred_wjets_comb[isr]>0. ? e_pred_wjets_comb[isr]/pred_wjets_comb[isr]*100. : 100.);
   }
   printf("Rare \t ");
   for (int isr=0; isr<NSR; ++isr) {
