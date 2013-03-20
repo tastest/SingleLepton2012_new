@@ -24,7 +24,7 @@
 #include "TMath.h"
 #include <sstream>
 #include <iomanip>
-#include "upperLimits.C"
+//#include "upperLimits.C"
 
 using namespace std;
 
@@ -52,12 +52,13 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     suffix         = "_x75";
   }
 
-  //const float denom    = 50000;
-  const float lumi      = 9200;
-  const char* filename  = Form("/tas/benhoob/testFiles/%s_8TeV/merged*njets4%s.root",sample,suffix);
-  const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
-  const float btagerr   = 0.02;
+  const float lumi      = 19500;
+  const char* filename  = "/tas/cms2/stop/MiniBabies/V00-02-18__V00-03-01__BDT004__4jetsMET100MT120_T2tt/T2tt_*root";
+  const char* denomname = "/tas/cms2/stop/MiniBabies/V00-02-s18b20__V00-03-01__BDT005__4jetsMET100MT150_all/T2tt_histos/myMassDB_25GeVbins.root";
 
+  //const char* filename  = Form("/tas/benhoob/testFiles/%s_8TeV/merged*njets4%s.root",sample,suffix);
+  //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
+  //const float btagerr   = 0.02;
 
   cout << "----------------------------------------------------" << endl;
   cout << "Sample            " << sample          << endl;
@@ -122,47 +123,68 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   // preselection
   //--------------------------------------------------
 
-  TCut rho    ("rhovor>=0 && rhovor<40");
-  TCut goodlep("ngoodlep > 0 && lep1->Pt()>30");
-  TCut goodel ("leptype==0 && abs(lep1->Eta())<1.4442 && eoverpin<4.0 ");
-  TCut goodmu ("leptype==1 && abs(lep1->Eta())<2.1");
-  TCut deltapt("abs( lep1.pt() - pflep1.pt() ) < 10.0");
-  TCut iso5   ("isopf1 * lep1.pt() < 5.0");
-  TCut njets4 ("npfjets30 >= 4");
-  TCut btag1  ("nbtagscsvm>=1");
-  TCut isotrk ("pfcandpt10 > 9998. || pfcandiso10 > 0.1");
+  TCut rho("rhovor>0 && rhovor<40");
+  TCut filters("isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)");
+  TCut goodlep("ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0");
+  TCut el("leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1)");
+  TCut mu("leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1)");
+  TCut njets4("mini_njets >= 4");
+  TCut btag1("mini_nb >= 1");
+  TCut passisotrk("mini_passisotrk==1");
+  TCut tauveto("mini_passtauveto == 1");
+  TCut met100("t1metphicorr > 100");
+  TCut mt120("t1metphicorrmt > 120");
+  TCut dphi("mini_dphimjmin>0.8");
+  TCut chi2("mini_chi2<5.0");
+  TCut mt2w("mini_mt2w>200.0");
 
-  //TCut weight("sltrigweight * 0.98 * 1.45"); // trigger efficiency X btagging SF
-  TCut weight("sltrigweight * 0.98"); // trigger efficiency X btagging SF
-  //TCut weight("1"); // no per-event weights (for Maria comparison)
+  // TCut testing("event%2==0");
+  // TCut HM("mini_t2ttHM==1");
+  // TCut LM("mini_t2ttLM==1");
+  // TCut met50("t1metphicorr > 50");
+  // TCut met150("t1metphicorr > 150");
+  // TCut met200("t1metphicorr > 200");
+  // TCut met250("t1metphicorr > 250");
+  // TCut met300("t1metphicorr > 300");
+  // TCut SRA("t1metphicorr > 100 && t1metphicorrmt > 150");
+  // TCut SRB("t1metphicorr > 150 && t1metphicorrmt > 120");
 
   TCut presel;
+
+  //-------------------------------------------
+  // THESE CUTS DEFINE PRESELECTION REGION
+  //-------------------------------------------
   presel += rho;
+  presel += filters;
   presel += goodlep;
-  presel += (goodel||goodmu);
-  presel += deltapt;
-  presel += iso5;
+  presel += (el||mu);
   presel += njets4;
   presel += btag1;
-  presel += isotrk;
+  presel += passisotrk;
+  //presel += tauveto;
+  presel += met100;
+  presel += mt120;
+  presel += dphi;
+  presel += chi2;
+  //presel += mt2w;
 
-  // if( x == 25 ) presel += TCut("x==0.25");
-  // if( x == 50 ) presel += TCut("x==0.50");
-  // if( x == 75 ) presel += TCut("x==0.75");
+  TCut weight("mini_sltrigeff"); // trigger efficiency X btagging SF
 
   cout << "Using pre-selection   " << presel.GetTitle() << endl;
   cout << "Using weight          " << weight.GetTitle() << endl;
 
-  TCut   SR[7];
-  string SRname[7]={"SRA","SRB","SRC","SRD","SRE","SRF","SRG"};
+  TCut   SR[8];
+  string SRname[8]={"LM150","LM200","LM250","LM300","HM150","HM200","HM250","HM300"};
 
-  SR[0]=TCut("t1metphicorrmt > 150 && t1metphicorr > 100");
-  SR[1]=TCut("t1metphicorrmt > 120 && t1metphicorr > 150");
-  SR[2]=TCut("t1metphicorrmt > 120 && t1metphicorr > 200");
-  SR[3]=TCut("t1metphicorrmt > 120 && t1metphicorr > 250");
-  SR[4]=TCut("t1metphicorrmt > 120 && t1metphicorr > 300");
-  SR[5]=TCut("t1metphicorrmt > 120 && t1metphicorr > 350");
-  SR[6]=TCut("t1metphicorrmt > 120 && t1metphicorr > 400");
+  SR[0]=TCut("mini_met > 150.0");
+  SR[1]=TCut("mini_met > 200.0");
+  SR[2]=TCut("mini_met > 250.0");
+  SR[3]=TCut("mini_met > 300.0");
+
+  SR[4]=TCut("mini_mt2w > 200.0 && mini_met > 150.0");
+  SR[5]=TCut("mini_mt2w > 200.0 && mini_met > 200.0");
+  SR[6]=TCut("mini_mt2w > 200.0 && mini_met > 250.0");
+  SR[7]=TCut("mini_mt2w > 200.0 && mini_met > 300.0");
 
   //--------------------------------------------------
   // signal regions
@@ -177,9 +199,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  cuts.push_back(1);
   sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  cuts.push_back(1);
   sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  cuts.push_back(1);
+
   sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  cuts.push_back(1);
   sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  cuts.push_back(1);
   sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  cuts.push_back(1);
+  sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  cuts.push_back(1);
 
   const unsigned int nsig = sigcuts.size();
 
@@ -207,6 +231,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
   for( unsigned int i = 0 ; i < nsig ; ++i ){
 
+
+    //------------------------------------------------
+    // turn off point-by-point signal uncertainties
+    //------------------------------------------------
+
+    /*
     TString jesup(sigcuts.at(i));
     jesup.ReplaceAll("npfjets30"       , "njetsUp");
     jesup.ReplaceAll("t1metphicorr "   , "t1metphicorrup ");
@@ -225,13 +255,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << "Selection     : " << sigcuts.at(i) << endl;
     cout << "Selection up  : " << jesupcut      << endl;
     cout << "Selection dn  : " << jesdncut      << endl;
+    */
 
-    int   nbinsx  =   120;
-    float xmin    =     0;
-    float xmax    =  1200;
-    int   nbinsy  =   120;
-    float ymin    =     0;
-    float ymax    =  1200;
+    int   nbinsx  =      41;
+    float xmin    =   -12.5;
+    float xmax    =  1012.5;
+    int   nbinsy  =      41;
+    float ymin    =   -12.5;
+    float ymax    =  1012.5;
 
     // if( TString(sample).Contains("T2bw") ){
     //   nbinsx =   9;
@@ -263,6 +294,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     //heff[i]->Scale(1.0/denom);
     heff[i]->Divide(hdenom);
 
+    /*
     ch->Draw(Form("ml:mg>>heffup_%i",i),jesupcut*weight);
     //heffup[i]->Scale(1.0/denom);
     heffup[i]->Divide(hdenom);
@@ -270,6 +302,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     ch->Draw(Form("ml:mg>>heffdn_%i",i),jesdncut*weight);
     //heffdn[i]->Scale(1.0/denom);
     heffdn[i]->Divide(hdenom);
+    */
 
     for( unsigned int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
       for( unsigned int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
@@ -278,22 +311,23 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	//float ml = heff[i]->GetYaxis()->GetBinCenter(jbin);
 
 	float eff    = heff[i]->GetBinContent(ibin,jbin);
-	float effup  = heffup[i]->GetBinContent(ibin,jbin);
-	float effdn  = heffdn[i]->GetBinContent(ibin,jbin);
+	//float effup  = heffup[i]->GetBinContent(ibin,jbin);
+	//float effdn  = heffdn[i]->GetBinContent(ibin,jbin);
 
 	if( eff   < 1e-20 ) continue;
 
-	float dup    = effup/eff-1;
-	float ddn    = 1-effdn/eff;
-	float djes   = 0.5 * (dup+ddn);
+	// float dup    = effup/eff-1;
+	// float ddn    = 1-effdn/eff;
+	// float djes   = 0.5 * (dup+ddn);
 
-	//djes = 0.10;
+	float djes = 0.10;
 
 	hjes[i]->SetBinContent(ibin,jbin,djes);
 
 	// lumi, lepton selection, trigger, b-tagging, JES
 
-	float toterr  = sqrt( 0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr + djes*djes );
+	float toterr  = 0.1;
+	//float toterr  = sqrt( 0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr + djes*djes );
 
 	// float this_ul     = getObservedLimit( toterr , labels.at(i) );
 	// float this_ul_exp = getExpectedLimit( toterr , labels.at(i) );
@@ -306,50 +340,66 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	float this_ul_expp1;
 	float this_ul_expm1;
 
-	if( TString(labels.at(i)).Contains("SRA") ){
-	  this_ul       = getUpperLimit_SRA( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRA( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRA( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRA( toterr );
+	if( TString(labels.at(i)).Contains("LM150") ){
+	  this_ul       = 66.0;
+	  this_ul_exp   = 66.0;
+	  this_ul_expp1 = 66.0;
+	  this_ul_expm1 = 66.0;
+	  // this_ul       = getUpperLimit_SRA( toterr );
+	  // this_ul_exp   = getExpectedUpperLimit_SRA( toterr );
+	  // this_ul_expp1 = getExpectedP1UpperLimit_SRA( toterr );
+	  // this_ul_expm1 = getExpectedM1UpperLimit_SRA( toterr );
 	}
 
-	else if( TString(labels.at(i)).Contains("SRB") ){
-	  this_ul       = getUpperLimit_SRB( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRB( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRB( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRB( toterr );
+	if( TString(labels.at(i)).Contains("LM200") ){
+	  this_ul       = 44.0;
+	  this_ul_exp   = 44.0;
+	  this_ul_expp1 = 44.0;
+	  this_ul_expm1 = 44.0;
 	}
 
-	else if( TString(labels.at(i)).Contains("SRC") ){
-	  this_ul       = getUpperLimit_SRC( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRC( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRC( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRC( toterr );
+	if( TString(labels.at(i)).Contains("LM250") ){
+	  this_ul       = 19.0;
+	  this_ul_exp   = 19.0;
+	  this_ul_expp1 = 19.0;
+	  this_ul_expm1 = 19.0;
 	}
-	else if( TString(labels.at(i)).Contains("SRD") ){
-	  this_ul       = getUpperLimit_SRD( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRD( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRD( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRD( toterr );
+
+	if( TString(labels.at(i)).Contains("LM300") ){
+	  this_ul       = 8.4;
+	  this_ul_exp   = 8.4;
+	  this_ul_expp1 = 8.4;
+	  this_ul_expm1 = 8.4;
 	}
-	else if( TString(labels.at(i)).Contains("SRE") ){
-	  this_ul       = getUpperLimit_SRE( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRE( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRE( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRE( toterr );
+
+	if( TString(labels.at(i)).Contains("HM150") ){
+	  this_ul       = 15.0;
+	  this_ul_exp   = 15.0;
+	  this_ul_expp1 = 15.0;
+	  this_ul_expm1 = 15.0;
 	}
-	else if( TString(labels.at(i)).Contains("SRF") ){
-	  this_ul       = getUpperLimit_SRF( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRF( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRF( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRF( toterr );
+
+	if( TString(labels.at(i)).Contains("HM200") ){
+	  this_ul       = 10.0;
+	  this_ul_exp   = 10.0;
+	  this_ul_expp1 = 10.0;
+	  this_ul_expm1 = 10.0;
 	}
-	else if( TString(labels.at(i)).Contains("SRG") ){
-	  this_ul       = getUpperLimit_SRG( toterr );
-	  this_ul_exp   = getExpectedUpperLimit_SRG( toterr );
-	  this_ul_expp1 = getExpectedP1UpperLimit_SRG( toterr );
-	  this_ul_expm1 = getExpectedM1UpperLimit_SRG( toterr );
+
+	if( TString(labels.at(i)).Contains("HM250") ){
+	  this_ul       = 7.3;
+	  this_ul_exp   = 7.3;
+	  this_ul_expp1 = 7.3;
+	  this_ul_expm1 = 7.3;
 	}
+
+	if( TString(labels.at(i)).Contains("HM300") ){
+	  this_ul       = 5.0;
+	  this_ul_exp   = 5.0;
+	  this_ul_expp1 = 5.0;
+	  this_ul_expm1 = 5.0;
+	}
+
 
 	float xsecul        = this_ul       / ( lumi * eff );
 	float xsecul_exp    = this_ul_exp   / ( lumi * eff );
@@ -451,7 +501,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     heff[i]->GetXaxis()->SetTitle("stop mass (GeV)");
     heff[i]->GetZaxis()->SetTitle("efficiency (%)");
     heff[i]->GetZaxis()->SetTitleOffset(1.2);
-    heff[i]->GetXaxis()->SetRangeUser(200,700);
+    heff[i]->GetXaxis()->SetRangeUser(100,700);
     heff[i]->GetYaxis()->SetRangeUser(0,600);
     heff[i]->Draw("colz");
     //heff[i]->Draw("sametext");
@@ -459,7 +509,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.78,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
 
     //-------------------------------
     // cross section
@@ -511,7 +561,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.78,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
 
     //-------------------------------
     // excluded points
@@ -534,7 +584,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.71,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
 
     //-------------------------------
     // JES uncertainty
@@ -554,7 +604,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     t->DrawLatex(0.2,0.83,label);
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.71,signames.at(i).c_str());
-    t->DrawLatex(0.15,0.92,"CMS Preliminary   #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 9.7 fb^{-1}");
+    t->DrawLatex(0.15,0.92,"CMS Preliminary   #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
 
     
     /*
@@ -576,7 +626,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
     int bin = heff[i]->FindBin(300,50);
 
-    float toterr = sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
+    float toterr = 0.1; //sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
+    //float toterr = sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
     cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
     cout << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
     cout << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
