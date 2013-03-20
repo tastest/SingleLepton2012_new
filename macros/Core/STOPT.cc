@@ -421,9 +421,6 @@ namespace Stop {
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pftaud() { return stopt.pftaud(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5() { return stopt.pfcand5(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand10() { return stopt.pfcand10(); }
-	int &pfTau15_leadPtcandID() { return stopt.pfTau15_leadPtcandID(); }
-	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau15() { return stopt.pfTau15(); }
-	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau15_leadPtcand() { return stopt.pfTau15_leadPtcand(); }
 	int &pfTau_leadPtcandID() { return stopt.pfTau_leadPtcandID(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau() { return stopt.pfTau(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand() { return stopt.pfTau_leadPtcand(); }
@@ -477,55 +474,4 @@ namespace Stop {
 	vector<float> &pfjets_mva5xPUid() { return stopt.pfjets_mva5xPUid(); }
 	vector<float> &pfjets_mvaBeta() { return stopt.pfjets_mvaBeta(); }
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs() { return stopt.genbs(); }
-	float &mini_mt() { return stopt.mini_mt(); }
-	float &mini_met() { return stopt.mini_met(); }
-	int &mini_sig() { return stopt.mini_sig(); }
-	int &mini_cr1() { return stopt.mini_cr1(); }
-	int &mini_cr4() { return stopt.mini_cr4(); }
-	int &mini_cr5() { return stopt.mini_cr5(); }
-	int &mini_whsig() { return stopt.mini_whsig(); }
-	int &mini_whcr1() { return stopt.mini_whcr1(); }
-	float &mini_chi2() { return stopt.mini_chi2(); }
-	float &mini_mt2b() { return stopt.mini_mt2b(); }
-	float &mini_mt2bl() { return stopt.mini_mt2bl(); }
-	float &mini_mt2w() { return stopt.mini_mt2w(); }
-	float &mini_weight() { return stopt.mini_weight(); }
-	float &mini_nvtxweight() { return stopt.mini_nvtxweight(); }
-	float &mini_sltrigeff() { return stopt.mini_sltrigeff(); }
-	float &mini_dltrigeff() { return stopt.mini_dltrigeff(); }
-	int &mini_nb() { return stopt.mini_nb(); }
-	int &mini_njets() { return stopt.mini_njets(); }
-	int &mini_passisotrk() { return stopt.mini_passisotrk(); }
-	int &mini_passtauveto() { return stopt.mini_passtauveto(); }
-	int &mini_nlep() { return stopt.mini_nlep(); }
-	float &mini_dRleptB1() { return stopt.mini_dRleptB1(); }
-	float &mini_lep1pt() { return stopt.mini_lep1pt(); }
-	float &mini_lep1eta() { return stopt.mini_lep1eta(); }
-	float &mini_lep2pt() { return stopt.mini_lep2pt(); }
-	float &mini_lep2eta() { return stopt.mini_lep2eta(); }
-	float &mini_dilmass() { return stopt.mini_dilmass(); }
-	float &mini_mstop() { return stopt.mini_mstop(); }
-	float &mini_mlsp() { return stopt.mini_mlsp(); }
-	float &mini_x() { return stopt.mini_x(); }
-	float &mini_xsecsusy() { return stopt.mini_xsecsusy(); }
-	float &mini_htssl() { return stopt.mini_htssl(); }
-	float &mini_htosl() { return stopt.mini_htosl(); }
-	float &mini_htratiol() { return stopt.mini_htratiol(); }
-	float &mini_htssm() { return stopt.mini_htssm(); }
-	float &mini_htosm() { return stopt.mini_htosm(); }
-	float &mini_htratiom() { return stopt.mini_htratiom(); }
-	float &mini_dphimj1() { return stopt.mini_dphimj1(); }
-	float &mini_dphimj2() { return stopt.mini_dphimj2(); }
-	float &mini_dphimjmin() { return stopt.mini_dphimjmin(); }
-	float &mini_pt_b() { return stopt.mini_pt_b(); }
-	float &mini_pt_J1() { return stopt.mini_pt_J1(); }
-	float &mini_pt_J2() { return stopt.mini_pt_J2(); }
-	float &mini_bbmass() { return stopt.mini_bbmass(); }
-	float &mini_bbpt() { return stopt.mini_bbpt(); }
-	float &mini_wpt() { return stopt.mini_wpt(); }
-	float &mini_bbwdphi() { return stopt.mini_bbwdphi(); }
-	float &mini_rand() { return stopt.mini_rand(); }
-	float &mini_t2ttLM() { return stopt.mini_t2ttLM(); }
-	float &mini_t2ttHM() { return stopt.mini_t2ttHM(); }
-	vector<float> &mini_bdt() { return stopt.mini_bdt(); }
 }
