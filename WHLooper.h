@@ -49,14 +49,17 @@ class WHLooper {
   float CUT_BBMASS_CR1_HIGH_;
   float CUT_MET_PRESEL_;
   float CUT_MET_;
+  float CUT_MT_PRESEL_;
   float CUT_MT_;
   float CUT_MT2BL_;
 
   // internal vars to store
   std::vector<LorentzVector> jets_;
   std::vector<LorentzVector> bjets_;
+  std::vector<LorentzVector> jets_fwd_;
   std::vector<float> jets_csv_;
   std::vector<int> jets_idx_;
+  std::vector<int> jets_fwd_idx_;
   std::vector<int> bjets_idx_;
   int njets_;
   int njetsalleta_;
@@ -82,6 +85,7 @@ class WHLooper {
 
   // internal flags
   bool isWjets_;
+  bool isWNjets_;
   bool isTChiwh_;
   bool isttmg_;
 
