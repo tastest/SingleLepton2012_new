@@ -34,10 +34,11 @@ class Candidate : public TObject {
 
 typedef vector<Candidate> CANDIDATES;
 
+float passLRM(double pt);
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1, int iskip2);
 unsigned int getNJets(const float etacut = 2.4);
-vector<int> getBJetIndex(double discr, int iskip1, int iskip2);
+vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector> jets, vector<float> csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM);
 
 float getdltrigweight(int id1, int id2);
 float getsltrigweight(int id1, float pt, float eta);
@@ -60,6 +61,7 @@ bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
 
 bool pass_T2tt_LM(bool isData, TString name);
 bool pass_T2tt_HM(bool isData, TString name);
+bool pass_T2bw_HM(bool isData, TString name);
 
 pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc);
 

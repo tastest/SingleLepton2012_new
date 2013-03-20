@@ -25,6 +25,18 @@ using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
+float passLRM(double pt) {
+
+  float b=0.1;
+  float a=(-0.1)/(150.);
+
+  float lrmCut = a * pt +b;
+
+  return lrmCut;
+
+}
+
+
 unsigned int getNJets(const float etacut){
 
   unsigned int njets=0;
@@ -44,32 +56,31 @@ unsigned int getNJets(const float etacut){
 
 }
 
-vector<int> getBJetIndex(double discr, int iskip1, int iskip2)
+vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector>jets, vector<float>csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM)
 {
 
   vector<int> btagJets;
 
-  for ( unsigned int i=0; i<stopt.pfjets().size() ; i++) {
+  for ( int i=0; i< (int) jets.size() ; i++) {
 
-    if( stopt.pfjets().at(i).pt()<30 )  continue;
-    if( fabs(stopt.pfjets().at(i).eta())>2.4 )  continue;
-    if ( stopt.pfjets_beta2_0p5().at(i) < 0.2 ) continue;
-    if( stopt.pfjets_csv().at(i)      < discr   ) continue;
+    if( jets.at(i).pt() < ptTH)  continue;
+    if( fabs(jets.at(i).eta()) > etaTH )  continue;
+    if( csv.at(i)      < discr   ) continue;
+    if( doLRM && lrm.at(i) < passLRM(jets.at(i).pt())) continue;
 
-    // skip these indices                                                                                                                                                                                  
-    if( int(i) == iskip1 ) continue;
-    if( int(i) == iskip2 ) continue;
+    // skip these indices                                                                                                                                                          \
+                                                                                                                                                                                    
+      if( int(i) == iskip1 ) continue;
+      if( int(i) == iskip2 ) continue;
 
-    //    nbtags++;                                                                                                                                                        
-    btagJets.push_back(i);
+      //    nbtags++;                                                                                                                                                                 
+      btagJets.push_back(i);
 
   }
 
   return btagJets;
 
 }
-
-
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
 
@@ -512,9 +523,13 @@ bool passDileptonSelection(bool isData)
   if ( fabs( stopt.pflep1().Pt() - stopt.lep1().Pt() ) > 10. )  return false;
   if ( fabs( stopt.pflep2().Pt() - stopt.lep2().Pt() ) > 10. )  return false;
 
-  //information is only stored for leading lepton
+  //requirement for leading lepton
   if ( ( stopt.isopf1() * stopt.lep1().Pt() ) > 5. )  return false; 
   if ( fabs(stopt.id1())==11 && stopt.eoverpin() > 4. ) return false;
+
+  //requirement for trailing lepton
+  if ( ( stopt.isopf2() * stopt.lep2().Pt() ) > 5. )  return false; 
+  if ( fabs(stopt.id2())==11 && stopt.eoverpin2() > 4. ) return false;
 
   //barrel only electrons
   if (fabs(stopt.id1())==11 && fabs(stopt.lep1().Eta() ) > 1.4442) return false;
@@ -701,6 +716,66 @@ bool pass_T2tt_HM(bool isData,TString name){
   if(chi2>5) return false;
 
   // mt2w                                                                                                                                                                            
+  double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
+  // cut a the top mass + some resoultion effect
+  if(x_mt2w<200) return false;
+
+  return true;
+
+
+}
+
+
+
+bool pass_T2bw_HM(bool isData,TString name){
+
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  if ( !passIsoTrkVeto_v4() ) return false;
+  if ( !passTauVeto() ) return false;
+  
+  // this is just a preselection                                                                                                                                                     
+  if(stopt.t1metphicorr()<100) return false;
+
+  if(stopt.t1metphicorrmt()<120) return false;
+
+  vector<LorentzVector> myJets;
+  vector<float> myJetsTag;
+  vector<int> myJetsMC;
+  vector<float> myJetsSigma;
+  int btag;
+
+  float bpt=-1;
+
+  for (int ijet =0; ijet<(int)stopt.pfjets().size(); ijet++){
+
+      if ( stopt.pfjets().at(ijet).Pt() < 30 ) continue;
+      if ( fabs(stopt.pfjets().at(ijet).eta()) > 2.4 ) continue;
+      // if( stopt.pfjets_beta2_0p5().at(ijet)<0.2 )  continue;
+      // bool passMediumPUid = passMVAJetId(stopt.pfjets().at(ijet).pt(), stopt.pfjets().at(ijet).eta(),stopt.pfjets_mvaPUid().at(ijet),1);
+      bool passTightPUid = passMVAJetId(stopt.pfjets().at(ijet).pt(), stopt.pfjets().at(ijet).eta(),stopt.pfjets_mva5xPUid().at(ijet),0);
+      if(!passTightPUid) continue;
+
+      myJets.push_back(stopt.pfjets().at(ijet));
+      myJetsTag.push_back(stopt.pfjets_csv().at(ijet));
+
+      if(stopt.pfjets_csv().at(ijet) > 0.679) btag++;
+      if(btag==1) bpt=stopt.pfjets().at(ijet).Pt();
+
+      myJetsSigma.push_back(stopt.pfjets_sigma().at(ijet));
+  }
+
+  if(myJets.size()<4) return false;
+  if(btag==0) return false;
+
+  // mindPhi                                                                                                                                                                       
+  float dphimjmin=getMinDphi(stopt.t1metphicorrphi(), myJets.at(0),myJets.at(1));
+  if(dphimjmin<0.8) return false;
+
+  // b jets pt
+  if(bpt<100) return false;
+
+  // mt2w                                                                                                                                                                          
   double x_mt2w = calculateMT2w(myJets, myJetsTag, stopt.lep1(), stopt.t1metphicorr(), stopt.t1metphicorrphi());
   // cut a the top mass + some resoultion effect
   if(x_mt2w<200) return false;
