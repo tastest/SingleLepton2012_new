@@ -374,8 +374,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
                 if ( stopt.pfjets().at(i).pt() < JET_PT ) continue;
                 if ( fabs(stopt.pfjets().at(i).eta()) > JET_ETA ) continue;
-                if ( (fabs(stopt.pfjets().at(i).eta()) <= 2.5) 
-                        && (stopt.pfjets_beta2_0p5().at(i) < 0.2) ) continue;
+		// if ( (fabs(stopt.pfjets().at(i).eta()) <= 2.5) 
+                //        && (stopt.pfjets_beta2_0p5().at(i) < 0.2) ) continue;
+		// bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
+		bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mva5xPUid().at(i),0);
+		if(!passTightPUid) continue;
 
                 // jet information
                 njets_++;
@@ -497,30 +500,31 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             // isolated track veto selection
             passisotrk_   = passIsoTrkVeto_v4() ? 1 : 0; 
-            // tau veto selection ( not availabel to the for now ) 
-	    passtauveto_  = (!name.Contains("T2") && passTauVeto()) ? 1 : 0;
-	    if(name.Contains("T2")) passtauveto_=1;
+            // tau veto selection 
+	    passtauveto_  = (passTauVeto()) ? 1 : 0;
 
             // which selections are passed
             // pass signal region preselection
-            sig_        = ( dataset_1l 
-                    && passOneLeptonSelection(isData) 
-                    && passisotrk_ == 1
-                    && nb_>=1 ) ? 1 : 0; 
+            sig_ = ( dataset_1l 
+		     && passOneLeptonSelection(isData) 
+		     && passisotrk_ == 1
+		     && passtauveto_ == 1
+		     && nb_>=1 ) ? 1 : 0; 
             // pass CR1 (b-veto) control region preselection
-            cr1_        = ( dataset_1l 
-                    && passOneLeptonSelection(isData) 
-                    && passisotrk_ == 1
-                    && nb_==0 ) ? 1 : 0; 
+            cr1_ = ( dataset_1l 
+		     && passOneLeptonSelection(isData) 
+		     && passisotrk_ == 1
+		     && passtauveto_ == 1
+		     && nb_==0 ) ? 1 : 0; 
             // pass CR4 (dilepton) control region preselection
-            cr4_        = ( dataset_CR4 
-                    && passDileptonSelection(isData) 
-                    && nb_>=1) ? 1 : 0; 
+            cr4_ = ( dataset_CR4 
+		     && passDileptonSelection(isData) 
+		     && nb_>=1) ? 1 : 0; 
             // pass CR1 (lepton+isotrack) control region preselection
-            cr5_        = ( dataset_1l 
-                    && passOneLeptonSelection(isData) 
-                    && passisotrk_ == 0
-                    && nb_>=1) ? 1 : 0; 
+            cr5_ = ( dataset_1l 
+		     && passOneLeptonSelection(isData) 
+		     && (passisotrk_ == 0 || passtauveto_ == 0 )
+		     && nb_>=1) ? 1 : 0; 
 
             // -- WH+MET analysis regions
             // signal region
@@ -540,8 +544,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                     && bbmass_ >= 150. ) ? 1 : 0; 
 
             // Cut & Count analysis Selections
-            t2ttLM_     = pass_T2tt_LM(isData,name);
-            t2ttHM_     = pass_T2tt_HM(isData,name);
+	    // tag_T2tt_LM -- dphi and chi2 selection
+	    t2ttLM_ = (dphimjmin_>0.8 && chi2_<5) ? true : false;
+	    // tag_T2tt_HM -- add mt2w requirement
+	    t2ttHM_ = (t2ttLM_ && mt2w_>200) ? true : false;
+	    //until the functions are updated
+            // t2ttLM_     = pass_T2tt_LM(isData,name);
+            // t2ttHM_     = pass_T2tt_HM(isData,name);
 
 	    // susy vars
 	    mstop_       = stopt.mg();                   // stop mass
@@ -613,6 +622,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         rootdir->cd();
 
         outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
         if ( __add_babies )
