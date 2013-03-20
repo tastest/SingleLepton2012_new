@@ -138,6 +138,36 @@ void doSimplePred() {
 		     << " total)" <<endl;
 	ttp_ttsl_sf_runc[isr] = ttp_ttsl_sf_aunc[isr]/ttp_ttsl_sf[isr];
   }
+  cout<<endl;
+
+  //Fill SFRwjets to be used in later calculations. For SRs with SFRwjets relative uncertainty > 50%, we take SFRwjets from the tightest SR with relative uncertainty <= 50%.
+  float ttp_wj_sf_constantabove50pcunc[NSR];
+  float ttp_wjets_aunc_constantabove50pcunc[NSR]; 
+  int SR_l50pcunc = 0;
+  //flag to set which ttbar prediction is used, based on the same criterion as above.
+  //doav true --> average between optimistic and pessimistic
+  //doav false --> decomposition method and CR1 SF
+  bool doav[NSR];
+
+  for (int isr = 0; isr < NSR; ++isr)
+  {
+  	if(in_ttp_wjets_aunc[isr]/in_ttp_wj_sf[isr] <= 0.5) {
+  		SR_l50pcunc = isr;
+  		doav[isr] = false;
+  		cout<<"INFO::using Decomposition method for 1-lepton ttbar in "<<samplename[isr]<<endl;
+  		ttp_wj_sf_constantabove50pcunc[isr] = in_ttp_wj_sf[isr];
+  		ttp_wjets_aunc_constantabove50pcunc[isr] = in_ttp_wjets_aunc[isr];
+  	}
+  	else {
+  		doav[isr] = true;
+  		cout<<"INFO::using Av. Estimate for 1-lepton ttbar in "<<samplename[isr]<<endl;
+  		ttp_wj_sf_constantabove50pcunc[isr] = in_ttp_wj_sf[SR_l50pcunc];
+  		ttp_wjets_aunc_constantabove50pcunc[isr] = in_ttp_wjets_aunc[SR_l50pcunc];		
+  	}
+  }
+  cout<<endl;
+
+
   float ttp_tt_av[NLEP][NSR];
   float ttp_tt_av_runc[NLEP][NSR];
   float ttp_tt_corr[NLEP][NSR];
@@ -146,15 +176,6 @@ void doSimplePred() {
   float e_ttp_wjets_comb[NSR];
   float ttp_ttsl_comb[NSR];
   float e_ttp_ttsl_comb[NSR];
-
-  //flag to set which ttbar prediction is used
-  //doav true --> average between optimistic and pessimistic
-  //doav false --> decomposition method and CR1 SF
-  bool doav = true;
-  cout<<endl;
-  if (doav) cout<<"INFO::using Av. Estimate for 1-lepton ttbar "<<endl;
-  else cout<<"INFO::using Decomposition method for 1-lepton ttbar "<<endl;
-  cout<<endl;
 
   //Open files
   TFile *dt_sl[2];
@@ -283,8 +304,8 @@ void doSimplePred() {
     float ttp_wjets[NLEP] = {ttp_wjets_comb[isr],ttp_wjets_comb[isr]};
     if (doverbose) cout<<"WJETS TTP "<<ttp_wjets_comb[isr]<<endl;
     //from b-veto control sample - fully correlated with electron 
-    float ttp_wjets_sf[NLEP] = {in_ttp_wj_sf[isr], in_ttp_wj_sf[isr]};
-    float ttp_wjets_aunc[NLEP] = {in_ttp_wjets_aunc[isr], in_ttp_wjets_aunc[isr]};
+    float ttp_wjets_sf[NLEP] = {ttp_wj_sf_constantabove50pcunc[isr], ttp_wj_sf_constantabove50pcunc[isr]};
+    float ttp_wjets_aunc[NLEP] = {ttp_wjets_aunc_constantabove50pcunc[isr], ttp_wjets_aunc_constantabove50pcunc[isr]};
     float ttp_wjets_runc[NLEP];
     float ttp_wjets_corr[NLEP];
     for (int il = 0; il<NLEP; il++) {
@@ -327,8 +348,8 @@ void doSimplePred() {
     float ttp_tt[NLEP];
     float ttp_tt_runc[NLEP];
     for (int il = 0; il<NLEP; il++) {
-      ttp_tt[il] = doav ? ttp_tt_av[il][isr] : ttp_tt_corr[il][isr];
-      ttp_tt_runc[il] = doav ? ttp_tt_av_runc[il][isr] : ttp_tt_sf_runc[il][isr];
+      ttp_tt[il] = doav[isr] ? ttp_tt_av[il][isr] : ttp_tt_corr[il][isr];
+      ttp_tt_runc[il] = doav[isr] ? ttp_tt_av_runc[il][isr] : ttp_tt_sf_runc[il][isr];
     }
 
     //dead reckoning dil BG - must be already already corrected for K3 etc
@@ -745,7 +766,7 @@ void doSimplePred() {
   cout<<"\\hline"<<endl;
   printf("%s \t ","$SF_{wjet}$");
   for (int isr=0; isr<NSR; ++isr) 
-    printf(" & $%.3f \\pm %.3f$ ", in_ttp_wj_sf[isr], in_ttp_wjets_aunc[isr]);
+    printf(" & $%.3f \\pm %.3f$ ", ttp_wj_sf_constantabove50pcunc[isr], ttp_wjets_aunc_constantabove50pcunc[isr]);
   printf(" \\\\\n");
   cout<<"\\hline"<<endl;
   cout<<"\\hline"<<endl;
