@@ -383,7 +383,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
  
       //iso-trk-veto & tau veto
       bool passisotrk = passIsoTrkVeto_v4() && passTauVeto();
-      string tag_isotrk = passisotrk ? "" : "_wisotrk";
+      //      string tag_isotrk = passisotrk ? "" : "_wisotrk";
+      string tag_isotrk = (passLepPlusIsoTrkSelection(isData)) ? "" : "_wisotrk";   
 
       // tag_T2tt_LM -- dphi and chi2 selection
       bool passT2ttLM = (dphimjmin>0.8 && chi2min<5) ? true : false;
@@ -630,9 +631,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtau"+tag_met[im], flav_tag_sl, mtcut[im] );
 	      if ( passIsoTrkVeto_v4() && !passTauVeto() )
 		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtau_notrk"+tag_met[im], flav_tag_sl, mtcut[im] );
-	      if ( !passIsoTrkVeto_v4() && passTauVeto() )
+	      if ( passLepPlusIsoTrkSelection(isData) && passTauVeto() )
 		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtrk_notau"+tag_met[im], flav_tag_sl, mtcut[im] );
-	      if ( !passIsoTrkVeto_v4() )
+	      if ( passLepPlusIsoTrkSelection(isData) )
 		makeCR5Plots( evtweight*trigweight, h_1d_cr5, "_wtrk"+tag_met[im], flav_tag_sl, mtcut[im] );
 
 	    }
