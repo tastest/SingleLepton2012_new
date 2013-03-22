@@ -155,7 +155,8 @@ void doSimplePred() {
   	if(in_ttp_wjets_aunc[isr]/in_ttp_wj_sf[isr] <= 0.4) {
   		SR_l50pcunc = isr;
   		doav[isr] = true;
-  		cout<<"INFO::using Decomposition method for 1-lepton ttbar in "<<samplename[isr]<<endl;
+  		cout<<"INFO::using Av. Estimate for 1-lepton ttbar in "<<samplename[isr]<<endl;
+  		//cout<<"INFO::using Decomposition method for 1-lepton ttbar in "<<samplename[isr]<<endl;
   		ttp_wj_sf_constantabove50pcunc[isr] = in_ttp_wj_sf[isr];
   		ttp_wjets_aunc_constantabove50pcunc[isr] = in_ttp_wjets_aunc[isr];
   	}
@@ -355,7 +356,7 @@ void doSimplePred() {
       if(il==MUO && true) cout<<samplename[isr]
 			      <<":  SFRtop*ttp_tt: "<<ttp_tt_corr[il][isr]
 			      <<" +/- "<<100.*ttp_tt_sf_runc[il][isr]
-			      <<"%  optimisic and pessimistic average: "<<ttp_tt_av[il][isr]
+			      <<"%  optimistic and pessimistic average: "<<ttp_tt_av[il][isr]
 			      <<" +/- "<<100.*ttp_tt_av_runc[il][isr]<<"%"<<endl;
     }
     float ttp_tt[NLEP];
