@@ -97,9 +97,9 @@ void doSimplePred() {
 
   //dil uncertainty from MC variations - to cover the range of variations from scale up/down
   //high mass values
-  //  float e_dl_vars[NSR] = {0.25, 0.40, 0.50, 0.60};		
+  float e_dl_vars[NSR] = {0.25, 0.40, 0.50, 0.60};		
   //low mass values
-  float e_dl_vars[NSR] = {0.15, 0.20, 0.35, 0.50};
+  //float e_dl_vars[NSR] = {0.15, 0.20, 0.35, 0.50};
 
   //from closure tests in CR1 - W+Jets control sample
   //THESE NUMBERS NEED TO BE UPDATED
@@ -116,11 +116,11 @@ void doSimplePred() {
   //ftop/fW numbers used to obtain ttp_ttsl_sf from in_ttp_wj_sf
   //note last number is cooked up -- no entries in MC
   //High mass values
- // float in_ftopW[NSR] = { 2.887,  4.579,  10.163,  20.};
- // float in_ftopW_aunc[NSR] = { 0.562,  1.521,  5.826, 10.}; 
+ float in_ftopW[NSR] = { 2.887,  4.579,  10.163,  20.};
+ float in_ftopW_aunc[NSR] = { 0.562,  1.521,  5.826, 10.}; 
  //low mass values
- float in_ftopW[NSR] = { 3.894,  5.501,  9.873,  20.};
- float in_ftopW_aunc[NSR] = { 0.591,  1.537,  4.942,  10.};
+ //float in_ftopW[NSR] = { 3.894,  5.501,  9.873,  20.};
+ //float in_ftopW_aunc[NSR] = { 0.591,  1.537,  4.942,  10.};
 
   //calculate SFRtop and its uncertainties (correlated part is 100% correlated with SFRwjets uncertainty)
   float ttp_ttsl_sf[NSR];
@@ -147,13 +147,14 @@ void doSimplePred() {
   //flag to set which ttbar prediction is used, based on the same criterion as above.
   //doav true --> average between optimistic and pessimistic
   //doav false --> decomposition method and CR1 SF
+  //we are now using the average method everywhere, with the decomposition method used as a cross-check
   bool doav[NSR];
 
   for (int isr = 0; isr < NSR; ++isr)
   {
-  	if(in_ttp_wjets_aunc[isr]/in_ttp_wj_sf[isr] <= 0.5) {
+  	if(in_ttp_wjets_aunc[isr]/in_ttp_wj_sf[isr] <= 0.4) {
   		SR_l50pcunc = isr;
-  		doav[isr] = false;
+  		doav[isr] = true;
   		cout<<"INFO::using Decomposition method for 1-lepton ttbar in "<<samplename[isr]<<endl;
   		ttp_wj_sf_constantabove50pcunc[isr] = in_ttp_wj_sf[isr];
   		ttp_wjets_aunc_constantabove50pcunc[isr] = in_ttp_wjets_aunc[isr];
@@ -223,6 +224,7 @@ void doSimplePred() {
     //postveto
     TH1F *h_dt[NLEP];
     TH1F *h_mc[MCID][NLEP];
+    TH1F *h_mc_prebtag[MCID][NLEP];
     //preveto
     TH1F *h_pv_dt[NLEP];
     TH1F *h_pv_mc[MCID][NLEP];
@@ -256,6 +258,17 @@ void doSimplePred() {
 	  h_mc[imc][il]->SetName(Form("h_mc_%s%s", mcsample[imc],leptag[il].c_str()));
 	  zeroHist(h_mc[imc][il]);
 	}
+	//pass veto, prebtag
+	h_mc_prebtag[imc][il] = (TH1F*)mc_sl[imc]->Get(Form("%s_prebtag%s%s",histoname.c_str(),
+						    selection[isr].c_str(),
+						    leptag[il].c_str()));
+	if (h_mc_prebtag[imc][il]==0) {
+	  h_mc_prebtag[imc][il] = (TH1F*)mc_sl[0]->Get(Form("%s_prebtag%s%s",histoname.c_str(),
+						    selection[isr].c_str(),
+						    leptag[il].c_str()));
+	  h_mc_prebtag[imc][il]->SetName(Form("h_mc_prebtag_%s%s", mcsample[imc],leptag[il].c_str()));
+	  zeroHist(h_mc[imc][il]);
+	}
 	//preveto is sum of pass and fail veto
 	h_pv_mc[imc][il] = 
 	  (TH1F*)h_mc[imc][il]->Clone(Form("h_pv_mc_%s%s", mcsample[imc],leptag[il].c_str()));
@@ -272,10 +285,10 @@ void doSimplePred() {
     
     //raw ttp from MC
     ttp_wjets_comb[isr] = 
-      (h_mc[WJETS][MUO]->GetBinContent(TAIL)+h_mc[WJETS][ELE]->GetBinContent(TAIL))/
-      (h_mc[WJETS][MUO]->GetBinContent(PEAK)+h_mc[WJETS][ELE]->GetBinContent(PEAK));
-    TH1F *h_wjets_tmp = (TH1F*)h_mc[WJETS][MUO]->Clone("h_wjets_tmp");
-    h_wjets_tmp->Add(h_mc[WJETS][ELE]);
+      (h_mc_prebtag[WJETS][MUO]->GetBinContent(TAIL)+h_mc_prebtag[WJETS][ELE]->GetBinContent(TAIL))/
+      (h_mc_prebtag[WJETS][MUO]->GetBinContent(PEAK)+h_mc_prebtag[WJETS][ELE]->GetBinContent(PEAK));
+    TH1F *h_wjets_tmp = (TH1F*)h_mc_prebtag[WJETS][MUO]->Clone("h_wjets_tmp");
+    h_wjets_tmp->Add(h_mc_prebtag[WJETS][ELE]);
     e_ttp_wjets_comb[isr] = sqrt( pow( (h_wjets_tmp->GetBinError(TAIL)/h_wjets_tmp->GetBinContent(TAIL)), 2) +
 				  pow( (h_wjets_tmp->GetBinError(PEAK)/h_wjets_tmp->GetBinContent(PEAK)), 2) ) * 
       ttp_wjets_comb[isr];
@@ -315,10 +328,10 @@ void doSimplePred() {
     
     //raw ttp from MC
     ttp_ttsl_comb[isr] = 
-      (h_mc[TTSL][MUO]->GetBinContent(TAIL)+h_mc[TTSL][ELE]->GetBinContent(TAIL))/
-      (h_mc[TTSL][MUO]->GetBinContent(PEAK)+h_mc[TTSL][ELE]->GetBinContent(PEAK));
-    TH1F *h_ttsl_tmp = (TH1F*)h_mc[TTSL][MUO]->Clone("h_ttsl_tmp");
-    h_ttsl_tmp->Add(h_mc[TTSL][ELE]);
+      (h_mc_prebtag[TTSL][MUO]->GetBinContent(TAIL)+h_mc_prebtag[TTSL][ELE]->GetBinContent(TAIL))/
+      (h_mc_prebtag[TTSL][MUO]->GetBinContent(PEAK)+h_mc_prebtag[TTSL][ELE]->GetBinContent(PEAK));
+    TH1F *h_ttsl_tmp = (TH1F*)h_mc_prebtag[TTSL][MUO]->Clone("h_ttsl_tmp");
+    h_ttsl_tmp->Add(h_mc_prebtag[TTSL][ELE]);
     e_ttp_ttsl_comb[isr] = sqrt( pow( (h_ttsl_tmp->GetBinError(TAIL)/h_ttsl_tmp->GetBinContent(TAIL)), 2) +
 				  pow( (h_ttsl_tmp->GetBinError(PEAK)/h_ttsl_tmp->GetBinContent(PEAK)), 2) ) * 
       ttp_ttsl_comb[isr];
