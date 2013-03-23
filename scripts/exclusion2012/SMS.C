@@ -53,8 +53,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   }
 
   const float lumi      = 19500;
-  const char* filename  = "/tas/cms2/stop/MiniBabies/V00-02-18__V00-03-01__BDT004__4jetsMET100MT120_T2tt/T2tt_*root";
-  const char* denomname = "/tas/cms2/stop/MiniBabies/V00-02-s18b20__V00-03-01__BDT005__4jetsMET100MT150_all/T2tt_histos/myMassDB_25GeVbins.root";
+  const char* filename  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt*root";
+  const char* denomname = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
+  const bool  doBDT     = true;
 
   //const char* filename  = Form("/tas/benhoob/testFiles/%s_8TeV/merged*njets4%s.root",sample,suffix);
   //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
@@ -161,11 +162,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   presel += njets4;
   presel += btag1;
   presel += passisotrk;
-  //presel += tauveto;
+  presel += tauveto;
   presel += met100;
   presel += mt120;
-  presel += dphi;
-  presel += chi2;
+  //presel += dphi;
+  //presel += chi2;
   //presel += mt2w;
 
   TCut weight("mini_sltrigeff"); // trigger efficiency X btagging SF
@@ -173,18 +174,42 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   cout << "Using pre-selection   " << presel.GetTitle() << endl;
   cout << "Using weight          " << weight.GetTitle() << endl;
 
+  //------------------------------------------
+  // cut-based signal region definitions
+  //------------------------------------------
+
   TCut   SR[8];
   string SRname[8]={"LM150","LM200","LM250","LM300","HM150","HM200","HM250","HM300"};
 
-  SR[0]=TCut("mini_met > 150.0");
-  SR[1]=TCut("mini_met > 200.0");
-  SR[2]=TCut("mini_met > 250.0");
-  SR[3]=TCut("mini_met > 300.0");
+  SR[0]=TCut("mini_met > 150.0")+dphi+chi2;
+  SR[1]=TCut("mini_met > 200.0")+dphi+chi2;
+  SR[2]=TCut("mini_met > 250.0")+dphi+chi2;
+  SR[3]=TCut("mini_met > 300.0")+dphi+chi2;
 
-  SR[4]=TCut("mini_mt2w > 200.0 && mini_met > 150.0");
-  SR[5]=TCut("mini_mt2w > 200.0 && mini_met > 200.0");
-  SR[6]=TCut("mini_mt2w > 200.0 && mini_met > 250.0");
-  SR[7]=TCut("mini_mt2w > 200.0 && mini_met > 300.0");
+  SR[4]=TCut("mini_met > 150.0")+dphi+chi2+mt2w;
+  SR[5]=TCut("mini_met > 200.0")+dphi+chi2+mt2w;
+  SR[6]=TCut("mini_met > 250.0")+dphi+chi2+mt2w;
+  SR[7]=TCut("mini_met > 300.0")+dphi+chi2+mt2w;
+
+  //------------------------------------------
+  // BDT signal region definitions
+  //------------------------------------------
+
+  TCut   SR_BDT[5];
+  string SRname_BDT[5];
+
+  SR_BDT[0]=TCut("mini_bdt[1] > 0.30"); SRname_BDT[0] = "BDT1L";
+  SR_BDT[1]=TCut("mini_bdt[1] > 0.40"); SRname_BDT[1] = "BDT1T";
+  SR_BDT[2]=TCut("mini_bdt[2] > 0.55"); SRname_BDT[2] = "BDT2";
+  SR_BDT[3]=TCut("mini_bdt[3] > 0.65"); SRname_BDT[3] = "BDT3";
+  SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
+
+
+  //SR_BDT[3]=TCut("mini_bdt[2] > 0.65"); SRname_BDT[3] = "BDT2_65";
+  //SR_BDT[4]=TCut("mini_bdt[3] > 0.55"); SRname_BDT[4] = "BDT3_55";
+  //SR_BDT[5]=TCut("mini_bdt[3] > 0.60"); SRname_BDT[5] = "BDT3_60";
+  //SR_BDT[7]=TCut("mini_bdt[3] > 0.70"); SRname_BDT[7] = "BDT3_70";
+  //SR_BDT[8]=TCut("mini_bdt[3] > 0.75"); SRname_BDT[8] = "BDT3_75";
 
   //--------------------------------------------------
   // signal regions
@@ -195,15 +220,39 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   vector<string>  labels;
   vector<int>     cuts;
 
-  sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  cuts.push_back(1);
-  sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  cuts.push_back(1);
-  sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  cuts.push_back(1);
-  sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  cuts.push_back(1);
+  if( doBDT ){
+    cout << "Doing BDT signal regions" << endl;
+    suffix = "_BDT";
 
-  sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  cuts.push_back(1);
-  sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  cuts.push_back(1);
-  sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  cuts.push_back(1);
-  sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  cuts.push_back(1);
+
+    // sigcuts.push_back(TCut(presel+SR_BDT[5]));  signames.push_back(SRname_BDT[5]);  labels.push_back(SRname_BDT[5]);  cuts.push_back(1);
+    // sigcuts.push_back(TCut(presel+SR_BDT[6]));  signames.push_back(SRname_BDT[6]);  labels.push_back(SRname_BDT[6]);  cuts.push_back(1);
+    // sigcuts.push_back(TCut(presel+SR_BDT[7]));  signames.push_back(SRname_BDT[7]);  labels.push_back(SRname_BDT[7]);  cuts.push_back(1);
+    // sigcuts.push_back(TCut(presel+SR_BDT[8]));  signames.push_back(SRname_BDT[8]);  labels.push_back(SRname_BDT[8]);  cuts.push_back(1);
+    // sigcuts.push_back(TCut(presel+SR_BDT[9]));  signames.push_back(SRname_BDT[9]);  labels.push_back(SRname_BDT[9]);  cuts.push_back(1);
+  }
+
+  else{
+    cout << "Doing cut-based signal regions" << endl;  
+
+    // low-mass
+    sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  cuts.push_back(1);
+
+    // high-mass
+    sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  cuts.push_back(1);
+    sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  cuts.push_back(1);
+  }
+
 
   const unsigned int nsig = sigcuts.size();
 
@@ -231,6 +280,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
   for( unsigned int i = 0 ; i < nsig ; ++i ){
 
+    cout << endl ;
+    cout << "Signal Region : " << i << " " << signames.at(i) << endl;
+    cout << "Selection     : " << sigcuts.at(i) << endl;
 
     //------------------------------------------------
     // turn off point-by-point signal uncertainties
@@ -341,63 +393,138 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	float this_ul_expm1;
 
 	if( TString(labels.at(i)).Contains("LM150") ){
-	  this_ul       = 66.0;
-	  this_ul_exp   = 66.0;
-	  this_ul_expp1 = 66.0;
-	  this_ul_expm1 = 66.0;
+	  this_ul       = 79.6;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	  // this_ul       = getUpperLimit_SRA( toterr );
 	  // this_ul_exp   = getExpectedUpperLimit_SRA( toterr );
 	  // this_ul_expp1 = getExpectedP1UpperLimit_SRA( toterr );
 	  // this_ul_expm1 = getExpectedM1UpperLimit_SRA( toterr );
 	}
 
-	if( TString(labels.at(i)).Contains("LM200") ){
-	  this_ul       = 44.0;
-	  this_ul_exp   = 44.0;
-	  this_ul_expp1 = 44.0;
-	  this_ul_expm1 = 44.0;
+	else if( TString(labels.at(i)).Contains("LM200") ){
+	  this_ul       = 42.1;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	if( TString(labels.at(i)).Contains("LM250") ){
+	else if( TString(labels.at(i)).Contains("LM250") ){
 	  this_ul       = 19.0;
-	  this_ul_exp   = 19.0;
-	  this_ul_expp1 = 19.0;
-	  this_ul_expm1 = 19.0;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	if( TString(labels.at(i)).Contains("LM300") ){
-	  this_ul       = 8.4;
-	  this_ul_exp   = 8.4;
-	  this_ul_expp1 = 8.4;
-	  this_ul_expm1 = 8.4;
+	else if( TString(labels.at(i)).Contains("LM300") ){
+	  this_ul       = 9.9;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	if( TString(labels.at(i)).Contains("HM150") ){
-	  this_ul       = 15.0;
-	  this_ul_exp   = 15.0;
-	  this_ul_expp1 = 15.0;
-	  this_ul_expm1 = 15.0;
+	else if( TString(labels.at(i)).Contains("HM150") ){
+	  this_ul       = 17.5;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	if( TString(labels.at(i)).Contains("HM200") ){
-	  this_ul       = 10.0;
-	  this_ul_exp   = 10.0;
-	  this_ul_expp1 = 10.0;
-	  this_ul_expm1 = 10.0;
+	else if( TString(labels.at(i)).Contains("HM200") ){
+	  this_ul       = 12.2;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	if( TString(labels.at(i)).Contains("HM250") ){
-	  this_ul       = 7.3;
-	  this_ul_exp   = 7.3;
-	  this_ul_expp1 = 7.3;
-	  this_ul_expm1 = 7.3;
+	else if( TString(labels.at(i)).Contains("HM250") ){
+	  this_ul       = 9.9;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	if( TString(labels.at(i)).Contains("HM300") ){
+	else if( TString(labels.at(i)).Contains("HM300") ){
+	  this_ul       = 6.4;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT1L") ){
+	  this_ul       = 162.0;
+	  this_ul_exp   = 162.0;
+	  this_ul_expp1 = 162.0;
+	  this_ul_expm1 = 162.0;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT1_40") ){
+	  this_ul       = 46.0;
+	  this_ul_exp   = 46.0;
+	  this_ul_expp1 = 46.0;
+	  this_ul_expm1 = 46.0;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT2_55") ){
+	  this_ul       = 38.0;
+	  this_ul_exp   = 38.0;
+	  this_ul_expp1 = 38.0;
+	  this_ul_expm1 = 38.0;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT2_65") ){
+	  this_ul       = 23.0;
+	  this_ul_exp   = 23.0;
+	  this_ul_expp1 = 23.0;
+	  this_ul_expm1 = 23.0;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT3_55") ){
+	  this_ul       = 17.0;
+	  this_ul_exp   = 17.0;
+	  this_ul_expp1 = 17.0;
+	  this_ul_expm1 = 17.0;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT3_60") ){
+	  this_ul       = 11.4;
+	  this_ul_exp   = 11.4;
+	  this_ul_expp1 = 11.4;
+	  this_ul_expm1 = 11.4;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT3_65") ){
+	  this_ul       = 8.0;
+	  this_ul_exp   = 8.0;
+	  this_ul_expp1 = 8.0;
+	  this_ul_expm1 = 8.0;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT3_70") ){
+	  this_ul       = 5.9;
+	  this_ul_exp   = 5.9;
+	  this_ul_expp1 = 5.9;
+	  this_ul_expm1 = 5.9;
+	}
+
+	else if( TString(labels.at(i)).Contains("BDT3_75") ){
 	  this_ul       = 5.0;
 	  this_ul_exp   = 5.0;
 	  this_ul_expp1 = 5.0;
 	  this_ul_expm1 = 5.0;
+	}
+	
+	else if( TString(labels.at(i)).Contains("BDT4_50") ){
+	  this_ul       = 3.7;
+	  this_ul_exp   = 3.7;
+	  this_ul_expp1 = 3.7;
+	  this_ul_expm1 = 3.7;
+	}
+
+	else{
+	  cout << "WARNING UNRECOGNIZED SIGNAL REGION " << labels.at(i) << " QUITTING!!!" << endl;
+	  exit(0);
 	}
 
 
@@ -639,6 +766,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   }
   
   TFile *outfile = TFile::Open(Form("%s%s_histos.root",sample,suffix),"RECREATE");
+
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
     hxsec[i]->Write();
