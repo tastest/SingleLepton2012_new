@@ -383,8 +383,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
  
       //iso-trk-veto & tau veto
       bool passisotrk = passIsoTrkVeto_v4() && passTauVeto();
-      //      string tag_isotrk = passisotrk ? "" : "_wisotrk";
-      string tag_isotrk = (passLepPlusIsoTrkSelection(isData)) ? "" : "_wisotrk";   
+      string tag_isotrk = passisotrk ? "" : "_wisotrk";
+      //string tag_isotrk = (passLepPlusIsoTrkSelection(isData)) ? "" : "_wisotrk";   
 
       // tag_T2tt_LM -- dphi and chi2 selection
       bool passT2ttLM = (dphimjmin>0.8 && chi2min<5) ? true : false;
