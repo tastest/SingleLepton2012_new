@@ -432,14 +432,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("HM200") ){
-	  this_ul       = 12.2;
+	  this_ul       = 12.3;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
 	else if( TString(labels.at(i)).Contains("HM250") ){
-	  this_ul       = 9.9;
+	  this_ul       = 9.0;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
@@ -453,40 +453,41 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("BDT1L") ){
-	  this_ul       = 162.0;
-	  this_ul_exp   = 162.0;
-	  this_ul_expp1 = 162.0;
-	  this_ul_expm1 = 162.0;
+	  this_ul       = 158.7;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("BDT1_40") ){
-	  this_ul       = 46.0;
-	  this_ul_exp   = 46.0;
-	  this_ul_expp1 = 46.0;
-	  this_ul_expm1 = 46.0;
+	else if( TString(labels.at(i)).Contains("BDT1T") ){
+	  this_ul       = 41.2
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("BDT2_55") ){
-	  this_ul       = 38.0;
-	  this_ul_exp   = 38.0;
-	  this_ul_expp1 = 38.0;
-	  this_ul_expm1 = 38.0;
+	else if( TString(labels.at(i)).Contains("BDT2") ){
+	  this_ul       = 32.6;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("BDT2_65") ){
-	  this_ul       = 23.0;
-	  this_ul_exp   = 23.0;
-	  this_ul_expp1 = 23.0;
-	  this_ul_expm1 = 23.0;
+	else if( TString(labels.at(i)).Contains("BDT3") ){
+	  this_ul       = 10.7;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("BDT3_55") ){
-	  this_ul       = 17.0;
-	  this_ul_exp   = 17.0;
-	  this_ul_expp1 = 17.0;
-	  this_ul_expm1 = 17.0;
+	else if( TString(labels.at(i)).Contains("BDT4") ){
+	  this_ul       =  5.0;
+	  this_ul_exp   = this_ul;
+	  this_ul_expp1 = this_ul;
+	  this_ul_expm1 = this_ul;
 	}
 
+	/*
 	else if( TString(labels.at(i)).Contains("BDT3_60") ){
 	  this_ul       = 11.4;
 	  this_ul_exp   = 11.4;
@@ -521,6 +522,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	  this_ul_expp1 = 3.7;
 	  this_ul_expm1 = 3.7;
 	}
+	*/
 
 	else{
 	  cout << "WARNING UNRECOGNIZED SIGNAL REGION " << labels.at(i) << " QUITTING!!!" << endl;
