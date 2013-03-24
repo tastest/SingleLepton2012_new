@@ -9,33 +9,21 @@
 
 using namespace std;
 
-void makeSuperSkims(){
+void makeSuperSkims_signal(){
 
-  char* path = "/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies_V00-03-03";
+  char* path = "T2ttSkims";
 
   //--------------------------------------------------
   // path and input file
   //--------------------------------------------------
-  const int NTAGS = 16;//10;//14;
+
+  const int NTAGS = 5;
   string tags[NTAGS] = {
-    "triboson",
-    "data_diel",
-    "data_mueg",
-    "data_dimu",
-    "diboson",
-    "DY1to4Jtot",
-    "ttV",
-    "tW_lepdl",
-    "ttdl_powheg",
-    "data_ele",
-    "data_muo",
-    "w1to4jets",
-    "tW_lepsl",
-    "tWall_lep",
-    "ttdl_lmg",
-    //"ttsl_powheg",
-    "ttsl_lmg",
-    //"wbbjets"
+    "T2tt_1",
+    "T2tt_2",
+    "T2tt_3",
+    "T2tt_4",
+    "T2tt_5"
   };
 
   //--------------------------------------------------

@@ -9,59 +9,46 @@
 
 using namespace std;
 
-void makeSuperSkims(){
+void makeT2ttSkims(){
 
-  char* path = "/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies_V00-03-03";
+  char* path = "/home/users/dalfonso/CMSSW_5_3_2_patch4_V05-03-21/src/SingleLepton2012/macros/MiniBabyMaker/output";
 
   //--------------------------------------------------
   // path and input file
   //--------------------------------------------------
-  const int NTAGS = 16;//10;//14;
-  string tags[NTAGS] = {
-    "triboson",
-    "data_diel",
-    "data_mueg",
-    "data_dimu",
-    "diboson",
-    "DY1to4Jtot",
-    "ttV",
-    "tW_lepdl",
-    "ttdl_powheg",
-    "data_ele",
-    "data_muo",
-    "w1to4jets",
-    "tW_lepsl",
-    "tWall_lep",
-    "ttdl_lmg",
-    //"ttsl_powheg",
-    "ttsl_lmg",
-    //"wbbjets"
-  };
+
+  const unsigned int n = 5;
+
+  char* cuts[n];
+  char* names[n];
+
+  cuts[0] = "mg < 340 && mg-ml > 160";                   names[0] = "T2tt_1";
+  cuts[1] = "mg > 340 && mg-ml > 160 && mg-ml < 280";    names[1] = "T2tt_2";
+  cuts[2] = "mg > 340 && mg-ml > 280 && mg-ml < 480";    names[2] = "T2tt_3";
+  cuts[3] = "mg > 340 && mg-ml > 480";                   names[3] = "T2tt_4";
+  cuts[4] = "mg-ml < 160";                               names[4] = "T2tt_5";
 
   //--------------------------------------------------
   // cut for output files
   //--------------------------------------------------
   
-  char* sel = "mini_njets >= 4 && mini_met > 100 && mini_mt > 120";
-
-  cout << "Skimming with selection : "<<sel<<endl;
-
-  for (int i=0; i<NTAGS;++i) {
+  for (int i=3; i<4;++i) {
 
     //--------------------------------------------------
     // input and output file
     //--------------------------------------------------
   
-    char* infilename  = Form("%s/%s.root",path,tags[i].c_str());
-    char* outfilename = Form("%s/Skim_4jets_MET100_MT120/%s.root",path,tags[i].c_str());
-    
+    char* infilename  = Form("%s/merged*root",path);
+    char* outfilename = Form("T2ttSkims/%s.root",names[i]);
+    TCut sel = TCut(cuts[i]);
+
     //--------------------------------------------------
     // cout stuff
     //--------------------------------------------------
     
     cout << "Reading in : " << infilename << endl;
     cout << "Writing to : " << outfilename << endl;
-    cout << "Selection : " << sel << endl;
+    cout << "Selection  : " << sel << endl;
     
     //--------------------------------------------------
     // read input file, write to output files
