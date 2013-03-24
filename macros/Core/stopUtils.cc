@@ -273,10 +273,11 @@ float getsltrigweight(int id1, float pt, float eta)
 bool passEvtSelection(TString name) 
 {
 
-  //rho requirement
-  if ( stopt.rhovor()<0. || stopt.rhovor()>=40. ) return false;
-
   if (!name.Contains("T2")  && !name.Contains("TChiwh")) {
+
+    //rho requirement
+    if ( stopt.rhovor()<0. || stopt.rhovor()>=40. ) return false;
+
     //met filters
     if ( stopt.csc()      != 0 ) return false;
     if ( stopt.hbhe()     != 1 ) return false;
@@ -291,10 +292,12 @@ bool passEvtSelection(TString name)
   //at least 1 lepton
   if ( stopt.ngoodlep() < 1 ) return false;
 
+  /*
   //if have more than 1 lepton, remove cases where have 2 close together
+  // moved to the passDilepton functions
   if ( stopt.ngoodlep() > 1 && 
        dRbetweenVectors( stopt.lep1() ,  stopt.lep2() )<0.1 ) return false;
-
+  */
   return true;
 
 }
@@ -534,6 +537,10 @@ bool passDileptonSelection(bool isData)
   //barrel only electrons
   if (fabs(stopt.id1())==11 && fabs(stopt.lep1().Eta() ) > 1.4442) return false;
   if (fabs(stopt.id2())==11 && fabs(stopt.lep2().Eta() ) > 1.4442) return false;
+
+  //if have more than 1 lepton, remove cases where have 2 close together
+  if ( stopt.ngoodlep() > 1 && 
+       dRbetweenVectors( stopt.lep1() ,  stopt.lep2() )<0.1 ) return false;
 
   return true;
 
