@@ -57,6 +57,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   const char* denomname = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
   const bool  doBDT     = true;
 
+  const char* pol       = "";
+  //const char* pol       = "left";
+  //const char* pol       = "right";
+
+
   //const char* filename  = Form("/tas/benhoob/testFiles/%s_8TeV/merged*njets4%s.root",sample,suffix);
   //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
   //const float btagerr   = 0.02;
@@ -170,6 +175,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //presel += mt2w;
 
   TCut weight("mini_sltrigeff"); // trigger efficiency X btagging SF
+  if( TString(pol).Contains("left") )  weight = TCut("mini_sltrigeff*weightleft");
+  if( TString(pol).Contains("right") ) weight = TCut("mini_sltrigeff*weightright");
 
   cout << "Using pre-selection   " << presel.GetTitle() << endl;
   cout << "Using weight          " << weight.GetTitle() << endl;
@@ -460,7 +467,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("BDT1T") ){
-	  this_ul       = 41.2
+	  this_ul       = 41.2;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
@@ -749,8 +756,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     */
 
     if( print ){
-      can[i]->          Print(Form("../../plots/%s%s_%s.pdf"       ,sample,suffix,labels.at(i).c_str()));
-      can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points.pdf",sample,suffix,labels.at(i).c_str()));
+      can[i]->          Print(Form("../../plots/%s%s_%s%s.pdf"       ,sample,suffix,labels.at(i).c_str()),pol);
+      can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str()),pol);
     }
 
     int bin = heff[i]->FindBin(300,50);
@@ -767,7 +774,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << endl << endl;
   }
   
-  TFile *outfile = TFile::Open(Form("%s%s_histos.root",sample,suffix),"RECREATE");
+  TFile *outfile = TFile::Open(Form("%s%s%s_histos.root",sample,suffix,pol),"RECREATE");
 
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
