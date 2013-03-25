@@ -57,7 +57,7 @@ bool passDileptonSelection(bool isData);
 bool passLepPlusTauSelection(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
 bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
-
+bool passLepPlusSSPionTrkSelection(bool isData);
 
 bool pass_T2tt_LM(bool isData, TString name);
 bool pass_T2tt_HM(bool isData, TString name);

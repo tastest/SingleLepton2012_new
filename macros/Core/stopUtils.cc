@@ -582,6 +582,31 @@ bool passTwoLeptonSelection(bool isData)
 }
 
 
+bool passLepPlusSSPionTrkSelection(bool isData)
+{
+  //single lepton plus iso trk selection for 8 TeV 53 analysis                                                                                                                                                         
+
+  //at least one lepton                                                                                                                                                                                                
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  //pass isolated track requirement                                                                                                                                                                                    
+  //unfortunately changed default value to 9999.                                                                                                                                                                       
+  //  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;                                                                                                                                                 
+  if ( stopt.pfcandpt5looseZ()  > 9990. || stopt.pfcandpt5looseZ() < 10.) return false;
+  if ( abs(stopt.pfcandid5looseZ())==13 || abs(stopt.pfcandid5looseZ())==11) return false;
+  if ( stopt.pfcandiso5looseZ() > 0.1) return false;
+
+  float charge=(stopt.pfcandid5looseZ()*stopt.id1());
+  // charge < 0 is a SS , charge > 0 is a OS for e/mu; need to flip for pions                                                                                                                                           if((abs(stopt.pfcandidOS10looseZ())!=11) && (abs(stopt.pfcandidOS10looseZ())!=13)) charge*=(-1);                                                                                                                   
+
+  if(charge > 0) return false;
+
+  return true;
+
+}
+
+
+
 //-------------------------------------------
 // lepton + isolated track selection CR5
 //-------------------------------------------
