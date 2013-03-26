@@ -330,7 +330,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
   gPad->SetTopMargin(0.1);
   gPad->SetRightMargin(0.2);
-  //gPad->SetLogz();
+  gPad->SetLogz();
   hdummy->GetXaxis()->SetLabelSize(0.035);
   hdummy->GetYaxis()->SetLabelSize(0.035);
   hdummy->GetZaxis()->SetLabelSize(0.035);
@@ -343,10 +343,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   hdummy->GetYaxis()->SetRangeUser(0,400);
   //hdummy->Draw("colz");
   hdummy->SetMinimum(0.01);
-  hdummy->SetMaximum(5);
+  hdummy->SetMaximum(100);
   hxsec_best_shifted->SetMinimum(0.01);
-  hxsec_best_shifted->SetMaximum(5);
-  hdummy->SetMaximum(5);
+  hxsec_best_shifted->SetMaximum(100);
+  hdummy->SetMaximum(100);
   hdummy->Draw();
   hxsec_best_shifted->Draw("samecolz");
   hdummy->Draw("axissame");
