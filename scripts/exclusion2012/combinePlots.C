@@ -153,7 +153,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     xaxismin    =   0.0;
     yaxismax    = 250.0;
     if( doBDT ){
-      filename    = "T2tt_BDTright_histos.root";
+      filename    = "T2tt_BDT_histos.root";
       suffix      = "_BDT";
       nSR         = 5;
     }
@@ -184,9 +184,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
       else{
 	xaxismin = 180.0;
-	outfilename = "combinePlots_T2bw_x50.root";
-	filename    = "T2bw_x50_histos.root";
-	nSR = 11;
+	//outfilename = "combinePlots_T2bw_x50.root";
+	//filename    = "T2bw_x50_histos.root";
+	outfilename = "combinePlots_T2bw_x50_unc15.root";
+	filename    = "T2bw_x50_unc15_histos.root";
+	//nSR = 11;
+	nSR = 4;
       }
 
     }
@@ -327,7 +330,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
   gPad->SetTopMargin(0.1);
   gPad->SetRightMargin(0.2);
-  gPad->SetLogz();
+  //gPad->SetLogz();
   hdummy->GetXaxis()->SetLabelSize(0.035);
   hdummy->GetYaxis()->SetLabelSize(0.035);
   hdummy->GetZaxis()->SetLabelSize(0.035);
@@ -340,10 +343,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   hdummy->GetYaxis()->SetRangeUser(0,400);
   //hdummy->Draw("colz");
   hdummy->SetMinimum(0.01);
-  hdummy->SetMaximum(100);
+  hdummy->SetMaximum(5);
   hxsec_best_shifted->SetMinimum(0.01);
-  hxsec_best_shifted->SetMaximum(100);
-  hdummy->SetMaximum(100);
+  hxsec_best_shifted->SetMaximum(5);
+  hdummy->SetMaximum(5);
   hdummy->Draw();
   hxsec_best_shifted->Draw("samecolz");
   hdummy->Draw("axissame");
@@ -593,17 +596,22 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     // t->DrawLatex(0.2,0.45,"7 = HM250");
     // t->DrawLatex(0.2,0.40,"8 = HM300");
 
-    t->DrawLatex(0.2,0.75," 1 = LM100");
-    t->DrawLatex(0.2,0.70," 2 = LM150");
-    t->DrawLatex(0.2,0.65," 3 = LM200");
-    t->DrawLatex(0.2,0.60," 4 = LM250");
-    t->DrawLatex(0.2,0.55," 5 = LM300");
-    t->DrawLatex(0.2,0.50," 6 = LM350");
-    t->DrawLatex(0.2,0.45," 7 = LM400");
-    t->DrawLatex(0.2,0.40," 8 = HM100");
-    t->DrawLatex(0.2,0.35," 9 = HM150");
-    t->DrawLatex(0.2,0.30,"10 = HM200");
-    t->DrawLatex(0.2,0.25,"11 = HM250");
+    // t->DrawLatex(0.2,0.75," 1 = LM100");
+    // t->DrawLatex(0.2,0.70," 2 = LM150");
+    // t->DrawLatex(0.2,0.65," 3 = LM200");
+    // t->DrawLatex(0.2,0.60," 4 = LM250");
+    // t->DrawLatex(0.2,0.55," 5 = LM300");
+    // t->DrawLatex(0.2,0.50," 6 = LM350");
+    // t->DrawLatex(0.2,0.45," 7 = LM400");
+    // t->DrawLatex(0.2,0.40," 8 = HM100");
+    // t->DrawLatex(0.2,0.35," 9 = HM150");
+    // t->DrawLatex(0.2,0.30,"10 = HM200");
+    // t->DrawLatex(0.2,0.25,"11 = HM250");
+
+    t->DrawLatex(0.2,0.70," 1 = HM100");
+    t->DrawLatex(0.2,0.65," 2 = HM150");
+    t->DrawLatex(0.2,0.60," 3 = HM200");
+    t->DrawLatex(0.2,0.55," 4 = HM250");
   }
 
   if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
