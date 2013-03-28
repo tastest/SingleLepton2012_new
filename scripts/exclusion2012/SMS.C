@@ -331,14 +331,13 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     }
 
     if( TString(sample).Contains("T2bw") ){
-      // sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   cuts.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   cuts.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   cuts.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   cuts.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_T2BW[4]));   signames.push_back(SRname_T2BW[4]);   labels.push_back(SRname_T2BW[4]);   cuts.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_T2BW[5]));   signames.push_back(SRname_T2BW[5]);   labels.push_back(SRname_T2BW[5]);   cuts.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_T2BW[6]));   signames.push_back(SRname_T2BW[6]);   labels.push_back(SRname_T2BW[6]);   cuts.push_back
-																(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   cuts.push_back(1);
+      //sigcuts.push_back(TCut(presel+SR_T2BW[4]));   signames.push_back(SRname_T2BW[4]);   labels.push_back(SRname_T2BW[4]);   cuts.push_back(1);
+      //sigcuts.push_back(TCut(presel+SR_T2BW[5]));   signames.push_back(SRname_T2BW[5]);   labels.push_back(SRname_T2BW[5]);   cuts.push_back(1);
+      //sigcuts.push_back(TCut(presel+SR_T2BW[6]));   signames.push_back(SRname_T2BW[6]);   labels.push_back(SRname_T2BW[6]);   cuts.push_back(1);
       sigcuts.push_back(TCut(presel+SR_T2BW[7]));   signames.push_back(SRname_T2BW[7]);   labels.push_back(SRname_T2BW[7]);   cuts.push_back(1);
       sigcuts.push_back(TCut(presel+SR_T2BW[8]));   signames.push_back(SRname_T2BW[8]);   labels.push_back(SRname_T2BW[8]);   cuts.push_back(1);
       sigcuts.push_back(TCut(presel+SR_T2BW[9]));   signames.push_back(SRname_T2BW[9]);   labels.push_back(SRname_T2BW[9]);   cuts.push_back(1);
@@ -676,7 +675,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM100") ){
-	  this_ul       = 15.9;
+	  this_ul       = 29.3;
 	  //this_ul       = 15.0;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
@@ -684,7 +683,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM150") ){
-	  this_ul       = 9.89;
+	  this_ul       = 18.7;
 	  //this_ul       = 9.06;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
@@ -692,7 +691,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM200") ){
-	  this_ul       = 6.80;
+	  this_ul       = 12.4;
 	  //this_ul       = 6.34;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
@@ -700,7 +699,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM250") ){
-	  this_ul       = 4.91;
+	  this_ul       = 8.64;
 	  //this_ul       = 4.70;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
