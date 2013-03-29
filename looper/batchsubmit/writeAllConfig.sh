@@ -4,7 +4,7 @@
 # All single lepton datasets available on hadoop
 #
 
-TAG="V00-02-21_2012"
+TAG="V00-02-23_2012"
 
 #
 # DATA
@@ -53,7 +53,7 @@ TAG="V00-02-21_2012"
 # TTBAR
 #
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_TTJetsMG
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A_ext-v1/V05-03-24/ ${TAG}_TTJetsFullHadMG
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A_ext-v1/V05-03-24/ ${TAG}_TTJetsFullHadMG
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_FullLeptMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-24/ ${TAG}_TTJetsFullLeptMG
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_SemiLeptMGDecays_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A_ext-v1/V05-03-24/ ${TAG}_TTJetsSemiLeptMG
 
@@ -67,9 +67,8 @@ TAG="V00-02-21_2012"
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaleup_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_ScaleUp
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_scaledown_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_ScaleDown
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v2/V05-03-25/ ${TAG}_TTJets_Powheg
+./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TTJets_Powhegv1
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_8TeV-mcatnlo_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-24/ ${TAG}_TTJets_MCNLO
-##SMALL POWHEG SAMPLE
-#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/ ${TAG}_TTJets_Powheg
 
 #
 # W+JETS
@@ -86,12 +85,12 @@ TAG="V00-02-21_2012"
 #
 # SINGLE TOP
 #
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-tWchannel
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_Tbar-tWchannel
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/  ${TAG}_Tbar-schannel
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-schannel
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_Tbar-tchannel 
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-tchannel
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-tWchannel
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_Tbar-tWchannel
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/  ${TAG}_Tbar-schannel
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-schannel
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_Tbar-tchannel 
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_T-tchannel
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToDilepton_tW-channel-DR_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToDilepton_tW-channel
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToLeptons_s-channel_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToLeptons_s-channel
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TBarToLeptons_t-channel_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_TBarToLeptons_t-channel
@@ -106,7 +105,7 @@ TAG="V00-02-21_2012"
 #
 # DY+JETS
 #
-./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_DYJetsToLL
+#./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_DYJetsToLL
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY4JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/ ${TAG}_DY4JetsToLL
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY3JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/ ${TAG}_DY3JetsToLL
 ./writeConfig.sh /hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY2JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7C-v1/V05-03-25/ ${TAG}_DY2JetsToLL

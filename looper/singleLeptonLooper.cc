@@ -515,6 +515,14 @@ void singleLeptonLooper::InitBaby(){
   ecalveto2_ = -9999;
   hcalveto2_ = -9999;
 
+  lep1_scslasercormean_ = -9999.;
+  lep1_scslasercormax_  = -9999.;
+  lep2_scslasercormean_ = -9999.;
+  lep2_scslasercormax_  = -9999.;
+  scslasercormax_ = -9999.;
+  scslasercormax_pt_ = -9999.;
+  scslasercormax_eta_ = -9999.;
+  
   //clear vectors
   pfjets_.clear();
   pfjets_genJet_.clear();
@@ -3230,6 +3238,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       if( isData ) eebadsc_ = filt_eeBadSc();
       hbhenew_   = passHBHEFilter();
 
+      //for SCs above 20 GeV, store the max. ECAL laser correction and the eta/pT of this SC
+      if( !TString(prefix).Contains("T2") ) {
+	scslasercormax_ = -99999.;
+	for (int isc= 0; isc<scs_p4().size(); ++isc) {
+	  if (scs_p4()[isc].pt()<20.) continue;
+	  if ( scs_laserCorMax()[isc] > scslasercormax_ ) {
+	    scslasercormax_ = scs_laserCorMax()[isc];
+	    scslasercormax_pt_ = scs_p4()[isc].pt();
+	    scslasercormax_eta_ = scs_eta()[isc];
+	  }
+	}
+      }
+
       k_ = 1;
       if     ( strcmp( prefix , "LM0"  )    == 0 ) k_ = kfactorSUSY( "lm0"  );
       else if( strcmp( prefix , "LM1"  )    == 0 ) k_ = kfactorSUSY( "lm1"  );
@@ -3251,7 +3272,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ecalveto2_ = -1.;
       hcalveto1_ = -1.;
       hcalveto2_ = -1.;
-      
+      lep1_badecallaser_ = 0;
+      lep2_badecallaser_ = 0;
+
       if( leptype_ == 0 ){
 	iso1_   = electronIsolation_rel   ( index1 , true ); //truncated
 	isont1_ = electronIsolation_rel_v1( index1 , true ); //non-truncated
@@ -3276,6 +3299,16 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	phiSC_ = els_phiSC()[index1];
 	eSCRaw_ = els_eSCRaw()[index1];
 	eSCPresh_ = els_eSCPresh()[index1];
+	if( !TString(prefix).Contains("T2") ) {
+	  //      lep1_scslasercormean_ = scs_laserCorMean()[index1];
+	  //      lep1_scslasercormax_  = scs_laserCorMax()[index1];
+	  lep1_scslasercormean_ = scs_laserCorMean()[els_scindex()[index1]];
+	  lep1_scslasercormax_  = scs_laserCorMax()[els_scindex()[index1]];
+	  //      cout<<scs_eta()[els_scindex()[index1]]<<" "<<lep1_scslasercormax_<<endl;
+	  if ((fabs(scs_eta()[els_scindex()[index1]])<1.4442)&&(lep1_scslasercormax_>2.0) ||
+	      (fabs(scs_eta()[els_scindex()[index1]])>1.4442)&&(lep1_scslasercormax_>3.0))
+	    lep1_badecallaser_ = 1;
+	}
       }
       else if( leptype_ == 1 ){
 	iso1_   = muonIsoValue( index1 , true  ); //truncated 
@@ -3309,6 +3342,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	phiSC2_ = els_phiSC()[index2];
 	eSCRaw2_ = els_eSCRaw()[index2];
 	eSCPresh2_ = els_eSCPresh()[index2];
+	if( !TString(prefix).Contains("T2") ) {
+	  lep2_scslasercormean_ = scs_laserCorMean()[els_scindex()[index2]];
+	  lep2_scslasercormax_  = scs_laserCorMax()[els_scindex()[index2]];
+	  if ((fabs(scs_eta()[els_scindex()[index2]])<1.4442)&&(lep2_scslasercormax_>2.0) ||
+	      (fabs(scs_eta()[els_scindex()[index2]])>1.4442)&&(lep2_scslasercormax_>3.0))
+	    lep2_badecallaser_ = 1;
+	}
       }
       else if(abs(id2_) == 13) {
 	iso2_   = muonIsoValue( index2 , true  ); //truncated 
@@ -3518,6 +3558,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("ecaltp"    ,  &ecaltp_    ,  "ecaltp/I");  
   outTree->Branch("trkfail"   ,  &trkfail_   ,  "trkfail/I");  
   outTree->Branch("eebadsc"   ,  &eebadsc_   ,  "eebadsc/I");  
+  outTree->Branch("lep1_badecallaser" ,  &lep1_badecallaser_ ,  "lep1_badecallaser/I");  
+  outTree->Branch("lep2_badecallaser" ,  &lep2_badecallaser_ ,  "lep2_badecallaser/I");  
 
   outTree->Branch("isdata",          &isdata_,           "isdata/I");
   outTree->Branch("jetid",           &jetid_,            "jetid/I");
@@ -3760,7 +3802,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("phiSC", & phiSC_, "phiSC/F");
   outTree->Branch("eSCRaw", & eSCRaw_, "eSCRaw/F");
   outTree->Branch("eSCPresh", & eSCPresh_, "eSCPresh/F");
-  
+  outTree->Branch("lep1_scslasercormean", &lep1_scslasercormean_, "lep1_scslasercormean/F");
+  outTree->Branch("lep1_scslasercormax", &lep1_scslasercormax_, "lep1_scslasercormax/F");
+
   outTree->Branch("eoverpin2",         &eoverpin2_,         "eoverpin2/F");
   outTree->Branch("eoverpout2",        &eoverpout2_,        "eoverpout2/F");
   outTree->Branch("dEtaIn2", &dEtaIn2_, "dEtaIn2/F");
@@ -3779,7 +3823,12 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("phiSC2", & phiSC2_, "phiSC2/F");
   outTree->Branch("eSCRaw2", & eSCRaw2_, "eSCRaw2/F");
   outTree->Branch("eSCPresh2", & eSCPresh2_, "eSCPresh2/F");
-  
+  outTree->Branch("lep2_scslasercormean", &lep2_scslasercormean_, "lep2_scslasercormean/F");
+  outTree->Branch("lep2_scslasercormax", &lep2_scslasercormax_, "lep2_scslasercormax/F");
+  outTree->Branch("scslasercormax", &scslasercormax_, "scslasercormax/F");
+  outTree->Branch("scslasercormax_pt", &scslasercormax_pt_, "scslasercormax_pt/F");
+  outTree->Branch("scslasercormax_eta", &scslasercormax_eta_, "scslasercormax_eta/F");
+
   outTree->Branch("iso2",             &iso2_,             "iso2/F");
   outTree->Branch("ecalveto1",        &ecalveto1_,        "ecalveto1/F");
   outTree->Branch("ecalveto2",        &ecalveto2_,        "ecalveto2/F");

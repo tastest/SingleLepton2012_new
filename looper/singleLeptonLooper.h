@@ -732,8 +732,16 @@ class singleLeptonLooper
 	Float_t phiSC2_;
 	Float_t eSCRaw2_;
 	Float_t eSCPresh2_;
-
-
+        Float_t lep1_scslasercormean_;
+        Float_t lep1_scslasercormax_;
+        Float_t lep2_scslasercormean_;
+        Float_t lep2_scslasercormax_;
+	Int_t   lep1_badecallaser_;
+	Int_t   lep2_badecallaser_;
+	//for SCs above 20 GeV, store the max. ECAL laser correction and the eta/pT of this SC
+        Float_t scslasercormax_;
+        Float_t scslasercormax_pt_;
+        Float_t scslasercormax_eta_;
 
 	//recoil
 	Float_t dilrecoil_;
