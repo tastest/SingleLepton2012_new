@@ -2017,7 +2017,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  trkreliso5loose_ = iso;
 	}
 
-	if( pfcands_p4().at(ipf).pt()>=5 && iso < pfcandiso5_ && !isLeadLepton){
+	if( pfcands_p4().at(ipf).pt()>=5 && iso < pfcandiso5looseZ_ && !isLeadLepton){
 	  pfcandiso5looseZ_ = iso;
 	  pfcanddz5looseZ_ = mindz;
 	  pfcandpt5looseZ_ = pfcands_p4().at(ipf).pt();
@@ -2025,7 +2025,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
           pfcandid5looseZ_ =  pfcands_particleId().at(ipf);
 	}
 
-	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandisoOS10_ && !isLeadLepton && charge>0){
+	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandisoOS10looseZ_ && !isLeadLepton && charge>0){
 	  pfcandisoOS10looseZ_ = iso;
 	  pfcanddzOS10looseZ_ = mindz;
 	  pfcandptOS10looseZ_ = pfcands_p4().at(ipf).pt();
