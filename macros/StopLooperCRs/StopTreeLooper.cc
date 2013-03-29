@@ -322,10 +322,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 				   stopt.pfjets().at(i).pt(),
 				   stopt.pfjets_csv().at(i),
 				   stopt.pfjets_mcflavorAlgo().at(i) ); 
-	if (csv_nominal > 0.679) n_bjets++;
-	if (n_bjets==1) {
-	  pt_b = stopt.pfjets().at(i).pt();
-	  dRleptB1 = ROOT::Math::VectorUtil::DeltaR( stopt.lep1(), stopt.pfjets().at(i) );
+	if (csv_nominal > 0.679) {
+	  n_bjets++;
+	  if (n_bjets==1) {
+	    pt_b = stopt.pfjets().at(i).pt();
+	    dRleptB1 = ROOT::Math::VectorUtil::DeltaR( stopt.lep1(), stopt.pfjets().at(i) );
+	  }
 	}
 	btag.push_back( csv_nominal );
 
@@ -393,6 +395,17 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // tag_T2tt_HM -- add mt2w requirement
       bool passT2ttHM = (passT2ttLM && mt2wmin>200) ? true : false;
       string tag_T2tt_HM = passT2ttHM ? "_passT2ttHM" : "_failT2ttHM"; 
+
+      // tag_T2bw_LM -- dphi and bpt selection
+      bool passT2bwLM = ( dphimjmin>0.8 ) ? true : false;
+      string tag_T2bw_LM = passT2bwLM ? "_passT2bwLM" : "_failT2bwLM"; 
+
+      // tag_T2bw_HM -- add mt2w requirement
+      bool passbpt = false;
+      if (n_bjets<1 && n_jets>0 && jets.at(0).pt()>100.) passbpt = true;
+      else if (n_bjets>0 && pt_b>100.) passbpt = true;
+      bool passT2bwHM = (passT2bwLM && passbpt && mt2wmin>200) ? true : false;
+      string tag_T2bw_HM = passT2bwHM ? "_passT2bwHM" : "_failT2bwHM"; 
 
       //z-peak/veto
       string tag_zcut;
