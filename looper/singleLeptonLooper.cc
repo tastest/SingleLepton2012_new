@@ -526,6 +526,7 @@ void singleLeptonLooper::InitBaby(){
   pfjets_mc3_.clear();
   pfjets_mcflavorAlgo_.clear();
   pfjets_mcflavorPhys_.clear();
+  pfjets_uncertainty_.clear();
 
   pfjets_flav_.clear();
   pfjets_lrm_.clear();
@@ -2795,6 +2796,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_lrm_.push_back(getLRM(vipfjets_p4.at(i).p4ind,1));
 	pfjets_lrm2_.push_back(getLRM(vipfjets_p4.at(i).p4ind,2));
 
+	pfUncertainty->setJetEta(vipfjets_p4.at(i).p4obj.eta());
+	pfUncertainty->setJetPt(vipfjets_p4.at(i).p4obj.pt());   // here you must use the CORRECTED jet pt
+	double unc = pfUncertainty->getUncertainty(true);
+
+	pfjets_uncertainty_.push_back(unc);
+
 	//	cout << "lrm " << getLRM(vipfjets_p4.at(i).p4ind) << endl;
 
 	pfjets_corr_.push_back(vipfjets_p4.at(i).p4obj.pt()/pfjets_p4().at(vipfjets_p4.at(i).p4ind).pt());
@@ -4017,6 +4024,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_mc3",     "std::vector<int>"  , &pfjets_mc3_      ); 
   outTree->Branch("pfjets_mcflavorAlgo", "std::vector<int>", &pfjets_mcflavorAlgo_ ); 
   outTree->Branch("pfjets_mcflavorPhys", "std::vector<int>", &pfjets_mcflavorPhys_ ); 
+  outTree->Branch("pfjets_uncertainty" , "std::vector<float>", &pfjets_uncertainty_ );
 
   outTree->Branch("pfjets_flav",    "std::vector<int>"  , &pfjets_flav_     ); 
   outTree->Branch("pfjets_lrm", "std::vector<float>", &pfjets_lrm_ );

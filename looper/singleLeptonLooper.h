@@ -463,6 +463,8 @@ class singleLeptonLooper
 	std::vector<int>   pfjets_mcflavorAlgo_;
 	std::vector<int>   pfjets_mcflavorPhys_;
 
+	std::vector<float> pfjets_uncertainty_;
+
 	//qg tagging
 	std::vector<float> pfjets_qgtag_;
 	//jet shape
