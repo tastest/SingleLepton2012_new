@@ -47,6 +47,8 @@ class WHLooper {
   float CUT_BBMASS_HIGH_;
   float CUT_BBMASS_CR1_LOW_;
   float CUT_BBMASS_CR1_HIGH_;
+  float CUT_BBMASS_CR8_LOW_;
+  float CUT_BBMASS_CR8_HIGH_;
   float CUT_MET_PRESEL_;
   float CUT_MET_;
   float CUT_MT_PRESEL_;
