@@ -965,6 +965,11 @@ void StopTreeLooper::makeCR5Plots( float evtweight, std::map<std::string, TH1F*>
   x_ovflw = h_xmax-0.001;
   plot1D("h_cr5_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_cr5_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
+  //use larger range to calculate SF for fakes with higher stats.
+  float mt_count_lg = -1.;
+  if ( t1metphicorrmt < 100. ) mt_count_lg = 0.5;
+  else if ( t1metphicorrmt > mtcut ) mt_count_lg = 1.5;
+  plot1D("h_cr5_mt_count_lg"+tag_selection+flav_tag, mt_count_lg, evtweight, h_1d, 2, 0, 2);
 
   //Plot more angles between various objects
   //angle between lepton and isolated track
