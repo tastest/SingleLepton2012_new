@@ -53,7 +53,6 @@ const bool doCR5 = false; // bveto
 const bool doCR6 = false; // 1 btag -- not used
 const bool doCR7 = false; // high m(bb), 3 jets
 const bool doCR8 = false; // low m(bb)
-const bool doCR9 = false; // signal m(bb), >= 3 jets
 const bool doStopSel = false;
 
 std::set<DorkyEventIdentifier> already_seen; 
@@ -236,11 +235,6 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr8 nm1 hists
   std::map<std::string, TH1F*> h_1d_cr8_met_nm1, h_1d_cr8_mt_nm1, h_1d_cr8_mt2bl_nm1;
 
-  // cr9 hists
-  std::map<std::string, TH1F*> h_1d_cr9_presel, h_1d_cr9_final;
-  // cr9 nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr9_met_nm1, h_1d_cr9_mt_nm1, h_1d_cr9_mt2bl_nm1;
-
   // stop region hists
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
   std::map<std::string, TH1F*> h_1d_stop_met_nm1, h_1d_stop_mt_nm1, h_1d_stop_isotrk_nm1, h_1d_stop_tauveto_nm1 ;
@@ -356,16 +350,6 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr8_mt2bl_nm1");
     }
     outfile_->mkdir("cr8_final");
-  }
-
-  if (doCR9) {
-    outfile_->mkdir("cr9_presel");
-    if (doNM1Plots) {
-      outfile_->mkdir("cr9_met_nm1");
-      outfile_->mkdir("cr9_mt_nm1");
-      outfile_->mkdir("cr9_mt2bl_nm1");
-    }
-    outfile_->mkdir("cr9_final");
   }
 
   if (doStopSel) {
@@ -1188,43 +1172,10 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 
       // -------------------------------------------
-      // *** CR9: signal mass window, at least 3 jets, then exactly 3 jets
+      // *** CR9 idea: signal mass window, at least 3 jets, then exactly 3 jets
       //  otherwise same as signal region
       //  !! need to check to make sure signal contribution isn't too large..
-      //  -- after final selection, bg ~3, sig ~2 => don't use this region
-
-      if ( doCR9
-	   && passSingleLeptonSelection(isData) 
-	   && passisotrk 
-	   && (nbjets_ == 2)
-	   && (njetsalleta_ >= 3)
-	   && (bb_.M() > CUT_BBMASS_LOW_) && (bb_.M() < CUT_BBMASS_HIGH_) 
-	   && (met_ > CUT_MET_PRESEL_) 
-	   && (mt_ > CUT_MT_PRESEL_) ) {
-
-        fillHists1DWrapper(h_1d_cr9_presel,evtweight1l,"cr9_presel");
-
-	bool fail = false;
-	if ( !fail && (njetsalleta_ == 3) && (nbjets_ == 2) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr9_met_nm1,evtweight1l,"cr9_met_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (met_ > CUT_MET_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr9_mt_nm1,evtweight1l,"cr9_mt_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (mt_ > CUT_MT_) ) {
-	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr9_mt2bl_nm1,evtweight1l,"cr9_mt2bl_nm1");
-	}
-	else fail = true;
-
-	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
-	  fillHists1DWrapper(h_1d_cr9_final,evtweight1l,"cr9_final");
-	}
-
-      } // CR9 region sel
+      //  -- after final selection, bg ~3, sig ~2 => don't use this region!
 
 
       // -------------------------------------------
@@ -1406,16 +1357,6 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr8_mt2bl_nm1,outfile_,"cr8_mt2bl_nm1");
     }
     savePlotsDir(h_1d_cr8_final,outfile_,"cr8_final");
-  }
-
-  if (doCR9) {
-    savePlotsDir(h_1d_cr9_presel,outfile_,"cr9_presel");
-    if (doNM1Plots) {
-      savePlotsDir(h_1d_cr9_met_nm1,outfile_,"cr9_met_nm1");
-      savePlotsDir(h_1d_cr9_mt_nm1,outfile_,"cr9_mt_nm1");
-      savePlotsDir(h_1d_cr9_mt2bl_nm1,outfile_,"cr9_mt2bl_nm1");
-    }
-    savePlotsDir(h_1d_cr9_final,outfile_,"cr9_final");
   }
 
   if (doStopSel) {
