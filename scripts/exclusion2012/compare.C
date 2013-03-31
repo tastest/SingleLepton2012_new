@@ -1,17 +1,23 @@
 {
 
-  //TFile* fCC = TFile::Open("T2tt_x1combinePlots.root");
-  TFile* fCC = TFile::Open("T2bw_x50combinePlots.root");
-  TH2F*  hCC = (TH2F*) fCC->Get("hxsec_best_exp");
+  TFile* fCC = TFile::Open("T2tt_x1combinePlots.root");
+  TFile* fBDT = TFile::Open("T2tt_x1combinePlots_BDT.root");
 
-  //TFile* fBDT = TFile::Open("T2tt_x1combinePlots_BDT.root");
-  TFile* fBDT = TFile::Open("T2bw_x50combinePlots_BDT.root");
+  // TFile* fCC = TFile::Open("T2bw_x50combinePlots.root");
+  // TFile* fBDT = TFile::Open("T2bw_x50combinePlots_BDT.root");
+
+  TH2F*  hCC = (TH2F*) fCC->Get("hxsec_best_exp");
   TH2F*  hBDT = (TH2F*) fBDT->Get("hxsec_best_exp");
+
+  TGraph* gCC  = (TGraph*) fCC->Get("gr_exp");
+  TGraph* gBDT = (TGraph*) fBDT->Get("gr_exp");
+
+  gBDT->SetLineColor(2);
 
   TH2F*  hratio = (TH2F*) hBDT->Clone("hratio");
   hratio->Divide(hCC);
 
-  TCanvas *c1 = new TCanvas("c1","",1800,600);
+  TCanvas *c1 = new TCanvas("c1","",1200,600);
   c1->cd();
 
   hratio->SetMinimum(0);
@@ -19,9 +25,25 @@
 
   gStyle->SetPaintTextFormat(".1f");
 
+  hratio->GetYaxis()->SetRangeUser(0,300);
+  hratio->GetYaxis()->SetTitleOffset(0.75);
+  hratio->SetMaximum(2.0);
+  hratio->SetMinimum(0.0);
+
   gPad->SetRightMargin(0.2);
   hratio->Draw("colz");
   hratio->Draw("sametext");
+  gCC->Draw("samel");
+  gBDT->Draw("samel");
+
+  hratio->GetZaxis()->SetTitle("#sigma_{UL}(MVA) / #sigma_{UL}(C&C)");
+
+  TLegend *leg = new TLegend(0.2,0.7,0.4,0.9);
+  leg->AddEntry(gCC,"C&C expected limit","l");
+  leg->AddEntry(gBDT,"MVA expected limit","l");
+  leg->SetBorderSize(0);
+  leg->SetFillColor(0);
+  leg->Draw();
 
   c1->Print("../../plots/compare_CC_BDT.pdf");
 
