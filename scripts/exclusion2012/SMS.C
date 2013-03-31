@@ -49,7 +49,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   char* denomname      = "";
 
   if( TString(sample).Contains("T2tt") ){
-    filename  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt*root";
+    filename  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
     denomname = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
 
     if( doBDT ){
@@ -139,6 +139,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   }
 
   //if( TString(sample).Contains("T2tt") ) label = "";
+
+  // char* logfilename = Form("%s%s%s.log",sample,suffix,pol);
+  // ofstream* logfile;
+  // logfile->open(logfilename,ios::trunc);
+
+  // *logfile << "test" << endl;
 
   //--------------------------------------------------
   // read in TChain
@@ -287,29 +293,28 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   vector<TCut>    sigcuts;
   vector<string>  signames;
   vector<string>  labels;
-  vector<int>     cuts;
+  vector<float>   uls;
 
   if( doBDT ){
 
+    cout << "Doing BDT signal regions" << endl;  
+
+    // T2tt BDT
     if( TString(sample).Contains("T2tt") ){
-      sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  uls.push_back(1);
     }
 
+    // T2bw BDT
     else if( TString(sample).Contains("T2bw") ){
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(1);
     }
 
-    // sigcuts.push_back(TCut(presel+SR_BDT[5]));  signames.push_back(SRname_BDT[5]);  labels.push_back(SRname_BDT[5]);  cuts.push_back(1);
-    // sigcuts.push_back(TCut(presel+SR_BDT[6]));  signames.push_back(SRname_BDT[6]);  labels.push_back(SRname_BDT[6]);  cuts.push_back(1);
-    // sigcuts.push_back(TCut(presel+SR_BDT[7]));  signames.push_back(SRname_BDT[7]);  labels.push_back(SRname_BDT[7]);  cuts.push_back(1);
-    // sigcuts.push_back(TCut(presel+SR_BDT[8]));  signames.push_back(SRname_BDT[8]);  labels.push_back(SRname_BDT[8]);  cuts.push_back(1);
-    // sigcuts.push_back(TCut(presel+SR_BDT[9]));  signames.push_back(SRname_BDT[9]);  labels.push_back(SRname_BDT[9]);  cuts.push_back(1);
   }
 
   else{
@@ -317,31 +322,52 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
     if( TString(sample).Contains("T2tt") ){
 
+      //----------------------------
+      // MT > 150 GeV
+      //----------------------------
+
+      // // low-mass
+      // sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  uls.push_back(64.4);
+      // sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  uls.push_back(30.0);
+      // sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  uls.push_back(15.3);
+      // sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  uls.push_back(8.79);
+
+      // // high-mass
+      // sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  uls.push_back(12.9);
+      // sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  uls.push_back(10.2);
+      // sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  uls.push_back(8.02);
+      // sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  uls.push_back(5.87);
+
+      //----------------------------
+      // MT > 120 GeV
+      //----------------------------
+
       // low-mass
-      sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  uls.push_back(79.6);
+      sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  uls.push_back(42.1);
+      sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  uls.push_back(19.0);
+      sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  uls.push_back(9.9);
 
       // high-mass
-      sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  cuts.push_back(1);
+      sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  uls.push_back(17.5);
+      sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  uls.push_back(12.3);
+      sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  uls.push_back(9.0);
+      sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  uls.push_back(6.4);
     }
 
     if( TString(sample).Contains("T2bw") ){
-      sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   cuts.push_back(1);
-      //sigcuts.push_back(TCut(presel+SR_T2BW[4]));   signames.push_back(SRname_T2BW[4]);   labels.push_back(SRname_T2BW[4]);   cuts.push_back(1);
-      //sigcuts.push_back(TCut(presel+SR_T2BW[5]));   signames.push_back(SRname_T2BW[5]);   labels.push_back(SRname_T2BW[5]);   cuts.push_back(1);
-      //sigcuts.push_back(TCut(presel+SR_T2BW[6]));   signames.push_back(SRname_T2BW[6]);   labels.push_back(SRname_T2BW[6]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[7]));   signames.push_back(SRname_T2BW[7]);   labels.push_back(SRname_T2BW[7]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[8]));   signames.push_back(SRname_T2BW[8]);   labels.push_back(SRname_T2BW[8]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[9]));   signames.push_back(SRname_T2BW[9]);   labels.push_back(SRname_T2BW[9]);   cuts.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[10]));  signames.push_back(SRname_T2BW[10]);  labels.push_back(SRname_T2BW[10]);  cuts.push_back(1);
+
+      // low-mass
+      sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   uls.push_back(1);
+
+      // high-mass
+      sigcuts.push_back(TCut(presel+SR_T2BW[7]));   signames.push_back(SRname_T2BW[7]);   labels.push_back(SRname_T2BW[7]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[8]));   signames.push_back(SRname_T2BW[8]);   labels.push_back(SRname_T2BW[8]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[9]));   signames.push_back(SRname_T2BW[9]);   labels.push_back(SRname_T2BW[9]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[10]));  signames.push_back(SRname_T2BW[10]);  labels.push_back(SRname_T2BW[10]);  uls.push_back(1);
     }
 
 
@@ -377,6 +403,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << endl ;
     cout << "Signal Region : " << i << " " << signames.at(i) << endl;
     cout << "Selection     : " << sigcuts.at(i) << endl;
+    cout << "UL            : " << uls.at(i) << endl;
 
     //------------------------------------------------
     // turn off point-by-point signal uncertainties
@@ -486,6 +513,13 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	float this_ul_expp1;
 	float this_ul_expm1;
 
+	this_ul       = uls.at(i);
+	this_ul_exp   = uls.at(i);
+	this_ul_expp1 = uls.at(i);
+	this_ul_expm1 = uls.at(i);
+
+
+	/*
 	if( TString(labels.at(i)).Contains("LM150") ){
 	  this_ul       = 79.6;
 	  this_ul_exp   = this_ul;
@@ -580,7 +614,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
-
+	*/
 	/*
 	else if( TString(labels.at(i)).Contains("BDT3_60") ){
 	  this_ul       = 11.4;
@@ -617,7 +651,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	  this_ul_expm1 = 3.7;
 	}
 	*/
-
+	/*
 	else if( TString(labels.at(i)).Contains("T2BW_LM100") ){
 	  this_ul       = 274.0;
 	  //this_ul       = 413.0;
@@ -731,7 +765,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 	  cout << "WARNING UNRECOGNIZED SIGNAL REGION " << labels.at(i) << " QUITTING!!!" << endl;
 	  exit(0);
 	}
-
+	*/
 
 	float xsecul        = this_ul       / ( lumi * eff );
 	float xsecul_exp    = this_ul_exp   / ( lumi * eff );
@@ -969,7 +1003,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     //cout << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
     cout << endl << endl;
   }
-  
+
   TFile *outfile = TFile::Open(Form("%s%s%s_histos.root",sample,suffix,pol),"RECREATE");
 
   outfile->cd();
