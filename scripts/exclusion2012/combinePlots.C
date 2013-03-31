@@ -24,9 +24,48 @@
 #include "TMath.h"
 #include <sstream>
 #include <iomanip>
-//#include "contours.C"
+#include "contours.C"
+#include "smooth.C"
 
 using namespace std;
+
+void removeSlice( TH2F* h ){
+  for( int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ )
+    h->SetBinContent(ibin,1,1000);
+}
+
+TH2F* largeDM( TH2F* hin ){
+  TH2F* hout = (TH2F*) hin->Clone("hout");
+
+
+  for( int ibin = 1 ; ibin <= hin->GetXaxis()->GetNbins() ; ibin++ ){
+    for( int jbin = 1 ; jbin <= hin->GetYaxis()->GetNbins() ; jbin++ ){
+      float mstop = hin->GetXaxis()->GetBinCenter(ibin);
+      float mlsp  = hin->GetYaxis()->GetBinCenter(jbin);
+
+      if( mstop - mlsp < 175 )  hout->SetBinContent(ibin,jbin,10000);
+    }
+  }
+
+  return hout;
+}
+
+TH2F* smallDM( TH2F* hin ){
+  TH2F* hout = (TH2F*) hin->Clone("hout");
+
+
+  for( int ibin = 1 ; ibin <= hin->GetXaxis()->GetNbins() ; ibin++ ){
+    for( int jbin = 1 ; jbin <= hin->GetYaxis()->GetNbins() ; jbin++ ){
+      float mstop = hin->GetXaxis()->GetBinCenter(ibin);
+      float mlsp  = hin->GetYaxis()->GetBinCenter(jbin);
+
+      if( mstop - mlsp >= 175 ) hout->SetBinContent(ibin,jbin,0);
+      if( mstop == 300 && mlsp == 150 ) hout->SetBinContent(ibin,jbin,10000);
+    }
+  }
+
+  return hout;  
+}
 
 TH2F* shiftHist(TH2F* hin){
 
@@ -144,21 +183,28 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   float yaxismax    = 250.0;
   char* suffix      = "";
   int   nSR         = -1;
+  bool  doRemoveSlice = true;
+  char* pol         = "";
+  //char* pol         = "right";
+  //char* pol         = "left";
+
+  TLatex *t = new TLatex();
+  t->SetNDC();
 
   gStyle->SetPaintTextFormat(".0f");
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #chi_{1}^{0}";
-    outfilename = "combinePlots_T2tt.root";
+    outfilename = "combinePlots_T2tt%s.root";
     xaxismin    =   0.0;
     yaxismax    = 250.0;
     if( doBDT ){
-      filename    = "T2tt_BDT_histos.root";
+      filename    = Form("T2tt_BDT%s_histos.root",pol);
       suffix      = "_BDT";
       nSR         = 5;
     }
     else{
-      filename    = "T2tt_histos.root";
+      filename    = Form("T2tt%s_histos.root",pol);
       nSR         = 8;
     }
   }
@@ -166,6 +212,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   else if( TString(sample).Contains("T2bw") ){
 
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #chi_{1}^{#pm} #rightarrow b W #chi_{1}^{0}";
+    doRemoveSlice = false;
 
     if( x==25 ){
       xaxismin = 360.0;
@@ -184,12 +231,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
       else{
 	xaxismin = 180.0;
-	//outfilename = "combinePlots_T2bw_x50.root";
-	//filename    = "T2bw_x50_histos.root";
-	outfilename = "combinePlots_T2bw_x50_unc15.root";
-	filename    = "T2bw_x50_unc15_histos.root";
-	//nSR = 11;
-	nSR = 4;
+	outfilename = "combinePlots_T2bw_x50.root";
+	filename    = "T2bw_x50_histos.root";
+	//outfilename = "combinePlots_T2bw_x50_unc15.root";
+	//filename    = "T2bw_x50_unc15_histos.root";
+	nSR = 8;
+	//nSR = 4;
       }
 
     }
@@ -288,249 +335,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     }
   }
 
-  TCanvas *can1 = new TCanvas("can1","",800,600);
-  can1->cd();
 
-  TLatex *t = new TLatex();
-  t->SetNDC();
-
-  //-------------------------------
-  // cross section limit
-  //-------------------------------
-
-  if( smooth ){
-    smoothHist( hxsec_best );
-    smoothHist( hbest );
-  }
-
-  //blankHist( hxsec_best , 200 );
-  //TH2F* hxsec_best_shifted = shiftHist( hxsec_best );
-  hxsec_best_exp->GetXaxis()->SetRangeUser(0,700);
-  TH2F* hxsec_best_shifted = (TH2F*) hxsec_best_exp;
-  TH2F* hdummy = (TH2F*) hxsec_best->Clone("hdummy");
-  hdummy->Reset();
-
-  //hxsec_best->Reset();
-  // if( shift ){
-  //   hxsec_best = shiftHist( hxsec_best );
-  //}
-
-  // cout << endl << "observed" << endl;
-  // plot1D( hxsec_best );
-  // cout << endl << "observed (+1)" << endl;
-  // plot1D( hxsec_best_obsp1 );
-  // cout << endl << "observed (-1)" << endl;
-  // plot1D( hxsec_best_obsm1 );
-  // cout << endl << "expected" << endl;
-  // plot1D( hxsec_best_exp );
-  // cout << endl << "expected (+1)" << endl;
-  // plot1D( hxsec_best_expp1 );
-  // cout << endl << "expected (-1)" << endl;
-  // plot1D( hxsec_best_expm1 );
-
-  gPad->SetTopMargin(0.1);
-  gPad->SetRightMargin(0.2);
-  gPad->SetLogz();
-  hdummy->GetXaxis()->SetLabelSize(0.035);
-  hdummy->GetYaxis()->SetLabelSize(0.035);
-  hdummy->GetZaxis()->SetLabelSize(0.035);
-  hdummy->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
-  hdummy->GetYaxis()->SetTitleOffset(0.9);
-  hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
-  hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
-  hdummy->GetZaxis()->SetTitleOffset(0.8);
-  hdummy->GetXaxis()->SetRangeUser(0,700);
-  hdummy->GetYaxis()->SetRangeUser(0,400);
-  //hdummy->Draw("colz");
-  hdummy->SetMinimum(0.01);
-  hdummy->SetMaximum(100);
-  hxsec_best_shifted->SetMinimum(0.01);
-  hxsec_best_shifted->SetMaximum(100);
-  hdummy->SetMaximum(100);
-  hdummy->Draw();
-  hxsec_best_shifted->Draw("samecolz");
-  hdummy->Draw("axissame");
-  
-  TGraph* gr        = getRefXsecGraph(hxsec_best       , "T2tt", 1.0);
-  TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp   , "T2tt", 1.0);
-  TGraph* gr_expp1  = getRefXsecGraph(hxsec_best_expp1 , "T2tt", 1.0);
-  TGraph* gr_expm1  = getRefXsecGraph(hxsec_best_expm1 , "T2tt", 1.0);
-  TGraph* gr_obsp1  = getRefXsecGraph(hxsec_best       , "T2tt", 1.15);
-  TGraph* gr_obsm1  = getRefXsecGraph(hxsec_best       , "T2tt", 0.85);
-
-  /*
-  TGraph* gr       = new TGraph();
-  TGraph* gr_exp   = new TGraph();
-  TGraph* gr_expp1 = new TGraph();
-  TGraph* gr_expm1 = new TGraph();
-  TGraph* gr_obsp1 = new TGraph();
-  TGraph* gr_obsm1 = new TGraph();
-
-  if( TString(sample).Contains("T2tt") ){
-    gr       = T2tt_observed();
-    gr_exp   = T2tt_expected();
-    gr_expp1 = T2tt_expectedP1();
-    gr_expm1 = T2tt_expectedM1();
-    gr_obsp1 = T2tt_observedP1();
-    gr_obsm1 = T2tt_observedM1();
-  }
-  else if( TString(sample).Contains("T2bw") && x==75 ){
-    gr       = T2bw_x75_observed();
-    gr_exp   = T2bw_x75_expected();
-    gr_expp1 = T2bw_x75_expectedP1();
-    gr_expm1 = T2bw_x75_expectedM1();
-    gr_obsp1 = T2bw_x75_observedP1();
-    gr_obsm1 = T2bw_x75_observedM1();
-  }
-  else if( TString(sample).Contains("T2bw") && x==50 ){
-    gr       = T2bw_x50_observed();
-    gr_exp   = T2bw_x50_expected();
-    gr_expp1 = T2bw_x50_expectedP1();
-    gr_expm1 = T2bw_x50_expectedM1();
-    gr_obsp1 = T2bw_x50_observedP1();
-    gr_obsm1 = T2bw_x50_observedM1();
-  }
-  */
-
-  gr->SetLineWidth(6);
-
-  // gr_exp->SetLineWidth(4);
-  // gr_exp->SetLineStyle(7);
-
-  gr_exp->SetLineColor(1);
-  gr_exp->SetLineWidth(4);
-  gr_exp->SetLineStyle(1);
-
-  gr_expp1->SetLineWidth(3);
-  gr_expp1->SetLineStyle(3);
-  gr_expm1->SetLineWidth(3);
-  gr_expm1->SetLineStyle(3);
-
-  //gr_exp->SetLineColor(4);
-  gr_expp1->SetLineColor(4);
-  gr_expm1->SetLineColor(4);
-
-  gr_obsp1->SetLineStyle(2);
-  gr_obsm1->SetLineStyle(2);
-  gr_obsp1->SetLineWidth(3);
-  gr_obsm1->SetLineWidth(3);
-
-  gr_exp->Draw();
-  // gr_expp1->Draw();
-  // gr_expm1->Draw();
-  // gr_obsp1->Draw();
-  // gr_obsm1->Draw();
-  // gr->Draw();
-
-  // cout << endl << "observed" << endl;
-  // printGraph(gr);
-  // cout << endl << "observed (+1)" << endl;
-  // printGraph(gr_obsp1);
-  // cout << endl << "observed (-1)" << endl;
-  // printGraph(gr_obsm1);
-  // cout << endl << "expected" << endl;
-  // printGraph(gr_exp);
-  // cout << endl << "expected (+1)" << endl;
-  // printGraph(gr_expp1);
-  // cout << endl << "expected (-1)" << endl;
-  // printGraph(gr_expm1);
-
-  // TLegend *leg = new TLegend(0.2,0.6,0.65,0.8);
-  // leg->AddEntry(gr,       "observed","l");
-  // leg->AddEntry(gr_exp,   "median expected (#pm1#sigma)","l");
-  // //leg->AddEntry(gr_expp1, "expected (#pm1#sigma)","l");
-  // leg->SetFillColor(0);
-  // leg->SetBorderSize(0);
-  // leg->Draw();
-
-  /*
-  t->SetTextSize(0.04);
-  t->DrawLatex(0.20,0.72  ,"NLO-NLL exclusions");
-  t->DrawLatex(0.27,0.67,"Observed #pm1#sigma^{theory}");
-  t->DrawLatex(0.27,0.62,"Expected #pm1#sigma");
-
-  t->DrawLatex(0.19,0.84,label);
-  t->DrawLatex(0.19,0.79,"unpolarized top quarks");
-  */
-
-  /*
-  t->SetTextSize(0.035);
-  t->DrawLatex(0.18,0.79,"50 / 50 t_{L} / t_{R} mixture");
-  t->DrawLatex(0.18,0.84,label);
-  t->SetTextSize(0.04);
-  t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
-  t->DrawLatex(0.55,0.80,"Observed #pm1#sigma^{theory}");
-  t->DrawLatex(0.55,0.75,"Expected #pm1#sigma");
-
-
-  t->SetTextSize(0.045);
-  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
-  */
-
-  /*
-  //float offset = 40.0;
-  float xoffset = 405.0;
-  float yoffset = 213.0;
-  float length  =  30.0;
-  float yspace1 =     5;
-  float yspace2 =    17;
-
-  if( TString(sample).Contains("T2bw") && x==75 ) xoffset -= 30.0;
-  
-  // median expected
-  //TLine *line22 = new TLine(xaxismin+xoffset+25, 310-yoffset, xaxismin+xoffset+65, 310-yoffset);
-  TLine *line22 = new TLine(xoffset,yoffset,xoffset+length,yoffset);
-  line22->SetLineWidth(4);
-  line22->SetLineColor(4);
-  line22->SetLineStyle(7);
-  line22->Draw();
- 
-  // expected +/-1sigma
-  //TLine *line23 = new TLine(xaxismin+xoffset+25, 317-yoffset, xaxismin+xoffset+65, 317-yoffset);
-  TLine *line23 = new TLine(xoffset,yoffset+yspace1,xoffset+length,yoffset+yspace1);
-  line23->SetLineWidth(3);
-  line23->SetLineColor(4);
-  line23->SetLineStyle(3);
-  line23->Draw();
-
-  // expected +/-1sigma  
-  //TLine *line24 = new TLine(xaxismin+xoffset+25, 303-yoffset, xaxismin+xoffset+65, 303-yoffset);
-  TLine *line24 = new TLine(xoffset,yoffset-yspace1,xoffset+length,yoffset-yspace1);
-  line24->SetLineWidth(3);
-  line24->SetLineColor(4);
-  line24->SetLineStyle(3);
-  line24->Draw();
-
-  // median observed
-  //TLine *line25 = new TLine(xaxismin+xoffset+25, 335-yoffset, xaxismin+xoffset+65, 335-yoffset);
-  TLine *line25 = new TLine(xoffset,yoffset+yspace2,xoffset+length,yoffset+yspace2);
-  line25->SetLineWidth(6);
-  line25->SetLineColor(1);
-  line25->SetLineStyle(1);
-  line25->Draw();
- 
-  //TLine *line26 = new TLine(xaxismin+xoffset+25, 342-yoffset, xaxismin+xoffset+65, 342-yoffset);
-  TLine *line26 = new TLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
-  line26->SetLineWidth(2);
-  line26->SetLineColor(1);
-  line26->SetLineStyle(2);
-  line26->Draw();
-  
-  //TLine *line27 = new TLine(xaxismin+xoffset+25, 328-yoffset, xaxismin+xoffset+65, 328-yoffset);
-  TLine *line27 = new TLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
-  line27->SetLineWidth(2);
-  line27->SetLineColor(1);
-  line27->SetLineStyle(2);
-  line27->Draw();
-  */
-
-
-  t->SetTextSize(0.04);
-  t->DrawLatex(0.18,0.94,"CMS Preliminary                 #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
-  
-
+  if(doRemoveSlice) removeSlice(hxsec_best_exp);
 
   //-------------------------------
   // best signal region
@@ -560,15 +366,15 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->DrawLatex(0.19,0.83,label);
 
   if( doBDT ){
-    // t->DrawLatex(0.2,0.75,"1 = BDT1loose");
-    // t->DrawLatex(0.2,0.70,"2 = BDT1tight");
-    // t->DrawLatex(0.2,0.65,"3 = BDT2");
-    // t->DrawLatex(0.2,0.60,"4 = BDT3");
-    // t->DrawLatex(0.2,0.55,"5 = BDT4");
+    t->DrawLatex(0.2,0.75,"1 = BDT1loose");
+    t->DrawLatex(0.2,0.70,"2 = BDT1tight");
+    t->DrawLatex(0.2,0.65,"3 = BDT2");
+    t->DrawLatex(0.2,0.60,"4 = BDT3");
+    t->DrawLatex(0.2,0.55,"5 = BDT4");
 
-    t->DrawLatex(0.2,0.75,"1 = BDT1");
-    t->DrawLatex(0.2,0.70,"2 = BDT2");
-    t->DrawLatex(0.2,0.65,"3 = BDT3");
+    // t->DrawLatex(0.2,0.75,"1 = BDT1");
+    // t->DrawLatex(0.2,0.70,"2 = BDT2");
+    // t->DrawLatex(0.2,0.65,"3 = BDT3");
 
 
     // t->DrawLatex(0.2,0.50,"6 = BDT2_65");
@@ -596,22 +402,23 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     // t->DrawLatex(0.2,0.45,"7 = HM250");
     // t->DrawLatex(0.2,0.40,"8 = HM300");
 
-    // t->DrawLatex(0.2,0.75," 1 = LM100");
-    // t->DrawLatex(0.2,0.70," 2 = LM150");
-    // t->DrawLatex(0.2,0.65," 3 = LM200");
-    // t->DrawLatex(0.2,0.60," 4 = LM250");
+    t->DrawLatex(0.2,0.75," 1 = LM100");
+    t->DrawLatex(0.2,0.70," 2 = LM150");
+    t->DrawLatex(0.2,0.65," 3 = LM200");
+    t->DrawLatex(0.2,0.60," 4 = LM250");
+    t->DrawLatex(0.2,0.55," 5 = HM100");
+    t->DrawLatex(0.2,0.50," 6 = HM150");
+    t->DrawLatex(0.2,0.45," 7 = HM200");
+    t->DrawLatex(0.2,0.40," 8 = HM250");
+
     // t->DrawLatex(0.2,0.55," 5 = LM300");
     // t->DrawLatex(0.2,0.50," 6 = LM350");
     // t->DrawLatex(0.2,0.45," 7 = LM400");
-    // t->DrawLatex(0.2,0.40," 8 = HM100");
-    // t->DrawLatex(0.2,0.35," 9 = HM150");
-    // t->DrawLatex(0.2,0.30,"10 = HM200");
-    // t->DrawLatex(0.2,0.25,"11 = HM250");
 
-    t->DrawLatex(0.2,0.70," 1 = HM100");
-    t->DrawLatex(0.2,0.65," 2 = HM150");
-    t->DrawLatex(0.2,0.60," 3 = HM200");
-    t->DrawLatex(0.2,0.55," 4 = HM250");
+    // t->DrawLatex(0.2,0.70," 1 = HM100");
+    // t->DrawLatex(0.2,0.65," 2 = HM150");
+    // t->DrawLatex(0.2,0.60," 3 = HM200");
+    // t->DrawLatex(0.2,0.55," 4 = HM250");
   }
 
   if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
@@ -686,6 +493,36 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   }
 
 
+  double contours[1];
+  contours[0] = 0.5;
+
+  TH2F* hexcl_exp1 = (TH2F*) hexcl_exp->Clone("hexcl_exp1");
+  TH2F* hexcl_exp2 = (TH2F*) hexcl_exp->Clone("hexcl_exp2");
+
+  for( int ibin = 1 ; ibin <= 41 ; ibin++ ){
+    for( int jbin = 1 ; jbin <= 41 ; jbin++ ){
+      float mstop = hexcl_exp->GetXaxis()->GetBinCenter(ibin);
+      float mlsp  = hexcl_exp->GetYaxis()->GetBinCenter(jbin);
+
+      if( mstop - mlsp < 175 )  hexcl_exp1->SetBinContent(ibin,jbin,0);
+      if( mstop - mlsp >= 175 ) hexcl_exp2->SetBinContent(ibin,jbin,0);
+      if( mstop == 300 && mlsp == 150 ) hexcl_exp2->SetBinContent(ibin,jbin,0);
+    }
+  }
+
+  TH2F* hxsec_best_exp_largeDM = largeDM( hxsec_best_exp);
+  TH2F* hxsec_best_exp_smallDM = smallDM( hxsec_best_exp);
+
+  TGraph* gr        = getRefXsecGraph(hxsec_best       , "T2tt", 1.0);
+  //TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp   , "T2tt", 1.0);
+  TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp_largeDM   , "T2tt", 1.0);
+  TGraph* gr_exp_smallDM    = getRefXsecGraph(hxsec_best_exp_smallDM   , "T2tt", 1.0);
+  TGraph* gr_expp1  = getRefXsecGraph(hxsec_best_expp1 , "T2tt", 1.0);
+  TGraph* gr_expm1  = getRefXsecGraph(hxsec_best_expm1 , "T2tt", 1.0);
+  TGraph* gr_obsp1  = getRefXsecGraph(hxsec_best       , "T2tt", 1.15);
+  TGraph* gr_obsm1  = getRefXsecGraph(hxsec_best       , "T2tt", 0.85);
+
+  
   TCanvas *can3 = new TCanvas("can3","can3",800,600);
   can3->cd();
 
@@ -697,7 +534,19 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   hexcl_exp->GetYaxis()->SetRangeUser(0,300);
   hexcl_exp->Draw("colz");
   gr_exp->Draw("lp");
+  gr_exp_smallDM->Draw("lp");
   t->DrawLatex(0.3,0.8,"expected");
+
+
+  // hexcl_exp1->SetContour(1,contours);
+  // hexcl_exp1->SetLineWidth(4);
+  // hexcl_exp1->Draw("SAMECONT3COLZ");
+
+  // hexcl_exp2->SetContour(1,contours);
+  // hexcl_exp2->SetLineWidth(4);
+  // hexcl_exp2->Draw("SAMECONT3COLZ");
+
+
 
   /*
   TCanvas *can3 = new TCanvas("can3","can3",1200,800);
@@ -779,6 +628,291 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
   */
 
+  TCanvas *can1 = new TCanvas("can1","",800,600);
+  can1->cd();
+
+
+  t->SetNDC();
+
+  //-------------------------------
+  // cross section limit
+  //-------------------------------
+
+  if( smooth ){
+    smoothHist( hxsec_best );
+    smoothHist( hbest );
+  }
+
+  blankHist( hxsec_best_exp , 300 );
+  //TH2F* hxsec_best_shifted = shiftHist( hxsec_best );
+  hxsec_best_exp->GetXaxis()->SetRangeUser(0,700);
+  TH2F* hxsec_best_shifted = (TH2F*) hxsec_best_exp;
+  //TH2F* hdummy = (TH2F*) hxsec_best->Clone("hdummy");
+  TH2F* hdummy = new TH2F("hdummy","",100,0,700,100,0,400);
+  hdummy->Reset();
+
+  //hxsec_best->Reset();
+  // if( shift ){
+  //   hxsec_best = shiftHist( hxsec_best );
+  //}
+
+  // cout << endl << "observed" << endl;
+  // plot1D( hxsec_best );
+  // cout << endl << "observed (+1)" << endl;
+  // plot1D( hxsec_best_obsp1 );
+  // cout << endl << "observed (-1)" << endl;
+  // plot1D( hxsec_best_obsm1 );
+  // cout << endl << "expected" << endl;
+  // plot1D( hxsec_best_exp );
+  // cout << endl << "expected (+1)" << endl;
+  // plot1D( hxsec_best_expp1 );
+  // cout << endl << "expected (-1)" << endl;
+  // plot1D( hxsec_best_expm1 );
+
+  gPad->SetTopMargin(0.1);
+  gPad->SetRightMargin(0.2);
+  gPad->SetLogz();
+  hdummy->GetXaxis()->SetLabelSize(0.035);
+  hdummy->GetYaxis()->SetLabelSize(0.035);
+  hdummy->GetZaxis()->SetLabelSize(0.035);
+  hdummy->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
+  hdummy->GetYaxis()->SetTitleOffset(0.9);
+  hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
+  hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
+  hdummy->GetZaxis()->SetTitleOffset(0.8);
+  hdummy->GetXaxis()->SetRangeUser(0,700);
+  hdummy->GetYaxis()->SetRangeUser(0,400);
+  //hdummy->Draw("colz");
+  hdummy->SetMinimum(0.01);
+  hdummy->SetMaximum(100);
+  hxsec_best_shifted->SetMinimum(0.01);
+  hxsec_best_shifted->SetMaximum(100);
+  hdummy->SetMaximum(100);
+  hdummy->Draw();
+  hxsec_best_shifted->Draw("samecolz");
+  hdummy->Draw("axissame");
+  hexcl_exp->Draw("samebox");
+
+  TGraph* HCP;
+  if     ( TString(sample).Contains("T2tt") )  HCP   = T2tt_expected();
+  else if( TString(sample).Contains("T2bw") )  HCP   = T2bw_x50_expected();
+
+  HCP->SetLineColor(6);
+  HCP->SetLineStyle(2);
+  HCP->SetLineWidth(4);
+  //HCP->Draw();
+
+  /*
+  TGraph* gr       = new TGraph();
+  TGraph* gr_exp   = new TGraph();
+  TGraph* gr_expp1 = new TGraph();
+  TGraph* gr_expm1 = new TGraph();
+  TGraph* gr_obsp1 = new TGraph();
+  TGraph* gr_obsm1 = new TGraph();
+
+  if( TString(sample).Contains("T2tt") ){
+    gr       = T2tt_observed();
+    gr_exp   = T2tt_expected();
+    gr_expp1 = T2tt_expectedP1();
+    gr_expm1 = T2tt_expectedM1();
+    gr_obsp1 = T2tt_observedP1();
+    gr_obsm1 = T2tt_observedM1();
+  }
+  else if( TString(sample).Contains("T2bw") && x==75 ){
+    gr       = T2bw_x75_observed();
+    gr_exp   = T2bw_x75_expected();
+    gr_expp1 = T2bw_x75_expectedP1();
+    gr_expm1 = T2bw_x75_expectedM1();
+    gr_obsp1 = T2bw_x75_observedP1();
+    gr_obsm1 = T2bw_x75_observedM1();
+  }
+  else if( TString(sample).Contains("T2bw") && x==50 ){
+    gr       = T2bw_x50_observed();
+    gr_exp   = T2bw_x50_expected();
+    gr_expp1 = T2bw_x50_expectedP1();
+    gr_expm1 = T2bw_x50_expectedM1();
+    gr_obsp1 = T2bw_x50_observedP1();
+    gr_obsm1 = T2bw_x50_observedM1();
+  }
+  */
+
+  gr->SetLineWidth(6);
+
+  // gr_exp->SetLineWidth(4);
+  // gr_exp->SetLineStyle(7);
+
+  gr_exp->SetLineColor(1);
+  gr_exp->SetLineWidth(4);
+  gr_exp->SetLineStyle(1);
+
+  gr_expp1->SetLineWidth(3);
+  gr_expp1->SetLineStyle(3);
+  gr_expm1->SetLineWidth(3);
+  gr_expm1->SetLineStyle(3);
+
+  //gr_exp->SetLineColor(4);
+  gr_expp1->SetLineColor(4);
+  gr_expm1->SetLineColor(4);
+
+  gr_obsp1->SetLineStyle(2);
+  gr_obsm1->SetLineStyle(2);
+  gr_obsp1->SetLineWidth(3);
+  gr_obsm1->SetLineWidth(3);
+
+  gr_exp->Draw();
+
+  TH2F* hR = exclusionContour(hxsec_best_exp);
+  hR->SetLineWidth(3);
+  hR->SetLineColor(2);
+  hR->Draw("CONT3SAME");
+
+  // gr_expp1->Draw();
+  // gr_expm1->Draw();
+  // gr_obsp1->Draw();
+  // gr_obsm1->Draw();
+  // gr->Draw();
+
+  // hexcl_exp1->SetContour(1,contours);
+  // hexcl_exp1->SetLineWidth(4);
+  // hexcl_exp1->Draw("SAMECONT3");
+
+  // hexcl_exp2->SetContour(1,contours);
+  // hexcl_exp2->SetLineWidth(4);
+  // hexcl_exp2->Draw("SAMECONT3");
+
+  // cout << endl << "observed" << endl;
+  // printGraph(gr);
+  // cout << endl << "observed (+1)" << endl;
+  // printGraph(gr_obsp1);
+  // cout << endl << "observed (-1)" << endl;
+  // printGraph(gr_obsm1);
+  // cout << endl << "expected" << endl;
+  // printGraph(gr_exp);
+  // cout << endl << "expected (+1)" << endl;
+  // printGraph(gr_expp1);
+  // cout << endl << "expected (-1)" << endl;
+  // printGraph(gr_expm1);
+
+  // TLegend *leg = new TLegend(0.2,0.6,0.65,0.8);
+  // leg->AddEntry(gr,       "observed","l");
+  // leg->AddEntry(gr_exp,   "median expected (#pm1#sigma)","l");
+  // //leg->AddEntry(gr_expp1, "expected (#pm1#sigma)","l");
+  // leg->SetFillColor(0);
+  // leg->SetBorderSize(0);
+  // leg->Draw();
+
+  /*
+  t->SetTextSize(0.04);
+  t->DrawLatex(0.20,0.72  ,"NLO-NLL exclusions");
+  t->DrawLatex(0.27,0.67,"Observed #pm1#sigma^{theory}");
+  t->DrawLatex(0.27,0.62,"Expected #pm1#sigma");
+
+  t->DrawLatex(0.19,0.84,label);
+  t->DrawLatex(0.19,0.79,"unpolarized top quarks");
+  */
+
+
+  t->SetTextSize(0.035);
+  t->DrawLatex(0.18,0.79,"50 / 50 t_{L} / t_{R} mixture");
+  t->DrawLatex(0.18,0.84,label);
+  t->SetTextSize(0.04);
+  t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
+  //t->DrawLatex(0.55,0.80,"Observed #pm1#sigma^{theory}");
+  //t->DrawLatex(0.55,0.75,"Expected #pm1#sigma");
+  if( doBDT ) t->DrawLatex(0.55,0.80,"MVA expected");
+  else        t->DrawLatex(0.55,0.80,"C&C expected");
+
+
+  t->SetTextSize(0.045);
+  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
+
+
+
+
+  //float offset = 40.0;
+  // float xoffset = 405.0;
+  // float yoffset = 213.0;
+  // float length  =  30.0;
+  // float yspace1 =     5;
+  // float yspace2 =    17;
+
+  float xoffset = 370.0;
+  float yoffset = 338.0;
+  float length  =  40.0;
+  float yspace1 =     5;
+  float yspace2 =    17;
+
+  /*
+  if( TString(sample).Contains("T2bw") && x==75 ) xoffset -= 30.0;
+  
+  // median expected
+  //TLine *line22 = new TLine(xaxismin+xoffset+25, 310-yoffset, xaxismin+xoffset+65, 310-yoffset);
+  TLine *line22 = new TLine(xoffset,yoffset,xoffset+length,yoffset);
+  line22->SetLineWidth(4);
+  line22->SetLineColor(4);
+  line22->SetLineStyle(7);
+  line22->Draw();
+ 
+  // expected +/-1sigma
+  //TLine *line23 = new TLine(xaxismin+xoffset+25, 317-yoffset, xaxismin+xoffset+65, 317-yoffset);
+  TLine *line23 = new TLine(xoffset,yoffset+yspace1,xoffset+length,yoffset+yspace1);
+  line23->SetLineWidth(3);
+  line23->SetLineColor(4);
+  line23->SetLineStyle(3);
+  line23->Draw();
+
+  // expected +/-1sigma  
+  //TLine *line24 = new TLine(xaxismin+xoffset+25, 303-yoffset, xaxismin+xoffset+65, 303-yoffset);
+  TLine *line24 = new TLine(xoffset,yoffset-yspace1,xoffset+length,yoffset-yspace1);
+  line24->SetLineWidth(3);
+  line24->SetLineColor(4);
+  line24->SetLineStyle(3);
+  line24->Draw();
+  */
+  // median observed
+  //TLine *line25 = new TLine(xaxismin+xoffset+25, 335-yoffset, xaxismin+xoffset+65, 335-yoffset);
+  TLine *line25 = new TLine(xoffset,yoffset+yspace2,xoffset+length,yoffset+yspace2);
+  line25->SetLineWidth(6);
+  line25->SetLineColor(1);
+  line25->SetLineStyle(1);
+  line25->Draw();
+  /*
+  //TLine *line26 = new TLine(xaxismin+xoffset+25, 342-yoffset, xaxismin+xoffset+65, 342-yoffset);
+  TLine *line26 = new TLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
+  line26->SetLineWidth(2);
+  line26->SetLineColor(1);
+  line26->SetLineStyle(2);
+  line26->Draw();
+  
+  //TLine *line27 = new TLine(xaxismin+xoffset+25, 328-yoffset, xaxismin+xoffset+65, 328-yoffset);
+  TLine *line27 = new TLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
+  line27->SetLineWidth(2);
+  line27->SetLineColor(1);
+  line27->SetLineStyle(2);
+  line27->Draw();
+  */
+
+
+  t->SetTextSize(0.04);
+  t->DrawLatex(0.18,0.94,"CMS Preliminary                 #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
+
+  TLine *line = new TLine();
+  line->SetLineWidth(2);
+  line->SetLineStyle(2);
+
+  if( TString(sample).Contains("T2tt") ){
+    line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
+  }
+
+  if( TString(sample).Contains("T2bw") ){
+    line->DrawLine(162,0,300+12.5+162,300+12.5);
+    t->SetTextAngle(55);
+    t->SetTextSize(0.045);
+    t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
+  }
+
   if( print ){
     if     ( TString(sample).Contains("T2tt") ){
       can1->Print(Form("../../plots/combinePlots_T2tt%s.pdf",suffix));
@@ -792,12 +926,15 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     }
   }
 
-  TFile* fout = TFile::Open(Form("%s_x%icombinePlots%s.root",sample,x,suffix),"RECREATE");
+  TFile* fout = TFile::Open(Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol),"RECREATE");
 
   fout->cd();
   hxsec_best->Write();
   hxsec_best_exp->Write();
   gr->Write();
+  gr_exp->SetName("gr_exp");
+  gr_exp->Write();
+  hexcl_exp->Write();
   fout->Close();
 
 }
