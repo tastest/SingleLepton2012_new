@@ -37,7 +37,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //--------------------------------------------------
 
   const float lumi      = 19500;
-  const bool  doBDT     = true;
+  const bool  doBDT     = false;
   char* pol             = "";
   //const char* pol       = "left";
   //const char* pol       = "right";
@@ -77,8 +77,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
       if( doBDT ){
 	cout << "Doing BDT signal regions" << endl;
-	//suffix = "_x50_BDT";
-	suffix = "_x50_BDT_region2";
+	suffix = "_x50_BDT";
+	//suffix = "_x50_BDT_region2";
       }
 
     }
@@ -267,18 +267,15 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCut   SR_T2BW[11];
   string SRname_T2BW[11];
 
-  SR_T2BW[0]=TCut("mini_met > 100.0")+dphi;   SRname_T2BW[0] = "T2BW_LM100";
-  SR_T2BW[1]=TCut("mini_met > 150.0")+dphi;   SRname_T2BW[1] = "T2BW_LM150";
-  SR_T2BW[2]=TCut("mini_met > 200.0")+dphi;   SRname_T2BW[2] = "T2BW_LM200";
-  SR_T2BW[3]=TCut("mini_met > 250.0")+dphi;   SRname_T2BW[3] = "T2BW_LM250";
-  SR_T2BW[4]=TCut("mini_met > 300.0")+dphi;   SRname_T2BW[4] = "T2BW_LM300";
-  SR_T2BW[5]=TCut("mini_met > 350.0")+dphi;   SRname_T2BW[5] = "T2BW_LM350";
-  SR_T2BW[6]=TCut("mini_met > 400.0")+dphi;   SRname_T2BW[6] = "T2BW_LM400";
+  SR_T2BW[0]=TCut("mini_met > 100.0")+dphi;                SRname_T2BW[0] = "T2BW_LM100";
+  SR_T2BW[1]=TCut("mini_met > 150.0")+dphi;                SRname_T2BW[1] = "T2BW_LM150";
+  SR_T2BW[2]=TCut("mini_met > 200.0")+dphi;                SRname_T2BW[2] = "T2BW_LM200";
+  SR_T2BW[3]=TCut("mini_met > 250.0")+dphi;                SRname_T2BW[3] = "T2BW_LM250";
 
-  SR_T2BW[7] =TCut("mini_met > 100.0")+dphi+bpt100+mt2w;   SRname_T2BW[7]  = "T2BW_HM100";
-  SR_T2BW[8] =TCut("mini_met > 150.0")+dphi+bpt100+mt2w;   SRname_T2BW[8]  = "T2BW_HM150";
-  SR_T2BW[9] =TCut("mini_met > 200.0")+dphi+bpt100+mt2w;   SRname_T2BW[9]  = "T2BW_HM200";
-  SR_T2BW[10]=TCut("mini_met > 250.0")+dphi+bpt100+mt2w;   SRname_T2BW[10] = "T2BW_HM250";
+  SR_T2BW[4]=TCut("mini_met > 100.0")+dphi+bpt100+mt2w;    SRname_T2BW[4] = "T2BW_HM100";
+  SR_T2BW[5]=TCut("mini_met > 150.0")+dphi+bpt100+mt2w;    SRname_T2BW[5] = "T2BW_HM150";
+  SR_T2BW[6]=TCut("mini_met > 200.0")+dphi+bpt100+mt2w;    SRname_T2BW[6] = "T2BW_HM200";
+  SR_T2BW[7]=TCut("mini_met > 250.0")+dphi+bpt100+mt2w;    SRname_T2BW[7] = "T2BW_HM250";
 
   //------------------------------------------
   // BDT signal region definitions
@@ -297,15 +294,15 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCut   SR_BDT_T2BW[5];
   string SRname_BDT_T2BW[5];
 
-  // SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_BDT1";
-  // SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_BDT2";
-  // SR_BDT_T2BW[2]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[2] = "T2BW_BDT3";
+  SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_BDT1";
+  SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_BDT2";
+  SR_BDT_T2BW[2]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[2] = "T2BW_BDT3";
 
-  SR_BDT_T2BW[0]=TCut("mini_bdt[13] > 0.35"); SRname_BDT_T2BW[0] = "BDT2_35";
-  SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.40"); SRname_BDT_T2BW[1] = "BDT2_40";
-  SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[2] = "BDT2_45";
-  SR_BDT_T2BW[3]=TCut("mini_bdt[13] > 0.50"); SRname_BDT_T2BW[3] = "BDT2_50";
-  SR_BDT_T2BW[4]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[4] = "BDT2_55";
+  // SR_BDT_T2BW[0]=TCut("mini_bdt[13] > 0.35"); SRname_BDT_T2BW[0] = "BDT2_35";
+  // SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.40"); SRname_BDT_T2BW[1] = "BDT2_40";
+  // SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[2] = "BDT2_45";
+  // SR_BDT_T2BW[3]=TCut("mini_bdt[13] > 0.50"); SRname_BDT_T2BW[3] = "BDT2_50";
+  // SR_BDT_T2BW[4]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[4] = "BDT2_55";
 
 
   //--------------------------------------------------
@@ -343,11 +340,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
     // T2bw BDT
     else if( TString(sample).Contains("T2bw") ){
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(1);
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(28.3);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(21.8);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(11.1);
 
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(39.2);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(39.2);
       // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(31.1);
       // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(21.9);
       // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[3]));  signames.push_back(SRname_BDT_T2BW[3]);  labels.push_back(SRname_BDT_T2BW[3]);  uls.push_back(15.2);
@@ -398,16 +395,16 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     if( TString(sample).Contains("T2bw") ){
 
       // low-mass
-      sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   uls.push_back(370.0);
+      sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   uls.push_back(139.0);
+      sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   uls.push_back( 56.0);
+      sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   uls.push_back( 26.9);
 
       // high-mass
-      sigcuts.push_back(TCut(presel+SR_T2BW[7]));   signames.push_back(SRname_T2BW[7]);   labels.push_back(SRname_T2BW[7]);   uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[8]));   signames.push_back(SRname_T2BW[8]);   labels.push_back(SRname_T2BW[8]);   uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[9]));   signames.push_back(SRname_T2BW[9]);   labels.push_back(SRname_T2BW[9]);   uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_T2BW[10]));  signames.push_back(SRname_T2BW[10]);  labels.push_back(SRname_T2BW[10]);  uls.push_back(1);
+      sigcuts.push_back(TCut(presel+SR_T2BW[4]));   signames.push_back(SRname_T2BW[4]);   labels.push_back(SRname_T2BW[4]);   uls.push_back( 29.3);
+      sigcuts.push_back(TCut(presel+SR_T2BW[5]));   signames.push_back(SRname_T2BW[5]);   labels.push_back(SRname_T2BW[5]);   uls.push_back( 18.7);
+      sigcuts.push_back(TCut(presel+SR_T2BW[6]));   signames.push_back(SRname_T2BW[6]);   labels.push_back(SRname_T2BW[6]);   uls.push_back( 12.4);
+      sigcuts.push_back(TCut(presel+SR_T2BW[7]));   signames.push_back(SRname_T2BW[7]);   labels.push_back(SRname_T2BW[7]);   uls.push_back( 8.64);
     }
 
 
