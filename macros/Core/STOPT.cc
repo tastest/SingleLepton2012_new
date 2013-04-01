@@ -258,9 +258,9 @@ namespace Stop {
 	float &phil2() { return stopt.phil2(); }
 	float &meff() { return stopt.meff(); }
 	float &mt() { return stopt.mt(); }
-	int &run() { return stopt.run(); }
-	int &lumi() { return stopt.lumi(); }
-	int &event() { return stopt.event(); }
+	unsigned int &run() { return stopt.run(); }
+	unsigned int &lumi() { return stopt.lumi(); }
+        unsigned int &event() { return stopt.event(); }
 	float &y() { return stopt.y(); }
 	float &ht() { return stopt.ht(); }
 	float &htgen() { return stopt.htgen(); }

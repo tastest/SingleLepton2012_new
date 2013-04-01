@@ -788,13 +788,13 @@ protected:
 	float	mt_;
 	TBranch *mt_branch;
 	bool mt_isLoaded;
-	int	run_;
+	unsigned int	run_;
 	TBranch *run_branch;
 	bool run_isLoaded;
-	int	lumi_;
+	unsigned int	lumi_;
 	TBranch *lumi_branch;
 	bool lumi_isLoaded;
-	int	event_;
+	unsigned int	event_;
 	TBranch *event_branch;
 	bool event_isLoaded;
 	float	y_;
@@ -8644,7 +8644,7 @@ void LoadAllBranches()
 		}
 		return mt_;
 	}
-	int &run()
+	unsigned int &run()
 	{
 		if (not run_isLoaded) {
 			if (run_branch != 0) {
@@ -8657,7 +8657,7 @@ void LoadAllBranches()
 		}
 		return run_;
 	}
-	int &lumi()
+	unsigned int &lumi()
 	{
 		if (not lumi_isLoaded) {
 			if (lumi_branch != 0) {
@@ -8670,7 +8670,7 @@ void LoadAllBranches()
 		}
 		return lumi_;
 	}
-	int &event()
+        unsigned int &event()
 	{
 		if (not event_isLoaded) {
 			if (event_branch != 0) {
@@ -12439,9 +12439,9 @@ namespace Stop {
 	float &phil2();
 	float &meff();
 	float &mt();
-	int &run();
-	int &lumi();
-	int &event();
+	unsigned int &run();
+	unsigned int &lumi();
+	unsigned int &event();
 	float &y();
 	float &ht();
 	float &htgen();
