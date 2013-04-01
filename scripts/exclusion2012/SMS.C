@@ -37,7 +37,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //--------------------------------------------------
 
   const float lumi      = 19500;
-  const bool  doBDT     = false;
+  const bool  doBDT     = true;
   char* pol             = "";
   //const char* pol       = "left";
   //const char* pol       = "right";
@@ -52,8 +52,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     filename  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
     denomname = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
 
+    //suffix = "_MT150";
+
     if( doBDT ){
       cout << "Doing BDT signal regions" << endl;
+      //suffix = "_MT150_BDT";
       suffix = "_BDT";
     }
   }
@@ -74,7 +77,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
       if( doBDT ){
 	cout << "Doing BDT signal regions" << endl;
-	suffix = "_x50_BDT";
+	//suffix = "_x50_BDT";
+	suffix = "_x50_BDT_region2";
       }
 
     }
@@ -95,14 +99,29 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
   //const float btagerr   = 0.02;
 
+  char* logfilename = Form("%s%s%s.log",sample,suffix,pol);
+  ofstream* logfile = new ofstream();
+  logfile->open(logfilename,ios::trunc);
+
   cout << "----------------------------------------------------" << endl;
   cout << "Sample            " << sample          << endl;
+  cout << "logfile           " << logfilename     << endl;
   cout << "x                 " << x               << endl;
   cout << "Using file        " << filename        << endl;
   cout << "Using denominator " << denomname       << endl;
   cout << "Denom histo       " << denomhistoname  << endl;
   cout << "Using lumi        " << lumi            << " pb-1" << endl;
   cout << "----------------------------------------------------" << endl;
+
+  *logfile << "----------------------------------------------------" << endl;
+  *logfile << "Sample            " << sample          << endl;
+  *logfile << "logfile           " << logfilename     << endl;
+  *logfile << "x                 " << x               << endl;
+  *logfile << "Using file        " << filename        << endl;
+  *logfile << "Using denominator " << denomname       << endl;
+  *logfile << "Denom histo       " << denomhistoname  << endl;
+  *logfile << "Using lumi        " << lumi            << " pb-1" << endl;
+  *logfile << "----------------------------------------------------" << endl;
 
   TFile* fdenom = TFile::Open(denomname);
   TH2F*  hdenom = (TH2F*) fdenom->Get(denomhistoname);
@@ -140,11 +159,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
   //if( TString(sample).Contains("T2tt") ) label = "";
 
-  // char* logfilename = Form("%s%s%s.log",sample,suffix,pol);
-  // ofstream* logfile;
-  // logfile->open(logfilename,ios::trunc);
 
-  // *logfile << "test" << endl;
 
   //--------------------------------------------------
   // read in TChain
@@ -175,6 +190,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   TCut tauveto("mini_passtauveto == 1");
   TCut met100("t1metphicorr > 100");
   TCut mt120("t1metphicorrmt > 120");
+  TCut mt150("t1metphicorrmt > 150");
   TCut dphi("mini_dphimjmin>0.8");
   TCut chi2("mini_chi2<5.0");
   TCut mt2w("mini_mt2w>200.0");
@@ -213,6 +229,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //presel += dphi;
   //presel += chi2;
   //presel += mt2w;
+  //presel += mt150;
 
   if( TString(sample).Contains("T2bw") && x==25 ) presel += x25;
   if( TString(sample).Contains("T2bw") && x==50 ) presel += x50;
@@ -224,6 +241,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
   cout << "Using pre-selection   " << presel.GetTitle() << endl;
   cout << "Using weight          " << weight.GetTitle() << endl;
+
+  *logfile << "Using pre-selection   " << presel.GetTitle() << endl;
+  *logfile << "Using weight          " << weight.GetTitle() << endl;
 
   //------------------------------------------
   // cut-based signal region definitions
@@ -264,27 +284,29 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   // BDT signal region definitions
   //------------------------------------------
 
-  TCut   SR_BDT[5];
-  string SRname_BDT[5];
+  TCut   SR_BDT[6];
+  string SRname_BDT[6];
 
   SR_BDT[0]=TCut("mini_bdt[1] > 0.30"); SRname_BDT[0] = "BDT1L";
   SR_BDT[1]=TCut("mini_bdt[1] > 0.40"); SRname_BDT[1] = "BDT1T";
   SR_BDT[2]=TCut("mini_bdt[2] > 0.55"); SRname_BDT[2] = "BDT2";
   SR_BDT[3]=TCut("mini_bdt[3] > 0.65"); SRname_BDT[3] = "BDT3";
   SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
+  SR_BDT[5]=TCut("mini_bdt[5] > 0.30"); SRname_BDT[5] = "BDT5";
 
-  TCut   SR_BDT_T2BW[3];
-  string SRname_BDT_T2BW[3];
+  TCut   SR_BDT_T2BW[5];
+  string SRname_BDT_T2BW[5];
 
-  SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_BDT1";
-  SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_BDT2";
-  SR_BDT_T2BW[2]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[2] = "T2BW_BDT3";
+  // SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_BDT1";
+  // SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_BDT2";
+  // SR_BDT_T2BW[2]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[2] = "T2BW_BDT3";
 
-  //SR_BDT[3]=TCut("mini_bdt[2] > 0.65"); SRname_BDT[3] = "BDT2_65";
-  //SR_BDT[4]=TCut("mini_bdt[3] > 0.55"); SRname_BDT[4] = "BDT3_55";
-  //SR_BDT[5]=TCut("mini_bdt[3] > 0.60"); SRname_BDT[5] = "BDT3_60";
-  //SR_BDT[7]=TCut("mini_bdt[3] > 0.70"); SRname_BDT[7] = "BDT3_70";
-  //SR_BDT[8]=TCut("mini_bdt[3] > 0.75"); SRname_BDT[8] = "BDT3_75";
+  SR_BDT_T2BW[0]=TCut("mini_bdt[13] > 0.35"); SRname_BDT_T2BW[0] = "BDT2_35";
+  SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.40"); SRname_BDT_T2BW[1] = "BDT2_40";
+  SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[2] = "BDT2_45";
+  SR_BDT_T2BW[3]=TCut("mini_bdt[13] > 0.50"); SRname_BDT_T2BW[3] = "BDT2_50";
+  SR_BDT_T2BW[4]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[4] = "BDT2_55";
+
 
   //--------------------------------------------------
   // signal regions
@@ -301,18 +323,35 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
     // T2tt BDT
     if( TString(sample).Contains("T2tt") ){
-      sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  uls.push_back(1);
+
+      // MT150
+      // sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  uls.push_back(139.0);
+      // sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  uls.push_back(34.8);
+      // sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  uls.push_back(28.6);
+      // sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  uls.push_back(9.59);
+      // sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  uls.push_back(4.94);
+      // sigcuts.push_back(TCut(presel+SR_BDT[5]));  signames.push_back(SRname_BDT[5]);  labels.push_back(SRname_BDT[5]);  uls.push_back(29.9);
+
+      // MT120
+      sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  uls.push_back(182.7);
+      sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  uls.push_back(42.0);
+      sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  uls.push_back(33.2);
+      sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  uls.push_back(10.4);
+      sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  uls.push_back(4.97);
+      sigcuts.push_back(TCut(presel+SR_BDT[5]));  signames.push_back(SRname_BDT[5]);  labels.push_back(SRname_BDT[5]);  uls.push_back(33.4);
     }
 
     // T2bw BDT
     else if( TString(sample).Contains("T2bw") ){
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(1);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(1);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(1);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(1);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(1);
+
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(39.2);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(31.1);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(21.9);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[3]));  signames.push_back(SRname_BDT_T2BW[3]);  labels.push_back(SRname_BDT_T2BW[3]);  uls.push_back(15.2);
+      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[4]));  signames.push_back(SRname_BDT_T2BW[4]);  labels.push_back(SRname_BDT_T2BW[4]);  uls.push_back(10.0);
     }
 
   }
@@ -326,6 +365,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
       // MT > 150 GeV
       //----------------------------
 
+      // cout << "USING MT CUT 150 GEV!!!!!!!!!!!!!!!!!!!!!!!" << endl;
       // // low-mass
       // sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  uls.push_back(64.4);
       // sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  uls.push_back(30.0);
@@ -404,6 +444,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << "Signal Region : " << i << " " << signames.at(i) << endl;
     cout << "Selection     : " << sigcuts.at(i) << endl;
     cout << "UL            : " << uls.at(i) << endl;
+
+    *logfile << endl ;
+    *logfile << "Signal Region : " << i << " " << signames.at(i) << endl;
+    *logfile << "Selection     : " << sigcuts.at(i) << endl;
+    *logfile << "UL            : " << uls.at(i) << endl;
 
     //------------------------------------------------
     // turn off point-by-point signal uncertainties
@@ -898,6 +943,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     hxsec[i]->SetMaximum(100);
     hxsec[i]->GetXaxis()->SetRangeUser(200,700);
     hxsec[i]->GetYaxis()->SetRangeUser(0,600);
+    hexcl[i]->Draw("samebox");
 
     gr[i]->Draw("same");
     gr_exp[i]->Draw("same");
@@ -932,7 +978,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     //-------------------------------
     // excluded points
     //-------------------------------
-
+    /*
     can_exclusion[i] = new TCanvas(Form("can_exclusion_%i",i),Form("can_exclusion_%i",i),1200,600);
     can_exclusion[i]->Divide(2,1);
 
@@ -971,7 +1017,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     //t->DrawLatex(0.2,0.77,"m(#tilde{q}) >> m(#tilde{g})");
     t->DrawLatex(0.2,0.71,signames.at(i).c_str());
     t->DrawLatex(0.15,0.92,"CMS Preliminary   #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
-
+    */
     
     /*
     hjes[i]->GetYaxis()->SetTitle("#chi^{0}_{1} mass (GeV)");
@@ -987,7 +1033,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
     if( print ){
       can[i]->          Print(Form("../../plots/%s%s_%s%s.pdf"       ,sample,suffix,labels.at(i).c_str(),pol));
-      can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str(),pol));
+      //can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str(),pol));
     }
 
     int bin = heff[i]->FindBin(300,50);
