@@ -171,13 +171,12 @@ void smoothHist(TH2F* h){
 
  
 
-void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
+void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool print = false){
 
-  bool  doBDT       = false;
   bool  shift       = true;
   bool  smooth      = false;
   char* filename    = "";
-  char* outfilename = "";
+  //char* outfilename = "";
   char* label       = "";
   float xaxismin    = 0;
   float yaxismax    = 250.0;
@@ -195,16 +194,20 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #chi_{1}^{0}";
-    outfilename = "combinePlots_T2tt%s.root";
+    //outfilename = "combinePlots_T2tt%s.root";
     xaxismin    =   0.0;
     yaxismax    = 250.0;
     if( doBDT ){
       filename    = Form("T2tt_BDT%s_histos.root",pol);
       suffix      = "_BDT";
-      nSR         = 5;
+      //filename    = Form("T2tt_MT150_BDT%s_histos.root",pol);
+      //suffix      = "_MT150_BDT";
+      nSR         = 6;
     }
     else{
-      filename    = Form("T2tt%s_histos.root",pol);
+      //filename    = Form("T2tt%s_histos.root",pol);
+      suffix      = "_MT150";
+      filename    = Form("T2tt_MT150%s_histos.root",pol);
       nSR         = 8;
     }
   }
@@ -216,33 +219,48 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
 
     if( x==25 ){
       xaxismin = 360.0;
-      outfilename = "combinePlots_T2bw_x25.root";
+      //outfilename = "combinePlots_T2bw_x25.root";
       filename    = "T2bw_x25_histos.root";
     }
     if( x==50 ){
 
       if( doBDT ){
 	xaxismin = 180.0;
-	outfilename = "combinePlots_T2bw_BDT_x50.root";
-	filename    = "T2bw_BDT_histos.root";
+
+	//outfilename = "combinePlots_T2bw_BDT_x50.root";
+
+	filename    = "T2bw_x50_BDT_histos.root";
 	suffix      = "_BDT";
 	nSR = 3;
+
+	// filename    = "backup/T2bw_BDT_histos.root";
+	// suffix      = "_BDT_old";
+	// nSR = 3;
+
+	// filename    = "T2bw_x50_BDT_region2cuts_histos.root";
+	// suffix      = "_BDT_region2cuts";
+	// nSR = 7;
+
+	// filename    = "T2bw_x50_BDT_region2_histos.root";
+	// suffix      = "_BDT_region2";
+	// nSR = 5;
+
       }
 
       else{
 	xaxismin = 180.0;
-	outfilename = "combinePlots_T2bw_x50.root";
+
 	filename    = "T2bw_x50_histos.root";
-	//outfilename = "combinePlots_T2bw_x50_unc15.root";
-	//filename    = "T2bw_x50_unc15_histos.root";
 	nSR = 8;
+
+	//filename    = "T2bw_x50_unc15_histos.root";
 	//nSR = 4;
       }
 
     }
     if( x==75 ){
       xaxismin = 120.0;
-      outfilename = "combinePlots_T2bw_x75.root";
+
       filename    = "T2bw_x75_histos.root";
       smooth      = true;
     }
@@ -252,6 +270,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << "ERROR! unrecognized sample " << sample << endl;
     exit(0);
   }
+
+  char* outfilename = Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol);
 
   cout << "--------------------------------------" << endl;
   cout << "Opening    " << filename << endl;
@@ -299,21 +319,21 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   for( int xbin = 1 ; xbin <= hxsec_best->GetXaxis()->GetNbins() ; ++xbin ){
     for( int ybin = 1 ; ybin <= hxsec_best->GetYaxis()->GetNbins() ; ++ybin ){
 
-      cout << "xbin ybin " << xbin << " " << ybin << endl;
-      cout << "mstop mlsp " << hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) << " " << hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin) << endl;
+      //cout << "xbin ybin " << xbin << " " << ybin << endl;
+      //cout << "mstop mlsp " << hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) << " " << hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin) << endl;
      
       if( hxsec_exp[0]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
       
       int   best_ul    = 0;
       float min_exp_ul = hxsec_exp[0]->GetBinContent(xbin,ybin);
 
-      cout << "exp0 " << hxsec_exp[0]->GetBinContent(xbin,ybin) << endl;
+      //cout << "exp0 " << hxsec_exp[0]->GetBinContent(xbin,ybin) << endl;
 
       for( unsigned int i = 1 ; i < ncuts ; ++i ){
 
 	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
 
-	cout << "exp" << i << " " << hxsec_exp[i]->GetBinContent(xbin,ybin) << endl;
+	//cout << "exp" << i << " " << hxsec_exp[i]->GetBinContent(xbin,ybin) << endl;
 
 	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < min_exp_ul ){
 	  min_exp_ul = hxsec_exp[i]->GetBinContent(xbin,ybin);
@@ -328,8 +348,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
       hxsec_best_expm1->SetBinContent(xbin,ybin,hxsec_expm1[best_ul]->GetBinContent(xbin,ybin));
       hbest->SetBinContent(xbin,ybin,best_ul+1);
 
-      cout << "best ul " << best_ul << " " << min_exp_ul << endl;
-      cout << "obs limit " << hxsec[best_ul]->GetBinContent(xbin,ybin) << endl << endl << endl;
+      // cout << "best ul " << best_ul << " " << min_exp_ul << endl;
+      // cout << "obs limit " << hxsec[best_ul]->GetBinContent(xbin,ybin) << endl << endl << endl;
       
  
     }
@@ -366,15 +386,20 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   t->DrawLatex(0.19,0.83,label);
 
   if( doBDT ){
-    t->DrawLatex(0.2,0.75,"1 = BDT1loose");
-    t->DrawLatex(0.2,0.70,"2 = BDT1tight");
-    t->DrawLatex(0.2,0.65,"3 = BDT2");
-    t->DrawLatex(0.2,0.60,"4 = BDT3");
-    t->DrawLatex(0.2,0.55,"5 = BDT4");
+    // t->DrawLatex(0.2,0.75,"1 = BDT1loose");
+    // t->DrawLatex(0.2,0.70,"2 = BDT1tight");
+    // t->DrawLatex(0.2,0.65,"3 = BDT2");
+    // t->DrawLatex(0.2,0.60,"4 = BDT3");
+    // t->DrawLatex(0.2,0.55,"5 = BDT4");
 
-    // t->DrawLatex(0.2,0.75,"1 = BDT1");
-    // t->DrawLatex(0.2,0.70,"2 = BDT2");
-    // t->DrawLatex(0.2,0.65,"3 = BDT3");
+    t->DrawLatex(0.2,0.75,"1 = BDT1");
+    t->DrawLatex(0.2,0.70,"2 = BDT2");
+    t->DrawLatex(0.2,0.65,"3 = BDT3");
+
+    t->DrawLatex(0.2,0.55,"4 = BDT2 35");
+    t->DrawLatex(0.2,0.50,"5 = BDT2 40");
+    t->DrawLatex(0.2,0.45,"6 = BDT2 50");
+    t->DrawLatex(0.2,0.40,"7 = BDT2 55");
 
 
     // t->DrawLatex(0.2,0.50,"6 = BDT2_65");
@@ -522,7 +547,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   TGraph* gr_obsp1  = getRefXsecGraph(hxsec_best       , "T2tt", 1.15);
   TGraph* gr_obsm1  = getRefXsecGraph(hxsec_best       , "T2tt", 0.85);
 
-  
+  /*
   TCanvas *can3 = new TCanvas("can3","can3",800,600);
   can3->cd();
 
@@ -536,7 +561,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   gr_exp->Draw("lp");
   gr_exp_smallDM->Draw("lp");
   t->DrawLatex(0.3,0.8,"expected");
-
+  */
 
   // hexcl_exp1->SetContour(1,contours);
   // hexcl_exp1->SetLineWidth(4);
@@ -764,7 +789,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
   TH2F* hR = exclusionContour(hxsec_best_exp);
   hR->SetLineWidth(3);
   hR->SetLineColor(2);
-  hR->Draw("CONT3SAME");
+  //hR->Draw("CONT3SAME");
 
   // gr_expp1->Draw();
   // gr_expm1->Draw();
@@ -917,16 +942,17 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool print = false){
     if     ( TString(sample).Contains("T2tt") ){
       can1->Print(Form("../../plots/combinePlots_T2tt%s.pdf",suffix));
       can2->Print(Form("../../plots/combinePlots_T2tt_bestSignalRegion%s.pdf",suffix));
-      can3->Print(Form("../../plots/combinePlots_T2tt_excludedPoints%s.pdf",suffix));
+      //can3->Print(Form("../../plots/combinePlots_T2tt_excludedPoints%s.pdf",suffix));
     }
     else if( TString(sample).Contains("T2bw") ){
       can1->Print(Form("../../plots/combinePlots_T2bw_x%i%s.pdf",x,suffix));
       can2->Print(Form("../../plots/combinePlots_T2bw_x%i_bestSignalRegion%s.pdf",x,suffix));
-      can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints%s.pdf",x,suffix));
+      //can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints%s.pdf",x,suffix));
     }
   }
 
-  TFile* fout = TFile::Open(Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol),"RECREATE");
+  //TFile* fout = TFile::Open(Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol),"RECREATE");
+  TFile* fout = TFile::Open(outfilename,"RECREATE");
 
   fout->cd();
   hxsec_best->Write();
