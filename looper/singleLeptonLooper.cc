@@ -3845,9 +3845,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("meff",             &meff_,             "meff/F");
   outTree->Branch("mt",               &mt_,               "mt/F");
   outTree->Branch("dataset",          &dataset_,          "dataset[200]/C");
-  outTree->Branch("run",              &run_,              "run/I");
-  outTree->Branch("lumi",             &lumi_,             "lumi/I");
-  outTree->Branch("event",            &event_,            "event/I");
+  outTree->Branch("run",              &run_,              "run/i");
+  outTree->Branch("lumi",             &lumi_,             "lumi/i");
+  outTree->Branch("event",            &event_,            "event/i");
   outTree->Branch("y",                &y_,                "y/F");  
   outTree->Branch("ht",               &ht_,               "ht/F");  
   outTree->Branch("htgen",            &htgen_,            "htgen/F");  
