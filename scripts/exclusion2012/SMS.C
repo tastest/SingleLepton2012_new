@@ -28,7 +28,7 @@
 
 using namespace std;
 
-void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
+void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = false){
 
   gStyle->SetPaintTextFormat(".2f");
 
@@ -36,55 +36,64 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   // input parameters
   //--------------------------------------------------
 
+  char* pol             = (char*) "";
+  //const char* pol       = (char*) "left";
+  //const char* pol       = (char*) "right";
+
   const float lumi      = 19500;
-  const bool  doBDT     = false;
-  char* pol             = "";
-  //const char* pol       = "left";
-  //const char* pol       = "right";
+  char* suffix          = (char*) "";
+  char* denomhistoname  = (char*) "masses";
+  char* filename        = (char*) "";
+  char* denomname       = (char*) "";
+  char* BDTchar         = (char*) "";
+  char* xchar           = (char*) "";
+  char* label           = (char*)"";
 
+  if( doBDT ){
+    BDTchar  = (char*) "_BDT";
+    cout << "Doing BDT analysis" << endl;
+  }else{
+    cout << "Doing cut-based analysis" << endl;
+  }
 
-  char* suffix         = "";
-  char* denomhistoname = "masses";
-  char* filename       = "";
-  char* denomname      = "";
+  //--------------------------------------------------
+  // set up input files
+  //--------------------------------------------------
 
   if( TString(sample).Contains("T2tt") ){
-    filename  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
-    denomname = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
-
-    //suffix = "_MT150";
-
-    if( doBDT ){
-      cout << "Doing BDT signal regions" << endl;
-      //suffix = "_MT150_BDT";
-      suffix = "_BDT";
-    }
+    filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
+    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
+    label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#chi_{1}^{0}";
   }
 
   else if( TString(sample).Contains("T2bw") ){
 
-    if( TString(sample).Contains("T2bw") && x==25 ){
-      denomhistoname = "masses25";
-      suffix         = "_x25";
+    if( x==25 ){
+      xchar          = (char*) "_x25";
+      denomhistoname = (char*) "masses25";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x25.root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      label          = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.25";
     }
-    if( TString(sample).Contains("T2bw") && x==50 ){
-      filename  = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x50.root";
-      denomname = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
 
-      denomhistoname = "masses";
-      suffix         = "_x50";
-      //suffix         = "_x50_unc15";
-
-      if( doBDT ){
-	cout << "Doing BDT signal regions" << endl;
-	suffix = "_x50_BDT";
-	//suffix = "_x50_BDT_region2";
-      }
-
+    else if( x==50 ){
+      xchar          = (char*) "_x50";
+      denomhistoname = (char*) "masses";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x50.root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      label          = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.50";
     }
-    if( TString(sample).Contains("T2bw") && x==75 ){
-      denomhistoname = "masses75";
-      suffix         = "_x75";
+
+    else if( x==75 ){
+      xchar          = (char*) "_x75";
+      denomhistoname = (char*) "masses75";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      label          = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.75";
+    }
+    
+    else{
+      cout << "ERROR! unrecognized x value " << x << ", quitting!!!" << endl;
     }
 
   }
@@ -99,7 +108,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
   //const float btagerr   = 0.02;
 
-  char* logfilename = Form("%s%s%s.log",sample,suffix,pol);
+  char* logfilename = Form("%s%s%s%s.log",sample,xchar,suffix,pol);
   ofstream* logfile = new ofstream();
   logfile->open(logfilename,ios::trunc);
 
@@ -125,41 +134,6 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
 
   TFile* fdenom = TFile::Open(denomname);
   TH2F*  hdenom = (TH2F*) fdenom->Get(denomhistoname);
-
-  char* label = (char*)"";
-
-  // T2tt
-  if     ( TString(sample).Contains("T2tt") ){
-    label = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#chi_{1}^{0}";
-  }
-
-  // T2bw, various x slices
-  else if( TString(sample).Contains("T2bw") ){
-    if( x == 25 ){
-      cout << "Doing x=0.25 slice" << endl;
-      label = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.25";
-    }
-    else if( x == 50 ){
-      cout << "Doing x=0.50 slice" << endl;
-      label = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.50";
-    }
-    else if( x == 75 ){
-      cout << "Doing x=0.75 slice" << endl;
-      label = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.75";
-    }
-    else{
-      cout << "ERROR! unrecognized x value " << x << endl;
-      exit(0);
-    }
-  }
-  else{
-    cout << "ERROR! unrecognized sample " << sample << endl;
-    exit(0);
-  }
-
-  //if( TString(sample).Contains("T2tt") ) label = "";
-
-
 
   //--------------------------------------------------
   // read in TChain
@@ -291,18 +265,18 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
   SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
   SR_BDT[5]=TCut("mini_bdt[5] > 0.30"); SRname_BDT[5] = "BDT5";
 
-  TCut   SR_BDT_T2BW[5];
-  string SRname_BDT_T2BW[5];
+  TCut   SR_BDT_T2BW[7];
+  string SRname_BDT_T2BW[7];
 
   SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_BDT1";
   SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_BDT2";
   SR_BDT_T2BW[2]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[2] = "T2BW_BDT3";
 
-  // SR_BDT_T2BW[0]=TCut("mini_bdt[13] > 0.35"); SRname_BDT_T2BW[0] = "BDT2_35";
-  // SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.40"); SRname_BDT_T2BW[1] = "BDT2_40";
-  // SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[2] = "BDT2_45";
-  // SR_BDT_T2BW[3]=TCut("mini_bdt[13] > 0.50"); SRname_BDT_T2BW[3] = "BDT2_50";
-  // SR_BDT_T2BW[4]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[4] = "BDT2_55";
+  SR_BDT_T2BW[3]=TCut("mini_bdt[13] > 0.35"); SRname_BDT_T2BW[3] = "T2BW_BDT2_35";
+  SR_BDT_T2BW[4]=TCut("mini_bdt[13] > 0.40"); SRname_BDT_T2BW[4] = "T2BW_BDT2_40";
+  // SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[2] = "T2BW_BDT2_45";
+  SR_BDT_T2BW[5]=TCut("mini_bdt[13] > 0.50"); SRname_BDT_T2BW[5] = "T2BW_BDT2_50";
+  SR_BDT_T2BW[6]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[6] = "T2BW_BDT2_55";
 
 
   //--------------------------------------------------
@@ -344,11 +318,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
       sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(21.8);
       sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(11.1);
 
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(39.2);
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(31.1);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[3]));  signames.push_back(SRname_BDT_T2BW[3]);  labels.push_back(SRname_BDT_T2BW[3]);  uls.push_back(39.2);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[4]));  signames.push_back(SRname_BDT_T2BW[4]);  labels.push_back(SRname_BDT_T2BW[4]);  uls.push_back(31.1);
       // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(21.9);
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[3]));  signames.push_back(SRname_BDT_T2BW[3]);  labels.push_back(SRname_BDT_T2BW[3]);  uls.push_back(15.2);
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[4]));  signames.push_back(SRname_BDT_T2BW[4]);  labels.push_back(SRname_BDT_T2BW[4]);  uls.push_back(10.0);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[5]));  signames.push_back(SRname_BDT_T2BW[5]);  labels.push_back(SRname_BDT_T2BW[5]);  uls.push_back(15.2);
+      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[6]));  signames.push_back(SRname_BDT_T2BW[6]);  labels.push_back(SRname_BDT_T2BW[6]);  uls.push_back(10.0);
     }
 
   }
@@ -1029,7 +1003,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     */
 
     if( print ){
-      can[i]->          Print(Form("../../plots/%s%s_%s%s.pdf"       ,sample,suffix,labels.at(i).c_str(),pol));
+      can[i]->          Print(Form("../../plots/%s%s%s_%s%s.pdf"       ,sample,xchar,suffix,labels.at(i).c_str(),pol));
       //can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str(),pol));
     }
 
@@ -1047,7 +1021,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool print = false){
     cout << endl << endl;
   }
 
-  TFile *outfile = TFile::Open(Form("%s%s%s_histos.root",sample,suffix,pol),"RECREATE");
+
+  TFile *outfile = TFile::Open(Form("%s%s%s%s_histos.root",sample,xchar,suffix,pol),"RECREATE");
 
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
