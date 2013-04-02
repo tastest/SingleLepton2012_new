@@ -173,19 +173,26 @@ void smoothHist(TH2F* h){
 
 void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool print = false){
 
-  bool  shift       = true;
-  bool  smooth      = false;
-  char* filename    = "";
-  //char* outfilename = "";
-  char* label       = "";
-  float xaxismin    = 0;
-  float yaxismax    = 250.0;
-  char* suffix      = "";
-  int   nSR         = -1;
-  bool  doRemoveSlice = true;
-  char* pol         = "";
+  //----------------------------------------------
+  // input parameters
+  //----------------------------------------------
+
+  char* pol           = (char*) "";
   //char* pol         = "right";
   //char* pol         = "left";
+
+  bool  shift         = true;
+  bool  smooth        = false;
+  char* filename      = (char*) "";
+  char* label         = (char*) "";
+  float xaxismin      = 0;
+  float yaxismax      = 250.0;
+  char* suffix        = (char*) "";
+  int   nSR           = -1;
+  bool  doRemoveSlice = true;
+  char* xchar         = (char*) "";
+  char* BDTchar       = (char*) "";
+  if( doBDT ) BDTchar = (char*) "_BDT";
 
   TLatex *t = new TLatex();
   t->SetNDC();
@@ -194,76 +201,39 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #chi_{1}^{0}";
-    //outfilename = "combinePlots_T2tt%s.root";
     xaxismin    =   0.0;
     yaxismax    = 250.0;
-    if( doBDT ){
-      filename    = Form("T2tt_BDT%s_histos.root",pol);
-      suffix      = "_BDT";
-      //filename    = Form("T2tt_MT150_BDT%s_histos.root",pol);
-      //suffix      = "_MT150_BDT";
-      nSR         = 6;
-    }
-    else{
-      //filename    = Form("T2tt%s_histos.root",pol);
-      suffix      = "_MT150";
-      filename    = Form("T2tt_MT150%s_histos.root",pol);
-      nSR         = 8;
-    }
+
+    if( doBDT ) nSR = 6;
+    else        nSR = 8;
   }
 
   else if( TString(sample).Contains("T2bw") ){
 
-    label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #chi_{1}^{#pm} #rightarrow b W #chi_{1}^{0}";
     doRemoveSlice = false;
+    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #chi_{1}^{#pm} #rightarrow b W #chi_{1}^{0}";
 
     if( x==25 ){
-      xaxismin = 360.0;
-      //outfilename = "combinePlots_T2bw_x25.root";
-      filename    = "T2bw_x25_histos.root";
+      xaxismin        = 360.0;
+      xchar           = (char*) "_x25";
+      nSR             = 8;
+      if( doBDT ) nSR = 2;
     }
-    if( x==50 ){
 
-      if( doBDT ){
-	xaxismin = 180.0;
-
-	//outfilename = "combinePlots_T2bw_BDT_x50.root";
-
-	filename    = "T2bw_x50_BDT_histos.root";
-	suffix      = "_BDT";
-	nSR = 3;
-
-	// filename    = "backup/T2bw_BDT_histos.root";
-	// suffix      = "_BDT_old";
-	// nSR = 3;
-
-	// filename    = "T2bw_x50_BDT_region2cuts_histos.root";
-	// suffix      = "_BDT_region2cuts";
-	// nSR = 7;
-
-	// filename    = "T2bw_x50_BDT_region2_histos.root";
-	// suffix      = "_BDT_region2";
-	// nSR = 5;
-
-      }
-
-      else{
-	xaxismin = 180.0;
-
-	filename    = "T2bw_x50_histos.root";
-	nSR = 8;
-
-	//filename    = "T2bw_x50_unc15_histos.root";
-	//nSR = 4;
-      }
-
+    else if( x==50 ){
+      xaxismin        = 180.0;
+      xchar           = (char*) "_x50";
+      nSR             = 8;
+      if( doBDT ) nSR = 3;
     }
-    if( x==75 ){
-      xaxismin = 120.0;
 
-      filename    = "T2bw_x75_histos.root";
-      smooth      = true;
+    else if( x==75 ){
+      xaxismin        = 120.0;
+      xchar           = (char*) "_x75";
+      nSR             = 8;
+      if( doBDT ) nSR = 4;
     }
+
   }
 
   else{
@@ -271,7 +241,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
     exit(0);
   }
 
-  char* outfilename = Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol);
+  filename = Form("%s%s%s%s_histos.root",sample,xchar,suffix,pol);
+
+  char* outfilename = Form("%s%s_combinePlots%s%s.root",sample,xchar,suffix,pol);
 
   cout << "--------------------------------------" << endl;
   cout << "Opening    " << filename << endl;
