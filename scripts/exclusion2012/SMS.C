@@ -108,7 +108,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
   //const float btagerr   = 0.02;
 
-  char* logfilename = Form("%s%s%s%s.log",sample,xchar,suffix,pol);
+  char* logfilename = Form("%s%s%s%s%s.log",sample,xchar,suffix,pol,BDTchar);
   ofstream* logfile = new ofstream();
   logfile->open(logfilename,ios::trunc);
 
