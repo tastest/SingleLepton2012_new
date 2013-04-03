@@ -241,9 +241,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
     exit(0);
   }
 
-  filename = Form("%s%s%s%s_histos.root",sample,xchar,suffix,pol);
+  filename = Form("%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar);
 
-  char* outfilename = Form("%s%s_combinePlots%s%s.root",sample,xchar,suffix,pol);
+  char* outfilename = Form("%s%s_combinePlots%s%s%s.root",sample,xchar,suffix,pol,BDTchar);
 
   cout << "--------------------------------------" << endl;
   cout << "Opening    " << filename << endl;
@@ -253,7 +253,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 
   TFile *file = TFile::Open(filename);
 
-  //const unsigned int ncuts = 8;
   const unsigned int ncuts = nSR;
 
   TH2F* hxsec[ncuts];
@@ -347,7 +346,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hbest->GetZaxis()->SetLabelSize(0.035);
   hbest->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
   hbest->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
-  hbest->GetXaxis()->SetRangeUser(0,700);
+  hbest->GetXaxis()->SetRangeUser(xaxismin,700);
   hbest->GetYaxis()->SetRangeUser(0,700);
   hbest->GetZaxis()->SetTitle("best signal region");
 
@@ -358,64 +357,61 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   t->DrawLatex(0.19,0.83,label);
 
   if( doBDT ){
-    // t->DrawLatex(0.2,0.75,"1 = BDT1loose");
-    // t->DrawLatex(0.2,0.70,"2 = BDT1tight");
-    // t->DrawLatex(0.2,0.65,"3 = BDT2");
-    // t->DrawLatex(0.2,0.60,"4 = BDT3");
-    // t->DrawLatex(0.2,0.55,"5 = BDT4");
 
-    t->DrawLatex(0.2,0.75,"1 = BDT1");
-    t->DrawLatex(0.2,0.70,"2 = BDT2");
-    t->DrawLatex(0.2,0.65,"3 = BDT3");
+    if( TString(sample).Contains("T2bw") ){
+      if( x==25 ){
+	t->DrawLatex(0.2,0.75,"1 = BDT2");
+	t->DrawLatex(0.2,0.70,"2 = BDT3");
+      }
 
-    t->DrawLatex(0.2,0.55,"4 = BDT2 35");
-    t->DrawLatex(0.2,0.50,"5 = BDT2 40");
-    t->DrawLatex(0.2,0.45,"6 = BDT2 50");
-    t->DrawLatex(0.2,0.40,"7 = BDT2 55");
+      else if( x==50 ){
+	t->DrawLatex(0.2,0.75,"1 = BDT1");
+	t->DrawLatex(0.2,0.70,"2 = BDT2loose");
+	t->DrawLatex(0.2,0.65,"3 = BDT3tight");
+	t->DrawLatex(0.2,0.55,"4 = BDT3");
+      } 
 
+      else if( x==75 ){
+	t->DrawLatex(0.2,0.75,"1 = BDT1");
+	t->DrawLatex(0.2,0.70,"2 = BDT2");
+	t->DrawLatex(0.2,0.65,"3 = BDT3");
+	t->DrawLatex(0.2,0.55,"4 = BDT4");
+      }
+    }
 
-    // t->DrawLatex(0.2,0.50,"6 = BDT2_65");
-    // t->DrawLatex(0.2,0.45,"7 = BDT3_70");
-    // t->DrawLatex(0.2,0.40,"8 = BDT3_75");
+    else{
+      t->DrawLatex(0.2,0.75,"1 = BDT1loose");
+      t->DrawLatex(0.2,0.70,"2 = BDT1tight");
+      t->DrawLatex(0.2,0.65,"3 = BDT2");
+      t->DrawLatex(0.2,0.60,"4 = BDT3");
+      t->DrawLatex(0.2,0.55,"5 = BDT4");
+    }
 
-    // t->DrawLatex(0.2,0.75, "1 = BDT1_30");
-    // t->DrawLatex(0.2,0.70, "2 = BDT1_40");
-    // t->DrawLatex(0.2,0.65, "3 = BDT2_55");
-    // t->DrawLatex(0.2,0.60, "4 = BDT2_65");
-    // t->DrawLatex(0.2,0.55, "5 = BDT3_55");
-    // t->DrawLatex(0.2,0.50, "6 = BDT3_60");
-    // t->DrawLatex(0.2,0.45, "7 = BDT3_65");
-    // t->DrawLatex(0.2,0.40, "8 = BDT3_70");
-    // t->DrawLatex(0.2,0.35, "9 = BDT3_75");
-    // t->DrawLatex(0.2,0.30,"10 = BDT4_50");
   }
   else{
-    // t->DrawLatex(0.2,0.75,"1 = LM150");
-    // t->DrawLatex(0.2,0.70,"2 = LM200");
-    // t->DrawLatex(0.2,0.65,"3 = LM250");
-    // t->DrawLatex(0.2,0.60,"4 = LM300");
-    // t->DrawLatex(0.2,0.55,"5 = HM150");
-    // t->DrawLatex(0.2,0.50,"6 = HM200");
-    // t->DrawLatex(0.2,0.45,"7 = HM250");
-    // t->DrawLatex(0.2,0.40,"8 = HM300");
 
-    t->DrawLatex(0.2,0.75," 1 = LM100");
-    t->DrawLatex(0.2,0.70," 2 = LM150");
-    t->DrawLatex(0.2,0.65," 3 = LM200");
-    t->DrawLatex(0.2,0.60," 4 = LM250");
-    t->DrawLatex(0.2,0.55," 5 = HM100");
-    t->DrawLatex(0.2,0.50," 6 = HM150");
-    t->DrawLatex(0.2,0.45," 7 = HM200");
-    t->DrawLatex(0.2,0.40," 8 = HM250");
+    if( TString(sample).Contains("T2bw") ){
+      t->DrawLatex(0.2,0.75," 1 = LM100");
+      t->DrawLatex(0.2,0.70," 2 = LM150");
+      t->DrawLatex(0.2,0.65," 3 = LM200");
+      t->DrawLatex(0.2,0.60," 4 = LM250");
+      t->DrawLatex(0.2,0.55," 5 = HM100");
+      t->DrawLatex(0.2,0.50," 6 = HM150");
+      t->DrawLatex(0.2,0.45," 7 = HM200");
+      t->DrawLatex(0.2,0.40," 8 = HM250");
+    }
 
-    // t->DrawLatex(0.2,0.55," 5 = LM300");
-    // t->DrawLatex(0.2,0.50," 6 = LM350");
-    // t->DrawLatex(0.2,0.45," 7 = LM400");
+    else{
+      t->DrawLatex(0.2,0.75,"1 = LM150");
+      t->DrawLatex(0.2,0.70,"2 = LM200");
+      t->DrawLatex(0.2,0.65,"3 = LM250");
+      t->DrawLatex(0.2,0.60,"4 = LM300");
+      t->DrawLatex(0.2,0.55,"5 = HM150");
+      t->DrawLatex(0.2,0.50,"6 = HM200");
+      t->DrawLatex(0.2,0.45,"7 = HM250");
+      t->DrawLatex(0.2,0.40,"8 = HM300");
+    }
 
-    // t->DrawLatex(0.2,0.70," 1 = HM100");
-    // t->DrawLatex(0.2,0.65," 2 = HM150");
-    // t->DrawLatex(0.2,0.60," 3 = HM200");
-    // t->DrawLatex(0.2,0.55," 4 = HM250");
   }
 
   if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
@@ -677,7 +673,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
   hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
   hdummy->GetZaxis()->SetTitleOffset(0.8);
-  hdummy->GetXaxis()->SetRangeUser(0,700);
+  hdummy->GetXaxis()->SetRangeUser(xaxismin,700);
   hdummy->GetYaxis()->SetRangeUser(0,400);
   //hdummy->Draw("colz");
   hdummy->SetMinimum(0.01);
@@ -810,7 +806,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 
 
   t->SetTextSize(0.035);
-  t->DrawLatex(0.18,0.79,"50 / 50 t_{L} / t_{R} mixture");
+  if( TString(sample).Contains("T2tt") ) t->DrawLatex(0.18,0.79,"50 / 50 t_{L} / t_{R} mixture");
   t->DrawLatex(0.18,0.84,label);
   t->SetTextSize(0.04);
   t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
@@ -874,7 +870,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   line25->SetLineWidth(6);
   line25->SetLineColor(1);
   line25->SetLineStyle(1);
-  line25->Draw();
+  //line25->Draw();
   /*
   //TLine *line26 = new TLine(xaxismin+xoffset+25, 342-yoffset, xaxismin+xoffset+65, 342-yoffset);
   TLine *line26 = new TLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
@@ -904,23 +900,27 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   }
 
   if( TString(sample).Contains("T2bw") ){
-    line->DrawLine(162,0,300+12.5+162,300+12.5);
-    t->SetTextAngle(55);
-    t->SetTextSize(0.045);
-    t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
+    // if     (x==50) line->DrawLine(162,0,300+12.5+162,300+12.5);
+    // else if(x==25) line->DrawLine(162*2,0,300+12.5+162*2,300+12.5);
+    // t->SetTextAngle(55);
+    // t->SetTextSize(0.045);
+    // t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
   }
 
   if( print ){
-    if     ( TString(sample).Contains("T2tt") ){
-      can1->Print(Form("../../plots/combinePlots_T2tt%s.pdf",suffix));
-      can2->Print(Form("../../plots/combinePlots_T2tt_bestSignalRegion%s.pdf",suffix));
-      //can3->Print(Form("../../plots/combinePlots_T2tt_excludedPoints%s.pdf",suffix));
-    }
-    else if( TString(sample).Contains("T2bw") ){
-      can1->Print(Form("../../plots/combinePlots_T2bw_x%i%s.pdf",x,suffix));
-      can2->Print(Form("../../plots/combinePlots_T2bw_x%i_bestSignalRegion%s.pdf",x,suffix));
-      //can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints%s.pdf",x,suffix));
-    }
+    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s.pdf"           ,sample,xchar,suffix,pol,BDTchar));
+    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s_bestRegion.pdf",sample,xchar,suffix,pol,BDTchar));
+
+    // if     ( TString(sample).Contains("T2tt") ){
+    //   can1->Print(Form("../../plots/combinePlots_T2tt%s.pdf",suffix));
+    //   can2->Print(Form("../../plots/combinePlots_T2tt_bestSignalRegion%s.pdf",suffix));
+    //   //can3->Print(Form("../../plots/combinePlots_T2tt_excludedPoints%s.pdf",suffix));
+    // }
+    // else if( TString(sample).Contains("T2bw") ){
+    //   can1->Print(Form("../../plots/combinePlots_T2bw_x%i%s.pdf",x,suffix));
+    //   can2->Print(Form("../../plots/combinePlots_T2bw_x%i_bestSignalRegion%s.pdf",x,suffix));
+    //   //can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints%s.pdf",x,suffix));
+    // }
   }
 
   //TFile* fout = TFile::Open(Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol),"RECREATE");
