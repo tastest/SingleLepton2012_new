@@ -87,8 +87,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     else if( x==75 ){
       xchar          = (char*) "_x75";
       denomhistoname = (char*) "masses75";
-      //filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/T2bw_x75.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.75";
     }
@@ -266,17 +265,6 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
   SR_BDT[5]=TCut("mini_bdt[5] > 0.30"); SRname_BDT[5] = "BDT5";
 
-  TCut   SR_BDT_T2BW[7];
-  string SRname_BDT_T2BW[7];
-
-  if( x==25 ){
-    SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_x50_BDT1";
-    SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_x50_BDT2L";
-    SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[2] = "T2BW_x50_BDT2T";
-    SR_BDT_T2BW[3]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[3] = "T2BW_x50_BDT3";
-  }
-
-
   //--------------------------------------------------
   // signal regions
   //--------------------------------------------------
@@ -303,15 +291,24 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     // T2bw BDT
     else if( TString(sample).Contains("T2bw") ){
 
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(28.3);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(21.8);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(11.1);
+      if( x==25 ){
+	sigcuts.push_back(TCut(presel+"mini_bdt[8]  > 0.30"));  signames.push_back("T2BW_x25_BDT2");   labels.push_back("T2BW_x25_BDT2");   uls.push_back(8.73);
+	sigcuts.push_back(TCut(presel+"mini_bdt[9]  > 0.45"));  signames.push_back("T2BW_x25_BDT3");   labels.push_back("T2BW_x25_BDT3");   uls.push_back(5.97);
+      }
 
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[3]));  signames.push_back(SRname_BDT_T2BW[3]);  labels.push_back(SRname_BDT_T2BW[3]);  uls.push_back(39.2);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[4]));  signames.push_back(SRname_BDT_T2BW[4]);  labels.push_back(SRname_BDT_T2BW[4]);  uls.push_back(31.1);
-      // sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(21.9);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[5]));  signames.push_back(SRname_BDT_T2BW[5]);  labels.push_back(SRname_BDT_T2BW[5]);  uls.push_back(15.2);
-      sigcuts.push_back(TCut(presel+SR_BDT_T2BW[6]));  signames.push_back(SRname_BDT_T2BW[6]);  labels.push_back(SRname_BDT_T2BW[6]);  uls.push_back(10.0);
+      else if( x==50 ){
+	sigcuts.push_back(TCut(presel+"mini_bdt[12] > 0.35"));  signames.push_back("T2BW_x50_BDT1");   labels.push_back("T2BW_x50_BDT1");   uls.push_back(28.3);
+	sigcuts.push_back(TCut(presel+"mini_bdt[13] > 0.45"));  signames.push_back("T2BW_x50_BDT2L");  labels.push_back("T2BW_x50_BDT2L");  uls.push_back(21.8);
+	sigcuts.push_back(TCut(presel+"mini_bdt[13] > 0.55"));  signames.push_back("T2BW_x50_BDT2T");  labels.push_back("T2BW_x50_BDT2T");  uls.push_back(10.4);
+	sigcuts.push_back(TCut(presel+"mini_bdt[14] > 0.35"));  signames.push_back("T2BW_x50_BDT3");   labels.push_back("T2BW_x50_BDT3");   uls.push_back(11.5);
+      }
+
+      else if( x==75 ){
+	sigcuts.push_back(TCut(presel+"mini_bdt[17] > 0.30"));  signames.push_back("T2BW_x75_BDT1");   labels.push_back("T2BW_x75_BDT1");   uls.push_back(24.2);
+	sigcuts.push_back(TCut(presel+"mini_bdt[18] > 0.55"));  signames.push_back("T2BW_x75_BDT2");   labels.push_back("T2BW_x75_BDT2");   uls.push_back(14.4);
+	sigcuts.push_back(TCut(presel+"mini_bdt[19] > 0.50"));  signames.push_back("T2BW_x75_BDT3");   labels.push_back("T2BW_x75_BDT3");   uls.push_back(7.96);
+	sigcuts.push_back(TCut(presel+"mini_bdt[20] > 0.25"));  signames.push_back("T2BW_x75_BDT4");   labels.push_back("T2BW_x75_BDT4");   uls.push_back(129.7);
+      }
     }
 
   }
@@ -971,15 +968,15 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     */
 
     if( print ){
-      can[i]->          Print(Form("../../plots/%s%s%s_%s%s.pdf"       ,sample,xchar,suffix,labels.at(i).c_str(),pol));
+      can[i]->          Print(Form("../../plots/%s%s%s_%s%s%s.pdf"       ,sample,xchar,suffix,labels.at(i).c_str(),pol,BDTchar));
       //can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str(),pol));
     }
 
-    int bin = heff[i]->FindBin(300,50);
+    int bin = heff[i]->FindBin(500,50);
 
     float toterr = 0.1; //sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
     //float toterr = sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
-    cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
+    cout << "efficiency (500,50)  " << heff[i]->GetBinContent(bin) << endl;
     cout << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
     cout << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
     cout << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
@@ -987,10 +984,19 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     //cout << "obs limit            " << getObservedLimit(toterr,labels.at(i)) << endl;
     //cout << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
     cout << endl << endl;
+
+    *logfile << "efficiency (500,50)  " << heff[i]->GetBinContent(bin) << endl;
+    *logfile << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
+    *logfile << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
+    *logfile << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
+    *logfile << "tot err              " << toterr << endl;
+    //*logfile << "obs limit            " << getObservedLimit(toterr,labels.at(i)) << endl;
+    //*logfile << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
+    *logfile << endl << endl;
   }
 
 
-  TFile *outfile = TFile::Open(Form("%s%s%s%s_histos.root",sample,xchar,suffix,pol),"RECREATE");
+  TFile *outfile = TFile::Open(Form("%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar),"RECREATE");
 
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
