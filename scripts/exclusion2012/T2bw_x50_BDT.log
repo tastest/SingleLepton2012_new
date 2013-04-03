@@ -1,0 +1,55 @@
+----------------------------------------------------
+Sample            T2bw
+logfile           T2bw_x50_BDT.log
+x                 50
+Using file        /tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x50.root
+Using denominator /tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root
+Denom histo       masses
+Using lumi        19500 pb-1
+----------------------------------------------------
+Using pre-selection   ((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.3 && x < 0.7)
+Using weight          mini_sltrigeff
+
+Signal Region : 0 T2BW_x50_BDT1
+Selection     : (((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.3 && x < 0.7))&&(mini_bdt[12] > 0.35)
+UL            : 28.3
+
+Signal Region : 1 T2BW_x50_BDT2L
+Selection     : (((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.3 && x < 0.7))&&(mini_bdt[13] > 0.45)
+UL            : 21.8
+
+Signal Region : 2 T2BW_x50_BDT2T
+Selection     : (((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.3 && x < 0.7))&&(mini_bdt[13] > 0.55)
+UL            : 10.4
+
+Signal Region : 3 T2BW_x50_BDT3
+Selection     : (((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.3 && x < 0.7))&&(mini_bdt[14] > 0.35)
+UL            : 11.5
+efficiency (500,50)  1.33291
+xsec UL              0.10888
+xsec UL exp          0.10888
+JES                  0.1
+tot err              0.1
+
+
+efficiency (500,50)  2.23167
+xsec UL              0.0500948
+xsec UL exp          0.0500948
+JES                  0.1
+tot err              0.1
+
+
+efficiency (500,50)  1.16409
+xsec UL              0.0458156
+xsec UL exp          0.0458156
+JES                  0.1
+tot err              0.1
+
+
+efficiency (500,50)  1.32383
+xsec UL              0.0445482
+xsec UL exp          0.0445482
+JES                  0.1
+tot err              0.1
+
+
