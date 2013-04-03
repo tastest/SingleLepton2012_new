@@ -224,7 +224,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
       xaxismin        = 180.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
-      if( doBDT ) nSR = 3;
+      if( doBDT ) nSR = 4;
     }
 
     else if( x==75 ){
@@ -368,14 +368,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 	t->DrawLatex(0.2,0.75,"1 = BDT1");
 	t->DrawLatex(0.2,0.70,"2 = BDT2loose");
 	t->DrawLatex(0.2,0.65,"3 = BDT3tight");
-	t->DrawLatex(0.2,0.55,"4 = BDT3");
+	t->DrawLatex(0.2,0.60,"4 = BDT3");
       } 
 
       else if( x==75 ){
 	t->DrawLatex(0.2,0.75,"1 = BDT1");
 	t->DrawLatex(0.2,0.70,"2 = BDT2");
 	t->DrawLatex(0.2,0.65,"3 = BDT3");
-	t->DrawLatex(0.2,0.55,"4 = BDT4");
+	t->DrawLatex(0.2,0.60,"4 = BDT4");
       }
     }
 
