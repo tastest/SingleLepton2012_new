@@ -73,7 +73,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
       denomhistoname = (char*) "masses25";
       filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x25.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
-      label          = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.25";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.25";
     }
 
     else if( x==50 ){
@@ -81,15 +81,16 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
       denomhistoname = (char*) "masses";
       filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x50.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
-      label          = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.50";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.50";
     }
 
     else if( x==75 ){
       xchar          = (char*) "_x75";
       denomhistoname = (char*) "masses75";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
+      //filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/T2bw_x75.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
-      label          = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.75";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.75";
     }
     
     else{
@@ -225,17 +226,17 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 
   // T2tt cut-based signal regions
   TCut   SR[8];
-  string SRname[8]={"LM150","LM200","LM250","LM300","HM150","HM200","HM250","HM300"};
+  string SRname[8];
 
-  SR[0]=TCut("mini_met > 150.0")+dphi+chi2;
-  SR[1]=TCut("mini_met > 200.0")+dphi+chi2;
-  SR[2]=TCut("mini_met > 250.0")+dphi+chi2;
-  SR[3]=TCut("mini_met > 300.0")+dphi+chi2;
+  SR[0]=TCut("mini_met > 150.0")+dphi+chi2;          SRname[0] = "LM150";
+  SR[1]=TCut("mini_met > 200.0")+dphi+chi2;          SRname[1] = "LM200";
+  SR[2]=TCut("mini_met > 250.0")+dphi+chi2;          SRname[2] = "LM250";
+  SR[3]=TCut("mini_met > 300.0")+dphi+chi2;          SRname[3] = "LM300";
 
-  SR[4]=TCut("mini_met > 150.0")+dphi+chi2+mt2w;
-  SR[5]=TCut("mini_met > 200.0")+dphi+chi2+mt2w;
-  SR[6]=TCut("mini_met > 250.0")+dphi+chi2+mt2w;
-  SR[7]=TCut("mini_met > 300.0")+dphi+chi2+mt2w;
+  SR[4]=TCut("mini_met > 150.0")+dphi+chi2+mt2w;     SRname[4] = "HM150";
+  SR[5]=TCut("mini_met > 200.0")+dphi+chi2+mt2w;     SRname[5] = "HM200";
+  SR[6]=TCut("mini_met > 250.0")+dphi+chi2+mt2w;     SRname[6] = "HM250";
+  SR[7]=TCut("mini_met > 300.0")+dphi+chi2+mt2w;     SRname[7] = "HM300";
 
   // T2bw cut-based signal regions
   TCut   SR_T2BW[11];
@@ -268,15 +269,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   TCut   SR_BDT_T2BW[7];
   string SRname_BDT_T2BW[7];
 
-  SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_BDT1";
-  SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_BDT2";
-  SR_BDT_T2BW[2]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[2] = "T2BW_BDT3";
-
-  SR_BDT_T2BW[3]=TCut("mini_bdt[13] > 0.35"); SRname_BDT_T2BW[3] = "T2BW_BDT2_35";
-  SR_BDT_T2BW[4]=TCut("mini_bdt[13] > 0.40"); SRname_BDT_T2BW[4] = "T2BW_BDT2_40";
-  // SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[2] = "T2BW_BDT2_45";
-  SR_BDT_T2BW[5]=TCut("mini_bdt[13] > 0.50"); SRname_BDT_T2BW[5] = "T2BW_BDT2_50";
-  SR_BDT_T2BW[6]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[6] = "T2BW_BDT2_55";
+  if( x==25 ){
+    SR_BDT_T2BW[0]=TCut("mini_bdt[12] > 0.35"); SRname_BDT_T2BW[0] = "T2BW_x50_BDT1";
+    SR_BDT_T2BW[1]=TCut("mini_bdt[13] > 0.45"); SRname_BDT_T2BW[1] = "T2BW_x50_BDT2L";
+    SR_BDT_T2BW[2]=TCut("mini_bdt[13] > 0.55"); SRname_BDT_T2BW[2] = "T2BW_x50_BDT2T";
+    SR_BDT_T2BW[3]=TCut("mini_bdt[14] > 0.35"); SRname_BDT_T2BW[3] = "T2BW_x50_BDT3";
+  }
 
 
   //--------------------------------------------------
@@ -294,16 +292,6 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 
     // T2tt BDT
     if( TString(sample).Contains("T2tt") ){
-
-      // MT150
-      // sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  uls.push_back(139.0);
-      // sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  uls.push_back(34.8);
-      // sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  uls.push_back(28.6);
-      // sigcuts.push_back(TCut(presel+SR_BDT[3]));  signames.push_back(SRname_BDT[3]);  labels.push_back(SRname_BDT[3]);  uls.push_back(9.59);
-      // sigcuts.push_back(TCut(presel+SR_BDT[4]));  signames.push_back(SRname_BDT[4]);  labels.push_back(SRname_BDT[4]);  uls.push_back(4.94);
-      // sigcuts.push_back(TCut(presel+SR_BDT[5]));  signames.push_back(SRname_BDT[5]);  labels.push_back(SRname_BDT[5]);  uls.push_back(29.9);
-
-      // MT120
       sigcuts.push_back(TCut(presel+SR_BDT[0]));  signames.push_back(SRname_BDT[0]);  labels.push_back(SRname_BDT[0]);  uls.push_back(182.7);
       sigcuts.push_back(TCut(presel+SR_BDT[1]));  signames.push_back(SRname_BDT[1]);  labels.push_back(SRname_BDT[1]);  uls.push_back(42.0);
       sigcuts.push_back(TCut(presel+SR_BDT[2]));  signames.push_back(SRname_BDT[2]);  labels.push_back(SRname_BDT[2]);  uls.push_back(33.2);
@@ -314,6 +302,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 
     // T2bw BDT
     else if( TString(sample).Contains("T2bw") ){
+
       sigcuts.push_back(TCut(presel+SR_BDT_T2BW[0]));  signames.push_back(SRname_BDT_T2BW[0]);  labels.push_back(SRname_BDT_T2BW[0]);  uls.push_back(28.3);
       sigcuts.push_back(TCut(presel+SR_BDT_T2BW[1]));  signames.push_back(SRname_BDT_T2BW[1]);  labels.push_back(SRname_BDT_T2BW[1]);  uls.push_back(21.8);
       sigcuts.push_back(TCut(presel+SR_BDT_T2BW[2]));  signames.push_back(SRname_BDT_T2BW[2]);  labels.push_back(SRname_BDT_T2BW[2]);  uls.push_back(11.1);
@@ -331,27 +320,6 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     cout << "Doing cut-based signal regions" << endl;  
 
     if( TString(sample).Contains("T2tt") ){
-
-      //----------------------------
-      // MT > 150 GeV
-      //----------------------------
-
-      // cout << "USING MT CUT 150 GEV!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-      // // low-mass
-      // sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  uls.push_back(64.4);
-      // sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  uls.push_back(30.0);
-      // sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  uls.push_back(15.3);
-      // sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  uls.push_back(8.79);
-
-      // // high-mass
-      // sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  uls.push_back(12.9);
-      // sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  uls.push_back(10.2);
-      // sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  uls.push_back(8.02);
-      // sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  uls.push_back(5.87);
-
-      //----------------------------
-      // MT > 120 GeV
-      //----------------------------
 
       // low-mass
       sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  uls.push_back(79.6);
@@ -912,7 +880,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     //hxsec[i]->Draw("sametext");
     hxsec[i]->SetMinimum(0.01);
     hxsec[i]->SetMaximum(100);
-    hxsec[i]->GetXaxis()->SetRangeUser(200,700);
+    hxsec[i]->GetXaxis()->SetRangeUser(100,700);
     hxsec[i]->GetYaxis()->SetRangeUser(0,600);
     hexcl[i]->Draw("samebox");
 
