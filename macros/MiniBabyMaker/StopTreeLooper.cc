@@ -63,9 +63,15 @@ void StopTreeLooper::setOutFileName(string filename)
 {
     m_outfilename_ = filename;
     jets.clear();
+    jets_up.clear();
+    jets_down.clear();
     bjets.clear();
     jets_btag.clear();
+    jets_up_btag.clear();
+    jets_down_btag.clear();
     jets_sigma.clear();
+    jets_up_sigma.clear();
+    jets_down_sigma.clear();
     metphi  = -99999.;
 }
 
@@ -123,7 +129,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         char* h_nsig_filename = "";
 
         if( name.Contains("T2tt") )
-            h_nsig_filename = "myMassDB_T2tt_MG.root";
+            h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/myMassDB_T2tt_MG.root";
 
         if( name.Contains("T2bw") )
             h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw_coarse/myMassDB_T2bw.root";
@@ -353,14 +359,28 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             // MET > cut value (100 GeV for stop)
             met_ = stopt.t1metphicorr();
             metphi = stopt.t1metphicorrphi();
+
+            metup_   = stopt.t1metphicorrup();
+            metupphi = stopt.t1metphicorrphiup();
+
+            metdown_   = stopt.t1metphicorrdn();
+            metdownphi = stopt.t1metphicorrphidn();
             if ( met_ < MET_CUT ) continue; 
 
             // jet selection
             jets.clear();
+            jets_up.clear();
+            jets_down.clear();
             bjets.clear();
             jets_btag.clear();
+            jets_up_btag.clear();
+            jets_down_btag.clear();
             jets_sigma.clear();
+            jets_up_sigma.clear();
+            jets_down_sigma.clear();
             njets_ = 0;
+            njets_up_ = 0;
+            njets_down_ = 0;
             nb_ = 0;
 
             // kinematic variables
@@ -371,74 +391,107 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             for (unsigned int i =0; i<stopt.pfjets().size(); i++){
 
+	      bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mva5xPUid().at(i),0);
 
-                if ( stopt.pfjets().at(i).pt() < JET_PT ) continue;
-                if ( fabs(stopt.pfjets().at(i).eta()) > JET_ETA ) continue;
-		// if ( (fabs(stopt.pfjets().at(i).eta()) <= 2.5) 
-                //        && (stopt.pfjets_beta2_0p5().at(i) < 0.2) ) continue;
-		// bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
-		bool passTightPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mva5xPUid().at(i),0);
-		if(!passTightPUid) continue;
-
-                // jet information
-                njets_++;
-                if (njets_==1) {
-                    pt_J1_   = stopt.pfjets().at(i).pt();
-                    dphimj1_ = getdphi(metphi, stopt.pfjets().at(i).phi() );
-                }
-                if (njets_==2) {
-                    pt_J2_ = stopt.pfjets().at(i).pt();
-                    dphimj2_    = getdphi(metphi, stopt.pfjets().at(i).phi() );
-                    dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
-                }
-                jets.push_back(stopt.pfjets().at(i));
-                jets_sigma.push_back(stopt.pfjets_sigma().at(i));
-
-                // b-tagging information
+	      // b-tagging information
 	       
-		float csv_nominal=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
-		  : nominalShape->reshape( stopt.pfjets().at(i).eta(),
-					   stopt.pfjets().at(i).pt(),
-					   stopt.pfjets_csv().at(i),
-					   stopt.pfjets_mcflavorAlgo().at(i) ); 
+	      float csv_nominal=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+		: nominalShape->reshape( stopt.pfjets().at(i).eta(),
+					 stopt.pfjets().at(i).pt(),
+					 stopt.pfjets_csv().at(i),
+					 stopt.pfjets_mcflavorAlgo().at(i) ); 
 
-                if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_nominal > 0.679) ) {
-                    nb_++;
-                    bjets.push_back(stopt.pfjets().at(i));
-                    // leading b-jet variables
-                    if (nb_==1) {
-                        pt_b_ = stopt.pfjets().at(i).pt();
-                        dRleptB1_ = deltaR(stopt.pfjets().at(i).eta() , 
-                                stopt.pfjets().at(i).phi() , 
-                                stopt.lep1().eta(), stopt.lep1().phi());
-                    }
-                }
-		
-		// for the cr1 we use the leading jet
-		if (nb_==0) {
-		  pt_b_ = stopt.pfjets().at(0).pt();
-		  dRleptB1_ = deltaR(stopt.pfjets().at(0).eta() , 
-				     stopt.pfjets().at(0).phi() , 
-				     stopt.lep1().eta(), stopt.lep1().phi());
+	      // jets with up and down variations
+	      float unc     = stopt.pfjets_uncertainty().at(i);
+	      float pt_up   = stopt.pfjets().at(i).pt() * ( 1 + unc );
+	      float pt_down = stopt.pfjets().at(i).pt() * ( 1 - unc );
+	      float eta     = fabs(stopt.pfjets().at(i).eta());
+
+	      if( pt_up > JET_PT && eta < JET_ETA && passTightPUid ){
+	      	njets_up_++;
+	      	jets_up.push_back      ( (1+unc)*stopt.pfjets().at(i) );
+                jets_up_sigma.push_back( stopt.pfjets_sigma().at(i)   );
+		jets_up_btag.push_back ( csv_nominal                  );
+	      }
+
+	      if( pt_down > JET_PT && eta < JET_ETA && passTightPUid ){
+	      	njets_down_++;
+	      	jets_down.push_back      ( (1-unc)*stopt.pfjets().at(i) );
+                jets_down_sigma.push_back( stopt.pfjets_sigma().at(i)   );
+		jets_down_btag.push_back ( csv_nominal                  );
+	      }
+	      
+	      if ( stopt.pfjets().at(i).pt() < JET_PT ) continue;
+	      if ( fabs(stopt.pfjets().at(i).eta()) > JET_ETA ) continue;
+	      // if ( (fabs(stopt.pfjets().at(i).eta()) <= 2.5) 
+	      //        && (stopt.pfjets_beta2_0p5().at(i) < 0.2) ) continue;
+	      // bool passMediumPUid = passMVAJetId(stopt.pfjets().at(i).pt(), stopt.pfjets().at(i).eta(),stopt.pfjets_mvaPUid().at(i),1);
+
+	      if(!passTightPUid) continue;
+
+	      // jet information
+	      njets_++;
+	      if (njets_==1) {
+		pt_J1_   = stopt.pfjets().at(i).pt();
+		dphimj1_ = getdphi(metphi, stopt.pfjets().at(i).phi() );
+	      }
+	      if (njets_==2) {
+		pt_J2_ = stopt.pfjets().at(i).pt();
+		dphimj2_    = getdphi(metphi, stopt.pfjets().at(i).phi() );
+		dphimjmin_  = TMath::Min( dphimj1_ , dphimj2_ );
+	      }
+	      jets.push_back(stopt.pfjets().at(i));
+	      jets_sigma.push_back(stopt.pfjets_sigma().at(i));
+
+ 
+
+	      if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_nominal > 0.679) ) {
+		nb_++;
+		bjets.push_back(stopt.pfjets().at(i));
+		// leading b-jet variables
+		if (nb_==1) {
+		  pt_b_      = stopt.pfjets().at(i).pt();
+		  pt_b_up_   = (1+unc)*stopt.pfjets().at(i).pt();
+		  pt_b_down_ = (1-unc)*stopt.pfjets().at(i).pt();
+		  dRleptB1_  = deltaR(stopt.pfjets().at(i).eta() , 
+				      stopt.pfjets().at(i).phi() , 
+				      stopt.lep1().eta(), stopt.lep1().phi());
 		}
+	      }
+		
+	      // for the cr1 we use the leading jet
+	      if (nb_==0) {
+		pt_b_      = stopt.pfjets().at(0).pt();
+		pt_b_up_   = (1+unc)*stopt.pfjets().at(0).pt();
+		pt_b_down_ = (1-unc)*stopt.pfjets().at(0).pt();
+		dRleptB1_  = deltaR(stopt.pfjets().at(0).eta() , 
+				    stopt.pfjets().at(0).phi() , 
+				    stopt.lep1().eta(), stopt.lep1().phi());
+	      }
 		
 
-		jets_btag.push_back(csv_nominal);
+	      jets_btag.push_back(csv_nominal);
 
-                float dPhiL = getdphi( stopt.lep1().Phi(), stopt.pfjets().at(i).phi() );
-                float dPhiM = getdphi(             metphi, stopt.pfjets().at(i).phi() );
+	      float dPhiL = getdphi( stopt.lep1().Phi(), stopt.pfjets().at(i).phi() );
+	      float dPhiM = getdphi(             metphi, stopt.pfjets().at(i).phi() );
 
-                if ( dPhiL  < (TMath::Pi()/2) ) htssl_=htssl_+stopt.pfjets().at(i).pt();
-                else htosl_=htosl_+stopt.pfjets().at(i).pt();
-                if ( dPhiM  < (TMath::Pi()/2) ) htssm_=htssm_+stopt.pfjets().at(i).pt();
-                else htosm_=htosm_+stopt.pfjets().at(i).pt();
+	      if ( dPhiL  < (TMath::Pi()/2) ) htssl_=htssl_+stopt.pfjets().at(i).pt();
+	      else htosl_=htosl_+stopt.pfjets().at(i).pt();
+	      if ( dPhiM  < (TMath::Pi()/2) ) htssm_=htssm_+stopt.pfjets().at(i).pt();
+	      else htosm_=htosm_+stopt.pfjets().at(i).pt();
 
 
 
             }
 
-            if ( njets_ < NJETS_CUT ) continue; 
+	    // for signal we need to store events with >=4 jets with JES UP
+	    if( name.Contains("T2") ){
+	      if ( njets_up_ < NJETS_CUT ) continue; 
+	    }
 
+	    else{
+	      if ( njets_ < NJETS_CUT ) continue; 
+	    }
 
             // event shapes: HT in hemispheres
             htratiol_   = htssl_ / (htosl_ + htssl_);
@@ -448,11 +501,19 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             // kinematic variables
             //------------------------------------------ 
 
-            mt_ = (float)getMT(stopt.lep1().pt(), stopt.lep1().phi(), met_, metphi );
-            mt2b_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2b);
-            mt2bl_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2bl);
-            mt2w_ = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2w);
-            chi2_ = (float)calculateChi2SNT(jets, jets_sigma, jets_btag);
+            mt_     = (float)getMT(stopt.lep1().pt(), stopt.lep1().phi(), met_     , metphi     );
+            mtup_   = (float)getMT(stopt.lep1().pt(), stopt.lep1().phi(), metup_   , metupphi   );
+            mtdown_ = (float)getMT(stopt.lep1().pt(), stopt.lep1().phi(), metdown_ , metdownphi );
+            mt2b_   = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2b);
+            mt2bl_  = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2bl);
+            mt2w_   = (float)calculateMT2w(jets, jets_btag, stopt.lep1(), met_, metphi, MT2w);
+            chi2_   = (float)calculateChi2SNT(jets, jets_sigma, jets_btag);
+
+            chi2up_   = (float)calculateChi2SNT(jets_up   , jets_up_sigma   , jets_up_btag  );
+            chi2down_ = (float)calculateChi2SNT(jets_down , jets_down_sigma , jets_down_btag);
+
+            mt2wup_   = (float)calculateMT2w(jets_up   , jets_up_btag   , stopt.lep1() , metup_   , metupphi   , MT2w);
+            mt2wdown_ = (float)calculateMT2w(jets_down , jets_down_btag , stopt.lep1() , metdown_ , metdownphi , MT2w);
 
             // for WH+MET ntuple
             TVector2 lep(stopt.lep1().px(), stopt.lep1().py());
@@ -630,7 +691,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         if ( __mini_branches) {
             outTree_->Branch("mini_mt"        , &mt_        ,  "mini_mt/F"	 );
+            outTree_->Branch("mini_mtup"      , &mtup_      ,  "mini_mtup/F"	 );
+            outTree_->Branch("mini_mtdown"    , &mtdown_    ,  "mini_mtdown/F"	 );
+
             outTree_->Branch("mini_met"       , &met_       ,  "mini_met/F"	 );
+            outTree_->Branch("mini_metup"     , &metup_     ,  "mini_metup/F"	 );
+            outTree_->Branch("mini_metdown"   , &metdown_   ,  "mini_metdown/F"	 );
 
             outTree_->Branch("mini_sig"       , &sig_       ,  "mini_sig/I"	 );
             outTree_->Branch("mini_cr1"       , &cr1_       ,  "mini_cr1/I"	 );
@@ -641,19 +707,25 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_whcr1"     , &whcr1_     ,  "mini_whcr1/I"	 );
 
             outTree_->Branch("mini_chi2"      , &chi2_      ,  "mini_chi2/F"      );
+            outTree_->Branch("mini_chi2up"    , &chi2up_    ,  "mini_chi2up/F"    );
+            outTree_->Branch("mini_chi2down"  , &chi2down_  ,  "mini_chi2down/F"  );
             outTree_->Branch("mini_mt2b"      , &mt2b_      ,  "mini_mt2b/F"      );
             outTree_->Branch("mini_mt2bl"     , &mt2bl_     ,  "mini_mt2bl/F"     );
             outTree_->Branch("mini_mt2w"      , &mt2w_      ,  "mini_mt2w/F"      );
+            outTree_->Branch("mini_mt2wup"    , &mt2wup_    ,  "mini_mt2wup/F"    );
+            outTree_->Branch("mini_mt2wdown"  , &mt2wdown_  ,  "mini_mt2wdown/F"  );
 
             outTree_->Branch("mini_weight"    , &weight_    ,  "mini_weight/F"	 );
             outTree_->Branch("mini_nvtxweight", &nvtxweight_,  "mini_nvtxweight/F"	 );
             outTree_->Branch("mini_sltrigeff" , &sltrigeff_ ,  "mini_sltrigeff/F" );
             outTree_->Branch("mini_dltrigeff" , &dltrigeff_ ,  "mini_dltrigeff/F" );
 
-            outTree_->Branch("mini_nb"        , &nb_        ,  "mini_nb/I"	 );
-            outTree_->Branch("mini_njets"     , &njets_     ,  "mini_njets/I"	 );
+            outTree_->Branch("mini_nb"        , &nb_        ,   "mini_nb/I"	         );
+            outTree_->Branch("mini_njets"     , &njets_      ,  "mini_njets/I"  	 );
+            outTree_->Branch("mini_njetsup"   , &njets_up_   ,  "mini_njetsup/I"	 );
+            outTree_->Branch("mini_njetsdown" , &njets_down_ ,  "mini_njetsdown/I"	 );
 
-            outTree_->Branch("mini_passisotrk", &passisotrk_,  "mini_passisotrk/I");
+            outTree_->Branch("mini_passisotrk" , &passisotrk_,  "mini_passisotrk/I");
 	    outTree_->Branch("mini_passtauveto", &passtauveto_,  "mini_passtauveto/I");
 
             outTree_->Branch("mini_nlep"      , &nlep_      ,  "mini_nlep/I"	 );
@@ -679,6 +751,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_dphimjmin" , &dphimjmin_ ,  "mini_dphimjmin/F" );
 
             outTree_->Branch("mini_pt_b"      , &pt_b_      ,  "mini_pt_b/F"      );
+            outTree_->Branch("mini_pt_bup"    , &pt_b_up_   ,  "mini_pt_bup/F"    );
+            outTree_->Branch("mini_pt_bdown"  , &pt_b_down_ ,  "mini_pt_bdown/F"  );
             outTree_->Branch("mini_pt_J1"     , &pt_J1_     ,  "mini_pt_J1/F"     );
             outTree_->Branch("mini_pt_J2"     , &pt_J2_     ,  "mini_pt_J2/F"     );
 
@@ -715,11 +789,19 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         // kinematic variables
         mt_         = -1.0;
+        mtup_       = -1.0;
+        mtdown_     = -1.0;
         met_        = -1.0;
+        metup_      = -1.0;
+        metdown_    = -1.0;
         chi2_       = -1.0;
+        chi2up_     = -1.0;
+        chi2down_   = -1.0;
         mt2b_       = -1.0;
         mt2bl_      = -1.0;
         mt2w_       = -1.0;
+        mt2wup_     = -1.0;
+        mt2wdown_   = -1.0;
 
         // event shapes
         htssl_      = -1.0;
@@ -738,6 +820,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         // jet counting
         nb_         = -1;
         njets_      = -1;
+        njets_up_   = -1;
+        njets_down_ = -1;
 
         // lepton variables
         passisotrk_ = -1;
@@ -758,9 +842,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	xsecsusy_   = -1.0;
 
         // jet kinematics
-        pt_b_  = -1.0;
-        pt_J1_ = -1.0;
-        pt_J2_ = -1.0;
+        pt_b_      = -1.0;
+        pt_b_up_   = -1.0;
+        pt_b_down_ = -1.0;
+        pt_J1_     = -1.0;
+        pt_J2_     = -1.0;
 
         // wh event kinematics
         bbmass_      = -1.0;

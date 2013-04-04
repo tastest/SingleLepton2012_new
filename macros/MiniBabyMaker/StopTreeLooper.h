@@ -77,11 +77,19 @@ class StopTreeLooper {
 
 	// kinematic variables
 	Float_t mt_;
+	Float_t mtup_;
+	Float_t mtdown_;
 	Float_t met_;
+	Float_t metup_;
+	Float_t metdown_;
 	Float_t chi2_;
+	Float_t chi2up_;
+	Float_t chi2down_;
 	Float_t mt2b_;
 	Float_t mt2bl_;
 	Float_t mt2w_;
+	Float_t mt2wup_;
+	Float_t mt2wdown_;
 
 	// event shapes
 	Float_t htssl_;
@@ -104,6 +112,8 @@ class StopTreeLooper {
 	// jet counting
 	Int_t nb_;
 	Int_t njets_;
+	Int_t njets_up_;
+	Int_t njets_down_;
 
 	// lepton variables
 	Int_t passisotrk_;
@@ -120,6 +130,8 @@ class StopTreeLooper {
 
 	// jet kinematics
 	Float_t pt_b_;
+	Float_t pt_b_up_;
+	Float_t pt_b_down_;
 	Float_t pt_J1_;
 	Float_t pt_J2_;
 
@@ -154,10 +166,18 @@ class StopTreeLooper {
 
 	//jet information
 	vector<LorentzVector> jets;
+	vector<LorentzVector> jets_up;
+	vector<LorentzVector> jets_down;
 	vector<LorentzVector> bjets;
 	vector<float> jets_btag;
+	vector<float> jets_up_btag;
+	vector<float> jets_down_btag;
 	vector<float> jets_sigma;
+	vector<float> jets_up_sigma;
+	vector<float> jets_down_sigma;
 	float metphi;
+	float metupphi;
+	float metdownphi;
 
     static const bool __apply_mva = true; 
     static const bool __mini_branches = true;
