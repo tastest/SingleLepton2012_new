@@ -108,6 +108,7 @@ class StopTreeLooper {
 	Float_t nvtxweight_;
 	Float_t sltrigeff_;
 	Float_t dltrigeff_;
+	Int_t   nsigevents_;
 
 	// jet counting
 	Int_t nb_;

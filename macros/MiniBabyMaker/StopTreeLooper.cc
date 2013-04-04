@@ -124,17 +124,24 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     makeTree(name.Data(), chain);
 
     TH2F *h_nsig, *h_nsig25, *h_nsig75 ;
+    TH2F *h_nsig_masslessLSP;
 
     if( name.Contains("T2") ){
-        char* h_nsig_filename = "";
+        char* h_nsig_filename             = "";
+        char* h_nsig_filename_masslessLSP = "";
 
-        if( name.Contains("T2tt") )
-            h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/myMassDB_T2tt_MG.root";
-
-        if( name.Contains("T2bw") )
-            h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw_coarse/myMassDB_T2bw.root";
-
-        cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
+        if( name.Contains("T2tt") ){
+	  h_nsig_filename             = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/myMassDB_T2tt_MG_massiveLSP.root";
+	  h_nsig_filename_masslessLSP = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/myMassDB_T2tt_MG_masslessLSP.root";
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massive LSP)  " << h_nsig_filename << endl;
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massless LSP) " << h_nsig_filename_masslessLSP << endl;
+	}
+        if( name.Contains("T2bw") ){
+	  h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw_coarse/myMassDB_T2bw.root";
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
+	  cout << "WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	  cout << "ARE YOU SURE THAT YOU ARE USING THE UP-TO-DATE HISTOGRAMS FOR T2BW?????" << endl;
+	}
 
         TFile *f_nsig = TFile::Open(h_nsig_filename);
 
@@ -146,6 +153,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             h_nsig25 = (TH2F*) f_nsig->Get("masses25");
             h_nsig75 = (TH2F*) f_nsig->Get("masses75");
         }
+
+        if( name.Contains("T2tt") ){
+	  TFile *f_nsig_masslessLSP = TFile::Open(h_nsig_filename_masslessLSP);
+	  h_nsig_masslessLSP = (TH2F*) f_nsig_masslessLSP->Get("masses");
+	}
 
     }
 
@@ -305,9 +317,18 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             weight_ = isData ? 1. : 
                 ( stopt.weight() * 19.5 * puweight * stopt.mgcor() );
 
+	    nsigevents_ = -1;
+
             if( name.Contains("T2tt") ) {
                 int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
                 float nevents = h_nsig->GetBinContent(bin);
+		if( stopt.ml() < 10.0 )
+		  nevents = h_nsig_masslessLSP->GetBinContent(bin);
+
+		// skip events with LSP mass = 0 because they're buggy
+		// the fixed slice has LSP mass = 1 GeV
+		if( stopt.ml() < 0.5 ) continue;
+
                 //NOTE::need to add vtx. reweighting for the signal sample
                 weight_  = stopt.xsecsusy() * 1000.0 / nevents * 19.5; 
 
@@ -315,6 +336,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 //      << " bin " << bin << " nevents " << nevents 
                 //      << " xsec " << tree->xsecsusy_ 
                 //      << " weight " << evtweight << endl;
+
+		nsigevents_ = (int) nevents;
             }
 
             if( name.Contains("T2bw") ) {
@@ -335,6 +358,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 //NOTE::need to add vtx. reweighting for the signal sample
                 weight_ =  stopt.xsecsusy() * 1000.0 / nevents * 19.5; 
 
+		nsigevents_ = (int) nevents;
                 // cout << "mg " << stopt.mg() << " ml " << stopt.ml() 
                 //      << " x " << stopt.x() 
                 //      << " nevents " << nevents 
@@ -719,6 +743,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_nvtxweight", &nvtxweight_,  "mini_nvtxweight/F"	 );
             outTree_->Branch("mini_sltrigeff" , &sltrigeff_ ,  "mini_sltrigeff/F" );
             outTree_->Branch("mini_dltrigeff" , &dltrigeff_ ,  "mini_dltrigeff/F" );
+            outTree_->Branch("mini_nsigevents", &nsigevents_,  "mini_nsigevents/I" );
 
             outTree_->Branch("mini_nb"        , &nb_        ,   "mini_nb/I"	         );
             outTree_->Branch("mini_njets"     , &njets_      ,  "mini_njets/I"  	 );
