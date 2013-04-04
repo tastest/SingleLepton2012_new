@@ -169,6 +169,10 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   TCut chi2("mini_chi2<5.0");
   TCut mt2w("mini_mt2w>200.0");
   TCut bpt100("mini_pt_b > 100.0");
+  TCut met150("mini_met > 150.0");
+  TCut met200("mini_met > 200.0");
+  TCut met250("mini_met > 250.0");
+  TCut met300("mini_met > 300.0");
 
   TCut x25("x < 0.3");
   TCut x50("x > 0.3 && x < 0.7");
@@ -224,32 +228,20 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   //------------------------------------------
 
   // T2tt cut-based signal regions
-  TCut   SR[8];
-  string SRname[8];
+  // TCut   SR[8];
+  // string SRname[8];
 
-  SR[0]=TCut("mini_met > 150.0")+dphi+chi2;          SRname[0] = "LM150";
-  SR[1]=TCut("mini_met > 200.0")+dphi+chi2;          SRname[1] = "LM200";
-  SR[2]=TCut("mini_met > 250.0")+dphi+chi2;          SRname[2] = "LM250";
-  SR[3]=TCut("mini_met > 300.0")+dphi+chi2;          SRname[3] = "LM300";
+  // SR[0]=TCut("mini_met > 150.0")+dphi+chi2;          SRname[0] = "T2TT_LM150";
+  // SR[1]=TCut("mini_met > 200.0")+dphi+chi2;          SRname[1] = "T2TT_LM200";
+  // SR[2]=TCut("mini_met > 250.0")+dphi+chi2;          SRname[2] = "T2TT_LM250";
+  // SR[3]=TCut("mini_met > 300.0")+dphi+chi2;          SRname[3] = "T2TT_LM300";
 
-  SR[4]=TCut("mini_met > 150.0")+dphi+chi2+mt2w;     SRname[4] = "HM150";
-  SR[5]=TCut("mini_met > 200.0")+dphi+chi2+mt2w;     SRname[5] = "HM200";
-  SR[6]=TCut("mini_met > 250.0")+dphi+chi2+mt2w;     SRname[6] = "HM250";
-  SR[7]=TCut("mini_met > 300.0")+dphi+chi2+mt2w;     SRname[7] = "HM300";
+  // SR[4]=TCut("mini_met > 150.0")+dphi+chi2+mt2w;     SRname[4] = "T2TT_HM150";
+  // SR[5]=TCut("mini_met > 200.0")+dphi+chi2+mt2w;     SRname[5] = "T2TT_HM200";
+  // SR[6]=TCut("mini_met > 250.0")+dphi+chi2+mt2w;     SRname[6] = "T2TT_HM250";
+  // SR[7]=TCut("mini_met > 300.0")+dphi+chi2+mt2w;     SRname[7] = "T2TT_HM300";
 
-  // T2bw cut-based signal regions
-  TCut   SR_T2BW[11];
-  string SRname_T2BW[11];
 
-  SR_T2BW[0]=TCut("mini_met > 100.0")+dphi;                SRname_T2BW[0] = "T2BW_LM100";
-  SR_T2BW[1]=TCut("mini_met > 150.0")+dphi;                SRname_T2BW[1] = "T2BW_LM150";
-  SR_T2BW[2]=TCut("mini_met > 200.0")+dphi;                SRname_T2BW[2] = "T2BW_LM200";
-  SR_T2BW[3]=TCut("mini_met > 250.0")+dphi;                SRname_T2BW[3] = "T2BW_LM250";
-
-  SR_T2BW[4]=TCut("mini_met > 100.0")+dphi+bpt100+mt2w;    SRname_T2BW[4] = "T2BW_HM100";
-  SR_T2BW[5]=TCut("mini_met > 150.0")+dphi+bpt100+mt2w;    SRname_T2BW[5] = "T2BW_HM150";
-  SR_T2BW[6]=TCut("mini_met > 200.0")+dphi+bpt100+mt2w;    SRname_T2BW[6] = "T2BW_HM200";
-  SR_T2BW[7]=TCut("mini_met > 250.0")+dphi+bpt100+mt2w;    SRname_T2BW[7] = "T2BW_HM250";
 
   //------------------------------------------
   // BDT signal region definitions
@@ -319,31 +311,33 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     if( TString(sample).Contains("T2tt") ){
 
       // low-mass
-      sigcuts.push_back(TCut(presel+SR[0]));  signames.push_back(SRname[0]);  labels.push_back(SRname[0]);  uls.push_back(79.6);
-      sigcuts.push_back(TCut(presel+SR[1]));  signames.push_back(SRname[1]);  labels.push_back(SRname[1]);  uls.push_back(42.1);
-      sigcuts.push_back(TCut(presel+SR[2]));  signames.push_back(SRname[2]);  labels.push_back(SRname[2]);  uls.push_back(19.0);
-      sigcuts.push_back(TCut(presel+SR[3]));  signames.push_back(SRname[3]);  labels.push_back(SRname[3]);  uls.push_back(9.9);
+      sigcuts.push_back(presel+met150+dphi+chi2);        signames.push_back("T2TT_LM150");   labels.push_back("T2TT_LM150");   uls.push_back(79.6);
+      sigcuts.push_back(presel+met200+dphi+chi2);        signames.push_back("T2TT_LM200");   labels.push_back("T2TT_LM200");   uls.push_back(42.1);
+      sigcuts.push_back(presel+met250+dphi+chi2);        signames.push_back("T2TT_LM250");   labels.push_back("T2TT_LM250");   uls.push_back(19.0);
+      sigcuts.push_back(presel+met300+dphi+chi2);        signames.push_back("T2TT_LM300");   labels.push_back("T2TT_LM300");   uls.push_back( 9.9);
 
       // high-mass
-      sigcuts.push_back(TCut(presel+SR[4]));  signames.push_back(SRname[4]);  labels.push_back(SRname[4]);  uls.push_back(17.5);
-      sigcuts.push_back(TCut(presel+SR[5]));  signames.push_back(SRname[5]);  labels.push_back(SRname[5]);  uls.push_back(12.3);
-      sigcuts.push_back(TCut(presel+SR[6]));  signames.push_back(SRname[6]);  labels.push_back(SRname[6]);  uls.push_back(9.0);
-      sigcuts.push_back(TCut(presel+SR[7]));  signames.push_back(SRname[7]);  labels.push_back(SRname[7]);  uls.push_back(6.4);
+      sigcuts.push_back(presel+met150+dphi+chi2+mt2w);   signames.push_back("T2TT_HM150");   labels.push_back("T2TT_HM150");   uls.push_back(17.5);
+      sigcuts.push_back(presel+met200+dphi+chi2+mt2w);   signames.push_back("T2TT_HM200");   labels.push_back("T2TT_HM200");   uls.push_back(12.3);
+      sigcuts.push_back(presel+met250+dphi+chi2+mt2w);   signames.push_back("T2TT_HM250");   labels.push_back("T2TT_HM250");   uls.push_back( 9.0);
+      sigcuts.push_back(presel+met300+dphi+chi2+mt2w);   signames.push_back("T2TT_HM300");   labels.push_back("T2TT_HM300");   uls.push_back( 6.4);
+
     }
 
     if( TString(sample).Contains("T2bw") ){
 
       // low-mass
-      sigcuts.push_back(TCut(presel+SR_T2BW[0]));   signames.push_back(SRname_T2BW[0]);   labels.push_back(SRname_T2BW[0]);   uls.push_back(370.0);
-      sigcuts.push_back(TCut(presel+SR_T2BW[1]));   signames.push_back(SRname_T2BW[1]);   labels.push_back(SRname_T2BW[1]);   uls.push_back(139.0);
-      sigcuts.push_back(TCut(presel+SR_T2BW[2]));   signames.push_back(SRname_T2BW[2]);   labels.push_back(SRname_T2BW[2]);   uls.push_back( 56.0);
-      sigcuts.push_back(TCut(presel+SR_T2BW[3]));   signames.push_back(SRname_T2BW[3]);   labels.push_back(SRname_T2BW[3]);   uls.push_back( 26.9);
+      sigcuts.push_back(presel+met100+dphi);               signames.push_back("T2BW_LM100");   labels.push_back("T2BW_LM100");   uls.push_back(79.6);
+      sigcuts.push_back(presel+met150+dphi);               signames.push_back("T2BW_LM150");   labels.push_back("T2BW_LM150");   uls.push_back(42.1);
+      sigcuts.push_back(presel+met200+dphi);               signames.push_back("T2BW_LM200");   labels.push_back("T2BW_LM200");   uls.push_back(19.0);
+      sigcuts.push_back(presel+met250+dphi);               signames.push_back("T2BW_LM250");   labels.push_back("T2BW_LM250");   uls.push_back( 9.9);
 
       // high-mass
-      sigcuts.push_back(TCut(presel+SR_T2BW[4]));   signames.push_back(SRname_T2BW[4]);   labels.push_back(SRname_T2BW[4]);   uls.push_back( 29.3);
-      sigcuts.push_back(TCut(presel+SR_T2BW[5]));   signames.push_back(SRname_T2BW[5]);   labels.push_back(SRname_T2BW[5]);   uls.push_back( 18.7);
-      sigcuts.push_back(TCut(presel+SR_T2BW[6]));   signames.push_back(SRname_T2BW[6]);   labels.push_back(SRname_T2BW[6]);   uls.push_back( 12.4);
-      sigcuts.push_back(TCut(presel+SR_T2BW[7]));   signames.push_back(SRname_T2BW[7]);   labels.push_back(SRname_T2BW[7]);   uls.push_back( 8.64);
+      sigcuts.push_back(presel+met100+dphi+bpt100+mt2w);   signames.push_back("T2BW_HM100");   labels.push_back("T2BW_HM100");   uls.push_back(17.5);
+      sigcuts.push_back(presel+met150+dphi+bpt100+mt2w);   signames.push_back("T2BW_HM150");   labels.push_back("T2BW_HM150");   uls.push_back(12.3);
+      sigcuts.push_back(presel+met200+dphi+bpt100+mt2w);   signames.push_back("T2BW_HM200");   labels.push_back("T2BW_HM200");   uls.push_back( 9.0);
+      sigcuts.push_back(presel+met250+dphi+bpt100+mt2w);   signames.push_back("T2BW_HM250");   labels.push_back("T2BW_HM250");   uls.push_back( 6.4);
+
     }
 
 
@@ -494,16 +488,134 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	float this_ul_expp1;
 	float this_ul_expm1;
 
-	this_ul       = uls.at(i);
-	this_ul_exp   = uls.at(i);
-	this_ul_expp1 = uls.at(i);
-	this_ul_expm1 = uls.at(i);
+	// this_ul       = uls.at(i);
+	// this_ul_exp   = uls.at(i);
+	// this_ul_expp1 = uls.at(i);
+	// this_ul_expm1 = uls.at(i);
+
+
+	if( TString(labels.at(i)).Contains("T2TT_LM150") ){
+	  this_ul         = 66.7991;
+	  this_ul_exp     = 76.7344;
+	  this_ul_expp1   = 104.545;
+	  this_ul_expm1   = 56.8783;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_LM200") ){
+	  this_ul         = 25.714;
+	  this_ul_exp     = 32.2226;
+	  this_ul_expp1   = 43.9916;
+	  this_ul_expm1   = 23.6334;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_LM250") ){
+	  this_ul         = 10.3561;
+	  this_ul_exp     = 15.1845;
+	  this_ul_expp1   = 23.3334;
+	  this_ul_expm1   = 10.9627;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_LM300") ){
+	  this_ul         = 7.7604;
+	  this_ul_exp     = 9.05201;
+	  this_ul_expp1   = 12.7193;
+	  this_ul_expm1   = 6.55692;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_HM150") ){
+	  this_ul         = 11.5352;
+	  this_ul_exp     = 14.5708;
+	  this_ul_expp1   = 20.3566;
+	  this_ul_expm1   = 10.4048;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_HM200") ){
+	  this_ul         = 7.4327;
+	  this_ul_exp     = 10.2928;
+	  this_ul_expp1   = 14.6985;
+	  this_ul_expm1   = 7.41028;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_HM250") ){
+	  this_ul         = 4.15662;
+	  this_ul_exp     = 7.37302;
+	  this_ul_expp1   = 10.4398;
+	  this_ul_expm1   = 5.09026;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_HM300") ){
+	  this_ul         = 3.97749;
+	  this_ul_exp     = 5.52676;
+	  this_ul_expp1   = 7.95513;
+	  this_ul_expm1   = 4.05663;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_LM100") ){
+	  this_ul         = 321.149;
+	  this_ul_exp     = 340.097;
+	  this_ul_expp1   = 476.991;
+	  this_ul_expm1   = 248.095;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_LM150") ){
+	  this_ul         = 97.8571;
+	  this_ul_exp     = 121.299;
+	  this_ul_expp1   = 166.086;
+	  this_ul_expm1   = 89.0909;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_LM200") ){
+	  this_ul         = 35.556;
+	  this_ul_exp     = 48.3854;
+	  this_ul_expp1   = 66.5798;
+	  this_ul_expm1   = 35.6169;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_LM250") ){
+	  this_ul         = 17.3482;
+	  this_ul_exp     = 24.0754;
+	  this_ul_expp1   = 33.372;
+	  this_ul_expm1   = 17.1881;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_HM100") ){
+	  this_ul         = 36.9713;
+	  this_ul_exp     = 29.0217;
+	  this_ul_expp1   = 40.1313;
+	  this_ul_expm1   = 21.6054;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_HM150") ){
+	  this_ul         = 19.3805;
+	  this_ul_exp     = 18.3767;
+	  this_ul_expp1   = 25.448;
+	  this_ul_expm1   = 13.2759;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_HM200") ){
+	  this_ul         = 11.4308;
+	  this_ul_exp     = 11.9613;
+	  this_ul_expp1   = 17.4688;
+	  this_ul_expm1   = 8.99217;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW_HM250") ){
+	  this_ul         = 5.04346;
+	  this_ul_exp     = 7.73816;
+	  this_ul_expp1   = 11.1644;
+	  this_ul_expm1   = 5.39447;
+	}
+
+	else{
+	  cout << "ERROR! UNRECOGNIZED SIGNAL REGION " << labels.at(i) << endl;
+	  exit(0);
+	}
 
 
 	/*
-	if( TString(labels.at(i)).Contains("LM150") ){
-	  this_ul       = 79.6;
-	  this_ul_exp   = this_ul;
+	if( TString(labels.at(i)).Contains("T2TT_LM150") ){
+	  this_ul       = 66.8;
+	  this_ul_exp   = 76.7;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	  // this_ul       = getUpperLimit_SRA( toterr );
@@ -512,55 +624,56 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	  // this_ul_expm1 = getExpectedM1UpperLimit_SRA( toterr );
 	}
 
-	else if( TString(labels.at(i)).Contains("LM200") ){
+	else if( TString(labels.at(i)).Contains("T2TT_LM200") ){
 	  this_ul       = 42.1;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("LM250") ){
+	else if( TString(labels.at(i)).Contains("T2TT_LM250") ){
 	  this_ul       = 19.0;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("LM300") ){
+	else if( TString(labels.at(i)).Contains("T2TT_LM300") ){
 	  this_ul       = 9.9;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("HM150") ){
+	else if( TString(labels.at(i)).Contains("T2TT_HM150") ){
 	  this_ul       = 17.5;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("HM200") ){
+	else if( TString(labels.at(i)).Contains("T2TT_HM200") ){
 	  this_ul       = 12.3;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("HM250") ){
+	else if( TString(labels.at(i)).Contains("T2TT_HM250") ){
 	  this_ul       = 9.0;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
-	else if( TString(labels.at(i)).Contains("HM300") ){
+	else if( TString(labels.at(i)).Contains("T2TT_HM300") ){
 	  this_ul       = 6.4;
 	  this_ul_exp   = this_ul;
 	  this_ul_expp1 = this_ul;
 	  this_ul_expm1 = this_ul;
 	}
 
+	/*
 	else if( TString(labels.at(i)).Contains("BDT1L") ){
 	  this_ul       = 158.7;
 	  this_ul_exp   = this_ul;
