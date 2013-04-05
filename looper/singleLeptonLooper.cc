@@ -787,11 +787,11 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     pfUncertaintyFile = "jetCorrections/GR_P_V39_AN3_Uncertainty_AK5PF.txt";
   } 
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V15_L1FastJet_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V15_L2Relative_AK5PF.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/DESIGN53_V15_L3Absolute_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START53_V21_L1FastJet_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START53_V21_L2Relative_AK5PF.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jetCorrections/START53_V21_L3Absolute_AK5PF.txt");
     
-    pfUncertaintyFile = "jetCorrections/DESIGN53_V15_Uncertainty_AK5PF.txt";
+    pfUncertaintyFile = "jetCorrections/START53_V21_Uncertainty_AK5PF.txt";
   }
 
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
@@ -952,9 +952,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       tree->LoadTree(z);
 
       cms2.GetEntry(z);
-
-      // PrintTriggers();
-      // exit(0);
 
       if( evt_ww_rho_vor() != evt_ww_rho_vor() ){
 	cout << "Skipping event with rho = nan!!!" << endl;
@@ -3305,8 +3302,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  lep1_scslasercormean_ = scs_laserCorMean()[els_scindex()[index1]];
 	  lep1_scslasercormax_  = scs_laserCorMax()[els_scindex()[index1]];
 	  //      cout<<scs_eta()[els_scindex()[index1]]<<" "<<lep1_scslasercormax_<<endl;
-	  if ((fabs(scs_eta()[els_scindex()[index1]])<1.4442)&&(lep1_scslasercormax_>2.0) ||
-	      (fabs(scs_eta()[els_scindex()[index1]])>1.4442)&&(lep1_scslasercormax_>3.0))
+	  if (((fabs(scs_eta()[els_scindex()[index1]])<1.4442)&&(lep1_scslasercormax_>2.0)) ||
+	      ((fabs(scs_eta()[els_scindex()[index1]])>1.4442)&&(lep1_scslasercormax_>3.0)))
 	    lep1_badecallaser_ = 1;
 	}
       }
