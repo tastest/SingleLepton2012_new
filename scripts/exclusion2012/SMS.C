@@ -961,7 +961,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     heff[i]->GetXaxis()->SetTitle("stop mass (GeV)");
     heff[i]->GetZaxis()->SetTitle("efficiency (%)");
     heff[i]->GetZaxis()->SetTitleOffset(1.2);
-    heff[i]->GetXaxis()->SetRangeUser(100,700);
+    heff[i]->GetXaxis()->SetRangeUser(100,800);
     heff[i]->GetYaxis()->SetRangeUser(0,600);
     heff[i]->Draw("colz");
     //heff[i]->Draw("sametext");
@@ -990,7 +990,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     //hxsec[i]->Draw("sametext");
     hxsec[i]->SetMinimum(0.01);
     hxsec[i]->SetMaximum(100);
-    hxsec[i]->GetXaxis()->SetRangeUser(100,700);
+    hxsec[i]->GetXaxis()->SetRangeUser(100,800);
     hxsec[i]->GetYaxis()->SetRangeUser(0,600);
     hexcl[i]->Draw("samebox");
 
@@ -1130,4 +1130,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   }
   outfile->Close();
 
+}
+
+
+void doAll(){
+  SMS("T2tt", 1,false,true);
+  SMS("T2bw",25,false,true);
+  SMS("T2bw",50,false,true);
+  SMS("T2bw",75,false,true);
 }
