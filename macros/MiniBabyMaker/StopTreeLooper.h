@@ -98,6 +98,8 @@ class StopTreeLooper {
 	Float_t htssm_;
 	Float_t htosm_;
 	Float_t htratiom_;
+	Float_t htratiomup_;
+	Float_t htratiomdown_;
 
 	Float_t dphimj1_;
 	Float_t dphimj2_;
@@ -150,6 +152,8 @@ class StopTreeLooper {
 
 	Float_t rand_;
 	vector<float> bdt_;
+	vector<float> bdtup_;
+	vector<float> bdtdown_;
 
     private:
 
