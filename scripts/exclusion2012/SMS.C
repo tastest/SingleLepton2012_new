@@ -103,10 +103,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     exit(0);
   }
 
-
-  //const char* filename  = Form("/tas/benhoob/testFiles/%s_8TeV/merged*njets4%s.root",sample,suffix);
-  //const char* denomname = Form("/tas/benhoob/testFiles/%s_8TeV/myMassDB.root",sample);
-  //const float btagerr   = 0.02;
+  //--------------------------------------------------
+  // set up logfile
+  //--------------------------------------------------
 
   char* logfilename = Form("%s%s%s%s%s.log",sample,xchar,suffix,pol,BDTchar);
   ofstream* logfile = new ofstream();
@@ -162,38 +161,30 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   TCut btag1("mini_nb >= 1");
   TCut passisotrk("mini_passisotrk==1");
   TCut tauveto("mini_passtauveto == 1");
-  TCut met100("t1metphicorr > 100");
   TCut mt120("t1metphicorrmt > 120");
   TCut mt150("t1metphicorrmt > 150");
   TCut dphi("mini_dphimjmin>0.8");
   TCut chi2("mini_chi2<5.0");
   TCut mt2w("mini_mt2w>200.0");
   TCut bpt100("mini_pt_b > 100.0");
+  TCut met100("t1metphicorr > 100");
   TCut met150("mini_met > 150.0");
   TCut met200("mini_met > 200.0");
   TCut met250("mini_met > 250.0");
   TCut met300("mini_met > 300.0");
+  TCut testing("event%2==0");
+  TCut BDTweight("1");
 
   TCut x25("x < 0.3");
   TCut x50("x > 0.3 && x < 0.7");
   TCut x75("x > 0.7");
-
-  // TCut testing("event%2==0");
-  // TCut HM("mini_t2ttHM==1");
-  // TCut LM("mini_t2ttLM==1");
-  // TCut met50("t1metphicorr > 50");
-  // TCut met150("t1metphicorr > 150");
-  // TCut met200("t1metphicorr > 200");
-  // TCut met250("t1metphicorr > 250");
-  // TCut met300("t1metphicorr > 300");
-  // TCut SRA("t1metphicorr > 100 && t1metphicorrmt > 150");
-  // TCut SRB("t1metphicorr > 150 && t1metphicorrmt > 120");
 
   TCut presel;
 
   //-------------------------------------------
   // THESE CUTS DEFINE PRESELECTION REGION
   //-------------------------------------------
+
   presel += rho;
   presel += filters;
   presel += goodlep;
@@ -204,18 +195,20 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   presel += tauveto;
   presel += met100;
   presel += mt120;
-  //presel += dphi;
-  //presel += chi2;
-  //presel += mt2w;
-  //presel += mt150;
+  if( doBDT ){
+    presel += testing;
+  }
 
   if( TString(sample).Contains("T2bw") && x==25 ) presel += x25;
   if( TString(sample).Contains("T2bw") && x==50 ) presel += x50;
   if( TString(sample).Contains("T2bw") && x==75 ) presel += x75;
 
-  TCut weight("mini_sltrigeff"); // trigger efficiency X btagging SF
-  if( TString(pol).Contains("left") )  weight = TCut("mini_sltrigeff*weightleft");
-  if( TString(pol).Contains("right") ) weight = TCut("mini_sltrigeff*weightright");
+  int BDTweight = 1;
+  if( doBDT ) BDTweight = 2;
+
+  TCut weight(Form("mini_sltrigeff * %i",BDTweight)); 
+  if( TString(pol).Contains("left") )  weight = TCut(Form("mini_sltrigeff * weightleft  * %i",BDTweight));
+  if( TString(pol).Contains("right") ) weight = TCut(Form("mini_sltrigeff * weightright * %i",BDTweight));
 
   cout << "Using pre-selection   " << presel.GetTitle() << endl;
   cout << "Using weight          " << weight.GetTitle() << endl;
@@ -247,15 +240,15 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   // BDT signal region definitions
   //------------------------------------------
 
-  TCut   SR_BDT[6];
-  string SRname_BDT[6];
+  // TCut   SR_BDT[6];
+  // string SRname_BDT[6];
 
-  SR_BDT[0]=TCut("mini_bdt[1] > 0.30"); SRname_BDT[0] = "BDT1L";
-  SR_BDT[1]=TCut("mini_bdt[1] > 0.40"); SRname_BDT[1] = "BDT1T";
-  SR_BDT[2]=TCut("mini_bdt[2] > 0.55"); SRname_BDT[2] = "BDT2";
-  SR_BDT[3]=TCut("mini_bdt[3] > 0.65"); SRname_BDT[3] = "BDT3";
-  SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
-  SR_BDT[5]=TCut("mini_bdt[5] > 0.30"); SRname_BDT[5] = "BDT5";
+  // SR_BDT[0]=TCut("mini_bdt[1] > 0.30"); SRname_BDT[0] = "BDT1L";
+  // SR_BDT[1]=TCut("mini_bdt[1] > 0.40"); SRname_BDT[1] = "BDT1T";
+  // SR_BDT[2]=TCut("mini_bdt[2] > 0.55"); SRname_BDT[2] = "BDT2";
+  // SR_BDT[3]=TCut("mini_bdt[3] > 0.65"); SRname_BDT[3] = "BDT3";
+  // SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
+  // SR_BDT[5]=TCut("mini_bdt[5] > 0.30"); SRname_BDT[5] = "BDT5";
 
   //--------------------------------------------------
   // signal regions
@@ -269,6 +262,16 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   if( doBDT ){
 
     cout << "Doing BDT signal regions" << endl;  
+
+  TCut   SR_BDT[6];
+  string SRname_BDT[6];
+
+  SR_BDT[0]=TCut("mini_bdt[1] > 0.30"); SRname_BDT[0] = "BDT1L";
+  SR_BDT[1]=TCut("mini_bdt[1] > 0.40"); SRname_BDT[1] = "BDT1T";
+  SR_BDT[2]=TCut("mini_bdt[2] > 0.55"); SRname_BDT[2] = "BDT2";
+  SR_BDT[3]=TCut("mini_bdt[3] > 0.65"); SRname_BDT[3] = "BDT3";
+  SR_BDT[4]=TCut("mini_bdt[4] > 0.50"); SRname_BDT[4] = "BDT4";
+  SR_BDT[5]=TCut("mini_bdt[5] > 0.30"); SRname_BDT[5] = "BDT5";
 
     // T2tt BDT
     if( TString(sample).Contains("T2tt") ){
@@ -492,7 +495,10 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	// this_ul_exp   = uls.at(i);
 	// this_ul_expp1 = uls.at(i);
 	// this_ul_expm1 = uls.at(i);
-
+	
+	//------------------------------------------
+	// T2tt cut-and-count
+	//------------------------------------------
 
 	if( TString(labels.at(i)).Contains("T2TT_LM150") ){
 	  this_ul         = 66.7991;
@@ -550,6 +556,10 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	  this_ul_expm1   = 4.05663;
 	}
 
+	//------------------------------------------
+	// T2bw cut-and-count
+	//------------------------------------------
+
 	else if( TString(labels.at(i)).Contains("T2BW_LM100") ){
 	  this_ul         = 321.149;
 	  this_ul_exp     = 340.097;
@@ -605,6 +615,56 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	  this_ul_expp1   = 11.1644;
 	  this_ul_expm1   = 5.39447;
 	}
+
+	//------------------------------------------
+	// T2tt BDT
+	//------------------------------------------
+
+	else if( TString(labels.at(i)).Contains("T2TT_BDT1L") ){
+	  this_ul         = 150.058;
+	  this_ul_exp     = 165.876;
+	  this_ul_expp1   = 228.763;
+	  this_ul_expm1   = 121.923;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_BDT1T") ){
+	  this_ul         = 27.8416;
+	  this_ul_exp     = 36.9395;
+	  this_ul_expp1   = 50.9219;
+	  this_ul_expm1   = 27.1247;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_BDT2") ){
+	  this_ul         = 15.5022;
+	  this_ul_exp     = 26.193;
+	  this_ul_expp1   = 35.9907;
+	  this_ul_expm1   = 18.5872;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_BDT3") ){
+	  this_ul         = 6.42278;
+	  this_ul_exp     = 9.12343;
+	  this_ul_expp1   = 12.9316;
+	  this_ul_expm1   = 6.50077;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_BDT4") ){
+	  this_ul         = 4.36022;
+	  this_ul_exp     = 4.87426;
+	  this_ul_expp1   = 7.392;
+	  this_ul_expm1   = 3.68327;
+	}
+
+	else if( TString(labels.at(i)).Contains("T2TT_BDT5") ){
+	  this_ul         = 26.1597;
+	  this_ul_exp     = 31.2588;
+	  this_ul_expp1   = 42.6817;
+	  this_ul_expm1   = 22.7823;
+	}
+
+	//------------------------------------------
+	// T2bw BDT
+	//------------------------------------------
 
 	else{
 	  cout << "ERROR! UNRECOGNIZED SIGNAL REGION " << labels.at(i) << endl;
