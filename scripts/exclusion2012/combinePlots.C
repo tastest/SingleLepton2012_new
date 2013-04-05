@@ -327,7 +327,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   }
 
 
-  if(doRemoveSlice) removeSlice(hxsec_best_exp);
+
 
   //-------------------------------
   // best signal region
@@ -346,8 +346,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hbest->GetZaxis()->SetLabelSize(0.035);
   hbest->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
   hbest->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
-  hbest->GetXaxis()->SetRangeUser(xaxismin,700);
-  hbest->GetYaxis()->SetRangeUser(0,700);
+  hbest->GetXaxis()->SetRangeUser(xaxismin,800);
+  hbest->GetYaxis()->SetRangeUser(0,800);
   hbest->GetZaxis()->SetTitle("best signal region");
 
   t->SetTextSize(0.035);
@@ -385,6 +385,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
       t->DrawLatex(0.2,0.65,"3 = BDT2");
       t->DrawLatex(0.2,0.60,"4 = BDT3");
       t->DrawLatex(0.2,0.55,"5 = BDT4");
+      t->DrawLatex(0.2,0.50,"6 = BDT5");
     }
 
   }
@@ -489,32 +490,52 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   double contours[1];
   contours[0] = 0.5;
 
-  TH2F* hexcl_exp1 = (TH2F*) hexcl_exp->Clone("hexcl_exp1");
-  TH2F* hexcl_exp2 = (TH2F*) hexcl_exp->Clone("hexcl_exp2");
+  // TH2F* hexcl_exp1 = (TH2F*) hexcl_exp->Clone("hexcl_exp1");
+  // TH2F* hexcl_exp2 = (TH2F*) hexcl_exp->Clone("hexcl_exp2");
 
-  for( int ibin = 1 ; ibin <= 41 ; ibin++ ){
-    for( int jbin = 1 ; jbin <= 41 ; jbin++ ){
-      float mstop = hexcl_exp->GetXaxis()->GetBinCenter(ibin);
-      float mlsp  = hexcl_exp->GetYaxis()->GetBinCenter(jbin);
+  // for( int ibin = 1 ; ibin <= 41 ; ibin++ ){
+  //   for( int jbin = 1 ; jbin <= 41 ; jbin++ ){
+  //     float mstop = hexcl_exp->GetXaxis()->GetBinCenter(ibin);
+  //     float mlsp  = hexcl_exp->GetYaxis()->GetBinCenter(jbin);
 
-      if( mstop - mlsp < 175 )  hexcl_exp1->SetBinContent(ibin,jbin,0);
-      if( mstop - mlsp >= 175 ) hexcl_exp2->SetBinContent(ibin,jbin,0);
-      if( mstop == 300 && mlsp == 150 ) hexcl_exp2->SetBinContent(ibin,jbin,0);
-    }
-  }
+  //     if( mstop - mlsp < 175 )  hexcl_exp1->SetBinContent(ibin,jbin,0);
+  //     if( mstop - mlsp >= 175 ) hexcl_exp2->SetBinContent(ibin,jbin,0);
+  //     if( mstop == 300 && mlsp == 150 ) hexcl_exp2->SetBinContent(ibin,jbin,0);
+  //   }
+  // }
 
   TH2F* hxsec_best_exp_largeDM = largeDM( hxsec_best_exp);
   TH2F* hxsec_best_exp_smallDM = smallDM( hxsec_best_exp);
 
-  TGraph* gr        = getRefXsecGraph(hxsec_best       , "T2tt", 1.0);
-  //TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp   , "T2tt", 1.0);
-  TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp_largeDM   , "T2tt", 1.0);
-  TGraph* gr_exp_smallDM    = getRefXsecGraph(hxsec_best_exp_smallDM   , "T2tt", 1.0);
-  TGraph* gr_expp1  = getRefXsecGraph(hxsec_best_expp1 , "T2tt", 1.0);
-  TGraph* gr_expm1  = getRefXsecGraph(hxsec_best_expm1 , "T2tt", 1.0);
+  TH2F* hxsec_best_expp1_largeDM = largeDM( hxsec_best_expp1);
+  TH2F* hxsec_best_expp1_smallDM = smallDM( hxsec_best_expp1);
+
+  TH2F* hxsec_best_expm1_largeDM = largeDM( hxsec_best_expm1);
+  TH2F* hxsec_best_expm1_smallDM = smallDM( hxsec_best_expm1);
+
+  TH2F* hxsec_best_largeDM = largeDM( hxsec_best );
+  TH2F* hxsec_best_smallDM = smallDM( hxsec_best );
+
+  // TGraph* gr        = getRefXsecGraph(hxsec_best       , "T2tt", 1.0);
+  // //TGraph* gr_exp    = getRefXsecGraph(hxsec_best_exp   , "T2tt", 1.0);
+  // TGraph* gr_expp1  = getRefXsecGraph(hxsec_best_expp1 , "T2tt", 1.0);
+  // TGraph* gr_expm1  = getRefXsecGraph(hxsec_best_expm1 , "T2tt", 1.0);
   TGraph* gr_obsp1  = getRefXsecGraph(hxsec_best       , "T2tt", 1.15);
   TGraph* gr_obsm1  = getRefXsecGraph(hxsec_best       , "T2tt", 0.85);
 
+  TGraph* gr_exp            = getRefXsecGraph(hxsec_best_exp_largeDM   , "T2tt", 1.0);
+  TGraph* gr_exp_smallDM    = getRefXsecGraph(hxsec_best_exp_smallDM   , "T2tt", 1.0);
+
+  TGraph* gr_expp1          = getRefXsecGraph(hxsec_best_expp1_largeDM   , "T2tt", 1.0);
+  TGraph* gr_expp1_smallDM  = getRefXsecGraph(hxsec_best_expp1_smallDM   , "T2tt", 1.0);
+
+  TGraph* gr_expm1          = getRefXsecGraph(hxsec_best_expm1_largeDM   , "T2tt", 1.0);
+  TGraph* gr_expm1_smallDM  = getRefXsecGraph(hxsec_best_expm1_smallDM   , "T2tt", 1.0);
+
+  TGraph* gr                = getRefXsecGraph(hxsec_best_largeDM   , "T2tt", 1.0);
+  TGraph* gr_smallDM        = getRefXsecGraph(hxsec_best_smallDM   , "T2tt", 1.0);
+
+  if(doRemoveSlice) removeSlice(hxsec_best);
   /*
   TCanvas *can3 = new TCanvas("can3","can3",800,600);
   can3->cd();
@@ -559,8 +580,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gPad->SetGridy();
   hexcl->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl->GetXaxis()->SetRangeUser(xaxismin,600);
-  hexcl->GetYaxis()->SetRangeUser(0,200);
+  hexcl->GetXaxis()->SetRangeUser(xaxismin,800);
+  hexcl->GetYaxis()->SetRangeUser(0,400);
   hexcl->Draw("colz");
   gr->Draw("lp");
   t->DrawLatex(0.3,0.8,"observed");
@@ -570,8 +591,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gPad->SetGridy();
   hexcl_obsp1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_obsp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_obsp1->GetXaxis()->SetRangeUser(xaxismin,600);
-  hexcl_obsp1->GetYaxis()->SetRangeUser(0,200);
+  hexcl_obsp1->GetXaxis()->SetRangeUser(xaxismin,800);
+  hexcl_obsp1->GetYaxis()->SetRangeUser(0,400);
   hexcl_obsp1->Draw("colz");
   gr_obsp1->Draw("lp");
   t->DrawLatex(0.3,0.8,"observed (+1#sigma)");
@@ -581,8 +602,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gPad->SetGridy();
   hexcl_obsm1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_obsm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_obsm1->GetXaxis()->SetRangeUser(xaxismin,600);
-  hexcl_obsm1->GetYaxis()->SetRangeUser(0,200);
+  hexcl_obsm1->GetXaxis()->SetRangeUser(xaxismin,800);
+  hexcl_obsm1->GetYaxis()->SetRangeUser(0,400);
   hexcl_obsm1->Draw("colz");
   gr_obsm1->Draw("lp");
   t->DrawLatex(0.3,0.8,"observed (-1#sigma)");
@@ -592,8 +613,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gPad->SetGridy();
   hexcl_exp->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_exp->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_exp->GetXaxis()->SetRangeUser(xaxismin,600);
-  hexcl_exp->GetYaxis()->SetRangeUser(0,200);
+  hexcl_exp->GetXaxis()->SetRangeUser(xaxismin,800);
+  hexcl_exp->GetYaxis()->SetRangeUser(0,400);
   hexcl_exp->Draw("colz");
   gr_exp->Draw("lp");
   t->DrawLatex(0.3,0.8,"expected");
@@ -603,8 +624,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gPad->SetGridy();
   hexcl_expp1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_expp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_expp1->GetXaxis()->SetRangeUser(0,600);
-  hexcl_expp1->GetYaxis()->SetRangeUser(0,200);
+  hexcl_expp1->GetXaxis()->SetRangeUser(0,800);
+  hexcl_expp1->GetYaxis()->SetRangeUser(0,400);
   hexcl_expp1->Draw("colz");
   gr_expp1->Draw("lp");
   t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
@@ -614,7 +635,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gPad->SetGridy();
   hexcl_expm1->GetXaxis()->SetTitle("stop mass [GeV]");
   hexcl_expm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_expm1->GetXaxis()->SetRangeUser(0,700);
+  hexcl_expm1->GetXaxis()->SetRangeUser(0,800);
   hexcl_expm1->GetYaxis()->SetRangeUser(0,400);
   hexcl_expm1->Draw("colz");
   gr_expm1->Draw("lp");
@@ -637,11 +658,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   }
 
   blankHist( hxsec_best_exp , 300 );
+  blankHist( hxsec_best , 300 );
   //TH2F* hxsec_best_shifted = shiftHist( hxsec_best );
-  hxsec_best_exp->GetXaxis()->SetRangeUser(0,700);
-  TH2F* hxsec_best_shifted = (TH2F*) hxsec_best_exp;
+  hxsec_best_exp->GetXaxis()->SetRangeUser(0,800);
+  TH2F* hxsec_best_shifted = (TH2F*) hxsec_best;
   //TH2F* hdummy = (TH2F*) hxsec_best->Clone("hdummy");
-  TH2F* hdummy = new TH2F("hdummy","",100,0,700,100,0,400);
+  TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,400);
   hdummy->Reset();
 
   //hxsec_best->Reset();
@@ -673,18 +695,19 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
   hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
   hdummy->GetZaxis()->SetTitleOffset(0.8);
-  hdummy->GetXaxis()->SetRangeUser(xaxismin,700);
+  hdummy->GetXaxis()->SetRangeUser(xaxismin,800);
   hdummy->GetYaxis()->SetRangeUser(0,400);
   //hdummy->Draw("colz");
-  hdummy->SetMinimum(0.01);
+  hdummy->SetMinimum(0.001);
   hdummy->SetMaximum(100);
-  hxsec_best_shifted->SetMinimum(0.01);
+  hxsec_best_shifted->SetMinimum(0.001);
   hxsec_best_shifted->SetMaximum(100);
   hdummy->SetMaximum(100);
   hdummy->Draw();
   hxsec_best_shifted->Draw("samecolz");
   hdummy->Draw("axissame");
-  hexcl_exp->Draw("samebox");
+  //hexcl_exp->Draw("samebox");
+  hexcl->Draw("samebox");
 
   TGraph* HCP;
   if     ( TString(sample).Contains("T2tt") )  HCP   = T2tt_expected();
@@ -729,13 +752,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   }
   */
 
-  gr->SetLineWidth(6);
+  gr->SetLineWidth(4);
 
-  // gr_exp->SetLineWidth(4);
-  // gr_exp->SetLineStyle(7);
-
-  gr_exp->SetLineColor(1);
-  gr_exp->SetLineWidth(4);
+  gr_exp->SetLineColor(2);
+  gr_exp->SetLineWidth(3);
   gr_exp->SetLineStyle(1);
 
   gr_expp1->SetLineWidth(3);
@@ -744,20 +764,62 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gr_expm1->SetLineStyle(3);
 
   //gr_exp->SetLineColor(4);
-  gr_expp1->SetLineColor(4);
-  gr_expm1->SetLineColor(4);
+  gr_expp1->SetLineColor(2);
+  gr_expm1->SetLineColor(2);
 
   gr_obsp1->SetLineStyle(2);
   gr_obsm1->SetLineStyle(2);
   gr_obsp1->SetLineWidth(3);
   gr_obsm1->SetLineWidth(3);
 
-  gr_exp->Draw();
+  // gr->Draw();
+  // gr_exp->Draw();
+  // gr_expp1->Draw();
+  // gr_expm1->Draw();
 
-  TH2F* hR = exclusionContour(hxsec_best_exp);
-  hR->SetLineWidth(3);
-  hR->SetLineColor(2);
-  //hR->Draw("CONT3SAME");
+  TH2F* hR_exp   = exclusionContour(hxsec_best_exp_largeDM);
+  TH2F* hR_expp1 = exclusionContour(hxsec_best_expp1_largeDM);
+  TH2F* hR_expm1 = exclusionContour(hxsec_best_expm1_largeDM);
+  TH2F* hR       = exclusionContour(hxsec_best_largeDM);
+
+  hR_exp->SetLineWidth(3);
+  hR_exp->SetLineColor(2);
+
+  hR_expp1->SetLineColor(2);
+  hR_expp1->SetLineStyle(3);
+
+  hR_expm1->SetLineColor(2);
+  hR_expm1->SetLineStyle(3);
+
+  hR->SetLineWidth(4);
+
+  hR->Draw("CONT3SAMEC");
+  hR_exp->Draw("CONT3SAMEC");
+  hR_expp1->Draw("CONT3SAMEC");
+  hR_expm1->Draw("CONT3SAMEC");
+
+  if( TString(sample).Contains("T2tt") ){
+    TH2F* hR_smallDM       = exclusionContour(hxsec_best_smallDM);
+    TH2F* hR_exp_smallDM   = exclusionContour(hxsec_best_exp_smallDM);
+    TH2F* hR_expp1_smallDM = exclusionContour(hxsec_best_expp1_smallDM);
+    TH2F* hR_expm1_smallDM = exclusionContour(hxsec_best_expm1_smallDM);
+
+    hR_exp_smallDM->SetLineWidth(3);
+    hR_exp_smallDM->SetLineColor(2);
+
+    hR_expp1_smallDM->SetLineColor(2);
+    hR_expp1_smallDM->SetLineStyle(3);
+
+    hR_expm1_smallDM->SetLineColor(2);
+    hR_expm1_smallDM->SetLineStyle(3);
+
+    hR_smallDM->SetLineWidth(4);
+
+    hR_smallDM->Draw("CONT3SAMEC");
+    hR_exp_smallDM->Draw("CONT3SAMEC");
+    hR_expp1_smallDM->Draw("CONT3SAMEC");
+    hR_expm1_smallDM->Draw("CONT3SAMEC");
+  }
 
   // gr_expp1->Draw();
   // gr_expm1->Draw();
@@ -813,7 +875,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   //t->DrawLatex(0.55,0.80,"Observed #pm1#sigma^{theory}");
   //t->DrawLatex(0.55,0.75,"Expected #pm1#sigma");
   if( doBDT ) t->DrawLatex(0.55,0.80,"MVA expected");
-  else        t->DrawLatex(0.55,0.80,"C&C expected");
+  //else        t->DrawLatex(0.55,0.80,"C&C expected");
+  else        t->DrawLatex(0.55,0.80,"cut-and-count");
 
 
   t->SetTextSize(0.045);
@@ -935,4 +998,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hexcl_exp->Write();
   fout->Close();
 
+}
+
+void doAll(){
+  combinePlots("T2tt", 1,false,true);
+  combinePlots("T2bw",25,false,true);
+  combinePlots("T2bw",50,false,true);
+  combinePlots("T2bw",75,false,true);
 }
