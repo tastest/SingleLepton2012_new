@@ -114,6 +114,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //------------------------------------------------------------------------------------------------------
   
     BTagShapeInterface * nominalShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 0.0);
+    //systematic variations for payloads
+    BTagShapeInterface * upBCShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 1.0, 0.0);
+    BTagShapeInterface * downBCShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", -1.0, 0.0);
+    BTagShapeInterface * upLShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, 1.0);
+    BTagShapeInterface * downLShape = new BTagShapeInterface("../../Tools/BTagReshaping/csvdiscr.root", 0.0, -1.0);
 
     //---------------------------------
     // set up histograms
@@ -481,6 +486,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             njets_up_ = 0;
             njets_down_ = 0;
             nb_ = 0;
+            nb_upBCShape_ = 0;
+            nb_downBCShape_ = 0;
+            nb_upLShape_ = 0;
+            nb_downLShape_ = 0;
 
             // kinematic variables
             htssl_ = 0.;
@@ -506,6 +515,30 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 					 stopt.pfjets().at(i).pt(),
 					 stopt.pfjets_csv().at(i),
 					 stopt.pfjets_mcflavorAlgo().at(i) ); 
+
+	      float csv_upBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+		: upBCShape->reshape( stopt.pfjets().at(i).eta(),
+					 stopt.pfjets().at(i).pt(),
+					 stopt.pfjets_csv().at(i),
+					 stopt.pfjets_mcflavorAlgo().at(i) );
+
+	      float csv_downBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+		: downBCShape->reshape( stopt.pfjets().at(i).eta(),
+					 stopt.pfjets().at(i).pt(),
+					 stopt.pfjets_csv().at(i),
+					 stopt.pfjets_mcflavorAlgo().at(i) );
+
+	      float csv_upLShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+		: upLShape->reshape( stopt.pfjets().at(i).eta(),
+					 stopt.pfjets().at(i).pt(),
+					 stopt.pfjets_csv().at(i),
+					 stopt.pfjets_mcflavorAlgo().at(i) );
+
+	      float csv_downLShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+		: downLShape->reshape( stopt.pfjets().at(i).eta(),
+					 stopt.pfjets().at(i).pt(),
+					 stopt.pfjets_csv().at(i),
+					 stopt.pfjets_mcflavorAlgo().at(i) );
 
 	      // jets with up and down variations
 	      float unc     = stopt.pfjets_uncertainty().at(i);
@@ -584,6 +617,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		
 
 	      jets_btag.push_back(csv_nominal);
+
+	      if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_upBCShape > 0.679) ) nb_upBCShape_++;
+	      if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_downBCShape > 0.679) ) nb_downBCShape_++;
+	      if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_upLShape > 0.679) ) nb_upLShape_++;
+	      if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_downLShape > 0.679) ) nb_downLShape_++;
 
 	      float dPhiL = getdphi( stopt.lep1().Phi(), stopt.pfjets().at(i).phi() );
 
@@ -867,6 +905,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_nsigevents", &nsigevents_,  "mini_nsigevents/I" );
 
             outTree_->Branch("mini_nb"        , &nb_        ,   "mini_nb/I"	         );
+            outTree_->Branch("mini_nb_upBCShape"  , &nb_upBCShape_  ,  "mini_nb_upBCShape/I"	);
+            outTree_->Branch("mini_nb_downBCShape", &nb_downBCShape_,  "mini_nb_downBCShape/I"	);
+            outTree_->Branch("mini_nb_upLShape"   , &nb_upLShape_   ,  "mini_nb_upLShape/I"	);
+            outTree_->Branch("mini_nb_downLShape" , &nb_downLShape_ ,  "mini_nb_downLShape/I"	);
             outTree_->Branch("mini_njets"     , &njets_      ,  "mini_njets/I"  	 );
             outTree_->Branch("mini_njetsup"   , &njets_up_   ,  "mini_njetsup/I"	 );
             outTree_->Branch("mini_njetsdown" , &njets_down_ ,  "mini_njetsdown/I"	 );
@@ -972,6 +1014,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         // jet counting
         nb_         = -1;
+        nb_upBCShape_   = -1;
+        nb_downBCShape_ = -1;
+        nb_upLShape_    = -1;
+        nb_downLShape_  = -1;
         njets_      = -1;
         njets_up_   = -1;
         njets_down_ = -1;

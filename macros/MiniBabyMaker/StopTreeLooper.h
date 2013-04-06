@@ -114,6 +114,10 @@ class StopTreeLooper {
 
 	// jet counting
 	Int_t nb_;
+	Int_t nb_upBCShape_;
+	Int_t nb_downBCShape_;
+	Int_t nb_upLShape_;
+	Int_t nb_downLShape_;
 	Int_t njets_;
 	Int_t njets_up_;
 	Int_t njets_down_;
