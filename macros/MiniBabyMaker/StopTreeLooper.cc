@@ -905,10 +905,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_nsigevents", &nsigevents_,  "mini_nsigevents/I" );
 
             outTree_->Branch("mini_nb"        , &nb_        ,   "mini_nb/I"	         );
-            outTree_->Branch("mini_nb_upBCShape"  , &nb_upBCShape_  ,  "mini_nb_upBCShape/I"	);
-            outTree_->Branch("mini_nb_downBCShape", &nb_downBCShape_,  "mini_nb_downBCShape/I"	);
-            outTree_->Branch("mini_nb_upLShape"   , &nb_upLShape_   ,  "mini_nb_upLShape/I"	);
-            outTree_->Branch("mini_nb_downLShape" , &nb_downLShape_ ,  "mini_nb_downLShape/I"	);
+            outTree_->Branch("mini_nbupBC"  , &nb_upBCShape_  ,  "mini_nbupBC/I"	);
+            outTree_->Branch("mini_nbdownBC", &nb_downBCShape_,  "mini_nbdownBC/I"	);
+            outTree_->Branch("mini_nbupL"   , &nb_upLShape_   ,  "mini_nbupL/I"	);
+            outTree_->Branch("mini_nbdownL" , &nb_downLShape_ ,  "mini_nbdownL/I"	);
             outTree_->Branch("mini_njets"     , &njets_      ,  "mini_njets/I"  	 );
             outTree_->Branch("mini_njetsup"   , &njets_up_   ,  "mini_njetsup/I"	 );
             outTree_->Branch("mini_njetsdown" , &njets_down_ ,  "mini_njetsdown/I"	 );
