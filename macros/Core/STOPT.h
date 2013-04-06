@@ -50,6 +50,12 @@ protected:
 	int	eebadsc_;
 	TBranch *eebadsc_branch;
 	bool eebadsc_isLoaded;
+	int	lep1_badecallaser_;
+	TBranch *lep1_badecallaser_branch;
+	bool lep1_badecallaser_isLoaded;
+	int	lep2_badecallaser_;
+	TBranch *lep2_badecallaser_branch;
+	bool lep2_badecallaser_isLoaded;
 	int	isdata_;
 	TBranch *isdata_branch;
 	bool isdata_isLoaded;
@@ -107,6 +113,12 @@ protected:
 	float	weight_;
 	TBranch *weight_branch;
 	bool weight_isLoaded;
+	float	weightleft_;
+	TBranch *weightleft_branch;
+	bool weightleft_isLoaded;
+	float	weightright_;
+	TBranch *weightright_branch;
+	bool weightright_isLoaded;
 	float	mutrigweight_;
 	TBranch *mutrigweight_branch;
 	bool mutrigweight_isLoaded;
@@ -689,6 +701,12 @@ protected:
 	float	eSCPresh_;
 	TBranch *eSCPresh_branch;
 	bool eSCPresh_isLoaded;
+	float	lep1_scslasercormean_;
+	TBranch *lep1_scslasercormean_branch;
+	bool lep1_scslasercormean_isLoaded;
+	float	lep1_scslasercormax_;
+	TBranch *lep1_scslasercormax_branch;
+	bool lep1_scslasercormax_isLoaded;
 	float	eoverpin2_;
 	TBranch *eoverpin2_branch;
 	bool eoverpin2_isLoaded;
@@ -743,6 +761,21 @@ protected:
 	float	eSCPresh2_;
 	TBranch *eSCPresh2_branch;
 	bool eSCPresh2_isLoaded;
+	float	lep2_scslasercormean_;
+	TBranch *lep2_scslasercormean_branch;
+	bool lep2_scslasercormean_isLoaded;
+	float	lep2_scslasercormax_;
+	TBranch *lep2_scslasercormax_branch;
+	bool lep2_scslasercormax_isLoaded;
+	float	scslasercormax_;
+	TBranch *scslasercormax_branch;
+	bool scslasercormax_isLoaded;
+	float	scslasercormax_pt_;
+	TBranch *scslasercormax_pt_branch;
+	bool scslasercormax_pt_isLoaded;
+	float	scslasercormax_eta_;
+	TBranch *scslasercormax_eta_branch;
+	bool scslasercormax_eta_isLoaded;
 	float	iso2_;
 	TBranch *iso2_branch;
 	bool iso2_isLoaded;
@@ -788,13 +821,13 @@ protected:
 	float	mt_;
 	TBranch *mt_branch;
 	bool mt_isLoaded;
-	unsigned int	run_;
+	int	run_;
 	TBranch *run_branch;
 	bool run_isLoaded;
-	unsigned int	lumi_;
+	int	lumi_;
 	TBranch *lumi_branch;
 	bool lumi_isLoaded;
-	unsigned int	event_;
+	int	event_;
 	TBranch *event_branch;
 	bool event_isLoaded;
 	float	y_;
@@ -1394,6 +1427,9 @@ protected:
 	vector<int> *pfjets_mcflavorPhys_;
 	TBranch *pfjets_mcflavorPhys_branch;
 	bool pfjets_mcflavorPhys_isLoaded;
+	vector<float> *pfjets_uncertainty_;
+	TBranch *pfjets_uncertainty_branch;
+	bool pfjets_uncertainty_isLoaded;
 	vector<int> *pfjets_flav_;
 	TBranch *pfjets_flav_branch;
 	bool pfjets_flav_isLoaded;
@@ -1445,159 +1481,24 @@ protected:
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *genbs_;
 	TBranch *genbs_branch;
 	bool genbs_isLoaded;
-	float	mini_mt_;
-	TBranch *mini_mt_branch;
-	bool mini_mt_isLoaded;
-	float	mini_met_;
-	TBranch *mini_met_branch;
-	bool mini_met_isLoaded;
-	int	mini_sig_;
-	TBranch *mini_sig_branch;
-	bool mini_sig_isLoaded;
-	int	mini_cr1_;
-	TBranch *mini_cr1_branch;
-	bool mini_cr1_isLoaded;
-	int	mini_cr4_;
-	TBranch *mini_cr4_branch;
-	bool mini_cr4_isLoaded;
-	int	mini_cr5_;
-	TBranch *mini_cr5_branch;
-	bool mini_cr5_isLoaded;
-	int	mini_whsig_;
-	TBranch *mini_whsig_branch;
-	bool mini_whsig_isLoaded;
-	int	mini_whcr1_;
-	TBranch *mini_whcr1_branch;
-	bool mini_whcr1_isLoaded;
-	float	mini_chi2_;
-	TBranch *mini_chi2_branch;
-	bool mini_chi2_isLoaded;
-	float	mini_mt2b_;
-	TBranch *mini_mt2b_branch;
-	bool mini_mt2b_isLoaded;
-	float	mini_mt2bl_;
-	TBranch *mini_mt2bl_branch;
-	bool mini_mt2bl_isLoaded;
-	float	mini_mt2w_;
-	TBranch *mini_mt2w_branch;
-	bool mini_mt2w_isLoaded;
-	float	mini_weight_;
-	TBranch *mini_weight_branch;
-	bool mini_weight_isLoaded;
-	float	mini_nvtxweight_;
-	TBranch *mini_nvtxweight_branch;
-	bool mini_nvtxweight_isLoaded;
-	float	mini_sltrigeff_;
-	TBranch *mini_sltrigeff_branch;
-	bool mini_sltrigeff_isLoaded;
-	float	mini_dltrigeff_;
-	TBranch *mini_dltrigeff_branch;
-	bool mini_dltrigeff_isLoaded;
-	int	mini_nb_;
-	TBranch *mini_nb_branch;
-	bool mini_nb_isLoaded;
-	int	mini_njets_;
-	TBranch *mini_njets_branch;
-	bool mini_njets_isLoaded;
-	int	mini_passisotrk_;
-	TBranch *mini_passisotrk_branch;
-	bool mini_passisotrk_isLoaded;
-	int	mini_passtauveto_;
-	TBranch *mini_passtauveto_branch;
-	bool mini_passtauveto_isLoaded;
-	int	mini_nlep_;
-	TBranch *mini_nlep_branch;
-	bool mini_nlep_isLoaded;
-	float	mini_dRleptB1_;
-	TBranch *mini_dRleptB1_branch;
-	bool mini_dRleptB1_isLoaded;
-	float	mini_lep1pt_;
-	TBranch *mini_lep1pt_branch;
-	bool mini_lep1pt_isLoaded;
-	float	mini_lep1eta_;
-	TBranch *mini_lep1eta_branch;
-	bool mini_lep1eta_isLoaded;
-	float	mini_lep2pt_;
-	TBranch *mini_lep2pt_branch;
-	bool mini_lep2pt_isLoaded;
-	float	mini_lep2eta_;
-	TBranch *mini_lep2eta_branch;
-	bool mini_lep2eta_isLoaded;
-	float	mini_dilmass_;
-	TBranch *mini_dilmass_branch;
-	bool mini_dilmass_isLoaded;
-	float	mini_mstop_;
-	TBranch *mini_mstop_branch;
-	bool mini_mstop_isLoaded;
-	float	mini_mlsp_;
-	TBranch *mini_mlsp_branch;
-	bool mini_mlsp_isLoaded;
-	float	mini_x_;
-	TBranch *mini_x_branch;
-	bool mini_x_isLoaded;
-	float	mini_xsecsusy_;
-	TBranch *mini_xsecsusy_branch;
-	bool mini_xsecsusy_isLoaded;
-	float	mini_htssl_;
-	TBranch *mini_htssl_branch;
-	bool mini_htssl_isLoaded;
-	float	mini_htosl_;
-	TBranch *mini_htosl_branch;
-	bool mini_htosl_isLoaded;
-	float	mini_htratiol_;
-	TBranch *mini_htratiol_branch;
-	bool mini_htratiol_isLoaded;
-	float	mini_htssm_;
-	TBranch *mini_htssm_branch;
-	bool mini_htssm_isLoaded;
-	float	mini_htosm_;
-	TBranch *mini_htosm_branch;
-	bool mini_htosm_isLoaded;
-	float	mini_htratiom_;
-	TBranch *mini_htratiom_branch;
-	bool mini_htratiom_isLoaded;
-	float	mini_dphimj1_;
-	TBranch *mini_dphimj1_branch;
-	bool mini_dphimj1_isLoaded;
-	float	mini_dphimj2_;
-	TBranch *mini_dphimj2_branch;
-	bool mini_dphimj2_isLoaded;
-	float	mini_dphimjmin_;
-	TBranch *mini_dphimjmin_branch;
-	bool mini_dphimjmin_isLoaded;
-	float	mini_pt_b_;
-	TBranch *mini_pt_b_branch;
-	bool mini_pt_b_isLoaded;
-	float	mini_pt_J1_;
-	TBranch *mini_pt_J1_branch;
-	bool mini_pt_J1_isLoaded;
-	float	mini_pt_J2_;
-	TBranch *mini_pt_J2_branch;
-	bool mini_pt_J2_isLoaded;
-	float	mini_bbmass_;
-	TBranch *mini_bbmass_branch;
-	bool mini_bbmass_isLoaded;
-	float	mini_bbpt_;
-	TBranch *mini_bbpt_branch;
-	bool mini_bbpt_isLoaded;
-	float	mini_wpt_;
-	TBranch *mini_wpt_branch;
-	bool mini_wpt_isLoaded;
-	float	mini_bbwdphi_;
-	TBranch *mini_bbwdphi_branch;
-	bool mini_bbwdphi_isLoaded;
-	float	mini_rand_;
-	TBranch *mini_rand_branch;
-	bool mini_rand_isLoaded;
-	float	mini_t2ttLM_;
-	TBranch *mini_t2ttLM_branch;
-	bool mini_t2ttLM_isLoaded;
-	float	mini_t2ttHM_;
-	TBranch *mini_t2ttHM_branch;
-	bool mini_t2ttHM_isLoaded;
-	vector<float> *mini_bdt_;
-	TBranch *mini_bdt_branch;
-	bool mini_bdt_isLoaded;
+	vector<int> *genps_pdgId_;
+	TBranch *genps_pdgId_branch;
+	bool genps_pdgId_isLoaded;
+	vector<int> *genps_firstMother_;
+	TBranch *genps_firstMother_branch;
+	bool genps_firstMother_isLoaded;
+	vector<float> *genps_energy_;
+	TBranch *genps_energy_branch;
+	bool genps_energy_isLoaded;
+	vector<float> *genps_pt_;
+	TBranch *genps_pt_branch;
+	bool genps_pt_isLoaded;
+	vector<float> *genps_eta_;
+	TBranch *genps_eta_branch;
+	bool genps_eta_isLoaded;
+	vector<float> *genps_phi_;
+	TBranch *genps_phi_branch;
+	bool genps_phi_isLoaded;
 public: 
 void Init(TTree *tree) {
 	mclep_branch = 0;
@@ -1916,6 +1817,16 @@ void Init(TTree *tree) {
 		eebadsc_branch = tree->GetBranch("eebadsc");
 		if (eebadsc_branch) {eebadsc_branch->SetAddress(&eebadsc_);}
 	}
+	lep1_badecallaser_branch = 0;
+	if (tree->GetBranch("lep1_badecallaser") != 0) {
+		lep1_badecallaser_branch = tree->GetBranch("lep1_badecallaser");
+		if (lep1_badecallaser_branch) {lep1_badecallaser_branch->SetAddress(&lep1_badecallaser_);}
+	}
+	lep2_badecallaser_branch = 0;
+	if (tree->GetBranch("lep2_badecallaser") != 0) {
+		lep2_badecallaser_branch = tree->GetBranch("lep2_badecallaser");
+		if (lep2_badecallaser_branch) {lep2_badecallaser_branch->SetAddress(&lep2_badecallaser_);}
+	}
 	isdata_branch = 0;
 	if (tree->GetBranch("isdata") != 0) {
 		isdata_branch = tree->GetBranch("isdata");
@@ -2010,6 +1921,16 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("weight") != 0) {
 		weight_branch = tree->GetBranch("weight");
 		if (weight_branch) {weight_branch->SetAddress(&weight_);}
+	}
+	weightleft_branch = 0;
+	if (tree->GetBranch("weightleft") != 0) {
+		weightleft_branch = tree->GetBranch("weightleft");
+		if (weightleft_branch) {weightleft_branch->SetAddress(&weightleft_);}
+	}
+	weightright_branch = 0;
+	if (tree->GetBranch("weightright") != 0) {
+		weightright_branch = tree->GetBranch("weightright");
+		if (weightright_branch) {weightright_branch->SetAddress(&weightright_);}
 	}
 	mutrigweight_branch = 0;
 	if (tree->GetBranch("mutrigweight") != 0) {
@@ -2981,6 +2902,16 @@ void Init(TTree *tree) {
 		eSCPresh_branch = tree->GetBranch("eSCPresh");
 		if (eSCPresh_branch) {eSCPresh_branch->SetAddress(&eSCPresh_);}
 	}
+	lep1_scslasercormean_branch = 0;
+	if (tree->GetBranch("lep1_scslasercormean") != 0) {
+		lep1_scslasercormean_branch = tree->GetBranch("lep1_scslasercormean");
+		if (lep1_scslasercormean_branch) {lep1_scslasercormean_branch->SetAddress(&lep1_scslasercormean_);}
+	}
+	lep1_scslasercormax_branch = 0;
+	if (tree->GetBranch("lep1_scslasercormax") != 0) {
+		lep1_scslasercormax_branch = tree->GetBranch("lep1_scslasercormax");
+		if (lep1_scslasercormax_branch) {lep1_scslasercormax_branch->SetAddress(&lep1_scslasercormax_);}
+	}
 	eoverpin2_branch = 0;
 	if (tree->GetBranch("eoverpin2") != 0) {
 		eoverpin2_branch = tree->GetBranch("eoverpin2");
@@ -3070,6 +3001,31 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("eSCPresh2") != 0) {
 		eSCPresh2_branch = tree->GetBranch("eSCPresh2");
 		if (eSCPresh2_branch) {eSCPresh2_branch->SetAddress(&eSCPresh2_);}
+	}
+	lep2_scslasercormean_branch = 0;
+	if (tree->GetBranch("lep2_scslasercormean") != 0) {
+		lep2_scslasercormean_branch = tree->GetBranch("lep2_scslasercormean");
+		if (lep2_scslasercormean_branch) {lep2_scslasercormean_branch->SetAddress(&lep2_scslasercormean_);}
+	}
+	lep2_scslasercormax_branch = 0;
+	if (tree->GetBranch("lep2_scslasercormax") != 0) {
+		lep2_scslasercormax_branch = tree->GetBranch("lep2_scslasercormax");
+		if (lep2_scslasercormax_branch) {lep2_scslasercormax_branch->SetAddress(&lep2_scslasercormax_);}
+	}
+	scslasercormax_branch = 0;
+	if (tree->GetBranch("scslasercormax") != 0) {
+		scslasercormax_branch = tree->GetBranch("scslasercormax");
+		if (scslasercormax_branch) {scslasercormax_branch->SetAddress(&scslasercormax_);}
+	}
+	scslasercormax_pt_branch = 0;
+	if (tree->GetBranch("scslasercormax_pt") != 0) {
+		scslasercormax_pt_branch = tree->GetBranch("scslasercormax_pt");
+		if (scslasercormax_pt_branch) {scslasercormax_pt_branch->SetAddress(&scslasercormax_pt_);}
+	}
+	scslasercormax_eta_branch = 0;
+	if (tree->GetBranch("scslasercormax_eta") != 0) {
+		scslasercormax_eta_branch = tree->GetBranch("scslasercormax_eta");
+		if (scslasercormax_eta_branch) {scslasercormax_eta_branch->SetAddress(&scslasercormax_eta_);}
 	}
 	iso2_branch = 0;
 	if (tree->GetBranch("iso2") != 0) {
@@ -3901,6 +3857,11 @@ void Init(TTree *tree) {
 		pfjets_mcflavorPhys_branch = tree->GetBranch("pfjets_mcflavorPhys");
 		if (pfjets_mcflavorPhys_branch) {pfjets_mcflavorPhys_branch->SetAddress(&pfjets_mcflavorPhys_);}
 	}
+	pfjets_uncertainty_branch = 0;
+	if (tree->GetBranch("pfjets_uncertainty") != 0) {
+		pfjets_uncertainty_branch = tree->GetBranch("pfjets_uncertainty");
+		if (pfjets_uncertainty_branch) {pfjets_uncertainty_branch->SetAddress(&pfjets_uncertainty_);}
+	}
 	pfjets_flav_branch = 0;
 	if (tree->GetBranch("pfjets_flav") != 0) {
 		pfjets_flav_branch = tree->GetBranch("pfjets_flav");
@@ -3981,260 +3942,35 @@ void Init(TTree *tree) {
 		pfjets_mvaBeta_branch = tree->GetBranch("pfjets_mvaBeta");
 		if (pfjets_mvaBeta_branch) {pfjets_mvaBeta_branch->SetAddress(&pfjets_mvaBeta_);}
 	}
-	mini_mt_branch = 0;
-	if (tree->GetBranch("mini_mt") != 0) {
-		mini_mt_branch = tree->GetBranch("mini_mt");
-		if (mini_mt_branch) {mini_mt_branch->SetAddress(&mini_mt_);}
+	genps_pdgId_branch = 0;
+	if (tree->GetBranch("genps_pdgId") != 0) {
+		genps_pdgId_branch = tree->GetBranch("genps_pdgId");
+		if (genps_pdgId_branch) {genps_pdgId_branch->SetAddress(&genps_pdgId_);}
 	}
-	mini_met_branch = 0;
-	if (tree->GetBranch("mini_met") != 0) {
-		mini_met_branch = tree->GetBranch("mini_met");
-		if (mini_met_branch) {mini_met_branch->SetAddress(&mini_met_);}
+	genps_firstMother_branch = 0;
+	if (tree->GetBranch("genps_firstMother") != 0) {
+		genps_firstMother_branch = tree->GetBranch("genps_firstMother");
+		if (genps_firstMother_branch) {genps_firstMother_branch->SetAddress(&genps_firstMother_);}
 	}
-	mini_sig_branch = 0;
-	if (tree->GetBranch("mini_sig") != 0) {
-		mini_sig_branch = tree->GetBranch("mini_sig");
-		if (mini_sig_branch) {mini_sig_branch->SetAddress(&mini_sig_);}
+	genps_energy_branch = 0;
+	if (tree->GetBranch("genps_energy") != 0) {
+		genps_energy_branch = tree->GetBranch("genps_energy");
+		if (genps_energy_branch) {genps_energy_branch->SetAddress(&genps_energy_);}
 	}
-	mini_cr1_branch = 0;
-	if (tree->GetBranch("mini_cr1") != 0) {
-		mini_cr1_branch = tree->GetBranch("mini_cr1");
-		if (mini_cr1_branch) {mini_cr1_branch->SetAddress(&mini_cr1_);}
+	genps_pt_branch = 0;
+	if (tree->GetBranch("genps_pt") != 0) {
+		genps_pt_branch = tree->GetBranch("genps_pt");
+		if (genps_pt_branch) {genps_pt_branch->SetAddress(&genps_pt_);}
 	}
-	mini_cr4_branch = 0;
-	if (tree->GetBranch("mini_cr4") != 0) {
-		mini_cr4_branch = tree->GetBranch("mini_cr4");
-		if (mini_cr4_branch) {mini_cr4_branch->SetAddress(&mini_cr4_);}
+	genps_eta_branch = 0;
+	if (tree->GetBranch("genps_eta") != 0) {
+		genps_eta_branch = tree->GetBranch("genps_eta");
+		if (genps_eta_branch) {genps_eta_branch->SetAddress(&genps_eta_);}
 	}
-	mini_cr5_branch = 0;
-	if (tree->GetBranch("mini_cr5") != 0) {
-		mini_cr5_branch = tree->GetBranch("mini_cr5");
-		if (mini_cr5_branch) {mini_cr5_branch->SetAddress(&mini_cr5_);}
-	}
-	mini_whsig_branch = 0;
-	if (tree->GetBranch("mini_whsig") != 0) {
-		mini_whsig_branch = tree->GetBranch("mini_whsig");
-		if (mini_whsig_branch) {mini_whsig_branch->SetAddress(&mini_whsig_);}
-	}
-	mini_whcr1_branch = 0;
-	if (tree->GetBranch("mini_whcr1") != 0) {
-		mini_whcr1_branch = tree->GetBranch("mini_whcr1");
-		if (mini_whcr1_branch) {mini_whcr1_branch->SetAddress(&mini_whcr1_);}
-	}
-	mini_chi2_branch = 0;
-	if (tree->GetBranch("mini_chi2") != 0) {
-		mini_chi2_branch = tree->GetBranch("mini_chi2");
-		if (mini_chi2_branch) {mini_chi2_branch->SetAddress(&mini_chi2_);}
-	}
-	mini_mt2b_branch = 0;
-	if (tree->GetBranch("mini_mt2b") != 0) {
-		mini_mt2b_branch = tree->GetBranch("mini_mt2b");
-		if (mini_mt2b_branch) {mini_mt2b_branch->SetAddress(&mini_mt2b_);}
-	}
-	mini_mt2bl_branch = 0;
-	if (tree->GetBranch("mini_mt2bl") != 0) {
-		mini_mt2bl_branch = tree->GetBranch("mini_mt2bl");
-		if (mini_mt2bl_branch) {mini_mt2bl_branch->SetAddress(&mini_mt2bl_);}
-	}
-	mini_mt2w_branch = 0;
-	if (tree->GetBranch("mini_mt2w") != 0) {
-		mini_mt2w_branch = tree->GetBranch("mini_mt2w");
-		if (mini_mt2w_branch) {mini_mt2w_branch->SetAddress(&mini_mt2w_);}
-	}
-	mini_weight_branch = 0;
-	if (tree->GetBranch("mini_weight") != 0) {
-		mini_weight_branch = tree->GetBranch("mini_weight");
-		if (mini_weight_branch) {mini_weight_branch->SetAddress(&mini_weight_);}
-	}
-	mini_nvtxweight_branch = 0;
-	if (tree->GetBranch("mini_nvtxweight") != 0) {
-		mini_nvtxweight_branch = tree->GetBranch("mini_nvtxweight");
-		if (mini_nvtxweight_branch) {mini_nvtxweight_branch->SetAddress(&mini_nvtxweight_);}
-	}
-	mini_sltrigeff_branch = 0;
-	if (tree->GetBranch("mini_sltrigeff") != 0) {
-		mini_sltrigeff_branch = tree->GetBranch("mini_sltrigeff");
-		if (mini_sltrigeff_branch) {mini_sltrigeff_branch->SetAddress(&mini_sltrigeff_);}
-	}
-	mini_dltrigeff_branch = 0;
-	if (tree->GetBranch("mini_dltrigeff") != 0) {
-		mini_dltrigeff_branch = tree->GetBranch("mini_dltrigeff");
-		if (mini_dltrigeff_branch) {mini_dltrigeff_branch->SetAddress(&mini_dltrigeff_);}
-	}
-	mini_nb_branch = 0;
-	if (tree->GetBranch("mini_nb") != 0) {
-		mini_nb_branch = tree->GetBranch("mini_nb");
-		if (mini_nb_branch) {mini_nb_branch->SetAddress(&mini_nb_);}
-	}
-	mini_njets_branch = 0;
-	if (tree->GetBranch("mini_njets") != 0) {
-		mini_njets_branch = tree->GetBranch("mini_njets");
-		if (mini_njets_branch) {mini_njets_branch->SetAddress(&mini_njets_);}
-	}
-	mini_passisotrk_branch = 0;
-	if (tree->GetBranch("mini_passisotrk") != 0) {
-		mini_passisotrk_branch = tree->GetBranch("mini_passisotrk");
-		if (mini_passisotrk_branch) {mini_passisotrk_branch->SetAddress(&mini_passisotrk_);}
-	}
-	mini_passtauveto_branch = 0;
-	if (tree->GetBranch("mini_passtauveto") != 0) {
-		mini_passtauveto_branch = tree->GetBranch("mini_passtauveto");
-		if (mini_passtauveto_branch) {mini_passtauveto_branch->SetAddress(&mini_passtauveto_);}
-	}
-	mini_nlep_branch = 0;
-	if (tree->GetBranch("mini_nlep") != 0) {
-		mini_nlep_branch = tree->GetBranch("mini_nlep");
-		if (mini_nlep_branch) {mini_nlep_branch->SetAddress(&mini_nlep_);}
-	}
-	mini_dRleptB1_branch = 0;
-	if (tree->GetBranch("mini_dRleptB1") != 0) {
-		mini_dRleptB1_branch = tree->GetBranch("mini_dRleptB1");
-		if (mini_dRleptB1_branch) {mini_dRleptB1_branch->SetAddress(&mini_dRleptB1_);}
-	}
-	mini_lep1pt_branch = 0;
-	if (tree->GetBranch("mini_lep1pt") != 0) {
-		mini_lep1pt_branch = tree->GetBranch("mini_lep1pt");
-		if (mini_lep1pt_branch) {mini_lep1pt_branch->SetAddress(&mini_lep1pt_);}
-	}
-	mini_lep1eta_branch = 0;
-	if (tree->GetBranch("mini_lep1eta") != 0) {
-		mini_lep1eta_branch = tree->GetBranch("mini_lep1eta");
-		if (mini_lep1eta_branch) {mini_lep1eta_branch->SetAddress(&mini_lep1eta_);}
-	}
-	mini_lep2pt_branch = 0;
-	if (tree->GetBranch("mini_lep2pt") != 0) {
-		mini_lep2pt_branch = tree->GetBranch("mini_lep2pt");
-		if (mini_lep2pt_branch) {mini_lep2pt_branch->SetAddress(&mini_lep2pt_);}
-	}
-	mini_lep2eta_branch = 0;
-	if (tree->GetBranch("mini_lep2eta") != 0) {
-		mini_lep2eta_branch = tree->GetBranch("mini_lep2eta");
-		if (mini_lep2eta_branch) {mini_lep2eta_branch->SetAddress(&mini_lep2eta_);}
-	}
-	mini_dilmass_branch = 0;
-	if (tree->GetBranch("mini_dilmass") != 0) {
-		mini_dilmass_branch = tree->GetBranch("mini_dilmass");
-		if (mini_dilmass_branch) {mini_dilmass_branch->SetAddress(&mini_dilmass_);}
-	}
-	mini_mstop_branch = 0;
-	if (tree->GetBranch("mini_mstop") != 0) {
-		mini_mstop_branch = tree->GetBranch("mini_mstop");
-		if (mini_mstop_branch) {mini_mstop_branch->SetAddress(&mini_mstop_);}
-	}
-	mini_mlsp_branch = 0;
-	if (tree->GetBranch("mini_mlsp") != 0) {
-		mini_mlsp_branch = tree->GetBranch("mini_mlsp");
-		if (mini_mlsp_branch) {mini_mlsp_branch->SetAddress(&mini_mlsp_);}
-	}
-	mini_x_branch = 0;
-	if (tree->GetBranch("mini_x") != 0) {
-		mini_x_branch = tree->GetBranch("mini_x");
-		if (mini_x_branch) {mini_x_branch->SetAddress(&mini_x_);}
-	}
-	mini_xsecsusy_branch = 0;
-	if (tree->GetBranch("mini_xsecsusy") != 0) {
-		mini_xsecsusy_branch = tree->GetBranch("mini_xsecsusy");
-		if (mini_xsecsusy_branch) {mini_xsecsusy_branch->SetAddress(&mini_xsecsusy_);}
-	}
-	mini_htssl_branch = 0;
-	if (tree->GetBranch("mini_htssl") != 0) {
-		mini_htssl_branch = tree->GetBranch("mini_htssl");
-		if (mini_htssl_branch) {mini_htssl_branch->SetAddress(&mini_htssl_);}
-	}
-	mini_htosl_branch = 0;
-	if (tree->GetBranch("mini_htosl") != 0) {
-		mini_htosl_branch = tree->GetBranch("mini_htosl");
-		if (mini_htosl_branch) {mini_htosl_branch->SetAddress(&mini_htosl_);}
-	}
-	mini_htratiol_branch = 0;
-	if (tree->GetBranch("mini_htratiol") != 0) {
-		mini_htratiol_branch = tree->GetBranch("mini_htratiol");
-		if (mini_htratiol_branch) {mini_htratiol_branch->SetAddress(&mini_htratiol_);}
-	}
-	mini_htssm_branch = 0;
-	if (tree->GetBranch("mini_htssm") != 0) {
-		mini_htssm_branch = tree->GetBranch("mini_htssm");
-		if (mini_htssm_branch) {mini_htssm_branch->SetAddress(&mini_htssm_);}
-	}
-	mini_htosm_branch = 0;
-	if (tree->GetBranch("mini_htosm") != 0) {
-		mini_htosm_branch = tree->GetBranch("mini_htosm");
-		if (mini_htosm_branch) {mini_htosm_branch->SetAddress(&mini_htosm_);}
-	}
-	mini_htratiom_branch = 0;
-	if (tree->GetBranch("mini_htratiom") != 0) {
-		mini_htratiom_branch = tree->GetBranch("mini_htratiom");
-		if (mini_htratiom_branch) {mini_htratiom_branch->SetAddress(&mini_htratiom_);}
-	}
-	mini_dphimj1_branch = 0;
-	if (tree->GetBranch("mini_dphimj1") != 0) {
-		mini_dphimj1_branch = tree->GetBranch("mini_dphimj1");
-		if (mini_dphimj1_branch) {mini_dphimj1_branch->SetAddress(&mini_dphimj1_);}
-	}
-	mini_dphimj2_branch = 0;
-	if (tree->GetBranch("mini_dphimj2") != 0) {
-		mini_dphimj2_branch = tree->GetBranch("mini_dphimj2");
-		if (mini_dphimj2_branch) {mini_dphimj2_branch->SetAddress(&mini_dphimj2_);}
-	}
-	mini_dphimjmin_branch = 0;
-	if (tree->GetBranch("mini_dphimjmin") != 0) {
-		mini_dphimjmin_branch = tree->GetBranch("mini_dphimjmin");
-		if (mini_dphimjmin_branch) {mini_dphimjmin_branch->SetAddress(&mini_dphimjmin_);}
-	}
-	mini_pt_b_branch = 0;
-	if (tree->GetBranch("mini_pt_b") != 0) {
-		mini_pt_b_branch = tree->GetBranch("mini_pt_b");
-		if (mini_pt_b_branch) {mini_pt_b_branch->SetAddress(&mini_pt_b_);}
-	}
-	mini_pt_J1_branch = 0;
-	if (tree->GetBranch("mini_pt_J1") != 0) {
-		mini_pt_J1_branch = tree->GetBranch("mini_pt_J1");
-		if (mini_pt_J1_branch) {mini_pt_J1_branch->SetAddress(&mini_pt_J1_);}
-	}
-	mini_pt_J2_branch = 0;
-	if (tree->GetBranch("mini_pt_J2") != 0) {
-		mini_pt_J2_branch = tree->GetBranch("mini_pt_J2");
-		if (mini_pt_J2_branch) {mini_pt_J2_branch->SetAddress(&mini_pt_J2_);}
-	}
-	mini_bbmass_branch = 0;
-	if (tree->GetBranch("mini_bbmass") != 0) {
-		mini_bbmass_branch = tree->GetBranch("mini_bbmass");
-		if (mini_bbmass_branch) {mini_bbmass_branch->SetAddress(&mini_bbmass_);}
-	}
-	mini_bbpt_branch = 0;
-	if (tree->GetBranch("mini_bbpt") != 0) {
-		mini_bbpt_branch = tree->GetBranch("mini_bbpt");
-		if (mini_bbpt_branch) {mini_bbpt_branch->SetAddress(&mini_bbpt_);}
-	}
-	mini_wpt_branch = 0;
-	if (tree->GetBranch("mini_wpt") != 0) {
-		mini_wpt_branch = tree->GetBranch("mini_wpt");
-		if (mini_wpt_branch) {mini_wpt_branch->SetAddress(&mini_wpt_);}
-	}
-	mini_bbwdphi_branch = 0;
-	if (tree->GetBranch("mini_bbwdphi") != 0) {
-		mini_bbwdphi_branch = tree->GetBranch("mini_bbwdphi");
-		if (mini_bbwdphi_branch) {mini_bbwdphi_branch->SetAddress(&mini_bbwdphi_);}
-	}
-	mini_rand_branch = 0;
-	if (tree->GetBranch("mini_rand") != 0) {
-		mini_rand_branch = tree->GetBranch("mini_rand");
-		if (mini_rand_branch) {mini_rand_branch->SetAddress(&mini_rand_);}
-	}
-	mini_t2ttLM_branch = 0;
-	if (tree->GetBranch("mini_t2ttLM") != 0) {
-		mini_t2ttLM_branch = tree->GetBranch("mini_t2ttLM");
-		if (mini_t2ttLM_branch) {mini_t2ttLM_branch->SetAddress(&mini_t2ttLM_);}
-	}
-	mini_t2ttHM_branch = 0;
-	if (tree->GetBranch("mini_t2ttHM") != 0) {
-		mini_t2ttHM_branch = tree->GetBranch("mini_t2ttHM");
-		if (mini_t2ttHM_branch) {mini_t2ttHM_branch->SetAddress(&mini_t2ttHM_);}
-	}
-	mini_bdt_branch = 0;
-	if (tree->GetBranch("mini_bdt") != 0) {
-		mini_bdt_branch = tree->GetBranch("mini_bdt");
-		if (mini_bdt_branch) {mini_bdt_branch->SetAddress(&mini_bdt_);}
+	genps_phi_branch = 0;
+	if (tree->GetBranch("genps_phi") != 0) {
+		genps_phi_branch = tree->GetBranch("genps_phi");
+		if (genps_phi_branch) {genps_phi_branch->SetAddress(&genps_phi_);}
 	}
   tree->SetMakeClass(0);
 }
@@ -4253,6 +3989,8 @@ void GetEntry(unsigned int idx)
 		ecaltp_isLoaded = false;
 		trkfail_isLoaded = false;
 		eebadsc_isLoaded = false;
+		lep1_badecallaser_isLoaded = false;
+		lep2_badecallaser_isLoaded = false;
 		isdata_isLoaded = false;
 		jetid_isLoaded = false;
 		jetid30_isLoaded = false;
@@ -4272,6 +4010,8 @@ void GetEntry(unsigned int idx)
 		njetsuncor_isLoaded = false;
 		costhetaweight_isLoaded = false;
 		weight_isLoaded = false;
+		weightleft_isLoaded = false;
+		weightright_isLoaded = false;
 		mutrigweight_isLoaded = false;
 		mutrigweight2_isLoaded = false;
 		sltrigweight_isLoaded = false;
@@ -4466,6 +4206,8 @@ void GetEntry(unsigned int idx)
 		phiSC_isLoaded = false;
 		eSCRaw_isLoaded = false;
 		eSCPresh_isLoaded = false;
+		lep1_scslasercormean_isLoaded = false;
+		lep1_scslasercormax_isLoaded = false;
 		eoverpin2_isLoaded = false;
 		eoverpout2_isLoaded = false;
 		dEtaIn2_isLoaded = false;
@@ -4484,6 +4226,11 @@ void GetEntry(unsigned int idx)
 		phiSC2_isLoaded = false;
 		eSCRaw2_isLoaded = false;
 		eSCPresh2_isLoaded = false;
+		lep2_scslasercormean_isLoaded = false;
+		lep2_scslasercormax_isLoaded = false;
+		scslasercormax_isLoaded = false;
+		scslasercormax_pt_isLoaded = false;
+		scslasercormax_eta_isLoaded = false;
 		iso2_isLoaded = false;
 		ecalveto1_isLoaded = false;
 		ecalveto2_isLoaded = false;
@@ -4701,6 +4448,7 @@ void GetEntry(unsigned int idx)
 		pfjets_mc3_isLoaded = false;
 		pfjets_mcflavorAlgo_isLoaded = false;
 		pfjets_mcflavorPhys_isLoaded = false;
+		pfjets_uncertainty_isLoaded = false;
 		pfjets_flav_isLoaded = false;
 		pfjets_lrm_isLoaded = false;
 		pfjets_lrm2_isLoaded = false;
@@ -4718,57 +4466,12 @@ void GetEntry(unsigned int idx)
 		pfjets_mva5xPUid_isLoaded = false;
 		pfjets_mvaBeta_isLoaded = false;
 		genbs_isLoaded = false;
-		mini_mt_isLoaded = false;
-		mini_met_isLoaded = false;
-		mini_sig_isLoaded = false;
-		mini_cr1_isLoaded = false;
-		mini_cr4_isLoaded = false;
-		mini_cr5_isLoaded = false;
-		mini_whsig_isLoaded = false;
-		mini_whcr1_isLoaded = false;
-		mini_chi2_isLoaded = false;
-		mini_mt2b_isLoaded = false;
-		mini_mt2bl_isLoaded = false;
-		mini_mt2w_isLoaded = false;
-		mini_weight_isLoaded = false;
-		mini_nvtxweight_isLoaded = false;
-		mini_sltrigeff_isLoaded = false;
-		mini_dltrigeff_isLoaded = false;
-		mini_nb_isLoaded = false;
-		mini_njets_isLoaded = false;
-		mini_passisotrk_isLoaded = false;
-		mini_passtauveto_isLoaded = false;
-		mini_nlep_isLoaded = false;
-		mini_dRleptB1_isLoaded = false;
-		mini_lep1pt_isLoaded = false;
-		mini_lep1eta_isLoaded = false;
-		mini_lep2pt_isLoaded = false;
-		mini_lep2eta_isLoaded = false;
-		mini_dilmass_isLoaded = false;
-		mini_mstop_isLoaded = false;
-		mini_mlsp_isLoaded = false;
-		mini_x_isLoaded = false;
-		mini_xsecsusy_isLoaded = false;
-		mini_htssl_isLoaded = false;
-		mini_htosl_isLoaded = false;
-		mini_htratiol_isLoaded = false;
-		mini_htssm_isLoaded = false;
-		mini_htosm_isLoaded = false;
-		mini_htratiom_isLoaded = false;
-		mini_dphimj1_isLoaded = false;
-		mini_dphimj2_isLoaded = false;
-		mini_dphimjmin_isLoaded = false;
-		mini_pt_b_isLoaded = false;
-		mini_pt_J1_isLoaded = false;
-		mini_pt_J2_isLoaded = false;
-		mini_bbmass_isLoaded = false;
-		mini_bbpt_isLoaded = false;
-		mini_wpt_isLoaded = false;
-		mini_bbwdphi_isLoaded = false;
-		mini_rand_isLoaded = false;
-		mini_t2ttLM_isLoaded = false;
-		mini_t2ttHM_isLoaded = false;
-		mini_bdt_isLoaded = false;
+		genps_pdgId_isLoaded = false;
+		genps_firstMother_isLoaded = false;
+		genps_energy_isLoaded = false;
+		genps_pt_isLoaded = false;
+		genps_eta_isLoaded = false;
+		genps_phi_isLoaded = false;
 	}
 
 void LoadAllBranches() 
@@ -4785,6 +4488,8 @@ void LoadAllBranches()
 	if (ecaltp_branch != 0) ecaltp();
 	if (trkfail_branch != 0) trkfail();
 	if (eebadsc_branch != 0) eebadsc();
+	if (lep1_badecallaser_branch != 0) lep1_badecallaser();
+	if (lep2_badecallaser_branch != 0) lep2_badecallaser();
 	if (isdata_branch != 0) isdata();
 	if (jetid_branch != 0) jetid();
 	if (jetid30_branch != 0) jetid30();
@@ -4804,6 +4509,8 @@ void LoadAllBranches()
 	if (njetsuncor_branch != 0) njetsuncor();
 	if (costhetaweight_branch != 0) costhetaweight();
 	if (weight_branch != 0) weight();
+	if (weightleft_branch != 0) weightleft();
+	if (weightright_branch != 0) weightright();
 	if (mutrigweight_branch != 0) mutrigweight();
 	if (mutrigweight2_branch != 0) mutrigweight2();
 	if (sltrigweight_branch != 0) sltrigweight();
@@ -4998,6 +4705,8 @@ void LoadAllBranches()
 	if (phiSC_branch != 0) phiSC();
 	if (eSCRaw_branch != 0) eSCRaw();
 	if (eSCPresh_branch != 0) eSCPresh();
+	if (lep1_scslasercormean_branch != 0) lep1_scslasercormean();
+	if (lep1_scslasercormax_branch != 0) lep1_scslasercormax();
 	if (eoverpin2_branch != 0) eoverpin2();
 	if (eoverpout2_branch != 0) eoverpout2();
 	if (dEtaIn2_branch != 0) dEtaIn2();
@@ -5016,6 +4725,11 @@ void LoadAllBranches()
 	if (phiSC2_branch != 0) phiSC2();
 	if (eSCRaw2_branch != 0) eSCRaw2();
 	if (eSCPresh2_branch != 0) eSCPresh2();
+	if (lep2_scslasercormean_branch != 0) lep2_scslasercormean();
+	if (lep2_scslasercormax_branch != 0) lep2_scslasercormax();
+	if (scslasercormax_branch != 0) scslasercormax();
+	if (scslasercormax_pt_branch != 0) scslasercormax_pt();
+	if (scslasercormax_eta_branch != 0) scslasercormax_eta();
 	if (iso2_branch != 0) iso2();
 	if (ecalveto1_branch != 0) ecalveto1();
 	if (ecalveto2_branch != 0) ecalveto2();
@@ -5233,6 +4947,7 @@ void LoadAllBranches()
 	if (pfjets_mc3_branch != 0) pfjets_mc3();
 	if (pfjets_mcflavorAlgo_branch != 0) pfjets_mcflavorAlgo();
 	if (pfjets_mcflavorPhys_branch != 0) pfjets_mcflavorPhys();
+	if (pfjets_uncertainty_branch != 0) pfjets_uncertainty();
 	if (pfjets_flav_branch != 0) pfjets_flav();
 	if (pfjets_lrm_branch != 0) pfjets_lrm();
 	if (pfjets_lrm2_branch != 0) pfjets_lrm2();
@@ -5250,57 +4965,12 @@ void LoadAllBranches()
 	if (pfjets_mva5xPUid_branch != 0) pfjets_mva5xPUid();
 	if (pfjets_mvaBeta_branch != 0) pfjets_mvaBeta();
 	if (genbs_branch != 0) genbs();
-	if (mini_mt_branch != 0) mini_mt();
-	if (mini_met_branch != 0) mini_met();
-	if (mini_sig_branch != 0) mini_sig();
-	if (mini_cr1_branch != 0) mini_cr1();
-	if (mini_cr4_branch != 0) mini_cr4();
-	if (mini_cr5_branch != 0) mini_cr5();
-	if (mini_whsig_branch != 0) mini_whsig();
-	if (mini_whcr1_branch != 0) mini_whcr1();
-	if (mini_chi2_branch != 0) mini_chi2();
-	if (mini_mt2b_branch != 0) mini_mt2b();
-	if (mini_mt2bl_branch != 0) mini_mt2bl();
-	if (mini_mt2w_branch != 0) mini_mt2w();
-	if (mini_weight_branch != 0) mini_weight();
-	if (mini_nvtxweight_branch != 0) mini_nvtxweight();
-	if (mini_sltrigeff_branch != 0) mini_sltrigeff();
-	if (mini_dltrigeff_branch != 0) mini_dltrigeff();
-	if (mini_nb_branch != 0) mini_nb();
-	if (mini_njets_branch != 0) mini_njets();
-	if (mini_passisotrk_branch != 0) mini_passisotrk();
-	if (mini_passtauveto_branch != 0) mini_passtauveto();
-	if (mini_nlep_branch != 0) mini_nlep();
-	if (mini_dRleptB1_branch != 0) mini_dRleptB1();
-	if (mini_lep1pt_branch != 0) mini_lep1pt();
-	if (mini_lep1eta_branch != 0) mini_lep1eta();
-	if (mini_lep2pt_branch != 0) mini_lep2pt();
-	if (mini_lep2eta_branch != 0) mini_lep2eta();
-	if (mini_dilmass_branch != 0) mini_dilmass();
-	if (mini_mstop_branch != 0) mini_mstop();
-	if (mini_mlsp_branch != 0) mini_mlsp();
-	if (mini_x_branch != 0) mini_x();
-	if (mini_xsecsusy_branch != 0) mini_xsecsusy();
-	if (mini_htssl_branch != 0) mini_htssl();
-	if (mini_htosl_branch != 0) mini_htosl();
-	if (mini_htratiol_branch != 0) mini_htratiol();
-	if (mini_htssm_branch != 0) mini_htssm();
-	if (mini_htosm_branch != 0) mini_htosm();
-	if (mini_htratiom_branch != 0) mini_htratiom();
-	if (mini_dphimj1_branch != 0) mini_dphimj1();
-	if (mini_dphimj2_branch != 0) mini_dphimj2();
-	if (mini_dphimjmin_branch != 0) mini_dphimjmin();
-	if (mini_pt_b_branch != 0) mini_pt_b();
-	if (mini_pt_J1_branch != 0) mini_pt_J1();
-	if (mini_pt_J2_branch != 0) mini_pt_J2();
-	if (mini_bbmass_branch != 0) mini_bbmass();
-	if (mini_bbpt_branch != 0) mini_bbpt();
-	if (mini_wpt_branch != 0) mini_wpt();
-	if (mini_bbwdphi_branch != 0) mini_bbwdphi();
-	if (mini_rand_branch != 0) mini_rand();
-	if (mini_t2ttLM_branch != 0) mini_t2ttLM();
-	if (mini_t2ttHM_branch != 0) mini_t2ttHM();
-	if (mini_bdt_branch != 0) mini_bdt();
+	if (genps_pdgId_branch != 0) genps_pdgId();
+	if (genps_firstMother_branch != 0) genps_firstMother();
+	if (genps_energy_branch != 0) genps_energy();
+	if (genps_pt_branch != 0) genps_pt();
+	if (genps_eta_branch != 0) genps_eta();
+	if (genps_phi_branch != 0) genps_phi();
 }
 
 	int &acc_2010()
@@ -5445,6 +5115,32 @@ void LoadAllBranches()
 			eebadsc_isLoaded = true;
 		}
 		return eebadsc_;
+	}
+	int &lep1_badecallaser()
+	{
+		if (not lep1_badecallaser_isLoaded) {
+			if (lep1_badecallaser_branch != 0) {
+				lep1_badecallaser_branch->GetEntry(index);
+			} else { 
+				printf("branch lep1_badecallaser_branch does not exist!\n");
+				exit(1);
+			}
+			lep1_badecallaser_isLoaded = true;
+		}
+		return lep1_badecallaser_;
+	}
+	int &lep2_badecallaser()
+	{
+		if (not lep2_badecallaser_isLoaded) {
+			if (lep2_badecallaser_branch != 0) {
+				lep2_badecallaser_branch->GetEntry(index);
+			} else { 
+				printf("branch lep2_badecallaser_branch does not exist!\n");
+				exit(1);
+			}
+			lep2_badecallaser_isLoaded = true;
+		}
+		return lep2_badecallaser_;
 	}
 	int &isdata()
 	{
@@ -5692,6 +5388,32 @@ void LoadAllBranches()
 			weight_isLoaded = true;
 		}
 		return weight_;
+	}
+	float &weightleft()
+	{
+		if (not weightleft_isLoaded) {
+			if (weightleft_branch != 0) {
+				weightleft_branch->GetEntry(index);
+			} else { 
+				printf("branch weightleft_branch does not exist!\n");
+				exit(1);
+			}
+			weightleft_isLoaded = true;
+		}
+		return weightleft_;
+	}
+	float &weightright()
+	{
+		if (not weightright_isLoaded) {
+			if (weightright_branch != 0) {
+				weightright_branch->GetEntry(index);
+			} else { 
+				printf("branch weightright_branch does not exist!\n");
+				exit(1);
+			}
+			weightright_isLoaded = true;
+		}
+		return weightright_;
 	}
 	float &mutrigweight()
 	{
@@ -8215,6 +7937,32 @@ void LoadAllBranches()
 		}
 		return eSCPresh_;
 	}
+	float &lep1_scslasercormean()
+	{
+		if (not lep1_scslasercormean_isLoaded) {
+			if (lep1_scslasercormean_branch != 0) {
+				lep1_scslasercormean_branch->GetEntry(index);
+			} else { 
+				printf("branch lep1_scslasercormean_branch does not exist!\n");
+				exit(1);
+			}
+			lep1_scslasercormean_isLoaded = true;
+		}
+		return lep1_scslasercormean_;
+	}
+	float &lep1_scslasercormax()
+	{
+		if (not lep1_scslasercormax_isLoaded) {
+			if (lep1_scslasercormax_branch != 0) {
+				lep1_scslasercormax_branch->GetEntry(index);
+			} else { 
+				printf("branch lep1_scslasercormax_branch does not exist!\n");
+				exit(1);
+			}
+			lep1_scslasercormax_isLoaded = true;
+		}
+		return lep1_scslasercormax_;
+	}
 	float &eoverpin2()
 	{
 		if (not eoverpin2_isLoaded) {
@@ -8449,6 +8197,71 @@ void LoadAllBranches()
 		}
 		return eSCPresh2_;
 	}
+	float &lep2_scslasercormean()
+	{
+		if (not lep2_scslasercormean_isLoaded) {
+			if (lep2_scslasercormean_branch != 0) {
+				lep2_scslasercormean_branch->GetEntry(index);
+			} else { 
+				printf("branch lep2_scslasercormean_branch does not exist!\n");
+				exit(1);
+			}
+			lep2_scslasercormean_isLoaded = true;
+		}
+		return lep2_scslasercormean_;
+	}
+	float &lep2_scslasercormax()
+	{
+		if (not lep2_scslasercormax_isLoaded) {
+			if (lep2_scslasercormax_branch != 0) {
+				lep2_scslasercormax_branch->GetEntry(index);
+			} else { 
+				printf("branch lep2_scslasercormax_branch does not exist!\n");
+				exit(1);
+			}
+			lep2_scslasercormax_isLoaded = true;
+		}
+		return lep2_scslasercormax_;
+	}
+	float &scslasercormax()
+	{
+		if (not scslasercormax_isLoaded) {
+			if (scslasercormax_branch != 0) {
+				scslasercormax_branch->GetEntry(index);
+			} else { 
+				printf("branch scslasercormax_branch does not exist!\n");
+				exit(1);
+			}
+			scslasercormax_isLoaded = true;
+		}
+		return scslasercormax_;
+	}
+	float &scslasercormax_pt()
+	{
+		if (not scslasercormax_pt_isLoaded) {
+			if (scslasercormax_pt_branch != 0) {
+				scslasercormax_pt_branch->GetEntry(index);
+			} else { 
+				printf("branch scslasercormax_pt_branch does not exist!\n");
+				exit(1);
+			}
+			scslasercormax_pt_isLoaded = true;
+		}
+		return scslasercormax_pt_;
+	}
+	float &scslasercormax_eta()
+	{
+		if (not scslasercormax_eta_isLoaded) {
+			if (scslasercormax_eta_branch != 0) {
+				scslasercormax_eta_branch->GetEntry(index);
+			} else { 
+				printf("branch scslasercormax_eta_branch does not exist!\n");
+				exit(1);
+			}
+			scslasercormax_eta_isLoaded = true;
+		}
+		return scslasercormax_eta_;
+	}
 	float &iso2()
 	{
 		if (not iso2_isLoaded) {
@@ -8644,7 +8457,7 @@ void LoadAllBranches()
 		}
 		return mt_;
 	}
-	unsigned int &run()
+	int &run()
 	{
 		if (not run_isLoaded) {
 			if (run_branch != 0) {
@@ -8657,7 +8470,7 @@ void LoadAllBranches()
 		}
 		return run_;
 	}
-	unsigned int &lumi()
+	int &lumi()
 	{
 		if (not lumi_isLoaded) {
 			if (lumi_branch != 0) {
@@ -8670,7 +8483,7 @@ void LoadAllBranches()
 		}
 		return lumi_;
 	}
-        unsigned int &event()
+	int &event()
 	{
 		if (not event_isLoaded) {
 			if (event_branch != 0) {
@@ -11270,6 +11083,19 @@ void LoadAllBranches()
 		}
 		return *pfjets_mcflavorPhys_;
 	}
+	vector<float> &pfjets_uncertainty()
+	{
+		if (not pfjets_uncertainty_isLoaded) {
+			if (pfjets_uncertainty_branch != 0) {
+				pfjets_uncertainty_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_uncertainty_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_uncertainty_isLoaded = true;
+		}
+		return *pfjets_uncertainty_;
+	}
 	vector<int> &pfjets_flav()
 	{
 		if (not pfjets_flav_isLoaded) {
@@ -11491,668 +11317,83 @@ void LoadAllBranches()
 		}
 		return *genbs_;
 	}
-	float &mini_mt()
+	vector<int> &genps_pdgId()
 	{
-		if (not mini_mt_isLoaded) {
-			if (mini_mt_branch != 0) {
-				mini_mt_branch->GetEntry(index);
+		if (not genps_pdgId_isLoaded) {
+			if (genps_pdgId_branch != 0) {
+				genps_pdgId_branch->GetEntry(index);
 			} else { 
-				printf("branch mini_mt_branch does not exist!\n");
+				printf("branch genps_pdgId_branch does not exist!\n");
 				exit(1);
 			}
-			mini_mt_isLoaded = true;
+			genps_pdgId_isLoaded = true;
 		}
-		return mini_mt_;
+		return *genps_pdgId_;
 	}
-	float &mini_met()
+	vector<int> &genps_firstMother()
 	{
-		if (not mini_met_isLoaded) {
-			if (mini_met_branch != 0) {
-				mini_met_branch->GetEntry(index);
+		if (not genps_firstMother_isLoaded) {
+			if (genps_firstMother_branch != 0) {
+				genps_firstMother_branch->GetEntry(index);
 			} else { 
-				printf("branch mini_met_branch does not exist!\n");
+				printf("branch genps_firstMother_branch does not exist!\n");
 				exit(1);
 			}
-			mini_met_isLoaded = true;
+			genps_firstMother_isLoaded = true;
 		}
-		return mini_met_;
+		return *genps_firstMother_;
 	}
-	int &mini_sig()
+	vector<float> &genps_energy()
 	{
-		if (not mini_sig_isLoaded) {
-			if (mini_sig_branch != 0) {
-				mini_sig_branch->GetEntry(index);
+		if (not genps_energy_isLoaded) {
+			if (genps_energy_branch != 0) {
+				genps_energy_branch->GetEntry(index);
 			} else { 
-				printf("branch mini_sig_branch does not exist!\n");
+				printf("branch genps_energy_branch does not exist!\n");
 				exit(1);
 			}
-			mini_sig_isLoaded = true;
+			genps_energy_isLoaded = true;
 		}
-		return mini_sig_;
+		return *genps_energy_;
 	}
-	int &mini_cr1()
+	vector<float> &genps_pt()
 	{
-		if (not mini_cr1_isLoaded) {
-			if (mini_cr1_branch != 0) {
-				mini_cr1_branch->GetEntry(index);
+		if (not genps_pt_isLoaded) {
+			if (genps_pt_branch != 0) {
+				genps_pt_branch->GetEntry(index);
 			} else { 
-				printf("branch mini_cr1_branch does not exist!\n");
+				printf("branch genps_pt_branch does not exist!\n");
 				exit(1);
 			}
-			mini_cr1_isLoaded = true;
+			genps_pt_isLoaded = true;
 		}
-		return mini_cr1_;
+		return *genps_pt_;
 	}
-	int &mini_cr4()
+	vector<float> &genps_eta()
 	{
-		if (not mini_cr4_isLoaded) {
-			if (mini_cr4_branch != 0) {
-				mini_cr4_branch->GetEntry(index);
+		if (not genps_eta_isLoaded) {
+			if (genps_eta_branch != 0) {
+				genps_eta_branch->GetEntry(index);
 			} else { 
-				printf("branch mini_cr4_branch does not exist!\n");
+				printf("branch genps_eta_branch does not exist!\n");
 				exit(1);
 			}
-			mini_cr4_isLoaded = true;
+			genps_eta_isLoaded = true;
 		}
-		return mini_cr4_;
+		return *genps_eta_;
 	}
-	int &mini_cr5()
+	vector<float> &genps_phi()
 	{
-		if (not mini_cr5_isLoaded) {
-			if (mini_cr5_branch != 0) {
-				mini_cr5_branch->GetEntry(index);
+		if (not genps_phi_isLoaded) {
+			if (genps_phi_branch != 0) {
+				genps_phi_branch->GetEntry(index);
 			} else { 
-				printf("branch mini_cr5_branch does not exist!\n");
+				printf("branch genps_phi_branch does not exist!\n");
 				exit(1);
 			}
-			mini_cr5_isLoaded = true;
+			genps_phi_isLoaded = true;
 		}
-		return mini_cr5_;
-	}
-	int &mini_whsig()
-	{
-		if (not mini_whsig_isLoaded) {
-			if (mini_whsig_branch != 0) {
-				mini_whsig_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_whsig_branch does not exist!\n");
-				exit(1);
-			}
-			mini_whsig_isLoaded = true;
-		}
-		return mini_whsig_;
-	}
-	int &mini_whcr1()
-	{
-		if (not mini_whcr1_isLoaded) {
-			if (mini_whcr1_branch != 0) {
-				mini_whcr1_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_whcr1_branch does not exist!\n");
-				exit(1);
-			}
-			mini_whcr1_isLoaded = true;
-		}
-		return mini_whcr1_;
-	}
-	float &mini_chi2()
-	{
-		if (not mini_chi2_isLoaded) {
-			if (mini_chi2_branch != 0) {
-				mini_chi2_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_chi2_branch does not exist!\n");
-				exit(1);
-			}
-			mini_chi2_isLoaded = true;
-		}
-		return mini_chi2_;
-	}
-	float &mini_mt2b()
-	{
-		if (not mini_mt2b_isLoaded) {
-			if (mini_mt2b_branch != 0) {
-				mini_mt2b_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_mt2b_branch does not exist!\n");
-				exit(1);
-			}
-			mini_mt2b_isLoaded = true;
-		}
-		return mini_mt2b_;
-	}
-	float &mini_mt2bl()
-	{
-		if (not mini_mt2bl_isLoaded) {
-			if (mini_mt2bl_branch != 0) {
-				mini_mt2bl_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_mt2bl_branch does not exist!\n");
-				exit(1);
-			}
-			mini_mt2bl_isLoaded = true;
-		}
-		return mini_mt2bl_;
-	}
-	float &mini_mt2w()
-	{
-		if (not mini_mt2w_isLoaded) {
-			if (mini_mt2w_branch != 0) {
-				mini_mt2w_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_mt2w_branch does not exist!\n");
-				exit(1);
-			}
-			mini_mt2w_isLoaded = true;
-		}
-		return mini_mt2w_;
-	}
-	float &mini_weight()
-	{
-		if (not mini_weight_isLoaded) {
-			if (mini_weight_branch != 0) {
-				mini_weight_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_weight_branch does not exist!\n");
-				exit(1);
-			}
-			mini_weight_isLoaded = true;
-		}
-		return mini_weight_;
-	}
-	float &mini_nvtxweight()
-	{
-		if (not mini_nvtxweight_isLoaded) {
-			if (mini_nvtxweight_branch != 0) {
-				mini_nvtxweight_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_nvtxweight_branch does not exist!\n");
-				exit(1);
-			}
-			mini_nvtxweight_isLoaded = true;
-		}
-		return mini_nvtxweight_;
-	}
-	float &mini_sltrigeff()
-	{
-		if (not mini_sltrigeff_isLoaded) {
-			if (mini_sltrigeff_branch != 0) {
-				mini_sltrigeff_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_sltrigeff_branch does not exist!\n");
-				exit(1);
-			}
-			mini_sltrigeff_isLoaded = true;
-		}
-		return mini_sltrigeff_;
-	}
-	float &mini_dltrigeff()
-	{
-		if (not mini_dltrigeff_isLoaded) {
-			if (mini_dltrigeff_branch != 0) {
-				mini_dltrigeff_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_dltrigeff_branch does not exist!\n");
-				exit(1);
-			}
-			mini_dltrigeff_isLoaded = true;
-		}
-		return mini_dltrigeff_;
-	}
-	int &mini_nb()
-	{
-		if (not mini_nb_isLoaded) {
-			if (mini_nb_branch != 0) {
-				mini_nb_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_nb_branch does not exist!\n");
-				exit(1);
-			}
-			mini_nb_isLoaded = true;
-		}
-		return mini_nb_;
-	}
-	int &mini_njets()
-	{
-		if (not mini_njets_isLoaded) {
-			if (mini_njets_branch != 0) {
-				mini_njets_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_njets_branch does not exist!\n");
-				exit(1);
-			}
-			mini_njets_isLoaded = true;
-		}
-		return mini_njets_;
-	}
-	int &mini_passisotrk()
-	{
-		if (not mini_passisotrk_isLoaded) {
-			if (mini_passisotrk_branch != 0) {
-				mini_passisotrk_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_passisotrk_branch does not exist!\n");
-				exit(1);
-			}
-			mini_passisotrk_isLoaded = true;
-		}
-		return mini_passisotrk_;
-	}
-	int &mini_passtauveto()
-	{
-		if (not mini_passtauveto_isLoaded) {
-			if (mini_passtauveto_branch != 0) {
-				mini_passtauveto_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_passtauveto_branch does not exist!\n");
-				exit(1);
-			}
-			mini_passtauveto_isLoaded = true;
-		}
-		return mini_passtauveto_;
-	}
-	int &mini_nlep()
-	{
-		if (not mini_nlep_isLoaded) {
-			if (mini_nlep_branch != 0) {
-				mini_nlep_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_nlep_branch does not exist!\n");
-				exit(1);
-			}
-			mini_nlep_isLoaded = true;
-		}
-		return mini_nlep_;
-	}
-	float &mini_dRleptB1()
-	{
-		if (not mini_dRleptB1_isLoaded) {
-			if (mini_dRleptB1_branch != 0) {
-				mini_dRleptB1_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_dRleptB1_branch does not exist!\n");
-				exit(1);
-			}
-			mini_dRleptB1_isLoaded = true;
-		}
-		return mini_dRleptB1_;
-	}
-	float &mini_lep1pt()
-	{
-		if (not mini_lep1pt_isLoaded) {
-			if (mini_lep1pt_branch != 0) {
-				mini_lep1pt_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_lep1pt_branch does not exist!\n");
-				exit(1);
-			}
-			mini_lep1pt_isLoaded = true;
-		}
-		return mini_lep1pt_;
-	}
-	float &mini_lep1eta()
-	{
-		if (not mini_lep1eta_isLoaded) {
-			if (mini_lep1eta_branch != 0) {
-				mini_lep1eta_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_lep1eta_branch does not exist!\n");
-				exit(1);
-			}
-			mini_lep1eta_isLoaded = true;
-		}
-		return mini_lep1eta_;
-	}
-	float &mini_lep2pt()
-	{
-		if (not mini_lep2pt_isLoaded) {
-			if (mini_lep2pt_branch != 0) {
-				mini_lep2pt_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_lep2pt_branch does not exist!\n");
-				exit(1);
-			}
-			mini_lep2pt_isLoaded = true;
-		}
-		return mini_lep2pt_;
-	}
-	float &mini_lep2eta()
-	{
-		if (not mini_lep2eta_isLoaded) {
-			if (mini_lep2eta_branch != 0) {
-				mini_lep2eta_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_lep2eta_branch does not exist!\n");
-				exit(1);
-			}
-			mini_lep2eta_isLoaded = true;
-		}
-		return mini_lep2eta_;
-	}
-	float &mini_dilmass()
-	{
-		if (not mini_dilmass_isLoaded) {
-			if (mini_dilmass_branch != 0) {
-				mini_dilmass_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_dilmass_branch does not exist!\n");
-				exit(1);
-			}
-			mini_dilmass_isLoaded = true;
-		}
-		return mini_dilmass_;
-	}
-	float &mini_mstop()
-	{
-		if (not mini_mstop_isLoaded) {
-			if (mini_mstop_branch != 0) {
-				mini_mstop_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_mstop_branch does not exist!\n");
-				exit(1);
-			}
-			mini_mstop_isLoaded = true;
-		}
-		return mini_mstop_;
-	}
-	float &mini_mlsp()
-	{
-		if (not mini_mlsp_isLoaded) {
-			if (mini_mlsp_branch != 0) {
-				mini_mlsp_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_mlsp_branch does not exist!\n");
-				exit(1);
-			}
-			mini_mlsp_isLoaded = true;
-		}
-		return mini_mlsp_;
-	}
-	float &mini_x()
-	{
-		if (not mini_x_isLoaded) {
-			if (mini_x_branch != 0) {
-				mini_x_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_x_branch does not exist!\n");
-				exit(1);
-			}
-			mini_x_isLoaded = true;
-		}
-		return mini_x_;
-	}
-	float &mini_xsecsusy()
-	{
-		if (not mini_xsecsusy_isLoaded) {
-			if (mini_xsecsusy_branch != 0) {
-				mini_xsecsusy_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_xsecsusy_branch does not exist!\n");
-				exit(1);
-			}
-			mini_xsecsusy_isLoaded = true;
-		}
-		return mini_xsecsusy_;
-	}
-	float &mini_htssl()
-	{
-		if (not mini_htssl_isLoaded) {
-			if (mini_htssl_branch != 0) {
-				mini_htssl_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_htssl_branch does not exist!\n");
-				exit(1);
-			}
-			mini_htssl_isLoaded = true;
-		}
-		return mini_htssl_;
-	}
-	float &mini_htosl()
-	{
-		if (not mini_htosl_isLoaded) {
-			if (mini_htosl_branch != 0) {
-				mini_htosl_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_htosl_branch does not exist!\n");
-				exit(1);
-			}
-			mini_htosl_isLoaded = true;
-		}
-		return mini_htosl_;
-	}
-	float &mini_htratiol()
-	{
-		if (not mini_htratiol_isLoaded) {
-			if (mini_htratiol_branch != 0) {
-				mini_htratiol_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_htratiol_branch does not exist!\n");
-				exit(1);
-			}
-			mini_htratiol_isLoaded = true;
-		}
-		return mini_htratiol_;
-	}
-	float &mini_htssm()
-	{
-		if (not mini_htssm_isLoaded) {
-			if (mini_htssm_branch != 0) {
-				mini_htssm_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_htssm_branch does not exist!\n");
-				exit(1);
-			}
-			mini_htssm_isLoaded = true;
-		}
-		return mini_htssm_;
-	}
-	float &mini_htosm()
-	{
-		if (not mini_htosm_isLoaded) {
-			if (mini_htosm_branch != 0) {
-				mini_htosm_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_htosm_branch does not exist!\n");
-				exit(1);
-			}
-			mini_htosm_isLoaded = true;
-		}
-		return mini_htosm_;
-	}
-	float &mini_htratiom()
-	{
-		if (not mini_htratiom_isLoaded) {
-			if (mini_htratiom_branch != 0) {
-				mini_htratiom_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_htratiom_branch does not exist!\n");
-				exit(1);
-			}
-			mini_htratiom_isLoaded = true;
-		}
-		return mini_htratiom_;
-	}
-	float &mini_dphimj1()
-	{
-		if (not mini_dphimj1_isLoaded) {
-			if (mini_dphimj1_branch != 0) {
-				mini_dphimj1_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_dphimj1_branch does not exist!\n");
-				exit(1);
-			}
-			mini_dphimj1_isLoaded = true;
-		}
-		return mini_dphimj1_;
-	}
-	float &mini_dphimj2()
-	{
-		if (not mini_dphimj2_isLoaded) {
-			if (mini_dphimj2_branch != 0) {
-				mini_dphimj2_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_dphimj2_branch does not exist!\n");
-				exit(1);
-			}
-			mini_dphimj2_isLoaded = true;
-		}
-		return mini_dphimj2_;
-	}
-	float &mini_dphimjmin()
-	{
-		if (not mini_dphimjmin_isLoaded) {
-			if (mini_dphimjmin_branch != 0) {
-				mini_dphimjmin_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_dphimjmin_branch does not exist!\n");
-				exit(1);
-			}
-			mini_dphimjmin_isLoaded = true;
-		}
-		return mini_dphimjmin_;
-	}
-	float &mini_pt_b()
-	{
-		if (not mini_pt_b_isLoaded) {
-			if (mini_pt_b_branch != 0) {
-				mini_pt_b_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_pt_b_branch does not exist!\n");
-				exit(1);
-			}
-			mini_pt_b_isLoaded = true;
-		}
-		return mini_pt_b_;
-	}
-	float &mini_pt_J1()
-	{
-		if (not mini_pt_J1_isLoaded) {
-			if (mini_pt_J1_branch != 0) {
-				mini_pt_J1_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_pt_J1_branch does not exist!\n");
-				exit(1);
-			}
-			mini_pt_J1_isLoaded = true;
-		}
-		return mini_pt_J1_;
-	}
-	float &mini_pt_J2()
-	{
-		if (not mini_pt_J2_isLoaded) {
-			if (mini_pt_J2_branch != 0) {
-				mini_pt_J2_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_pt_J2_branch does not exist!\n");
-				exit(1);
-			}
-			mini_pt_J2_isLoaded = true;
-		}
-		return mini_pt_J2_;
-	}
-	float &mini_bbmass()
-	{
-		if (not mini_bbmass_isLoaded) {
-			if (mini_bbmass_branch != 0) {
-				mini_bbmass_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_bbmass_branch does not exist!\n");
-				exit(1);
-			}
-			mini_bbmass_isLoaded = true;
-		}
-		return mini_bbmass_;
-	}
-	float &mini_bbpt()
-	{
-		if (not mini_bbpt_isLoaded) {
-			if (mini_bbpt_branch != 0) {
-				mini_bbpt_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_bbpt_branch does not exist!\n");
-				exit(1);
-			}
-			mini_bbpt_isLoaded = true;
-		}
-		return mini_bbpt_;
-	}
-	float &mini_wpt()
-	{
-		if (not mini_wpt_isLoaded) {
-			if (mini_wpt_branch != 0) {
-				mini_wpt_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_wpt_branch does not exist!\n");
-				exit(1);
-			}
-			mini_wpt_isLoaded = true;
-		}
-		return mini_wpt_;
-	}
-	float &mini_bbwdphi()
-	{
-		if (not mini_bbwdphi_isLoaded) {
-			if (mini_bbwdphi_branch != 0) {
-				mini_bbwdphi_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_bbwdphi_branch does not exist!\n");
-				exit(1);
-			}
-			mini_bbwdphi_isLoaded = true;
-		}
-		return mini_bbwdphi_;
-	}
-	float &mini_rand()
-	{
-		if (not mini_rand_isLoaded) {
-			if (mini_rand_branch != 0) {
-				mini_rand_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_rand_branch does not exist!\n");
-				exit(1);
-			}
-			mini_rand_isLoaded = true;
-		}
-		return mini_rand_;
-	}
-	float &mini_t2ttLM()
-	{
-		if (not mini_t2ttLM_isLoaded) {
-			if (mini_t2ttLM_branch != 0) {
-				mini_t2ttLM_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_t2ttLM_branch does not exist!\n");
-				exit(1);
-			}
-			mini_t2ttLM_isLoaded = true;
-		}
-		return mini_t2ttLM_;
-	}
-	float &mini_t2ttHM()
-	{
-		if (not mini_t2ttHM_isLoaded) {
-			if (mini_t2ttHM_branch != 0) {
-				mini_t2ttHM_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_t2ttHM_branch does not exist!\n");
-				exit(1);
-			}
-			mini_t2ttHM_isLoaded = true;
-		}
-		return mini_t2ttHM_;
-	}
-	vector<float> &mini_bdt()
-	{
-		if (not mini_bdt_isLoaded) {
-			if (mini_bdt_branch != 0) {
-				mini_bdt_branch->GetEntry(index);
-			} else { 
-				printf("branch mini_bdt_branch does not exist!\n");
-				exit(1);
-			}
-			mini_bdt_isLoaded = true;
-		}
-		return *mini_bdt_;
+		return *genps_phi_;
 	}
 
   static void progress( int nEventsTotal, int nEventsChain ){
@@ -12193,6 +11434,8 @@ namespace Stop {
 	int &ecaltp();
 	int &trkfail();
 	int &eebadsc();
+	int &lep1_badecallaser();
+	int &lep2_badecallaser();
 	int &isdata();
 	int &jetid();
 	int &jetid30();
@@ -12212,6 +11455,8 @@ namespace Stop {
 	int &njetsuncor();
 	float &costhetaweight();
 	float &weight();
+	float &weightleft();
+	float &weightright();
 	float &mutrigweight();
 	float &mutrigweight2();
 	float &sltrigweight();
@@ -12406,6 +11651,8 @@ namespace Stop {
 	float &phiSC();
 	float &eSCRaw();
 	float &eSCPresh();
+	float &lep1_scslasercormean();
+	float &lep1_scslasercormax();
 	float &eoverpin2();
 	float &eoverpout2();
 	float &dEtaIn2();
@@ -12424,6 +11671,11 @@ namespace Stop {
 	float &phiSC2();
 	float &eSCRaw2();
 	float &eSCPresh2();
+	float &lep2_scslasercormean();
+	float &lep2_scslasercormax();
+	float &scslasercormax();
+	float &scslasercormax_pt();
+	float &scslasercormax_eta();
 	float &iso2();
 	float &ecalveto1();
 	float &ecalveto2();
@@ -12439,9 +11691,9 @@ namespace Stop {
 	float &phil2();
 	float &meff();
 	float &mt();
-	unsigned int &run();
-	unsigned int &lumi();
-	unsigned int &event();
+	int &run();
+	int &lumi();
+	int &event();
 	float &y();
 	float &ht();
 	float &htgen();
@@ -12641,6 +11893,7 @@ namespace Stop {
 	vector<int> &pfjets_mc3();
 	vector<int> &pfjets_mcflavorAlgo();
 	vector<int> &pfjets_mcflavorPhys();
+	vector<float> &pfjets_uncertainty();
 	vector<int> &pfjets_flav();
 	vector<float> &pfjets_lrm();
 	vector<float> &pfjets_lrm2();
@@ -12658,56 +11911,11 @@ namespace Stop {
 	vector<float> &pfjets_mva5xPUid();
 	vector<float> &pfjets_mvaBeta();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs();
-	float &mini_mt();
-	float &mini_met();
-	int &mini_sig();
-	int &mini_cr1();
-	int &mini_cr4();
-	int &mini_cr5();
-	int &mini_whsig();
-	int &mini_whcr1();
-	float &mini_chi2();
-	float &mini_mt2b();
-	float &mini_mt2bl();
-	float &mini_mt2w();
-	float &mini_weight();
-	float &mini_nvtxweight();
-	float &mini_sltrigeff();
-	float &mini_dltrigeff();
-	int &mini_nb();
-	int &mini_njets();
-	int &mini_passisotrk();
-	int &mini_passtauveto();
-	int &mini_nlep();
-	float &mini_dRleptB1();
-	float &mini_lep1pt();
-	float &mini_lep1eta();
-	float &mini_lep2pt();
-	float &mini_lep2eta();
-	float &mini_dilmass();
-	float &mini_mstop();
-	float &mini_mlsp();
-	float &mini_x();
-	float &mini_xsecsusy();
-	float &mini_htssl();
-	float &mini_htosl();
-	float &mini_htratiol();
-	float &mini_htssm();
-	float &mini_htosm();
-	float &mini_htratiom();
-	float &mini_dphimj1();
-	float &mini_dphimj2();
-	float &mini_dphimjmin();
-	float &mini_pt_b();
-	float &mini_pt_J1();
-	float &mini_pt_J2();
-	float &mini_bbmass();
-	float &mini_bbpt();
-	float &mini_wpt();
-	float &mini_bbwdphi();
-	float &mini_rand();
-	float &mini_t2ttLM();
-	float &mini_t2ttHM();
-	vector<float> &mini_bdt();
+	vector<int> &genps_pdgId();
+	vector<int> &genps_firstMother();
+	vector<float> &genps_energy();
+	vector<float> &genps_pt();
+	vector<float> &genps_eta();
+	vector<float> &genps_phi();
 }
 #endif
