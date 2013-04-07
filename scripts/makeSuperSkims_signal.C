@@ -11,19 +11,27 @@ using namespace std;
 
 void makeSuperSkims_signal(){
 
-  char* path = "T2ttSkims";
+  //char* path = "T2ttSkims";
+  char* path = "T2bwSkims";
 
   //--------------------------------------------------
   // path and input file
   //--------------------------------------------------
 
-  const int NTAGS = 5;
+  // const int NTAGS = 5;
+  // string tags[NTAGS] = {
+  //   "T2tt_1",
+  //   "T2tt_2",
+  //   "T2tt_3",
+  //   "T2tt_4",
+  //   "T2tt_5"
+  // };
+
+  const int NTAGS = 1;
   string tags[NTAGS] = {
-    "T2tt_1",
-    "T2tt_2",
-    "T2tt_3",
-    "T2tt_4",
-    "T2tt_5"
+    // "T2bw_x50",
+    // "T2bw_x25",
+    "T2bw_x75",
   };
 
   //--------------------------------------------------
