@@ -92,6 +92,18 @@ void smoothTH2( TH2F* h , float min = 1.0e-10 , float max = 9){
 
       if( valnn > 9 ) continue;
 
+      // if( valdd > 9 ) continue;
+      // if( valdn > 9 ) continue;
+      // if( valdu > 9 ) continue;
+
+      // if( valnd > 9 ) continue;
+      // if( valnn > 9 ) continue;
+      // if( valnu > 9 ) continue;
+
+      // if( valud > 9 ) continue;
+      // if( valun > 9 ) continue;
+      // if( valuu > 9 ) continue;
+
       if( valdd > min  && valdd < max ){
       	nbins++;
       	average+=valdd;
