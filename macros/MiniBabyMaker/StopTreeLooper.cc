@@ -510,31 +510,36 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	      // b-tagging information
 	       
-	      float csv_nominal=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      //float csv_nominal=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      float csv_nominal=(isData) ? stopt.pfjets_csv().at(i)
 		: nominalShape->reshape( stopt.pfjets().at(i).eta(),
 					 stopt.pfjets().at(i).pt(),
 					 stopt.pfjets_csv().at(i),
 					 stopt.pfjets_mcflavorAlgo().at(i) ); 
 
-	      float csv_upBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      //float csv_upBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      float csv_upBCShape=(isData) ? stopt.pfjets_csv().at(i)
 		: upBCShape->reshape( stopt.pfjets().at(i).eta(),
 					 stopt.pfjets().at(i).pt(),
 					 stopt.pfjets_csv().at(i),
 					 stopt.pfjets_mcflavorAlgo().at(i) );
 
-	      float csv_downBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      //float csv_downBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      float csv_downBCShape=(isData) ? stopt.pfjets_csv().at(i)
 		: downBCShape->reshape( stopt.pfjets().at(i).eta(),
 					 stopt.pfjets().at(i).pt(),
 					 stopt.pfjets_csv().at(i),
 					 stopt.pfjets_mcflavorAlgo().at(i) );
 
-	      float csv_upLShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      //float csv_upLShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      float csv_upLShape=(isData) ? stopt.pfjets_csv().at(i)
 		: upLShape->reshape( stopt.pfjets().at(i).eta(),
 					 stopt.pfjets().at(i).pt(),
 					 stopt.pfjets_csv().at(i),
 					 stopt.pfjets_mcflavorAlgo().at(i) );
 
-	      float csv_downLShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      //float csv_downLShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
+	      float csv_downLShape=(isData) ? stopt.pfjets_csv().at(i)
 		: downLShape->reshape( stopt.pfjets().at(i).eta(),
 					 stopt.pfjets().at(i).pt(),
 					 stopt.pfjets_csv().at(i),
@@ -783,13 +788,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             }
 
             rand_       = aleatorio.Uniform(0.0,1.0);
-	    
-// 	    cout << endl;
-// 	    cout << "MET     " << Form("%.1f",met_)      << " " << Form("%.1f",metup_)      << " " << Form("%.1f",metdown_)      << " " << endl;
-// 	    cout << "MT2W    " << Form("%.1f",mt2w_)     << " " << Form("%.1f",mt2wup_)     << " " << Form("%.1f",mt2wdown_)     << " " << endl;
-// 	    cout << "chi2    " << Form("%.1f",chi2_)     << " " << Form("%.1f",chi2up_)     << " " << Form("%.1f",chi2down_)     << " " << endl;
-// 	    cout << "HTratio " << Form("%.3f",htratiom_) << " " << Form("%.3f",htratiomup_) << " " << Form("%.3f",htratiomdown_) << " " << endl;
-// 	    cout << "b pt    " << Form("%.1f",pt_b_)     << " " << Form("%.1f",pt_b_up_)    << " " << Form("%.1f",pt_b_down_)    << " " << endl;
+
+	    float isrboost = (stopt.stop_t() + stopt.stop_tbar()).pt();
+
+	    isrweight_ = 1.0;
+	    if( isrboost > 120.0 && isrboost < 150.0 ) isrweight_ = 0.95;
+	    if( isrboost > 150.0 && isrboost < 250.0 ) isrweight_ = 0.90;
+	    if( isrboost > 250.0                     ) isrweight_ = 0.80;
 
             for ( int i=0; i < NREG_T2tt; i++){
 
@@ -876,6 +881,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_mt"        , &mt_        ,  "mini_mt/F"	 );
             outTree_->Branch("mini_mtup"      , &mtup_      ,  "mini_mtup/F"	 );
             outTree_->Branch("mini_mtdown"    , &mtdown_    ,  "mini_mtdown/F"	 );
+
+            outTree_->Branch("mini_isrweight" , &isrweight_ ,  "mini_isrweight/F");
 
             outTree_->Branch("mini_met"       , &met_       ,  "mini_met/F"	 );
             outTree_->Branch("mini_metup"     , &metup_     ,  "mini_metup/F"	 );
