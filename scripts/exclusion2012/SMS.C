@@ -61,9 +61,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   //--------------------------------------------------
 
   if( TString(sample).Contains("T2tt") ){
-    filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
-    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
-    label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#chi_{1}^{0}";
+    
+    //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
+    //denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
+
+    filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/merged*root";
+    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_combined_25GeVbins.root";
+
+    label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#tilde{#chi}_{1}^{0}";
   }
 
   else if( TString(sample).Contains("T2bw") ){
@@ -73,7 +78,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
       denomhistoname = (char*) "masses25";
       filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x25.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
-      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.25";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.25";
     }
 
     else if( x==50 ){
@@ -81,7 +86,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
       denomhistoname = (char*) "masses";
       filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x50.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
-      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.50";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.50";
     }
 
     else if( x==75 ){
@@ -89,7 +94,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
       denomhistoname = (char*) "masses75";
       filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
-      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#chi_{1}^{#pm}, x=0.75";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
     }
     
     else{
@@ -844,7 +849,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     hxsec[i]->GetYaxis()->SetLabelSize(0.035);
     hxsec[i]->GetYaxis()->SetTitle("#chi^{0}_{1} mass (GeV)");
     hxsec[i]->GetXaxis()->SetTitle("stop mass (GeV)");
-    hxsec[i]->GetZaxis()->SetTitle("#sigma upper limit");
+    hxsec[i]->GetZaxis()->SetTitle("#sigma upper limit [pb]");
     hxsec[i]->GetZaxis()->SetTitleOffset(1.2);
     hxsec[i]->Draw("colz");
     //hxsec[i]->Draw("sametext");

@@ -965,21 +965,21 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
  
   // expected +/-1sigma
   TLine *line23 = new TLine(xoffset,yoffset+yspace1,xoffset+length,yoffset+yspace1);
-  line23->SetLineWidth(3);
+  line23->SetLineWidth(1);
   line23->SetLineColor(2);
   line23->SetLineStyle(3);
   line23->Draw();
 
   // expected +/-1sigma  
   TLine *line24 = new TLine(xoffset,yoffset-yspace1,xoffset+length,yoffset-yspace1);
-  line24->SetLineWidth(3);
+  line24->SetLineWidth(1);
   line24->SetLineColor(2);
   line24->SetLineStyle(3);
   line24->Draw();
 
   // median observed
   TLine *line25 = new TLine(xoffset,yoffset+yspace2,xoffset+length,yoffset+yspace2);
-  line25->SetLineWidth(6);
+  line25->SetLineWidth(4);
   line25->SetLineColor(1);
   line25->SetLineStyle(1);
   line25->Draw();
@@ -1011,31 +1011,21 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
     line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
   }
 
-  if( TString(sample).Contains("T2bw") ){
-    // if     (x==50) line->DrawLine(162,0,300+12.5+162,300+12.5);
-    // else if(x==25) line->DrawLine(162*2,0,300+12.5+162*2,300+12.5);
-    // t->SetTextAngle(55);
-    // t->SetTextSize(0.045);
-    // t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
-  }
+  // if( TString(sample).Contains("T2bw") ){
+  //   if     (x==75) line->DrawLine(108   , 0 , 300+12.5+108   , 300+12.5);
+  //   if     (x==50) line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
+  //   else if(x==25) line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
+  //   t->SetTextAngle(55);
+  //   t->SetTextSize(0.045);
+  //   t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
+  // }
 
   if( print ){
-    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s.pdf"           ,sample,xchar,suffix,pol,BDTchar));
-    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s_bestRegion.pdf",sample,xchar,suffix,pol,BDTchar));
-
-    // if     ( TString(sample).Contains("T2tt") ){
-    //   can1->Print(Form("../../plots/combinePlots_T2tt%s.pdf",suffix));
-    //   can2->Print(Form("../../plots/combinePlots_T2tt_bestSignalRegion%s.pdf",suffix));
-    //   //can3->Print(Form("../../plots/combinePlots_T2tt_excludedPoints%s.pdf",suffix));
-    // }
-    // else if( TString(sample).Contains("T2bw") ){
-    //   can1->Print(Form("../../plots/combinePlots_T2bw_x%i%s.pdf",x,suffix));
-    //   can2->Print(Form("../../plots/combinePlots_T2bw_x%i_bestSignalRegion%s.pdf",x,suffix));
-    //   //can3->Print(Form("../../plots/combinePlots_T2bw_x%i_excludedPoints%s.pdf",x,suffix));
-    // }
+    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar));
+    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar));
+    can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar));
   }
 
-  //TFile* fout = TFile::Open(Form("%s_x%icombinePlots%s%s.root",sample,x,suffix,pol),"RECREATE");
   TFile* fout = TFile::Open(outfilename,"RECREATE");
 
   fout->cd();
@@ -1045,6 +1035,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gr_exp->SetName("gr_exp");
   gr_exp->Write();
   hexcl_exp->Write();
+  hR->Write();
+  hR_exp->Write();
+  if( TString(sample).Contains("T2tt") ){
+    hR_smallDM->Write();
+    hR_exp_smallDM->Write();
+  }
   fout->Close();
 
 }
