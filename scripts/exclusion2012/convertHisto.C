@@ -6,8 +6,14 @@
   // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG.root";
   // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
 
-  char* filename_in  = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw.root";
-  char* filename_out = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+  // char* filename_in  = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw.root";
+  // char* filename_out = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+
+  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_massiveLSP.root";
+  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_massiveLSP_25GeVbins.root";
+
+  cout << "Reading in  " << filename_in  << endl;
+  cout << "Writing out " << filename_out << endl;
 
   TFile* fin = TFile::Open(filename_in);
 
@@ -26,10 +32,12 @@
       int mstop   = hout->GetXaxis()->GetBinCenter(ibin);
       int mlsp    = hout->GetYaxis()->GetBinCenter(jbin);
 
+      //if( mlsp < 10 ) continue;
+
       int bin     = hin->FindBin(mstop,mlsp);
       int nevents = hin->GetBinContent(bin);
 
-      cout << endl << "mstop mlsp bin nevents " << mstop << " " << mlsp << " " << bin << " " << nevents << endl;
+      //cout << endl << "mstop mlsp bin nevents " << mstop << " " << mlsp << " " << bin << " " << nevents << endl;
       
       hout->SetBinContent(ibin,jbin,nevents);
 
