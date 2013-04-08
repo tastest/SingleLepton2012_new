@@ -29,10 +29,18 @@
 
 using namespace std;
 
+//------------------------------------
+// remove the LSP = 0 slice
+//------------------------------------
+
 void removeSlice( TH2F* h ){
   for( int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ )
     h->SetBinContent(ibin,1,1000);
 }
+
+//------------------------------------
+// smooth over missing points
+//------------------------------------
 
 void smoothHistogram( TH2F* h ){
 
@@ -57,6 +65,10 @@ void smoothHistogram( TH2F* h ){
   }
 }
 
+//------------------------------------
+// take the dM > mtop points
+//------------------------------------
+
 TH2F* largeDM( TH2F* hin , char* sample ){
   TH2F* hout = (TH2F*) hin->Clone("hout");
 
@@ -73,6 +85,10 @@ TH2F* largeDM( TH2F* hin , char* sample ){
 
   return hout;
 }
+
+//------------------------------------
+// take the dM < mtop points
+//------------------------------------
 
 TH2F* smallDM( TH2F* hin ){
   TH2F* hout = (TH2F*) hin->Clone("hout");
@@ -224,18 +240,20 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gStyle->SetPaintTextFormat(".0f");
 
   if( TString(sample).Contains("T2tt") ){
-    label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #chi_{1}^{0}";
-    xaxismin    = 100.0;
+    label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #tilde{#chi}_{1}^{0}";
+    xaxismin    = 150.0;
     yaxismax    = 250.0;
 
     if( doBDT ) nSR = 6;
     else        nSR = 8;
+
+    doRemoveSlice = false;
   }
 
   else if( TString(sample).Contains("T2bw") ){
 
     doRemoveSlice = false;
-    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #chi_{1}^{#pm} #rightarrow b W #chi_{1}^{0}";
+    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm} #rightarrow b W #tilde{#chi}_{1}^{0}";
 
     if( x==25 ){
       xaxismin        = 360.0;
@@ -368,8 +386,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hbest->GetXaxis()->SetLabelSize(0.035);
   hbest->GetYaxis()->SetLabelSize(0.035);
   hbest->GetZaxis()->SetLabelSize(0.035);
-  hbest->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
-  hbest->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
+  hbest->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}}  [GeV]");
+  hbest->GetXaxis()->SetTitle("m_{ #tilde{t}}  [GeV]");
   hbest->GetXaxis()->SetRangeUser(xaxismin,800);
   hbest->GetYaxis()->SetRangeUser(0,800);
   hbest->GetZaxis()->SetTitle("best signal region");
@@ -377,8 +395,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   t->SetTextSize(0.035);
   t->DrawLatex(0.18,0.92,"CMS Preliminary   #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
   
+  t->SetTextSize(0.045);
+  t->DrawLatex(0.21,0.83,label);
   t->SetTextSize(0.04);
-  t->DrawLatex(0.19,0.83,label);
 
   if( doBDT ){
 
@@ -721,9 +740,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hdummy->GetXaxis()->SetLabelSize(0.035);
   hdummy->GetYaxis()->SetLabelSize(0.035);
   hdummy->GetZaxis()->SetLabelSize(0.035);
-  hdummy->GetYaxis()->SetTitle("m_{#chi^{0}_{1}} [GeV]");
+  hdummy->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}}  [GeV]");
   hdummy->GetYaxis()->SetTitleOffset(0.9);
-  hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}} [GeV]");
+  hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}}  [GeV]");
   hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
   hdummy->GetZaxis()->SetTitleOffset(0.8);
   hdummy->GetXaxis()->SetRangeUser(xaxismin,800);
@@ -898,9 +917,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   */
 
 
-  t->SetTextSize(0.035);
-  if( TString(sample).Contains("T2tt") ) t->DrawLatex(0.18,0.79,"50 / 50 t_{L} / t_{R} mixture");
-  t->DrawLatex(0.18,0.84,label);
+  t->SetTextSize(0.045);
+  if( TString(sample).Contains("T2tt") ) t->DrawLatex(0.19,0.76,"50 / 50 t_{L} / t_{R} mixture");
+  t->DrawLatex(0.19,0.82,label);
   t->SetTextSize(0.04);
   t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
   t->DrawLatex(0.55,0.80,"Observed");
@@ -911,9 +930,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 
 
   t->SetTextSize(0.045);
-  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#chi_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#tilde{#chi}_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#tilde{#chi}_{1}^{0}}");
 
 
 
