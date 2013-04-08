@@ -3342,8 +3342,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if( !TString(prefix).Contains("T2") ) {
 	  lep2_scslasercormean_ = scs_laserCorMean()[els_scindex()[index2]];
 	  lep2_scslasercormax_  = scs_laserCorMax()[els_scindex()[index2]];
-	  if ((fabs(scs_eta()[els_scindex()[index2]])<1.4442)&&(lep2_scslasercormax_>2.0) ||
-	      (fabs(scs_eta()[els_scindex()[index2]])>1.4442)&&(lep2_scslasercormax_>3.0))
+	  if (((fabs(scs_eta()[els_scindex()[index2]])<1.4442)&&(lep2_scslasercormax_>2.0)) ||
+	      ((fabs(scs_eta()[els_scindex()[index2]])>1.4442)&&(lep2_scslasercormax_>3.0)))
 	    lep2_badecallaser_ = 1;
 	}
       }
