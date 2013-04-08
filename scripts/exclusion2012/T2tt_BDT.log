@@ -2,8 +2,8 @@
 Sample            T2tt
 logfile           T2tt_BDT.log
 x                 1
-Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root
-Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root
+Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/merged*root
+Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_combined_25GeVbins.root
 Denom histo       masses
 Using lumi        19500 pb-1
 ----------------------------------------------------
@@ -33,44 +33,44 @@ UL            : -1
 Signal Region : 5 T2TT_BDT5
 Selection     : (((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(event%2==0))&&(mini_bdt[5] > 0.30)
 UL            : -1
-efficiency (500,50)  4.12392
-xsec UL              0.186601
-xsec UL exp          0.206271
+efficiency (500,50)  4.06644
+xsec UL              0.189239
+xsec UL exp          0.209187
 JES                  0.1
 tot err              0.1
 
 
-efficiency (500,50)  2.55424
-xsec UL              0.0558983
-xsec UL exp          0.0741643
+efficiency (500,50)  2.50136
+xsec UL              0.0570798
+xsec UL exp          0.075732
 JES                  0.1
 tot err              0.1
 
 
-efficiency (500,50)  2.77944
-xsec UL              0.0286023
-xsec UL exp          0.0483274
+efficiency (500,50)  2.73196
+xsec UL              0.0290994
+xsec UL exp          0.0491673
 JES                  0.1
 tot err              0.1
 
 
-efficiency (500,50)  1.50624
-xsec UL              0.0218673
-xsec UL exp          0.0310621
+efficiency (500,50)  1.48268
+xsec UL              0.0222147
+xsec UL exp          0.0315556
 JES                  0.1
 tot err              0.1
 
 
-efficiency (500,50)  0.724629
-xsec UL              0.0308573
-xsec UL exp          0.0344952
+efficiency (500,50)  0.712778
+xsec UL              0.0313704
+xsec UL exp          0.0350687
 JES                  0.1
 tot err              0.1
 
 
-efficiency (500,50)  0.803757
-xsec UL              0.166907
-xsec UL exp          0.19944
+efficiency (500,50)  0.787935
+xsec UL              0.170258
+xsec UL exp          0.203445
 JES                  0.1
 tot err              0.1
 
