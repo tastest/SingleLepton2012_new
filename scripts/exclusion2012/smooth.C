@@ -26,7 +26,7 @@
 
 using namespace std;
 
-TH2F* normalizeTH2( TH2F* hin , TH1F* hxsec ){
+TH2F* normalizeTH2( TH2F* hin , TH1F* hxsec , char* type){
 
   TH2F* hout = (TH2F*) hin->Clone("hout");
   hout->Reset();
@@ -37,6 +37,8 @@ TH2F* normalizeTH2( TH2F* hin , TH1F* hxsec ){
       float mass   = hin->GetXaxis()->GetBinCenter(ibin);
       int   bin    = hxsec->FindBin(mass);
       float xsec   = hxsec->GetBinContent(bin);
+      if( TString(type).Contains("up") )   xsec += hxsec->GetBinError(bin); 
+      if( TString(type).Contains("down") ) xsec -= hxsec->GetBinError(bin); 
       float R      = 10;
       if( xsec > 1e-10 && val > 1e-10) R = val / xsec;
 
@@ -164,12 +166,12 @@ void smoothTH2( TH2F* h , float min = 1.0e-10 , float max = 9){
 
 }
 
-TH2F* exclusionContour( TH2F* hul , int nsmooth = -1 ){
+TH2F* exclusionContour( TH2F* hul , int nsmooth = -1 , char* type = "nominal" ){
 
   TFile* f_xsec  = TFile::Open("stop_xsec.root");
   TH1F*  h_xsec  = (TH1F*) f_xsec->Get("h_stop_xsec");
 
-  TH2F*  h_R     = normalizeTH2( hul , h_xsec );
+  TH2F*  h_R     = normalizeTH2( hul , h_xsec , type);
 
   //if( nsmooth > 0 ) h_R->Smooth(nsmooth);
   if( nsmooth > 0 ) h_R->Smooth(nsmooth,"k3a");

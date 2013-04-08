@@ -584,9 +584,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hR_expm1->SetLineColor(2);
   hR_expm1->SetLineStyle(3);
   hR->SetLineWidth(4);
-  hR_obsp1->SetLineWidth(3);
+  hR_obsp1->SetLineWidth(1);
   hR_obsp1->SetLineStyle(7);
-  hR_obsm1->SetLineWidth(3);
+  hR_obsm1->SetLineWidth(1);
   hR_obsm1->SetLineStyle(7);
 
   TH2F* hR_smallDM       = exclusionContour(hxsec_best_smallDM);
@@ -603,9 +603,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hR_expm1_smallDM->SetLineColor(2);
   hR_expm1_smallDM->SetLineStyle(3);
   hR_smallDM->SetLineWidth(4);
-  hR_obsp1_smallDM->SetLineWidth(3);
+  hR_obsp1_smallDM->SetLineWidth(1);
   hR_obsp1_smallDM->SetLineStyle(7);
-  hR_obsm1_smallDM->SetLineWidth(3);
+  hR_obsm1_smallDM->SetLineWidth(1);
   hR_obsm1_smallDM->SetLineStyle(7);
 
   //------------------------------------------------------------
@@ -632,7 +632,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   //------------------------------------------------------------
   // print excluded regions and contours
   //------------------------------------------------------------
-
 
   TCanvas *can3 = new TCanvas("can3","can3",1200,800);
   can3->Divide(3,2);
@@ -837,7 +836,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gr_expm1->SetLineWidth(3);
   gr_expm1->SetLineStyle(3);
 
-  //gr_exp->SetLineColor(4);
+  gr_exp->SetLineColor(4);
   gr_expp1->SetLineColor(2);
   gr_expm1->SetLineColor(2);
 
@@ -850,6 +849,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   // gr_exp->Draw();
   // gr_expp1->Draw();
   // gr_expm1->Draw();
+
+  //-------------------------------
+  // draw exclusion contours
+  //-------------------------------
 
   hR->Draw("CONT3SAMEC");
   hR_exp->Draw("CONT3SAMEC");
@@ -913,13 +916,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   */
 
 
-  t->SetTextSize(0.045);
-  if( TString(sample).Contains("T2tt") ) t->DrawLatex(0.19,0.76,"50 / 50 t_{L} / t_{R} mixture");
-  t->DrawLatex(0.19,0.82,label);
+  t->SetTextSize(0.033);
+  if( TString(sample).Contains("T2tt") ) t->DrawLatex(0.18,0.77,"50 / 50 t_{L} / t_{R} mixture");
+  t->DrawLatex(0.18,0.83,label);
   t->SetTextSize(0.04);
-  t->DrawLatex(0.50,0.85  ,"NLO-NLL exclusions");
-  t->DrawLatex(0.55,0.80,"Observed");
-  t->DrawLatex(0.55,0.75,"Expected #pm1#sigma");
+  t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
+  t->DrawLatex(0.53,0.80,"Observed (#pm1#sigma^{theory})");
+  t->DrawLatex(0.53,0.75,"Expected (#pm1#sigma)");
   //if( doBDT ) t->DrawLatex(0.55,0.80,"Expected (#pm1#sigma)");
   //else        t->DrawLatex(0.55,0.80,"C&C expected");
   //else        t->DrawLatex(0.55,0.80,"cut-and-count");
@@ -930,35 +933,30 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
   if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#tilde{#chi}_{1}^{0}}");
 
-
-
-
-  //float offset = 40.0;
+  // float offset = 40.0;
   // float xoffset = 405.0;
   // float yoffset = 213.0;
   // float length  =  30.0;
   // float yspace1 =     5;
   // float yspace2 =    17;
 
-  float xoffset = xaxismin+370.0;
+  float xoffset = 0.51*(800-xaxismin)+xaxismin;
   float yoffset = 330.0;
-  float length  =  40.0;
+  float length  = 0.05*(800-xaxismin);
   float yspace1 =     5;
   float yspace2 =    25;
 
-
-  if( TString(sample).Contains("T2bw") && x==25 ){
-    xoffset -= 130.0;
-    length = 20;
-  }
-  if( TString(sample).Contains("T2bw") && x==50 ){
-    xoffset -= 40.0;
-    length = 30;
-  }
+  // if( TString(sample).Contains("T2bw") && x==25 ){
+  //   xoffset -= 130.0;
+  //   length = 20;
+  // }
+  // if( TString(sample).Contains("T2bw") && x==50 ){
+  //   xoffset -= 40.0;
+  //   length = 30;
+  // }
   //if( TString(sample).Contains("T2bw") && x==75 ) xoffset -= 30.0;
   
   // median expected
-  //TLine *line22 = new TLine(xaxismin+xoffset+25, 310-yoffset, xaxismin+xoffset+65, 310-yoffset);
   TLine *line22 = new TLine(xoffset,yoffset,xoffset+length,yoffset);
   line22->SetLineWidth(4);
   line22->SetLineColor(2);
@@ -966,7 +964,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   line22->Draw();
  
   // expected +/-1sigma
-  //TLine *line23 = new TLine(xaxismin+xoffset+25, 317-yoffset, xaxismin+xoffset+65, 317-yoffset);
   TLine *line23 = new TLine(xoffset,yoffset+yspace1,xoffset+length,yoffset+yspace1);
   line23->SetLineWidth(3);
   line23->SetLineColor(2);
@@ -974,7 +971,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   line23->Draw();
 
   // expected +/-1sigma  
-  //TLine *line24 = new TLine(xaxismin+xoffset+25, 303-yoffset, xaxismin+xoffset+65, 303-yoffset);
   TLine *line24 = new TLine(xoffset,yoffset-yspace1,xoffset+length,yoffset-yspace1);
   line24->SetLineWidth(3);
   line24->SetLineColor(2);
@@ -982,28 +978,26 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   line24->Draw();
 
   // median observed
-  //TLine *line25 = new TLine(xaxismin+xoffset+25, 335-yoffset, xaxismin+xoffset+65, 335-yoffset);
   TLine *line25 = new TLine(xoffset,yoffset+yspace2,xoffset+length,yoffset+yspace2);
   line25->SetLineWidth(6);
   line25->SetLineColor(1);
   line25->SetLineStyle(1);
   line25->Draw();
 
-  /*
-  //TLine *line26 = new TLine(xaxismin+xoffset+25, 342-yoffset, xaxismin+xoffset+65, 342-yoffset);
+  // observed +1
   TLine *line26 = new TLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
-  line26->SetLineWidth(2);
+  line26->SetLineWidth(1);
   line26->SetLineColor(1);
-  line26->SetLineStyle(2);
+  line26->SetLineStyle(7);
   line26->Draw();
-  
-  //TLine *line27 = new TLine(xaxismin+xoffset+25, 328-yoffset, xaxismin+xoffset+65, 328-yoffset);
+
+  // observed -1  
   TLine *line27 = new TLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
-  line27->SetLineWidth(2);
+  line27->SetLineWidth(1);
   line27->SetLineColor(1);
-  line27->SetLineStyle(2);
+  line27->SetLineStyle(7);
   line27->Draw();
-  */
+
 
 
   t->SetTextSize(0.04);
