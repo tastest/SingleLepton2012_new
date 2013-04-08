@@ -107,18 +107,6 @@ TH2F* smallDM( TH2F* hin ){
   return hout;  
 }
 
-TH2F* shiftHist(TH2F* hin){
-
-  TH2F* hout = new TH2F(Form("%s_out",hin->GetName()),Form("%s_out",hin->GetName()), 120.0 , 0-5.0 , 1200-5.0 , 120 , 0-5.0 , 1200-5.0 );
-
-  for(int ibin = 1 ; ibin <= 120 ; ibin++ ){
-    for(int jbin = 1 ; jbin <= 120 ; jbin++ ){
-      hout->SetBinContent(ibin,jbin,hin->GetBinContent(ibin,jbin));
-    }
-  }
-
-  return hout;
-}
 
 void blankHist( TH2F* h , float y ){
 
@@ -221,7 +209,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   //char* pol         = "right";
   //char* pol         = "left";
 
-  bool  shift         = true;
   bool  smooth        = false;
   char* filename      = (char*) "";
   char* label         = (char*) "";
@@ -709,17 +696,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 
   blankHist( hxsec_best_exp , 300 );
   blankHist( hxsec_best , 300 );
-  //TH2F* hxsec_best_shifted = shiftHist( hxsec_best );
   hxsec_best_exp->GetXaxis()->SetRangeUser(0,800);
-  TH2F* hxsec_best_shifted = (TH2F*) hxsec_best;
+  //TH2F* hxsec_best_shifted = (TH2F*) hxsec_best;
   //TH2F* hdummy = (TH2F*) hxsec_best->Clone("hdummy");
   TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,400);
   hdummy->Reset();
-
-  //hxsec_best->Reset();
-  // if( shift ){
-  //   hxsec_best = shiftHist( hxsec_best );
-  //}
 
   // cout << endl << "observed" << endl;
   // plot1D( hxsec_best );
@@ -750,11 +731,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   //hdummy->Draw("colz");
   hdummy->SetMinimum(0.001);
   hdummy->SetMaximum(100);
-  hxsec_best_shifted->SetMinimum(0.001);
-  hxsec_best_shifted->SetMaximum(100);
+  hxsec_best->SetMinimum(0.001);
+  hxsec_best->SetMaximum(100);
   hdummy->SetMaximum(100);
   hdummy->Draw();
-  hxsec_best_shifted->Draw("samecolz");
+  hxsec_best->Draw("samecolz");
   hdummy->Draw("axissame");
   //hexcl_exp->Draw("samebox");
   //hexcl->Draw("samebox");
