@@ -44,7 +44,7 @@ int getMotherIndex(int motherid){
 // In the off-shell case top and anti-top may get very different polarizations
 double Reweight_Stop_to_TopChi0 (std::vector<SUSYGenParticle> genParticles, double referenceTopPolarization, double requestedTopPolarization, char* prefix) {
 
-  if( !TString(prefix).Contains("T2") ) return 1.0;
+  if( !TString(prefix).Contains("T2tt") ) return 1.0;
 
   double weight = 1.;
   int nFoundStops = 0;
@@ -1829,7 +1829,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  genps_pt_         .push_back(part.pt);
 	  genps_eta_        .push_back(part.eta);
 	  genps_phi_        .push_back(part.phi);
+<<<<<<< singleLeptonLooper.cc
+
 	  genps_mass_       .push_back(genps_p4().at(ig).mass());
+
+=======
+	  genps_mass_       .push_back(genps_p4().at(ig).mass());
+>>>>>>> 1.98
 	}
 
 	weightleft_  = Reweight_Stop_to_TopChi0 (genParticles, 0., -1, prefix);
@@ -3092,10 +3098,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	
 	if( TString(prefix).Contains("T2bw") ){
 	  for (int i=0; i<(int)sparm_values().size(); ++i) {
+	    if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
+	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	    if (sparm_names().at(i).Contains("x")) x_ = (sparm_values().at(i)/100 - mL_)/(mG_-mL_) ;
+
+	    // this was for phythia
+	    /*
 	    if (sparm_names().at(i).Contains("x")) x_ = sparm_values().at(i);
 	    if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
 	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	    */
 	  }
+
+	  //	  cout << "stop " << mG_ << " lsp " << mL_ << " x " << x_ << endl;
+
         }
 	
         xsecsusy_  = mG_ > 0. ? stopPairCrossSection(mG_) : -999;
