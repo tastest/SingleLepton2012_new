@@ -30,12 +30,12 @@ void doAll() {
  
   char* path = "/nfs-3/userdata/stop/output_V00-02-20_2012_4jskim";
  
-  char* path_T2tt        = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad";
+  char* path_T2tt        = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad";
   char* path_T2bw_fine   = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_fine";
   char* path_T2bw_coarse = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_coarse";
   
 
-  const int NSAMPLES = 33;
+  const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
 
     // T2tt
@@ -49,33 +49,33 @@ void doAll() {
     "merged_T2tt_mStop-675to800_mLSP-300to700",
 
     // T2bw coarse
-    "merged_T2bw_coarse",
-    "merged_T2bw_coarse_1",
-    "merged_T2bw_coarse_2",
-    "merged_T2bw_coarse_3",
-    "merged_T2bw_coarse_4",
-    "merged_T2bw_coarse_5",
-    "merged_T2bw_coarse_6",
-    "merged_T2bw_coarse_7",
-    "merged_T2bw_coarse_8",
-    "merged_T2bw_coarse_9",
+    // "merged_T2bw_coarse",
+    // "merged_T2bw_coarse_1",
+    // "merged_T2bw_coarse_2",
+    // "merged_T2bw_coarse_3",
+    // "merged_T2bw_coarse_4",
+    // "merged_T2bw_coarse_5",
+    // "merged_T2bw_coarse_6",
+    // "merged_T2bw_coarse_7",
+    // "merged_T2bw_coarse_8",
+    // "merged_T2bw_coarse_9",
 
     // T2bw fine
-    "merged_T2bw_fine",
-    "merged_T2bw_fine_1",
-    "merged_T2bw_fine_2",
-    "merged_T2bw_fine_3",
-    "merged_T2bw_fine_4",
-    "merged_T2bw_fine_5",
-    "merged_T2bw_fine_6",
-    "merged_T2bw_fine_7",
-    "merged_T2bw_fine_8",
-    "merged_T2bw_fine_9",
-    "merged_T2bw_fine_10",
-    "merged_T2bw_fine_11",
-    "merged_T2bw_fine_12",
-    "merged_T2bw_fine_13",
-    "merged_T2bw_fine_14",
+    // "merged_T2bw_fine",
+    // "merged_T2bw_fine_1",
+    // "merged_T2bw_fine_2",
+    // "merged_T2bw_fine_3",
+    // "merged_T2bw_fine_4",
+    // "merged_T2bw_fine_5",
+    // "merged_T2bw_fine_6",
+    // "merged_T2bw_fine_7",
+    // "merged_T2bw_fine_8",
+    // "merged_T2bw_fine_9",
+    // "merged_T2bw_fine_10",
+    // "merged_T2bw_fine_11",
+    // "merged_T2bw_fine_12",
+    // "merged_T2bw_fine_13",
+    // "merged_T2bw_fine_14",
 
     // "T2tt_250_0",
     // "T2tt_350_0",
@@ -143,5 +143,3 @@ void doAll() {
     delete ch[i];
 
 }
-
-
