@@ -31,14 +31,14 @@ void doAll() {
   char* path = "/nfs-3/userdata/stop/output_V00-02-20_2012_4jskim";
  
   char* path_T2tt        = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad";
-  char* path_T2bw_fine   = "/tas/benhoob/StopBabies/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_1/res";
-  //char* path_T2bw_coarse = "/tas/benhoob/StopBabies/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse/res";
-  char* path_T2bw_coarse = "/tas/dalfonso/cms2V05-03-18_stoplooperV00-02-07/crabT2bw_coarse_3/res/";
+  char* path_T2bw_fine   = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_fine";
+  char* path_T2bw_coarse = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_coarse";
   
 
   const int NSAMPLES = 8;
   char* sampletag[NSAMPLES] = {
 
+    // T2tt
     "merged_T2tt_mStop-500to650_mLSP-0to225",
     "merged_T2tt_mStop-500to650_mLSP-250to550",
     "merged_T2tt_mStop-150to350_mLSP-0to250",
@@ -47,6 +47,35 @@ void doAll() {
     "merged_T2tt_mStop-375to475_mLSP-0to375",
     "merged_T2tt_mStop-675to800_mLSP-0to275",
     "merged_T2tt_mStop-675to800_mLSP-300to700",
+
+    // T2bw coarse
+    // "merged_T2bw_coarse",
+    // "merged_T2bw_coarse_1",
+    // "merged_T2bw_coarse_2",
+    // "merged_T2bw_coarse_3",
+    // "merged_T2bw_coarse_4",
+    // "merged_T2bw_coarse_5",
+    // "merged_T2bw_coarse_6",
+    // "merged_T2bw_coarse_7",
+    // "merged_T2bw_coarse_8",
+    // "merged_T2bw_coarse_9",
+
+    // T2bw fine
+    // "merged_T2bw_fine",
+    // "merged_T2bw_fine_1",
+    // "merged_T2bw_fine_2",
+    // "merged_T2bw_fine_3",
+    // "merged_T2bw_fine_4",
+    // "merged_T2bw_fine_5",
+    // "merged_T2bw_fine_6",
+    // "merged_T2bw_fine_7",
+    // "merged_T2bw_fine_8",
+    // "merged_T2bw_fine_9",
+    // "merged_T2bw_fine_10",
+    // "merged_T2bw_fine_11",
+    // "merged_T2bw_fine_12",
+    // "merged_T2bw_fine_13",
+    // "merged_T2bw_fine_14",
 
     // "T2tt_250_0",
     // "T2tt_350_0",
@@ -58,7 +87,7 @@ void doAll() {
     // "T2bw_fine_scan",
     // "T2bw_coarse_scan",
     // "T2tt_scan",
-    //    "ttdl_lmg"
+    // "ttdl_lmg"
     // "T2tt_scan",
     // "w1to4jets",
     // "data_muo",
@@ -85,22 +114,18 @@ void doAll() {
     if( TString(sampletag[i]).Contains("T2") ){
 
       if( TString(sampletag[i]).Contains("T2tt") ){
-	//ch[i]->Add(Form("%s/merged_T2tt_10.root",path_T2tt));
-	//ch[i]->Add(Form("%s/merged*root",path_T2tt));
-	//cout << "Added " << Form("%s/merged*root",path_T2tt) << endl;
 	ch[i]->Add(Form("%s/%s*root",path_T2tt,sampletag[i]));
 	cout << "Added " << Form("%s/%s*root",path_T2tt,sampletag[i]) << endl;	
       }
 
-      if( TString(sampletag[i]).Contains("T2bw_fine_scan") ){
-	ch[i]->Add(Form("%s/baby_1_*root",path_T2bw_fine));
-	//ch[i]->Add(Form("%s/baby*root",path_T2bw_fine));
-	cout << "Added " << Form("%s/baby*root",path_T2bw_fine) << endl;
+      if( TString(sampletag[i]).Contains("T2bw_fine") ){
+	ch[i]->Add(Form("%s/%s*root",path_T2bw_fine,sampletag[i]));
+	cout << "Added " << Form("%s/%s*root",path_T2bw_fine,sampletag[i]) << endl;	
       }
 
-      if( TString(sampletag[i]).Contains("T2bw_coarse_scan") ){
-	ch[i]->Add(Form("%s/baby*root",path_T2bw_coarse));
-	cout << "Added " << Form("%s/baby*root",path_T2bw_coarse) << endl;
+      if( TString(sampletag[i]).Contains("T2bw_coarse") ){
+	ch[i]->Add(Form("%s/%s*root",path_T2bw_coarse,sampletag[i]));
+	cout << "Added " << Form("%s/%s*root",path_T2bw_coarse,sampletag[i]) << endl;	
       }
 
     }
