@@ -1829,7 +1829,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  genps_pt_         .push_back(part.pt);
 	  genps_eta_        .push_back(part.eta);
 	  genps_phi_        .push_back(part.phi);
-	  genps_mass_       .push_back(part.genps_p4().at(ig).mass());
+	  genps_mass_       .push_back(genps_p4().at(ig).mass());
 	}
 
 	weightleft_  = Reweight_Stop_to_TopChi0 (genParticles, 0., -1, prefix);
