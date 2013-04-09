@@ -265,6 +265,178 @@ float getsltrigweight(int id1, float pt, float eta)
   return 1.;
 }
 
+float getideffweight(int id1, float pt, float eta) 
+{
+  //--------------------------------------------------------------------------------------
+  // This function returns the ID efficiencies
+  // Efficiencies are calculated with the full 2012 data sample using Z tag-and-probe
+  // 3 arguments:
+  // id1 : lepton PDG ID, abs(id1)=11 (electron),  abs(id1)=13 (muon)  
+  // pt  : lepton pt
+  // eta : lepton eta
+  //--------------------------------------------------------------------------------------
+  //muon efficiencies
+  if ( abs(id1)==13 ) {
+
+    if ( fabs(eta)<0.8 ) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9839;
+      else if (pt>=30. && pt<40.) 	return 0.9850;
+      else if (pt>=40. && pt<50.) 	return 0.9865;
+      else if (pt>=50. && pt<60.) 	return 0.9829;
+      else if (pt>=60. && pt<80.) 	return 0.9835;
+      else if (pt>=80. && pt<100.) 	return 0.9785;
+      else if (pt>=100. && pt<150.) 	return 0.9847;
+      else if (pt>=150. && pt<200.) 	return 0.9958;
+      else if (pt>=200. && pt<300.) 	return 0.9937;
+      else if (pt>=300. ) 		return 0.9754;
+    } else if ( fabs(eta)<1.5) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9850;
+      else if (pt>=30. && pt<40.) 	return 0.9846;
+      else if (pt>=40. && pt<50.) 	return 0.9866;
+      else if (pt>=50. && pt<60.) 	return 0.9834;
+      else if (pt>=60. && pt<80.) 	return 0.9818;
+      else if (pt>=80. && pt<100.) 	return 0.9803;
+      else if (pt>=100. && pt<150.) 	return 0.9765;
+      else if (pt>=150. && pt<200.) 	return 1.0064;
+      else if (pt>=200. && pt<300.) 	return 0.9867;
+      else if (pt>=300. ) 		return 1.0348; 
+    } else if ( fabs(eta)<2.1) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9876;
+      else if (pt>=30. && pt<40.) 	return 0.9890;
+      else if (pt>=40. && pt<50.) 	return 0.9902;
+      else if (pt>=50. && pt<60.) 	return 0.9864;
+      else if (pt>=60. && pt<80.) 	return 0.9909;
+      else if (pt>=80. && pt<100.) 	return 0.9995;
+      else if (pt>=100. && pt<150.) 	return 0.9884;
+      else if (pt>=150. && pt<200.) 	return 0.9613;
+      else if (pt>=200. && pt<300.) 	return 0.9652;
+      else if (pt>=300. ) 		return 0.4286; 
+    } else return 1.;
+  } 
+  //electron efficiencies
+  else if ( abs(id1)==11 ) {
+    if ( fabs(eta)<0.8 ) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9923;
+      else if (pt>=30. && pt<40.) 	return 0.9883;
+      else if (pt>=40. && pt<50.) 	return 0.9900;
+      else if (pt>=50. && pt<60.) 	return 0.9880;
+      else if (pt>=60. && pt<80.) 	return 0.9847;
+      else if (pt>=80. && pt<100.) 	return 0.9924;
+      else if (pt>=100. && pt<150.) 	return 0.9892;
+      else if (pt>=150. && pt<200.) 	return 1.0216;
+      else if (pt>=200. && pt<300.) 	return 0.9869;
+      else if (pt>=300. ) 		return 1.0789; 
+    } else if ( fabs(eta)<1.4442 ) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9632;
+      else if (pt>=30. && pt<40.) 	return 0.9707;
+      else if (pt>=40. && pt<50.) 	return 0.9755;
+      else if (pt>=50. && pt<60.) 	return 0.9777;
+      else if (pt>=60. && pt<80.) 	return 0.9797;
+      else if (pt>=80. && pt<100.) 	return 0.9687;
+      else if (pt>=100. && pt<150.) 	return 0.9813;
+      else if (pt>=150. && pt<200.) 	return 0.9940;
+      else if (pt>=200. && pt<300.) 	return 0.8853;
+      else if (pt>=300. ) 		return 1.0286; 
+    } else return 1.;
+  }
+
+  return 1.;
+
+}
+
+
+float getisoeffweight(int id1, float pt, float eta) 
+{
+  //--------------------------------------------------------------------------------------
+  // This function returns the ISO efficiencies
+  // Efficiencies are calculated with the full 2012 data sample using Z tag-and-probe
+  // 3 arguments:
+  // id1 : lepton PDG ID, abs(id1)=11 (electron),  abs(id1)=13 (muon)  
+  // pt  : lepton pt
+  // eta : lepton eta
+  //--------------------------------------------------------------------------------------
+  //muon efficiencies
+  if ( abs(id1)==13 ) {
+
+    if ( fabs(eta)<0.8 ) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9934;
+      else if (pt>=30. && pt<40.) 	return 0.9969;
+      else if (pt>=40. && pt<50.) 	return 0.9979;
+      else if (pt>=50. && pt<60.) 	return 0.9985;
+      else if (pt>=60. && pt<80.) 	return 0.9989;
+      else if (pt>=80. && pt<100.) 	return 0.9999;
+      else if (pt>=100. && pt<150.) 	return 1.0014;
+      else if (pt>=150. && pt<200.) 	return 0.9802;
+      else if (pt>=200. && pt<300.) 	return 1.0016;
+      else if (pt>=300. ) 		return 0.9923;
+    } else if ( fabs(eta)<1.5) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9974;
+      else if (pt>=30. && pt<40.) 	return 1.0004;
+      else if (pt>=40. && pt<50.) 	return 1.0001;
+      else if (pt>=50. && pt<60.) 	return 1.0007;
+      else if (pt>=60. && pt<80.) 	return 0.9997;
+      else if (pt>=80. && pt<100.) 	return 1.0075;
+      else if (pt>=100. && pt<150.) 	return 1.0056;
+      else if (pt>=150. && pt<200.) 	return 1.0203;
+      else if (pt>=200. && pt<300.) 	return 1.0059;
+      else if (pt>=300. ) 		return 0.9822; 
+    } else if ( fabs(eta)<2.1) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 1.0068;
+      else if (pt>=30. && pt<40.) 	return 1.0039;
+      else if (pt>=40. && pt<50.) 	return 1.0023;
+      else if (pt>=50. && pt<60.) 	return 1.0042;
+      else if (pt>=60. && pt<80.) 	return 1.0046;
+      else if (pt>=80. && pt<100.) 	return 1.0086;
+      else if (pt>=100. && pt<150.) 	return 1.0071;
+      else if (pt>=150. && pt<200.) 	return 0.9582;
+      else if (pt>=200. && pt<300.) 	return 1.0261;
+      else if (pt>=300. ) 		return 1.0000; 
+    } else return 1.;
+
+  } 
+  //electron efficiencies
+  else if ( abs(id1)==11 ) {
+
+    if ( fabs(eta)<0.8 ) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9938;
+      else if (pt>=30. && pt<40.) 	return 0.9968;
+      else if (pt>=40. && pt<50.) 	return 0.9973;
+      else if (pt>=50. && pt<60.) 	return 0.9957;
+      else if (pt>=60. && pt<80.) 	return 0.9962;
+      else if (pt>=80. && pt<100.) 	return 0.9992;
+      else if (pt>=100. && pt<150.) 	return 0.9964;
+      else if (pt>=150. && pt<200.) 	return 0.9861;
+      else if (pt>=200. && pt<300.) 	return 1.0025;
+      else if (pt>=300. ) 		return 1.1525; 
+    } else if ( fabs(eta)<1.4442 ) {
+      if ( pt<20. ) 			return 0.;
+      else if (pt>=20. && pt<30.) 	return 0.9939;
+      else if (pt>=30. && pt<40.) 	return 0.9963;
+      else if (pt>=40. && pt<50.) 	return 0.9965;
+      else if (pt>=50. && pt<60.) 	return 0.9963;
+      else if (pt>=60. && pt<80.) 	return 0.9952;
+      else if (pt>=80. && pt<100.) 	return 1.0013;
+      else if (pt>=100. && pt<150.) 	return 0.9882;
+      else if (pt>=150. && pt<200.) 	return 1.0068;
+      else if (pt>=200. && pt<300.) 	return 1.0076;
+      else if (pt>=300. ) 		return 1.0084; 
+    } else return 1.;
+
+  }
+
+  return 1.;
+
+ }
+
 //-----------------------------------------------------------------------
 // basic event selection:
 // >=1 good lepton, rho cut, MET filters, remove 2 nearby lepton events

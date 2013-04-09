@@ -42,6 +42,8 @@ vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVec
 
 float getdltrigweight(int id1, int id2);
 float getsltrigweight(int id1, float pt, float eta);
+float getideffweight(int id1, float pt, float eta);
+float getisoeffweight(int id1, float pt, float eta);
 
 bool passEvtSelection(TString name);
 bool passOneLeptonSelection(bool isData);
