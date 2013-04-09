@@ -1295,7 +1295,7 @@ double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, 
   int n_jets = jets.size();
   if (n_jets>6) n_jets = 6;
   //consider at least 3 jets
-  if (n_jets<3) return 99999.;
+  if (n_jets<3) return 999999.;
   
   vector<int> v_i, v_j;
   vector<double> v_k1, v_k2;
