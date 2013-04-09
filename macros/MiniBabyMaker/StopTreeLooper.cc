@@ -138,8 +138,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         char* h_nsig_filename_masslessLSP = "";
 
         if( name.Contains("T2tt") ){
-	  h_nsig_filename             = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/myMassDB_T2tt_MG_massiveLSP.root";
-	  h_nsig_filename_masslessLSP = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/myMassDB_T2tt_MG_masslessLSP.root";
+	  h_nsig_filename             = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/myMassDB_T2tt_massiveLSP.root";
+	  h_nsig_filename_masslessLSP = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/myMassDB_T2tt_masslessLSP.root";
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massive LSP)  " << h_nsig_filename << endl;
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massless LSP) " << h_nsig_filename_masslessLSP << endl;
 	}
@@ -395,7 +395,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             //---------------------------------
 
             ++nEventsTotal;
-            if (nEventsTotal%10000==0) {
+            //if (nEventsTotal%10000==0) {
+            if (nEventsTotal%1000==0) {
                 ULong64_t i_permille = (int)floor(1000 * nEventsTotal / float(nEventsChain));
                 //if (i_permille != i_permille_old) {//this prints too often!
                 // xterm magic from L. Vacavant and A. Cerri
@@ -405,6 +406,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                     fflush(stdout);
                 }
                 //	i_permille_old = i_permille;
+
             }
 
             //---------------------
@@ -562,24 +564,20 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             // MET > cut value (100 GeV for stop)
             met_       = stopt.t1metphicorr();
             metphi     = stopt.t1metphicorrphi();
+	    
+	    metup_     = stopt.t1metphicorrup();
+	    metupphi   = stopt.t1metphicorrphiup();
 
-	    // temporary fix for buggy JEC uncertainties
+	    metdown_   = stopt.t1metphicorrdn();
+	    metdownphi = stopt.t1metphicorrphidn();
 
-	    if( fabs( stopt.t1metphicorrdn() - met_ ) < 50.0 && fabs( stopt.t1metphicorrup() - met_ ) < 50.0 ){
-	      metup_     = stopt.t1metphicorrup();
-	      metupphi   = stopt.t1metphicorrphiup();
-
-	      metdown_   = stopt.t1metphicorrdn();
-	      metdownphi = stopt.t1metphicorrphidn();
-	    }
-
-	    else{
-	      metup_     = met_;
-	      metupphi   = metphi;
-
-	      metdown_   = met_;
-	      metdownphi = metphi;
-	    }
+	    // warning for possibly bad MET up/down variables
+	    // if( fabs( stopt.t1metphicorrdn() - met_ ) > 50.0 || fabs( stopt.t1metphicorrup() - met_ ) > 50.0 ){
+	    //   cout << __FILE__ << " " << __LINE__ << " WARNING! large difference in MET JES up/down variables" << endl;
+	    //   cout << "Nominal MET " << met_     << endl;
+	    //   cout << "MET up      " << metup_   << endl;
+	    //   cout << "MET down    " << metdown_ << endl;
+	    // }
 
             if ( met_ < MET_CUT && metup_ < MET_CUT && metdown_ < MET_CUT ) continue; 
 
@@ -1037,7 +1035,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-06/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
