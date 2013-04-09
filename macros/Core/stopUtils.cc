@@ -1289,6 +1289,7 @@ double calculateChi2(vector<LorentzVector>& jets, vector<float>& sigma_jets){
 double calculateChi2SNT(vector<LorentzVector>& jets, vector<float>& sigma_jets, vector<float>& btag){
 
   assert(jets.size() == sigma_jets.size());
+  assert(jets.size() == btag.size());
 
   //check at most first 6 jets
   int n_jets = jets.size();
