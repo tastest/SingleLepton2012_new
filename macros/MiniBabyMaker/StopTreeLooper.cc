@@ -142,10 +142,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massless LSP) " << h_nsig_filename_masslessLSP << endl;
 	}
         if( name.Contains("T2bw") ){
-	  h_nsig_filename = "/nfs-3/userdata/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw_coarse/myMassDB_T2bw.root";
-	  cout << "[StopTreeLooper::loop] opening mass TH2 file " << h_nsig_filename << endl;
-	  cout << "WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-	  cout << "ARE YOU SURE THAT YOU ARE USING THE UP-TO-DATE HISTOGRAMS FOR T2BW?????" << endl;
+
+	  if( name.Contains("fine") ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_fine/myMassDB_T2bw_fine.root";
+	  }
+
+	  else if( name.Contains("coarse") ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_coarse/myMassDB_T2bw_coarse.root";
+	  }
+
+	  else{
+	    cout << __FILE__ << " " << __LINE__ << " ERROR! I don't recognize " << name << ", quitting" << endl;
+	    exit(0);
+	  }
+
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file  " << h_nsig_filename << endl;
 	}
 
         TFile *f_nsig = TFile::Open(h_nsig_filename);
@@ -420,6 +431,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                     nevents = h_nsig75->GetBinContent(bin);
                 }
 
+		if( nevents == 0 ){
+		  cout << stopt.mg() << " " << stopt.ml() << " " << stopt.x() << endl;
+		}
                 assert ( nevents > 0 );
 
                 //NOTE::need to add vtx. reweighting for the signal sample
