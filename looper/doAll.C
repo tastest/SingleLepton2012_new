@@ -105,8 +105,8 @@ void doAll(bool skipFWLite = true)
   bool runT2tt     = 0; 
   bool runT2tt_few = 0;
   bool runT2bw     = 0;
-  bool runT2bw_few = 0;
-  bool runtttest   = 1;
+  bool runT2bw_few = 1;
+  bool runtttest   = 0;
 
   bool rundata2012a      = 0;
   bool rundata2012b      = 0;
@@ -203,7 +203,7 @@ void doAll(bool skipFWLite = true)
 
   if (runtttest) {
     //pickSkimIfExists(chtttest,"/tas/benhoob/testFiles/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/merged_ntuple_154.root");
-    pickSkimIfExists(chtttest,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TT_CT10_TuneZ2star_8TeV-powheg-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13_slim/merged_ntuple_154.root");
+    pickSkimIfExists(chtttest,"/home/users/dalfonso/CMSSW_5_3_2_patch4__V05-03-26_V00-02-24/src/SingleLepton2012/looper/ntuple.root");
     //    pickSkimIfExists(chtttest,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_1.root");
     // pickSkimIfExists(chtttest,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_2.root");
     // pickSkimIfExists(chtttest,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged_ntuple_3.root");
@@ -426,9 +426,9 @@ void doAll(bool skipFWLite = true)
   TChain *chT2bw_few = new TChain("Events");
   if (runT2bw_few) {
     cout << "UPDATE 7 TeV T2BW SAMPLE!!!! QUITTING!!!" << endl;
-    exit(0);
+    //exit(0);
 
-    pickSkimIfExists(chT2bw_few,"");
+    pickSkimIfExists(chT2bw_few,"/home/users/dalfonso/CMSSW_5_3_2_patch4__V05-03-26_V00-02-24/src/SingleLepton2012/looper/ntuple.root");
   }
 
   //----------------------------------------
