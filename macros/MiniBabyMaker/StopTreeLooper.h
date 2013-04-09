@@ -85,11 +85,15 @@ class StopTreeLooper {
 	Float_t chi2_;
 	Float_t chi2up_;
 	Float_t chi2down_;
+	Float_t chi2bup_;
+	Float_t chi2bdown_;
 	Float_t mt2b_;
 	Float_t mt2bl_;
 	Float_t mt2w_;
 	Float_t mt2wup_;
 	Float_t mt2wdown_;
+	Float_t mt2wbup_;
+	Float_t mt2wbdown_;
 
 	// event shapes
 	Float_t htssl_;
@@ -130,6 +134,8 @@ class StopTreeLooper {
 	Float_t lep1pt_;
 	Float_t lep1eta_;
 	Float_t dRleptB1_;
+	Float_t dRleptB1_bup_;
+	Float_t dRleptB1_bdown_;
 
 	Float_t lep2pt_;
 	Float_t lep2eta_;
@@ -139,6 +145,8 @@ class StopTreeLooper {
 	Float_t pt_b_;
 	Float_t pt_b_up_;
 	Float_t pt_b_down_;
+	Float_t pt_b_bup_;
+	Float_t pt_b_bdown_;
 	Float_t pt_J1_;
 	Float_t pt_J2_;
 
@@ -159,6 +167,8 @@ class StopTreeLooper {
 	vector<float> bdt_;
 	vector<float> bdtup_;
 	vector<float> bdtdown_;
+	vector<float> bdtbup_;
+	vector<float> bdtbdown_;
 
     private:
 
@@ -182,6 +192,8 @@ class StopTreeLooper {
 	vector<float> jets_btag;
 	vector<float> jets_up_btag;
 	vector<float> jets_down_btag;
+	vector<float> jets_bup_btag;
+	vector<float> jets_bdown_btag;
 	vector<float> jets_sigma;
 	vector<float> jets_up_sigma;
 	vector<float> jets_down_sigma;
