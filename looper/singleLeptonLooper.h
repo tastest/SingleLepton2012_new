@@ -443,6 +443,7 @@ class singleLeptonLooper
 	std::vector<float> genps_pt_;
 	std::vector<float> genps_eta_;
 	std::vector<float> genps_phi_;
+	std::vector<float> genps_mass_;
 
 	//        std::vector<Candidate>  candidates_;
         VofP4 jets_;
