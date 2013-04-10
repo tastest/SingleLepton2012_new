@@ -570,12 +570,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   // get exclusion contours
   //------------------------------------------------------------
 
-  TH2F* hR_exp   = exclusionContour(hxsec_best_exp_largeDM);
-  TH2F* hR_expp1 = exclusionContour(hxsec_best_expp1_largeDM);
-  TH2F* hR_expm1 = exclusionContour(hxsec_best_expm1_largeDM);
-  TH2F* hR       = exclusionContour(hxsec_best_largeDM);
-  TH2F* hR_obsp1 = exclusionContour(hxsec_best_largeDM,-1,"up");
-  TH2F* hR_obsm1 = exclusionContour(hxsec_best_largeDM,-1,"down");
+  TH2F* hR_exp   = exclusionContour(hxsec_best_exp_largeDM   ,sample,doBDT);
+  TH2F* hR_expp1 = exclusionContour(hxsec_best_expp1_largeDM ,sample,doBDT);
+  TH2F* hR_expm1 = exclusionContour(hxsec_best_expm1_largeDM ,sample,doBDT);
+  TH2F* hR       = exclusionContour(hxsec_best_largeDM       ,sample,doBDT);
+  TH2F* hR_obsp1 = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,-1,"up");
+  TH2F* hR_obsm1 = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,-1,"down");
 
   hR_exp->SetLineWidth(3);
   hR_exp->SetLineColor(2);
@@ -589,12 +589,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   hR_obsm1->SetLineWidth(1);
   hR_obsm1->SetLineStyle(7);
 
-  TH2F* hR_smallDM       = exclusionContour(hxsec_best_smallDM);
-  TH2F* hR_exp_smallDM   = exclusionContour(hxsec_best_exp_smallDM);
-  TH2F* hR_expp1_smallDM = exclusionContour(hxsec_best_expp1_smallDM);
-  TH2F* hR_expm1_smallDM = exclusionContour(hxsec_best_expm1_smallDM);
-  TH2F* hR_obsp1_smallDM = exclusionContour(hxsec_best_smallDM,-1,"up");
-  TH2F* hR_obsm1_smallDM = exclusionContour(hxsec_best_smallDM,-1,"down");
+  TH2F* hR_smallDM       = exclusionContour(hxsec_best_smallDM       ,sample,doBDT);
+  TH2F* hR_exp_smallDM   = exclusionContour(hxsec_best_exp_smallDM   ,sample,doBDT);
+  TH2F* hR_expp1_smallDM = exclusionContour(hxsec_best_expp1_smallDM ,sample,doBDT);
+  TH2F* hR_expm1_smallDM = exclusionContour(hxsec_best_expm1_smallDM ,sample,doBDT);
+  TH2F* hR_obsp1_smallDM = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,-1,"up");
+  TH2F* hR_obsm1_smallDM = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,-1,"down");
 
   hR_exp_smallDM->SetLineWidth(3);
   hR_exp_smallDM->SetLineColor(2);
@@ -1035,10 +1035,22 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
   gr_exp->SetName("gr_exp");
   gr_exp->Write();
   hexcl_exp->Write();
+
+  hR->SetName("hR");
+  hR->SetTitle("hR");
   hR->Write();
+
+  hR_exp->SetName("hR_exp");
+  hR_exp->SetTitle("hR_exp");
   hR_exp->Write();
+
   if( TString(sample).Contains("T2tt") ){
+    hR_smallDM->SetName("hR_smallDM");
+    hR_smallDM->SetTitle("hR_smallDM");
     hR_smallDM->Write();
+
+    hR_exp_smallDM->SetName("hR_exp_smallDM");
+    hR_exp_smallDM->SetTitle("hR_exp_smallDM");
     hR_exp_smallDM->Write();
   }
   fout->Close();
