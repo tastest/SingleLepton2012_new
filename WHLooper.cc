@@ -45,14 +45,16 @@ const bool blindSignal = true;
 const bool doInclusive = true;
 const bool doSignal = true;
 const bool doSignalMassLast = false;
-const bool doCR1 = false; // high m(bb)
-const bool doCR2 = false; // lep + track
+const bool doCR1 = true; // high m(bb)
+const bool doCR2 = true; // lep + track
 const bool doCR3 = true; // dilep
 const bool doCR4 = true; // dilep, high m(bb)
-const bool doCR5 = false; // bveto
+const bool doCR5 = true; // bveto
 const bool doCR6 = false; // 1 btag -- not used
-const bool doCR7 = false; // high m(bb), 3 jets
-const bool doCR8 = false; // low m(bb)
+const bool doCR7 = true; // high m(bb), 3 jets
+const bool doCR8 = true; // low m(bb)
+const bool doCR9 = false; // high m(bb), 150-200
+const bool doCR10 = false; // high m(bb), 200-250
 const bool doStopSel = false;
 
 std::set<DorkyEventIdentifier> already_seen; 
@@ -235,6 +237,16 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr8 nm1 hists
   std::map<std::string, TH1F*> h_1d_cr8_met_nm1, h_1d_cr8_mt_nm1, h_1d_cr8_mt2bl_nm1;
 
+  // cr9 hists
+  std::map<std::string, TH1F*> h_1d_cr9_presel, h_1d_cr9_final;
+  // cr9 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr9_met_nm1, h_1d_cr9_mt_nm1, h_1d_cr9_mt2bl_nm1;
+
+  // cr10 hists
+  std::map<std::string, TH1F*> h_1d_cr10_presel, h_1d_cr10_final;
+  // cr10 nm1 hists
+  std::map<std::string, TH1F*> h_1d_cr10_met_nm1, h_1d_cr10_mt_nm1, h_1d_cr10_mt2bl_nm1;
+
   // stop region hists
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
   std::map<std::string, TH1F*> h_1d_stop_met_nm1, h_1d_stop_mt_nm1, h_1d_stop_isotrk_nm1, h_1d_stop_tauveto_nm1 ;
@@ -352,6 +364,26 @@ void WHLooper::loop(TChain *chain, TString name) {
     outfile_->mkdir("cr8_final");
   }
 
+  if (doCR9) {
+    outfile_->mkdir("cr9_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr9_met_nm1");
+      outfile_->mkdir("cr9_mt_nm1");
+      outfile_->mkdir("cr9_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr9_final");
+  }
+
+  if (doCR10) {
+    outfile_->mkdir("cr10_presel");
+    if (doNM1Plots) {
+      outfile_->mkdir("cr10_met_nm1");
+      outfile_->mkdir("cr10_mt_nm1");
+      outfile_->mkdir("cr10_mt2bl_nm1");
+    }
+    outfile_->mkdir("cr10_final");
+  }
+
   if (doStopSel) {
     outfile_->mkdir("stop_presel");
     outfile_->mkdir("stop_met_nm1");
@@ -367,7 +399,8 @@ void WHLooper::loop(TChain *chain, TString name) {
   // vtx reweighting
   //------------------------------
 
-  // TFile* vtx_file = TFile::Open("../vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
+  //  TFile* vtx_file = TFile::Open("../vtxreweight/vtxreweight_Summer12_DR53X-PU_S10_9p7ifb_Zselection.root");
+  // TFile* vtx_file = TFile::Open("vtxreweight_Run2012D_Zselection.root");
   // if( vtx_file == 0 ){
   //   cout << "vtxreweight error, couldn't open vtx file. Quitting!"<< endl;
   //   exit(0);
@@ -456,8 +489,18 @@ void WHLooper::loop(TChain *chain, TString name) {
       // make 2 example histograms of nvtx and corresponding weight
       //---------------------------------------------------------------------------- 
 
-      float evtweight_novtxweight = isData ? 1. : ( stopt.weight() * 19.5 * stopt.mgcor() );
+      const float lumi = 19.5; // full 2012
+      //      const float lumi = 12.5; // 2012 periods A-C (approx..)
+      //      const float lumi = 7.; // 2012 period D (approx)
+
+      float evtweight_novtxweight = isData ? 1. : ( stopt.weight() * lumi * stopt.mgcor() );
       float evtweight = isData ? 1. : evtweight_novtxweight * stopt.nvtxweight();
+      // float evtweight = evtweight_novtxweight;
+
+      // to reweight from file - also need to comment stuff before
+      // float vtxweight = vtxweight_n( stopt.nvtx(), h_vtx_wgt, isData );
+      // evtweight *= vtxweight;
+
       // remove mgcor for ttbar mg samples
       if (isttmg_) evtweight /= stopt.mgcor();
       // cross section weights for TChiwh samples:
@@ -472,10 +515,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 	else if (name.Contains("TChiwh_350")) xsecweight = 0.074 * weight_lumi_br_nevents;
 
 	// reset weight here for signal MC. Ignore weight, nvtxweight, mgcor
-	evtweight = xsecweight * 19.5;
+	evtweight = xsecweight * lumi;
       }
-      // to reweight from file - also need to comment stuff before
-      //      float vtxweight = vtxweight_n( nvtx, h_vtx_wgt, isData );
 
       plot1D("h_nvtx_nosel",       stopt.nvtx(),       evtweight, h_1d_sig_presel, 40, 0, 40);
       plot1D("h_vtxweight_nosel", stopt.nvtxweight(), evtweight, h_1d_sig_presel, 41, -4., 4.);
@@ -495,6 +536,14 @@ void WHLooper::loop(TChain *chain, TString name) {
       //----------------------------------------------------------------------------
 
       if ( !passEvtSelection(name) ) continue;
+
+      // data run selection: to run on certain periods
+      // if (isData && (stopt.run() > 203755)) continue; // periods A-C
+      // if (isData && (stopt.run() < 203768)) continue; // period D
+
+      // require first vertex to be good (i.e. index == 0)
+      //   to make sure the same vertex is used for btagging, leptons, etc
+      //      if (stopt.indexfirstGoodVertex_()) continue;
 
       //----------------------------------------------------------------------------
       // Function to perform MET phi corrections on-the-fly
@@ -914,6 +963,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	//	if (!fail && isData && met_ > 270.) dumpEventInfo("CR3, high MET event");
+
 	//	if (!fail && (pseudomet_lep_ > CUT_MET_) ) {
 	if (!fail && (met_ > CUT_MET_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr3_mt_nm1,evtweight2l,"cr3_mt_nm1");
@@ -987,6 +1038,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr4_met_nm1,evtweight2l,"cr4_met_nm1");
 	}
 	else fail = true;
+
+	//	if (!fail && isData && met_ > 320.) dumpEventInfo("CR4, high MET event");
 
 	//	if (!fail && (pseudomet_lep_ > CUT_MET_) ) {
 	if (!fail && (met_ > CUT_MET_) ) {
@@ -1112,7 +1165,8 @@ void WHLooper::loop(TChain *chain, TString name) {
         fillHists1DWrapper(h_1d_cr7_presel,evtweight1l,"cr7_presel");
 
 	bool fail = false;
-	if ( !fail && (njetsalleta_ == 3) && (nbjets_ == 2) ) {
+	//	if ( !fail && (njetsalleta_ == 3) && (nbjets_ == 2) ) {
+	if ( !fail && (njetsalleta_ == 3) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr7_met_nm1,evtweight1l,"cr7_met_nm1");
 	}
 	else fail = true;
@@ -1172,10 +1226,86 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 
       // -------------------------------------------
-      // *** CR9 idea: signal mass window, at least 3 jets, then exactly 3 jets
+      // *** CR idea: signal mass window, at least 3 jets, then exactly 3 jets
       //  otherwise same as signal region
       //  !! need to check to make sure signal contribution isn't too large..
       //  -- after final selection, bg ~3, sig ~2 => don't use this region!
+
+
+      // -------------------------------------------
+      // *** CR9: 150 < m(bb) < 200 
+      //  otherwise same as signal region
+      //  to study met shape disagreement in CR1
+
+      if ( doCR9
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ >= 2)
+	   && (bb_.M() > 150.) && (bb_.M() < 200.) 
+	   && (met_ > CUT_MET_PRESEL_) 
+	   && (mt_ > CUT_MT_PRESEL_) ) {
+
+        fillHists1DWrapper(h_1d_cr9_presel,evtweight1l,"cr9_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr9_met_nm1,evtweight1l,"cr9_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr9_mt_nm1,evtweight1l,"cr9_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr9_mt2bl_nm1,evtweight1l,"cr9_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr9_final,evtweight1l,"cr9_final");
+	}
+
+      } // CR9 region sel
+
+
+      // -------------------------------------------
+      // *** CR10: 200 < m(bb) < 250 
+      //  otherwise same as signal region
+      //  to study met shape disagreement in CR1
+
+      if ( doCR10
+	   && passSingleLeptonSelection(isData) 
+	   && passisotrk 
+	   && (nbjets_ >= 2)
+	   && (bb_.M() > 200.) && (bb_.M() < 250.) 
+	   && (met_ > CUT_MET_PRESEL_) 
+	   && (mt_ > CUT_MT_PRESEL_) ) {
+
+        fillHists1DWrapper(h_1d_cr10_presel,evtweight1l,"cr10_presel");
+
+	bool fail = false;
+	if ( !fail && (njetsalleta_ == 2) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr10_met_nm1,evtweight1l,"cr10_met_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > CUT_MET_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr10_mt_nm1,evtweight1l,"cr10_mt_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt_ > CUT_MT_) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr10_mt2bl_nm1,evtweight1l,"cr10_mt2bl_nm1");
+	}
+	else fail = true;
+
+	if (!fail && (mt2bl_ > CUT_MT2BL_) ) {
+	  fillHists1DWrapper(h_1d_cr10_final,evtweight1l,"cr10_final");
+	}
+
+      } // CR10 region sel
 
 
       // -------------------------------------------
@@ -1359,6 +1489,26 @@ void WHLooper::loop(TChain *chain, TString name) {
     savePlotsDir(h_1d_cr8_final,outfile_,"cr8_final");
   }
 
+  if (doCR9) {
+    savePlotsDir(h_1d_cr9_presel,outfile_,"cr9_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr9_met_nm1,outfile_,"cr9_met_nm1");
+      savePlotsDir(h_1d_cr9_mt_nm1,outfile_,"cr9_mt_nm1");
+      savePlotsDir(h_1d_cr9_mt2bl_nm1,outfile_,"cr9_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr9_final,outfile_,"cr9_final");
+  }
+
+  if (doCR10) {
+    savePlotsDir(h_1d_cr10_presel,outfile_,"cr10_presel");
+    if (doNM1Plots) {
+      savePlotsDir(h_1d_cr10_met_nm1,outfile_,"cr10_met_nm1");
+      savePlotsDir(h_1d_cr10_mt_nm1,outfile_,"cr10_mt_nm1");
+      savePlotsDir(h_1d_cr10_mt2bl_nm1,outfile_,"cr10_mt2bl_nm1");
+    }
+    savePlotsDir(h_1d_cr10_final,outfile_,"cr10_final");
+  }
+
   if (doStopSel) {
     savePlotsDir(h_1d_stop_presel,outfile_,"stop_presel");
     savePlotsDir(h_1d_stop_met_nm1,outfile_,"stop_met_nm1");
@@ -1448,7 +1598,12 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
   plot1D("h_lep1eta"+suffix,      stopt.lep1().eta(),       evtweight, h_1d, 100, -3., 3.);
   plot1D("h_lep1mt"+suffix,       mt_,       evtweight, h_1d, 1000, 0., 1000.);
   plot1D("h_lep1isopf"+suffix,    stopt.isopf1(),       evtweight, h_1d, 100, 0., 0.5);
-  plot1D("h_pfmet"+suffix,        met_,    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_met"+suffix,          met_,    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_pfmet"+suffix,        stopt.pfmet(),    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_t1met10"+suffix,      stopt.t1met10(),    evtweight, h_1d, 500, 0., 500.);
+  plot1D("h_genmet"+suffix,       stopt.genmet(),    evtweight, h_1d, 500, 0., 500.);
+  // plot1D("h_genmet_minus_pfmet"+suffix,       stopt.genmet() - met_,    evtweight, h_1d, 500, -250., 250.);
+  // plot1D("h_genmet_minus_pfmet_div_genmet"+suffix,       (stopt.genmet() - met_)/stopt.genmet(),    evtweight, h_1d, 500, -5.0, 5.0);
   // plot1D("h_pfsumet"+suffix,      stopt.pfsumet(),    evtweight, h_1d, 1500, 0., 1500.);
   // plot1D("h_pfmetsig"+suffix,     stopt.pfmet()/sqrt(stopt.pfsumet()),   evtweight, h_1d, 500, 0., 20.);
   plot1D("h_njets"+suffix,        njets_,              evtweight, h_1d, 10, 0., 10.);
@@ -1460,6 +1615,9 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   if (met_ > 100.) {
     plot1D("h_pfmetcalometdphi_met100"+suffix,getdphi(stopt.t1metphicorrphi(), stopt.calometphi()),  evtweight, h_1d, 50, 0., TMath::Pi());
+  }
+  if (met_ > 150.) {
+    plot1D("h_pfmetcalometdphi_met150"+suffix,getdphi(stopt.t1metphicorrphi(), stopt.calometphi()),  evtweight, h_1d, 50, 0., TMath::Pi());
   }
   if (met_ > 175.) {
     plot1D("h_pfmetcalometdphi_met175"+suffix,getdphi(stopt.t1metphicorrphi(), stopt.calometphi()),  evtweight, h_1d, 50, 0., TMath::Pi());
@@ -1534,23 +1692,30 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D("h_bbdphi"+suffix,  fabs(TVector2::Phi_mpi_pi(bjets_[0].phi() - bjets_[1].phi())), evtweight, h_1d, 50, 0., TMath::Pi());
     plot1D("h_bbdeta"+suffix,  bjets_.at(0).eta() - bjets_.at(1).eta() , evtweight, h_1d, 100, -6., 6.);
 
-    // plots for low pt jets: leading pt < 100
-    //  to investigate data/MC disagreement
-    if (bjets_[0].pt() < 100.) {
-      plot1D("h_bjet1eta_lowpt"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
-      plot1D("h_bjet2eta_lowpt"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
+    float lep1bjet1dr = ROOT::Math::VectorUtil::DeltaR( stopt.lep1(), bjets_.at(0) );
+    float lep1bjet2dr = ROOT::Math::VectorUtil::DeltaR( stopt.lep1(), bjets_.at(1) );
+    plot1D("h_lep1bjet1dr"+suffix, lep1bjet1dr , evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    plot1D("h_lep1bjet2dr"+suffix, lep1bjet2dr , evtweight, h_1d, 100, 0., 2.*TMath::Pi());
 
-      plot1D("h_bbdr_lowpt"+suffix,  ROOT::Math::VectorUtil::DeltaR( bjets_.at(0) , bjets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
-      plot1D("h_bbdeta_lowpt"+suffix,  bjets_.at(0).eta() - bjets_.at(1).eta() , evtweight, h_1d, 100, -6., 6.);
-    }
+    plot1D("h_lep1bjetmindr"+suffix, TMath::Min(lep1bjet1dr,lep1bjet2dr) , evtweight, h_1d, 100, 0., 2.*TMath::Pi());
 
-    else {
-      plot1D("h_bjet1eta_highpt"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
-      plot1D("h_bjet2eta_highpt"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
+    // // plots for low pt jets: leading pt < 100
+    // //  to investigate data/MC disagreement
+    // if (bjets_[0].pt() < 100.) {
+    //   plot1D("h_bjet1eta_lowpt"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
+    //   plot1D("h_bjet2eta_lowpt"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
 
-      plot1D("h_bbdr_highpt"+suffix,  ROOT::Math::VectorUtil::DeltaR( bjets_.at(0) , bjets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
-      plot1D("h_bbdeta_highpt"+suffix,  bjets_.at(0).eta() - bjets_.at(1).eta() , evtweight, h_1d, 100, -6., 6.);
-    }
+    //   plot1D("h_bbdr_lowpt"+suffix,  ROOT::Math::VectorUtil::DeltaR( bjets_.at(0) , bjets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    //   plot1D("h_bbdeta_lowpt"+suffix,  bjets_.at(0).eta() - bjets_.at(1).eta() , evtweight, h_1d, 100, -6., 6.);
+    // }
+
+    // else {
+    //   plot1D("h_bjet1eta_highpt"+suffix,       bjets_[0].eta(),       evtweight, h_1d, 100, -3., 3.);
+    //   plot1D("h_bjet2eta_highpt"+suffix,       bjets_[1].eta(),       evtweight, h_1d, 100, -3., 3.);
+
+    //   plot1D("h_bbdr_highpt"+suffix,  ROOT::Math::VectorUtil::DeltaR( bjets_.at(0) , bjets_.at(1) ), evtweight, h_1d, 100, 0., 2.*TMath::Pi());
+    //   plot1D("h_bbdeta_highpt"+suffix,  bjets_.at(0).eta() - bjets_.at(1).eta() , evtweight, h_1d, 100, -6., 6.);
+    // }
 
     // LorentzVector b1lep1 = bjets_.at(0) + stopt.lep1();
     // plot1D("h_bjet1lep1mass"+suffix,       b1lep1.M(),       evtweight, h_1d, 1000, 0., 1000.);
@@ -1667,6 +1832,35 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
     plot1D("h_dilmass"+suffix,       stopt.dilmass(),       evtweight, h_1d, 1000, 0., 1000.);
     plot1D("h_dilpt"+suffix,       stopt.dilpt(),       evtweight, h_1d, 1000, 0., 1000.);
   }
+
+  // plots for CR7 (high mass + 3 jets)
+  if (dir.find("cr7") != std::string::npos) {
+    if (njets_ >= 3) {
+      plot1D("h_jet3pt"+suffix,       jets_[2].pt(),       evtweight, h_1d, 1000, 0., 1000.);
+      plot1D("h_jet3eta"+suffix,      jets_[2].eta(),      evtweight, h_1d, 100, -3., 3.);
+      plot1D("h_jet3csv"+suffix,      jets_csv_.at(2),      evtweight, h_1d, 100, 0., 1.);
+      plot1D("h_jet3flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(2))) , evtweight, h_1d, 23, -1., 22.);
+      if (nbjets_ >= 3) {
+	plot1D("h_bjet3pt"+suffix,       bjets_[2].pt(),       evtweight, h_1d, 1000, 0., 1000.);
+	plot1D("h_bjet3eta"+suffix,       bjets_[2].eta(),       evtweight, h_1d, 100, -3., 3.);
+        plot1D("h_bjet3flavor"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(bjets_idx_.at(2))) , evtweight, h_1d, 23, -1., 22.);
+      }
+    }
+  }
+
+  return;
+}
+
+//--------------------------------------------------------------------
+
+void WHLooper::dumpEventInfo(const std::string& comment) {
+
+  std::cout << "- Dumping info for event: " << comment << std::endl 
+	    << "-- run: " << stopt.run() << ", event: " <<  stopt.event() << ", lumi: " <<  stopt.lumi() << std::endl
+	    << "-- leptype: " << stopt.leptype() << ", lep pt: " << stopt.lep1().pt() << ", lep eta: " << stopt.lep1().eta() << std::endl
+            << "-- met: " << met_ << ", mt: " << mt_ << ", njetsalleta: " << njetsalleta_ << std::endl
+	    << "-- jet1 pt: " << jets_.at(0).pt() << ", jet1 eta: " << jets_.at(0).eta() << std::endl
+	    << "-- jet2 pt: " << jets_.at(1).pt() << ", jet2 eta: " << jets_.at(1).eta() << std::endl;
 
   return;
 }

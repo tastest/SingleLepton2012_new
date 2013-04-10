@@ -35,6 +35,8 @@ class WHLooper {
 
   float getCSVCut(const csvpoint csv = WHLooper::CSVM);
 
+  void dumpEventInfo(const std::string& comment);
+
   string m_outfilename_;
   TFile* outfile_;
   //for phi corrected met
