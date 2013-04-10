@@ -24,7 +24,22 @@
 #include "TMath.h"
 #include <sstream>
 #include <iomanip>
-//#include "upperLimits.C"
+
+#include "limits_T2tt_LM150.C"
+#include "limits_T2tt_LM200.C"
+#include "limits_T2tt_LM250.C"
+#include "limits_T2tt_LM300.C"
+#include "limits_T2tt_HM150.C"
+#include "limits_T2tt_HM200.C"
+#include "limits_T2tt_HM250.C"
+#include "limits_T2tt_HM300.C"
+
+#include "limits_T2TT_BDT1L.C"
+#include "limits_T2TT_BDT1T.C"
+#include "limits_T2TT_BDT2.C"
+#include "limits_T2TT_BDT3.C"
+#include "limits_T2TT_BDT4.C"
+#include "limits_T2TT_BDT5.C"
 
 using namespace std;
 
@@ -65,8 +80,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
     //denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
 
-    filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/merged*root";
-    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_combined_25GeVbins.root";
+    //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/merged*root";
+    //denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_combined_25GeVbins.root";
+
+    filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged*root";
+    //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged_T2tt_mStop-150to350_mLSP-0to250.root";
+    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root";
 
     label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#tilde{#chi}_{1}^{0}";
   }
@@ -166,19 +185,19 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   TCut btag1("mini_nb >= 1");
   TCut passisotrk("mini_passisotrk==1");
   TCut tauveto("mini_passtauveto == 1");
-  TCut mt120("t1metphicorrmt > 120");
-  TCut mt150("t1metphicorrmt > 150");
+  TCut mt120(" mini_mt > 120");
+  TCut mt150(" mini_mt > 150");
   TCut dphi("mini_dphimjmin>0.8");
   TCut chi2("mini_chi2<5.0");
   TCut mt2w("mini_mt2w>200.0");
   TCut bpt100("mini_pt_b > 100.0");
-  TCut met100("t1metphicorr > 100");
+  TCut met100("mini_met > 100");
   TCut met150("mini_met > 150.0");
   TCut met200("mini_met > 200.0");
   TCut met250("mini_met > 250.0");
   TCut met300("mini_met > 300.0");
   TCut testing("event%2==0");
-
+  TCut isrweight("mini_isrweight");
   TCut x25("x < 0.3");
   TCut x50("x > 0.3 && x < 0.7");
   TCut x75("x > 0.7");
@@ -189,8 +208,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   // THESE CUTS DEFINE PRESELECTION REGION
   //-------------------------------------------
 
+  //presel += filters;
   presel += rho;
-  presel += filters;
   presel += goodlep;
   presel += (el||mu);
   presel += njets4;
@@ -214,11 +233,13 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   if( TString(pol).Contains("left") )  weight = TCut(Form("mini_sltrigeff * weightleft  * %i",BDTweight));
   if( TString(pol).Contains("right") ) weight = TCut(Form("mini_sltrigeff * weightright * %i",BDTweight));
 
-  cout << "Using pre-selection   " << presel.GetTitle() << endl;
-  cout << "Using weight          " << weight.GetTitle() << endl;
+  cout << "Using pre-selection   " << presel.GetTitle()    << endl;
+  cout << "Using weight          " << weight.GetTitle()    << endl;
+  cout << "Using ISR weight      " << isrweight.GetTitle() << endl;
 
-  *logfile << "Using pre-selection   " << presel.GetTitle() << endl;
-  *logfile << "Using weight          " << weight.GetTitle() << endl;
+  *logfile << "Using pre-selection   " << presel.GetTitle()    << endl;
+  *logfile << "Using weight          " << weight.GetTitle()    << endl;
+  *logfile << "Using ISR weight      " << isrweight.GetTitle() << endl;
 
   //--------------------------------------------------
   // signal regions
@@ -287,7 +308,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 
       cout << "Doing T2tt cut-based signal regions" << endl;  
 
-      // low-mass
+      // // low-mass
       sigcuts.push_back(presel+met150+dphi+chi2);        signames.push_back("T2TT_LM150");   labels.push_back("T2TT_LM150");   uls.push_back(79.6);
       sigcuts.push_back(presel+met200+dphi+chi2);        signames.push_back("T2TT_LM200");   labels.push_back("T2TT_LM200");   uls.push_back(42.1);
       sigcuts.push_back(presel+met250+dphi+chi2);        signames.push_back("T2TT_LM250");   labels.push_back("T2TT_LM250");   uls.push_back(19.0);
@@ -334,8 +355,11 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   //--------------------------------------------------
   
   TH2F* heff[nsig];
+  TH2F* heff_noisr[nsig];
   TH2F* heffup[nsig];
   TH2F* heffdn[nsig];
+  TH2F* heffbup[nsig];
+  TH2F* heffbdn[nsig];
   TH2F* hxsec[nsig];
   TH2F* hxsec_exp[nsig];
   TH2F* hxsec_expp1[nsig];
@@ -347,46 +371,71 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   TH2F* hexcl_obsp1[nsig];
   TH2F* hexcl_obsm1[nsig];
   TH2F* hjes[nsig];
+  TH2F* hbtagerr[nsig];
+  TH2F* hstaterr[nsig];
+  TH2F* htoterr[nsig];
+  TH2F* hisrerr[nsig];
   
   TCanvas *ctemp = new TCanvas();
   ctemp->cd();
 
   for( unsigned int i = 0 ; i < nsig ; ++i ){
 
-    cout << endl ;
-    cout << "Signal Region : " << i << " " << signames.at(i) << endl;
-    cout << "Selection     : " << sigcuts.at(i) << endl;
-    cout << "UL            : " << uls.at(i) << endl;
-
-    *logfile << endl ;
-    *logfile << "Signal Region : " << i << " " << signames.at(i) << endl;
-    *logfile << "Selection     : " << sigcuts.at(i) << endl;
-    *logfile << "UL            : " << uls.at(i) << endl;
-
     //------------------------------------------------
-    // turn off point-by-point signal uncertainties
+    // calculate point-by-point signal uncertainties
     //------------------------------------------------
 
-    /*
     TString jesup(sigcuts.at(i));
-    jesup.ReplaceAll("npfjets30"       , "njetsUp");
-    jesup.ReplaceAll("t1metphicorr "   , "t1metphicorrup ");
-    jesup.ReplaceAll("t1metphicorrmt " , "t1metphicorrmtup ");
+    jesup.ReplaceAll("mini_njets"         , "mini_njetsup"    );
+    jesup.ReplaceAll("mini_met"           , "mini_metup"      );
+    jesup.ReplaceAll(" mini_mt"           , "mini_mtup"       );
+    jesup.ReplaceAll("mini_chi2"          , "mini_chi2up"     );
+    jesup.ReplaceAll("mini_mt2w"          , "mini_mt2wup"     );
+    jesup.ReplaceAll("mini_pt_b"          , "mini_pt_bup"     );
+    jesup.ReplaceAll("mini_bdt"           , "mini_bdtup"      );
 
-    TString jesdn(sigcuts.at(i));
-    jesdn.ReplaceAll("npfjets30"       , "njetsDown");
-    jesdn.ReplaceAll("t1metphicorr "   , "t1metphicorrdn ");
-    jesdn.ReplaceAll("t1metphicorrmt " , "t1metphicorrmtdn ");
+    TString jesdown(sigcuts.at(i));
+    jesdown.ReplaceAll("mini_njets"       , "mini_njetsdown"  );
+    jesdown.ReplaceAll("mini_met"         , "mini_metdown"    );
+    jesdown.ReplaceAll(" mini_mt"         , "mini_mtdown"     );
+    jesdown.ReplaceAll("mini_chi2"        , "mini_chi2down"   );
+    jesdown.ReplaceAll("mini_mt2w"        , "mini_mt2wdown"   );
+    jesdown.ReplaceAll("mini_pt_b"        , "mini_pt_bdown"   );
+    jesdown.ReplaceAll("mini_bdt"         , "mini_bdtdown"    );
+
+    TString btagup(sigcuts.at(i));
+    btagup.ReplaceAll("mini_nb"           , "mini_nbupBC"     );
+    btagup.ReplaceAll("mini_chi2"         , "mini_chi2bup"    );
+    btagup.ReplaceAll("mini_mt2w"         , "mini_mt2wbup"    );
+    btagup.ReplaceAll("mini_pt_b"         , "mini_pt_b_bup"   );
+    btagup.ReplaceAll("mini_bdt"          , "mini_bdtbup"     );
+
+    TString btagdn(sigcuts.at(i));
+    btagdn.ReplaceAll("mini_nb"         , "mini_nbdownBC"   );
+    btagdn.ReplaceAll("mini_chi2"       , "mini_chi2bdown"  );
+    btagdn.ReplaceAll("mini_mt2w"       , "mini_mt2wbdown"  );
+    btagdn.ReplaceAll("mini_pt_b"       , "mini_pt_b_bdown" );
+    btagdn.ReplaceAll("mini_bdt"        , "mini_bdtbdown"   );
 
     TCut jesupcut(jesup);
-    TCut jesdncut(jesdn);
+    TCut jesdncut(jesdown);
+    TCut btagupcut(btagup);
+    TCut btagdncut(btagdn);
 
-    cout << endl << endl;
-    cout << "Signal region : " << labels.at(i)  << endl;
-    cout << "Selection     : " << sigcuts.at(i) << endl;
-    cout << "Selection up  : " << jesupcut      << endl;
-    cout << "Selection dn  : " << jesdncut      << endl;
-    */
+    cout << endl << endl << endl;
+    cout << "Signal region       : " << labels.at(i)   << endl << endl;
+    cout << "Selection           : " << sigcuts.at(i)  << endl << endl;
+    cout << "Selection JES up    : " << jesupcut       << endl << endl;
+    cout << "Selection JES down  : " << jesdncut       << endl << endl;
+    cout << "Selection btag up   : " << btagupcut      << endl << endl;
+    cout << "Selection btag down : " << btagdncut      << endl << endl;
+
+    *logfile << "Signal region       : " << labels.at(i)   << endl << endl;
+    *logfile << "Selection           : " << sigcuts.at(i)  << endl << endl;
+    *logfile << "Selection JES up    : " << jesupcut       << endl << endl;
+    *logfile << "Selection JES down  : " << jesdncut       << endl << endl;
+    *logfile << "Selection btag up   : " << btagupcut      << endl << endl;
+    *logfile << "Selection btag down : " << btagdncut      << endl << endl;
 
     int   nbinsx  =      41;
     float xmin    =   -12.5;
@@ -395,18 +444,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     float ymin    =   -12.5;
     float ymax    =  1012.5;
 
-    // if( TString(sample).Contains("T2bw") ){
-    //   nbinsx =   9;
-    //   xmin   = 175;
-    //   xmax   = 625;
-    //   nbinsy =   7;
-    //   ymin   = -25;
-    //   ymax   = 325;
-    // }
-
     heff[i]        = new TH2F(Form("heff_%i",i)          , Form("heff_%i",i)         , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    heff_noisr[i]  = new TH2F(Form("heff_noisr_%i",i)    , Form("heff_noisr_%i",i)   , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     heffup[i]      = new TH2F(Form("heffup_%i",i)        , Form("heffup_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     heffdn[i]      = new TH2F(Form("heffdn_%i",i)        , Form("heffdn_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    heffbup[i]     = new TH2F(Form("heffbup_%i",i)       , Form("heffbup_%i",i)      , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    heffbdn[i]     = new TH2F(Form("heffbdn_%i",i)       , Form("heffbdn_%i",i)      , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hxsec[i]       = new TH2F(Form("hxsec_%i",i)         , Form("hxsec_%i",i)        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hxsec_exp[i]   = new TH2F(Form("hxsec_exp_%i",i)     , Form("hxsec_exp_%i",i)    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hxsec_expp1[i] = new TH2F(Form("hxsec_expp1_%i",i)   , Form("hxsec_expp1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
@@ -419,52 +462,89 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     hexcl_expp1[i] = new TH2F(Form("hexcl_expp1_%i",i)   , Form("hexcl_expp1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     hexcl_expm1[i] = new TH2F(Form("hexcl_expm1_%i",i)   , Form("hexcl_expm1_%i",i)  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
 
-    hjes[i]      = new TH2F(Form("hjes_%i",i)        , Form("hjes_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hjes[i]        = new TH2F(Form("hjes_%i",i)          , Form("hjes_%i",i)         , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    htoterr[i]     = new TH2F(Form("htoterr_%i",i)       , Form("htoterr_%i",i)      , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hisrerr[i]     = new TH2F(Form("hisrerr_%i",i)       , Form("hisrerr_%i",i)      , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hbtagerr[i]    = new TH2F(Form("hbtagerr_%i",i)      , Form("hbtagerr_%i",i)     , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hstaterr[i]    = new TH2F(Form("hstaterr_%i",i)      , Form("hstaterr_%i",i)     , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
 
-    ch->Draw(Form("ml:mg>>heff_%i",i),sigcuts.at(i)*weight);
-    //heff[i]->Scale(1.0/denom);
+    heff[i]->Sumw2();
+
+    // nominal
+    ch->Draw(Form("ml:mg>>heff_%i",i),sigcuts.at(i)*weight*isrweight);
+    TH2F* hnevents = (TH2F*) heff[i]->Clone(Form("hnevents_%i",i));
     heff[i]->Divide(hdenom);
 
-    /*
-    ch->Draw(Form("ml:mg>>heffup_%i",i),jesupcut*weight);
-    //heffup[i]->Scale(1.0/denom);
+    // JES up
+    ch->Draw(Form("ml:mg>>heffup_%i",i),jesupcut*weight*isrweight);
     heffup[i]->Divide(hdenom);
 
-    ch->Draw(Form("ml:mg>>heffdn_%i",i),jesdncut*weight);
-    //heffdn[i]->Scale(1.0/denom);
+    // JES down
+    ch->Draw(Form("ml:mg>>heffdn_%i",i),jesdncut*weight*isrweight);
     heffdn[i]->Divide(hdenom);
-    */
 
-    for( unsigned int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
-      for( unsigned int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
+    // btag up
+    ch->Draw(Form("ml:mg>>heffbup_%i",i),btagupcut*weight*isrweight);
+    heffbup[i]->Divide(hdenom);
+
+    // btag down
+    ch->Draw(Form("ml:mg>>heffbdn_%i",i),btagdncut*weight*isrweight);
+    heffbdn[i]->Divide(hdenom);
+
+    // remove ISR weight
+    ch->Draw(Form("ml:mg>>heff_noisr_%i",i),sigcuts.at(i)*weight);
+    heff_noisr[i]->Divide(hdenom);
+
+    for( int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
+      for( int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
+
+	hjes[i]->SetBinContent(ibin,jbin,0.0);
+	hbtagerr[i]->SetBinContent(ibin,jbin,0.0);
+	htoterr[i]->SetBinContent(ibin,jbin,0.0);
+	hisrerr[i]->SetBinContent(ibin,jbin,0.0);
+	hstaterr[i]->SetBinContent(ibin,jbin,0.0);
 
 	float mg = heff[i]->GetXaxis()->GetBinCenter(ibin);
 	//float ml = heff[i]->GetYaxis()->GetBinCenter(jbin);
 
-	float eff    = heff[i]->GetBinContent(ibin,jbin);
-	//float effup  = heffup[i]->GetBinContent(ibin,jbin);
-	//float effdn  = heffdn[i]->GetBinContent(ibin,jbin);
+	// nominal
+	float eff          = heff[i]->GetBinContent(ibin,jbin);
+	float eff_staterr  = 1.0/sqrt(hnevents->GetBinContent(ibin,jbin));
+
+	// JES up/down
+	float effup      = heffup[i]->GetBinContent(ibin,jbin);
+	float effdn      = heffdn[i]->GetBinContent(ibin,jbin);
+
+	// btag up/down
+	float effbup     = heffbup[i]->GetBinContent(ibin,jbin);
+	float effbdn     = heffbdn[i]->GetBinContent(ibin,jbin);
+
+	// no ISR weighting
+	float eff_noisr  = heff_noisr[i]->GetBinContent(ibin,jbin);
 
 	if( eff   < 1e-20 ) continue;
 
-	// float dup    = effup/eff-1;
-	// float ddn    = 1-effdn/eff;
-	// float djes   = 0.5 * (dup+ddn);
+	// JES uncertainty
+	float dup    = fabs(effup/eff-1);
+	float ddn    = fabs(1-effdn/eff);
+	float djes   = 0.5 * (dup+ddn);
 
-	float djes = 0.10;
+	// btag uncertainty
+	float dbup    = fabs(effbup/eff-1);
+	float dbdn    = fabs(1-effbdn/eff);
+	float dbtag   = 0.5 * (dbup+dbdn);
 
+	// ISR uncertainty
+	float disr   = fabs(1-eff/eff_noisr);
+
+	// lumi (4.4%), trigger (3%), lepton selection (5%), JES, ISR, btagging
+	//float toterr  = sqrt( 0.044*0.044 + 0.03*0.03 + 0.05*0.05 + djes*djes + disr*disr + dbtag * dbtag + eff_staterr*eff_staterr);
+	float toterr  = sqrt( 0.044*0.044 + 0.03*0.03 + 0.05*0.05 + djes*djes + disr*disr + dbtag * dbtag );
+	htoterr[i]->SetBinContent(ibin,jbin,toterr);
+	hisrerr[i]->SetBinContent(ibin,jbin,disr);
+	hbtagerr[i]->SetBinContent(ibin,jbin,dbtag);
 	hjes[i]->SetBinContent(ibin,jbin,djes);
-
-	// lumi, lepton selection, trigger, b-tagging, JES
-
-	float toterr  = 0.1;
-	//float toterr  = sqrt( 0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr + djes*djes );
-
-	// float this_ul     = getObservedLimit( toterr , labels.at(i) );
-	// float this_ul_exp = getExpectedLimit( toterr , labels.at(i) );
-
-	// float xsecul      = this_ul / ( lumi * eff );
-	// float xsecul_exp  = this_ul_exp / ( lumi * eff );
+	hstaterr[i]->SetBinContent(ibin,jbin,eff_staterr);
 
 	float this_ul;
 	float this_ul_exp;
@@ -481,64 +561,99 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	//------------------------------------------
 
 	if( TString(labels.at(i)).Contains("T2TT_LM150") ){
-	  this_ul         = 66.7991;
-	  this_ul_exp     = 76.7344;
-	  this_ul_expp1   = 104.545;
-	  this_ul_expm1   = 56.8783;
+	  // this_ul         = 66.7991;
+	  // this_ul_exp     = 76.7344;
+	  // this_ul_expp1   = 104.545;
+	  // this_ul_expm1   = 56.8783;
 
-	  // this_ul       = getUpperLimit_SRA( toterr );
-	  // this_ul_exp   = getExpectedUpperLimit_SRA( toterr );
-	  // this_ul_expp1 = getExpectedP1UpperLimit_SRA( toterr );
-	  // this_ul_expm1 = getExpectedM1UpperLimit_SRA( toterr );
+	  this_ul       = getUpperLimit_T2tt_LM150( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_LM150( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_LM150( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_LM150( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_LM200") ){
-	  this_ul         = 25.714;
-	  this_ul_exp     = 32.2226;
-	  this_ul_expp1   = 43.9916;
-	  this_ul_expm1   = 23.6334;
+	  // this_ul         = 25.714;
+	  // this_ul_exp     = 32.2226;
+	  // this_ul_expp1   = 43.9916;
+	  // this_ul_expm1   = 23.6334;
+
+	  this_ul       = getUpperLimit_T2tt_LM200( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_LM200( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_LM200( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_LM200( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_LM250") ){
-	  this_ul         = 10.3561;
-	  this_ul_exp     = 15.1845;
-	  this_ul_expp1   = 23.3334;
-	  this_ul_expm1   = 10.9627;
+	  // this_ul         = 10.3561;
+	  // this_ul_exp     = 15.1845;
+	  // this_ul_expp1   = 23.3334;
+	  // this_ul_expm1   = 10.9627;
+
+	  this_ul       = getUpperLimit_T2tt_LM250( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_LM250( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_LM250( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_LM250( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_LM300") ){
-	  this_ul         = 7.7604;
-	  this_ul_exp     = 9.05201;
-	  this_ul_expp1   = 12.7193;
-	  this_ul_expm1   = 6.55692;
+	  // this_ul         = 7.7604;
+	  // this_ul_exp     = 9.05201;
+	  // this_ul_expp1   = 12.7193;
+	  // this_ul_expm1   = 6.55692;
+
+	  this_ul       = getUpperLimit_T2tt_LM300( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_LM300( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_LM300( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_LM300( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_HM150") ){
-	  this_ul         = 11.5352;
-	  this_ul_exp     = 14.5708;
-	  this_ul_expp1   = 20.3566;
-	  this_ul_expm1   = 10.4048;
+	  // this_ul         = 11.5352;
+	  // this_ul_exp     = 14.5708;
+	  // this_ul_expp1   = 20.3566;
+	  // this_ul_expm1   = 10.4048;
+
+	  this_ul       = getUpperLimit_T2tt_HM150( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_HM150( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_HM150( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_HM150( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_HM200") ){
-	  this_ul         = 7.4327;
-	  this_ul_exp     = 10.2928;
-	  this_ul_expp1   = 14.6985;
-	  this_ul_expm1   = 7.41028;
+	  // this_ul         = 7.4327;
+	  // this_ul_exp     = 10.2928;
+	  // this_ul_expp1   = 14.6985;
+	  // this_ul_expm1   = 7.41028;
+
+	  this_ul       = getUpperLimit_T2tt_HM200( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_HM200( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_HM200( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_HM200( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_HM250") ){
-	  this_ul         = 4.15662;
-	  this_ul_exp     = 7.37302;
-	  this_ul_expp1   = 10.4398;
-	  this_ul_expm1   = 5.09026;
+	  // this_ul         = 4.15662;
+	  // this_ul_exp     = 7.37302;
+	  // this_ul_expp1   = 10.4398;
+	  // this_ul_expm1   = 5.09026;
+
+	  this_ul       = getUpperLimit_T2tt_HM250( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_HM250( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_HM250( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_HM250( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_HM300") ){
-	  this_ul         = 3.97749;
-	  this_ul_exp     = 5.52676;
-	  this_ul_expp1   = 7.95513;
-	  this_ul_expm1   = 4.05663;
+	  // this_ul         = 3.97749;
+	  // this_ul_exp     = 5.52676;
+	  // this_ul_expp1   = 7.95513;
+	  // this_ul_expm1   = 4.05663;
+
+	  this_ul       = getUpperLimit_T2tt_HM300( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2tt_HM300( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2tt_HM300( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2tt_HM300( toterr );
 	}
 
 	//------------------------------------------
@@ -606,45 +721,75 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	//------------------------------------------
 
 	else if( TString(labels.at(i)).Contains("T2TT_BDT1L") ){
-	  this_ul         = 150.058;
-	  this_ul_exp     = 165.876;
-	  this_ul_expp1   = 228.763;
-	  this_ul_expm1   = 121.923;
+	  // this_ul         = 150.058;
+	  // this_ul_exp     = 165.876;
+	  // this_ul_expp1   = 228.763;
+	  // this_ul_expm1   = 121.923;
+
+	  this_ul       = getUpperLimit_T2TT_BDT1L( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2TT_BDT1L( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2TT_BDT1L( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2TT_BDT1L( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_BDT1T") ){
-	  this_ul         = 27.8416;
-	  this_ul_exp     = 36.9395;
-	  this_ul_expp1   = 50.9219;
-	  this_ul_expm1   = 27.1247;
+	  // this_ul         = 27.8416;
+	  // this_ul_exp     = 36.9395;
+	  // this_ul_expp1   = 50.9219;
+	  // this_ul_expm1   = 27.1247;
+
+	  this_ul       = getUpperLimit_T2TT_BDT1T( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2TT_BDT1T( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2TT_BDT1T( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2TT_BDT1T( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_BDT2") ){
-	  this_ul         = 15.5022;
-	  this_ul_exp     = 26.193;
-	  this_ul_expp1   = 35.9907;
-	  this_ul_expm1   = 18.5872;
+	  // this_ul         = 15.5022;
+	  // this_ul_exp     = 26.193;
+	  // this_ul_expp1   = 35.9907;
+	  // this_ul_expm1   = 18.5872;
+
+	  this_ul       = getUpperLimit_T2TT_BDT2( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2TT_BDT2( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2TT_BDT2( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2TT_BDT2( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_BDT3") ){
-	  this_ul         = 6.42278;
-	  this_ul_exp     = 9.12343;
-	  this_ul_expp1   = 12.9316;
-	  this_ul_expm1   = 6.50077;
+	  // this_ul         = 6.42278;
+	  // this_ul_exp     = 9.12343;
+	  // this_ul_expp1   = 12.9316;
+	  // this_ul_expm1   = 6.50077;
+
+	  this_ul       = getUpperLimit_T2TT_BDT3( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2TT_BDT3( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2TT_BDT3( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2TT_BDT3( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_BDT4") ){
-	  this_ul         = 4.36022;
-	  this_ul_exp     = 4.87426;
-	  this_ul_expp1   = 7.392;
-	  this_ul_expm1   = 3.68327;
+	  // this_ul         = 4.36022;
+	  // this_ul_exp     = 4.87426;
+	  // this_ul_expp1   = 7.392;
+	  // this_ul_expm1   = 3.68327;
+
+	  this_ul       = getUpperLimit_T2TT_BDT4( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2TT_BDT4( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2TT_BDT4( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2TT_BDT4( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2TT_BDT5") ){
-	  this_ul         = 26.1597;
-	  this_ul_exp     = 31.2588;
-	  this_ul_expp1   = 42.6817;
-	  this_ul_expm1   = 22.7823;
+	  // this_ul         = 26.1597;
+	  // this_ul_exp     = 31.2588;
+	  // this_ul_expp1   = 42.6817;
+	  // this_ul_expm1   = 22.7823;
+
+	  this_ul       = getUpperLimit_T2TT_BDT5( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2TT_BDT5( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2TT_BDT5( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2TT_BDT5( toterr );
 	}
 
 	//------------------------------------------
@@ -725,6 +870,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 	  exit(0);
 	}
 
+	// cout << endl;
+	// cout << "toterr " << toterr << endl;
+	// cout << "this_ul        " << this_ul       << endl;
+	// cout << "this_ul_exp    " << this_ul_exp   << endl;
+	// cout << "this_ul_expp1  " << this_ul_expp1 << endl;
+	// cout << "this_ul_expm1  " << this_ul_expm1 << endl;
 
 	float xsecul        = this_ul       / ( lumi * eff );
 	float xsecul_exp    = this_ul_exp   / ( lumi * eff );
@@ -792,8 +943,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     //TGraph *gr     = getGraph( sample , "observed" , signames.at(i) );
     //TGraph *gr_exp = getGraph( sample , "expected" , signames.at(i) );
 
-    gr[i]      = getRefXsecGraph(hxsec[i]     , "T2tt", 1.0);
-    gr_exp[i]  = getRefXsecGraph(hxsec_exp[i] , "T2tt", 1.0);
+    gr[i]      = getRefXsecGraph(hxsec[i]     , (char*) "T2tt", 1.0);
+    gr_exp[i]  = getRefXsecGraph(hxsec_exp[i] , (char*) "T2tt", 1.0);
 
     gr[i]->SetLineWidth(3);
     gr_exp[i]->SetLineWidth(3);
@@ -950,27 +1101,26 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
       //can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str(),pol));
     }
 
-    int bin = heff[i]->FindBin(500,50);
+    int bin = heff[i]->FindBin(300,50);
 
-    float toterr = 0.1; //sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
-    //float toterr = sqrt(pow(hjes[i]->GetBinContent(bin),2)+0.04*0.04 + 0.02*0.02 + 0.03*0.03 + btagerr*btagerr);
-    cout << "efficiency (500,50)  " << heff[i]->GetBinContent(bin) << endl;
+    cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
     cout << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
     cout << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
     cout << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
-    cout << "tot err              " << toterr << endl;
-    //cout << "obs limit            " << getObservedLimit(toterr,labels.at(i)) << endl;
-    //cout << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
+    cout << "tot err              " << htoterr[i]->GetBinContent(bin) << endl;
+    cout << "btag err             " << hbtagerr[i]->GetBinContent(bin) << endl;
+    cout << "stat err             " << hstaterr[i]->GetBinContent(bin) << endl;
     cout << endl << endl;
 
-    *logfile << "efficiency (500,50)  " << heff[i]->GetBinContent(bin) << endl;
+    *logfile << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
     *logfile << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
     *logfile << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
     *logfile << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
-    *logfile << "tot err              " << toterr << endl;
-    //*logfile << "obs limit            " << getObservedLimit(toterr,labels.at(i)) << endl;
-    //*logfile << "exp limit            " << getExpectedLimit(toterr,labels.at(i)) << endl;
+    *logfile << "tot err              " << htoterr[i]->GetBinContent(bin) << endl;
+    *logfile << "btag err             " << hbtagerr[i]->GetBinContent(bin) << endl;
+    *logfile << "stat err             " << hstaterr[i]->GetBinContent(bin) << endl;
     *logfile << endl << endl;
+
   }
 
 
@@ -990,6 +1140,10 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
     hexcl_expm1[i]->Write();
     heff[i]->Write();
     hjes[i]->Write();
+    htoterr[i]->Write();
+    hisrerr[i]->Write();
+    hbtagerr[i]->Write();
+    hstaterr[i]->Write();
     gr[i]->Write();
     gr_exp[i]->Write();
   }
@@ -1001,14 +1155,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 void doAll(){
 
   // C&C
-  // SMS("T2tt", 1,false,true);
+  SMS("T2tt", 1,false,true);
   // SMS("T2bw",25,false,true);
   // SMS("T2bw",50,false,true);
   // SMS("T2bw",75,false,true);
 
   // BDT
-  //SMS("T2tt", 1,true,true);
-  SMS("T2bw",25,true,true);
-  SMS("T2bw",50,true,true);
-  SMS("T2bw",75,true,true);
+  SMS("T2tt", 1,true,true);
+  // SMS("T2bw",25,true,true);
+  // SMS("T2bw",50,true,true);
+  // SMS("T2bw",75,true,true);
 }
