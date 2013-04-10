@@ -944,7 +944,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             rand_       = aleatorio.Uniform(0.0,1.0);
 
-	    float isrboost = (stopt.stop_t() + stopt.stop_tbar()).pt();
+	    float isrboost = 0.0;
+
+	    if     ( name.Contains("T2") ) isrboost = (stopt.stop_t() + stopt.stop_tbar()).pt();
+	    else if( name.Contains("ttsl") || name.Contains("ttdl") || name.Contains("ttall") || name.Contains("tt_") ) isrboost = (stopt.ttbar()).pt();
 
 	    isrweight_ = 1.0;
 	    if( isrboost > 120.0 && isrboost < 150.0 ) isrweight_ = 0.95;
