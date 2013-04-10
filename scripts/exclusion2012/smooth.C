@@ -50,7 +50,26 @@ TH2F* normalizeTH2( TH2F* hin , TH1F* hxsec , char* type){
   return hout;
 }
 
-void smoothTH2( TH2F* h , float min = 1.0e-10 , float max = 9){
+void fixupTH2( TH2F* h , char* sample , bool doBDT = false , float min = 1.0e-10 , float max = 9){
+
+  for( int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ ){
+    for( int jbin = 1 ; jbin <= h->GetYaxis()->GetNbins() ; jbin++ ){
+
+      int x      = h->GetXaxis()->GetBinCenter(ibin);
+      int y      = h->GetYaxis()->GetBinCenter(jbin);
+
+      if( TString(sample).Contains("T2tt") && doBDT && x==300 && y==125 ){
+	h->SetBinContent(ibin,jbin,2.5);
+      }
+
+
+    }
+  }
+
+}
+
+
+void smoothTH2( TH2F* h , char* sample , bool doBDT = false , float min = 1.0e-10 , float max = 9){
 
   /*
   gStyle->SetPaintTextFormat(".1f");
@@ -71,9 +90,11 @@ void smoothTH2( TH2F* h , float min = 1.0e-10 , float max = 9){
   for( int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ ){
     for( int jbin = 1 ; jbin <= h->GetYaxis()->GetNbins() ; jbin++ ){
 
-      float x      = h->GetXaxis()->GetBinCenter(ibin);
-      float y      = h->GetYaxis()->GetBinCenter(jbin);
+      int x      = h->GetXaxis()->GetBinCenter(ibin);
+      int y      = h->GetYaxis()->GetBinCenter(jbin);
 
+      if( TString(sample).Contains("T2tt") && (int) x-y == 175 ) continue;
+      
       // if( x == 400 && y == 175 ) cout << "FOUND IT" << endl;
       // else continue;
 	
@@ -166,7 +187,7 @@ void smoothTH2( TH2F* h , float min = 1.0e-10 , float max = 9){
 
 }
 
-TH2F* exclusionContour( TH2F* hul , int nsmooth = -1 , char* type = "nominal" ){
+TH2F* exclusionContour( TH2F* hul , char* sample , bool doBDT = false , int nsmooth = -1 , char* type = "nominal" ){
 
   TFile* f_xsec  = TFile::Open("stop_xsec.root");
   TH1F*  h_xsec  = (TH1F*) f_xsec->Get("h_stop_xsec");
@@ -174,13 +195,14 @@ TH2F* exclusionContour( TH2F* hul , int nsmooth = -1 , char* type = "nominal" ){
   TH2F*  h_R     = normalizeTH2( hul , h_xsec , type);
 
   //if( nsmooth > 0 ) h_R->Smooth(nsmooth);
-  if( nsmooth > 0 ) h_R->Smooth(nsmooth,"k3a");
+  //if( nsmooth > 0 ) h_R->Smooth(nsmooth,"k3a");
 
-  smoothTH2( h_R);
+  smoothTH2( h_R , sample , doBDT );
+
+  fixupTH2( h_R , sample , doBDT );
 
   double contours[1];
   contours[0] = 1.0;
-  //contours[1] = 2.0;
 
   h_R->SetContour(1,contours);
 
@@ -194,7 +216,7 @@ void smooth(){
   TH2F*  hul    = (TH2F*) f->Get("hxsec_best_exp");
   TH2F*  hexcl  = (TH2F*) f->Get("hexcl_exp");
 
-  TH2F* h_R = exclusionContour(hul);
+  TH2F* h_R = exclusionContour(hul,"T2tt",false);
 
   TCanvas *c1 = new TCanvas();
   c1->cd();
