@@ -232,6 +232,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   char* xchar         = (char*) "";
   char* BDTchar       = (char*) "";
   if( doBDT ) BDTchar = (char*) "_BDT";
+  bool  plotHCP       = true;
+
+  if( x==25 ) plotHCP = false;
 
   //----------------------------------------------
   // set up parameters for each scan
@@ -737,7 +740,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   blankHist( hxsec_best_exp , 300 );
   blankHist( hxsec_best , 300 );
   hxsec_best_exp->GetXaxis()->SetRangeUser(0,800);
-  TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,400);
+  TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,430);
   hdummy->Reset();
 
   // cout << endl << "observed" << endl;
@@ -765,7 +768,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
   hdummy->GetZaxis()->SetTitleOffset(0.8);
   hdummy->GetXaxis()->SetRangeUser(xaxismin,800);
-  hdummy->GetYaxis()->SetRangeUser(0,400);
+  hdummy->GetYaxis()->SetRangeUser(0,430);
   //hdummy->Draw("colz");
   hdummy->SetMinimum(0.001);
   hdummy->SetMaximum(100);
@@ -778,14 +781,19 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   //hexcl_exp->Draw("samebox");
   //hexcl->Draw("samebox");
 
-  TGraph* HCP;
-  if     ( TString(sample).Contains("T2tt") )  HCP   = T2tt_expected();
-  else if( TString(sample).Contains("T2bw") )  HCP   = T2bw_x50_expected();
+  if( plotHCP ){
+    TGraph* HCP;
+    if     ( TString(sample).Contains("T2tt") )             HCP   = T2tt_observed();
+    else if( TString(sample).Contains("T2bw") && x == 50 )  HCP   = T2bw_x50_observed();
+    else if( TString(sample).Contains("T2bw") && x == 75 )  HCP   = T2bw_x75_observed();
 
-  HCP->SetLineColor(6);
-  HCP->SetLineStyle(2);
-  HCP->SetLineWidth(4);
-  //HCP->Draw();
+    HCP->SetLineColor(6);
+    HCP->SetLineStyle(2);
+    HCP->SetLineWidth(3);
+
+    HCP->Draw();
+  }
+
 
   /*
   TGraph* gr       = new TGraph();
@@ -912,20 +920,25 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   */
 
 
-  t->SetTextSize(0.033);
+  t->SetTextSize(0.034);
   if( TString(sample).Contains("T2tt") ){
-    if     ( TString(pol).Contains("right") )  t->DrawLatex(0.18,0.77,"t_{R} scenario");
-    else if( TString(pol).Contains("left") )   t->DrawLatex(0.18,0.77,"t_{L} scenario");
-    else  t->DrawLatex(0.18,0.77,"50 / 50 t_{L} / t_{R} mixture");
-  }
-  if( doBDT ) t->DrawLatex(0.18,0.71,"BDT analysis");
-  else        t->DrawLatex(0.18,0.71,"cut-based analysis");
+    // if     ( TString(pol).Contains("right") )  t->DrawLatex(0.18,0.77,"t_{R} scenario");
+    // else if( TString(pol).Contains("left") )   t->DrawLatex(0.18,0.77,"t_{L} scenario");
+    // else  t->DrawLatex(0.18,0.77,"50 / 50 t_{L} / t_{R} mixture");
 
-  t->DrawLatex(0.18,0.83,label);
-  t->SetTextSize(0.04);
-  t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
-  t->DrawLatex(0.53,0.80,"Observed (#pm1#sigma^{theory})");
-  t->DrawLatex(0.53,0.75,"Expected (#pm1#sigma)");
+    if     ( TString(pol).Contains("right") )  t->DrawLatex(0.19,0.73,"right-handed top");
+    else if( TString(pol).Contains("left") )   t->DrawLatex(0.19,0.73,"left-handed top");
+    else  t->DrawLatex(0.19,0.73,"unpolarized top");
+  }
+  if( doBDT ) t->DrawLatex(0.19,0.78,"BDT analysis");
+  else        t->DrawLatex(0.19,0.78,"cut-based analysis");
+
+  t->DrawLatex(0.19,0.83,label);
+  t->SetTextSize(0.037);
+  //t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
+  t->DrawLatex(0.55,0.83,"Observed (#pm1#sigma^{theory})");
+  t->DrawLatex(0.55,0.78,"Expected (#pm1#sigma)");
+  if( plotHCP )   t->DrawLatex(0.55,0.73,"Observed (9.7 fb^{-1})");
   //if( doBDT ) t->DrawLatex(0.55,0.80,"Expected (#pm1#sigma)");
   //else        t->DrawLatex(0.55,0.80,"C&C expected");
   //else        t->DrawLatex(0.55,0.80,"cut-and-count");
@@ -943,11 +956,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // float yspace1 =     5;
   // float yspace2 =    17;
 
-  float xoffset = 0.51*(800-xaxismin)+xaxismin;
-  float yoffset = 330.0;
+  float xoffset = 0.53*(800-xaxismin)+xaxismin;
+  float yoffset = 370.0;
   float length  = 0.05*(800-xaxismin);
   float yspace1 =     5;
-  float yspace2 =    25;
+  float yspace2 =    28;
 
   // if( TString(sample).Contains("T2bw") && x==25 ){
   //   xoffset -= 130.0;
@@ -1000,6 +1013,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   line27->SetLineColor(1);
   line27->SetLineStyle(7);
   line27->Draw();
+
+  // observed -1  
+  TLine *lineHCP = new TLine(xoffset,yoffset-yspace2,xoffset+length,yoffset-yspace2);
+  lineHCP->SetLineWidth(2);
+  lineHCP->SetLineColor(6);
+  lineHCP->SetLineStyle(3);
+  if( plotHCP ) lineHCP->Draw();
 
 
 
@@ -1062,11 +1082,15 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
 void doAll(){
   combinePlots("T2tt", 1,false,"",true);
+  combinePlots("T2tt", 1,false,"right",true);
+  combinePlots("T2tt", 1,false,"left",true);
   combinePlots("T2bw",25,false,"",true);
   combinePlots("T2bw",50,false,"",true);
   combinePlots("T2bw",75,false,"",true);
 
   combinePlots("T2tt", 1,true,"",true);
+  combinePlots("T2tt", 1,true,"right",true);
+  combinePlots("T2tt", 1,true,"left",true);
   combinePlots("T2bw",25,true,"",true);
   combinePlots("T2bw",50,true,"",true);
   combinePlots("T2bw",75,true,"",true);
