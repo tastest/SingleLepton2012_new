@@ -215,15 +215,11 @@ void smoothHist(TH2F* h){
 // main function
 //------------------------------------ 
 
-void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool print = false){
+void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* pol = "" , bool print = false){
 
   //----------------------------------------------
   // input parameters
   //----------------------------------------------
-
-  char* pol           = (char*) "";
-  //char* pol         = "right";
-  //char* pol         = "left";
 
   bool  smooth        = false;
   char* filename      = (char*) "";
@@ -917,7 +913,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 
 
   t->SetTextSize(0.033);
-  if( TString(sample).Contains("T2tt") ) t->DrawLatex(0.18,0.77,"50 / 50 t_{L} / t_{R} mixture");
+  if( TString(sample).Contains("T2tt") ){
+    if     ( TString(pol).Contains("right") )  t->DrawLatex(0.18,0.77,"t_{R} scenario");
+    else if( TString(pol).Contains("left") )   t->DrawLatex(0.18,0.77,"t_{L} scenario");
+    else  t->DrawLatex(0.18,0.77,"50 / 50 t_{L} / t_{R} mixture");
+  }
+  if( doBDT ) t->DrawLatex(0.18,0.71,"BDT analysis");
+  else        t->DrawLatex(0.18,0.71,"cut-based analysis");
+
   t->DrawLatex(0.18,0.83,label);
   t->SetTextSize(0.04);
   t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
@@ -1058,13 +1061,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, bool pr
 }
 
 void doAll(){
-  combinePlots("T2tt", 1,false,true);
-  combinePlots("T2bw",25,false,true);
-  combinePlots("T2bw",50,false,true);
-  combinePlots("T2bw",75,false,true);
+  combinePlots("T2tt", 1,false,"",true);
+  combinePlots("T2bw",25,false,"",true);
+  combinePlots("T2bw",50,false,"",true);
+  combinePlots("T2bw",75,false,"",true);
 
-  combinePlots("T2tt", 1,true,true);
-  combinePlots("T2bw",25,true,true);
-  combinePlots("T2bw",50,true,true);
-  combinePlots("T2bw",75,true,true);
+  combinePlots("T2tt", 1,true,"",true);
+  combinePlots("T2bw",25,true,"",true);
+  combinePlots("T2bw",50,true,"",true);
+  combinePlots("T2bw",75,true,"",true);
 }
