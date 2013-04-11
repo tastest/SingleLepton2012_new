@@ -9,8 +9,8 @@
   // char* filename_in  = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw.root";
   // char* filename_out = "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
 
-  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_massiveLSP.root";
-  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_massiveLSP_25GeVbins.root";
+  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_masslessLSP.root";
+  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_masslessLSP_25GeVbins.root";
 
   cout << "Reading in  " << filename_in  << endl;
   cout << "Writing out " << filename_out << endl;
