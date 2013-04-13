@@ -153,6 +153,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_coarse/myMassDB_T2bw_coarse.root";
 	  }
 
+	  else if( name.Contains("x050") ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_x50.root";
+	  }
+
 	  else{
 	    cout << __FILE__ << " " << __LINE__ << " ERROR! I don't recognize " << name << ", quitting" << endl;
 	    exit(0);
@@ -469,6 +473,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	      // if x is buggy, calculate it by hand using the genparticle masses
 	      //---------------------------------------------------------------------
 
+	      /*
 	      if( x_ < -1.0 ){
 
 		//cout << "mstop mlsp " << stopt.mg() << " " << stopt.ml() << endl;
@@ -511,6 +516,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		//cout << "mchi x " << mchi << " " << x_ << endl << endl;
 
 	      } 
+	      */
 
 	      float nevents = 0;
 	      if ( x_ == 0.25 ){
@@ -1038,7 +1044,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        outFile_   = new TFile(Form("output_V00-03-06/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-08/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
