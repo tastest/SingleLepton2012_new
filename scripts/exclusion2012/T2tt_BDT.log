@@ -2,6 +2,7 @@
 Sample            T2tt
 logfile           T2tt_BDT.log
 x                 1
+pol               
 Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged*root
 Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root
 Denom histo       masses
@@ -86,7 +87,7 @@ efficiency (300,50)  1.13889
 xsec UL              0.675874
 xsec UL exp          0.747018
 JES                  0.0545335
-tot err              0.106192
+tot err              0.109166
 btag err             0.00797254
 stat err             0.025309
 
@@ -95,7 +96,7 @@ efficiency (300,50)  0.333897
 xsec UL              0.42697
 xsec UL exp          0.566734
 JES                  0.0963244
-tot err              0.136005
+tot err              0.143813
 btag err             0.00576794
 stat err             0.0467421
 
@@ -104,25 +105,25 @@ efficiency (300,50)  0.19594
 xsec UL              0.405671
 xsec UL exp          0.685714
 JES                  0.0702399
-tot err              0.134792
+tot err              0.14796
 btag err             0.00542459
 stat err             0.0610173
 
 
 efficiency (300,50)  0.0411836
-xsec UL              0.809385
-xsec UL exp          1.14559
+xsec UL              0.821837
+xsec UL exp          1.18295
 JES                  0.139459
-tot err              0.185384
+tot err              0.228212
 btag err             0
 stat err             0.133092
 
 
 efficiency (300,50)  0.00566243
-xsec UL              4.07545
-xsec UL exp          4.61884
+xsec UL              4.43771
+xsec UL exp          5.07167
 JES                  0.0948209
-tot err              0.215742
+tot err              0.418781
 btag err             0
 stat err             0.358933
 
@@ -131,7 +132,7 @@ efficiency (300,50)  0.103606
 xsec UL              1.29683
 xsec UL exp          1.54926
 JES                  0.0435215
-tot err              0.117227
+tot err              0.144164
 btag err             0.0119277
 stat err             0.0839116
 

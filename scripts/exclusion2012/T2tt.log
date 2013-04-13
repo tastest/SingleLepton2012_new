@@ -2,6 +2,7 @@
 Sample            T2tt
 logfile           T2tt.log
 x                 1
+pol               
 Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged*root
 Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root
 Denom histo       masses
@@ -110,7 +111,7 @@ efficiency (300,50)  0.559619
 xsec UL              0.612138
 xsec UL exp          0.702859
 JES                  0.0644692
-tot err              0.109583
+tot err              0.115378
 btag err             0.00406232
 stat err             0.0361051
 
@@ -119,7 +120,7 @@ efficiency (300,50)  0.223183
 xsec UL              0.590525
 xsec UL exp          0.739879
 JES                  0.076641
-tot err              0.128757
+tot err              0.14088
 btag err             0.0014382
 stat err             0.0571721
 
@@ -128,52 +129,52 @@ efficiency (300,50)  0.073342
 xsec UL              0.70621
 xsec UL exp          1.05582
 JES                  0.0697235
-tot err              0.150948
+tot err              0.180919
 btag err             0.00453568
 stat err             0.0997328
 
 
 efficiency (300,50)  0.0274998
-xsec UL              1.45455
-xsec UL exp          1.69698
+xsec UL              1.49185
+xsec UL exp          1.73428
 JES                  0.0490961
-tot err              0.148368
+tot err              0.220319
 btag err             0.0120966
 stat err             0.162873
 
 
 efficiency (300,50)  0.0842091
-xsec UL              0.700332
-xsec UL exp          0.889117
+xsec UL              0.712512
+xsec UL exp          0.907387
 JES                  0.088506
-tot err              0.123807
+tot err              0.154891
 btag err             0.00359952
 stat err             0.0930754
 
 
 efficiency (300,50)  0.0440075
 xsec UL              0.862324
-xsec UL exp          1.20026
+xsec UL exp          1.21192
 JES                  0.073419
-tot err              0.123474
+tot err              0.178389
 btag err             0.0214504
 stat err             0.128751
 
 
 efficiency (300,50)  0.0207545
-xsec UL              1.03778
-xsec UL exp          1.82846
+xsec UL              1.08719
+xsec UL exp          1.87788
 JES                  0.0623374
-tot err              0.13192
+tot err              0.229243
 btag err             0.0160282
 stat err             0.187482
 
 
 efficiency (300,50)  0.00913451
-xsec UL              2.24564
-xsec UL exp          3.25618
+xsec UL              2.35792
+xsec UL exp          3.4246
 JES                  0.15703
-tot err              0.19855
+tot err              0.345376
 btag err             0.0364174
 stat err             0.2826
 
