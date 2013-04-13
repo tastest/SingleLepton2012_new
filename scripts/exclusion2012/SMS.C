@@ -43,17 +43,13 @@
 
 using namespace std;
 
-void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = false){
+void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" , bool print = false){
 
   gStyle->SetPaintTextFormat(".2f");
 
   //--------------------------------------------------
   // input parameters
   //--------------------------------------------------
-
-  char* pol             = (char*) "";
-  //const char* pol       = (char*) "left";
-  //const char* pol       = (char*) "right";
 
   const float lumi      = 19500;
   char* suffix          = (char*) "";
@@ -75,16 +71,8 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   // set up input files
   //--------------------------------------------------
 
-  if( TString(sample).Contains("T2tt") ){
-    
-    //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2tt_*root";
-    //denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-22/T2tt_mad/minibabyV00-03-03/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_25GeVbins.root";
-
-    //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/merged*root";
-    //denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-23/T2tt_mad/minibaby_V00-03-04/Skim_4jets_MET100_MT120/myMassDB_T2tt_MG_combined_25GeVbins.root";
-
+  if( TString(sample).Contains("T2tt") ){    
     filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged*root";
-    //filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged_T2tt_mStop-150to350_mLSP-0to250.root";
     denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root";
 
     label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#tilde{#chi}_{1}^{0}";
@@ -139,6 +127,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   cout << "Sample            " << sample          << endl;
   cout << "logfile           " << logfilename     << endl;
   cout << "x                 " << x               << endl;
+  cout << "pol               " << pol             << endl;
   cout << "Using file        " << filename        << endl;
   cout << "Using denominator " << denomname       << endl;
   cout << "Denom histo       " << denomhistoname  << endl;
@@ -149,6 +138,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
   *logfile << "Sample            " << sample          << endl;
   *logfile << "logfile           " << logfilename     << endl;
   *logfile << "x                 " << x               << endl;
+  *logfile << "pol               " << pol             << endl;
   *logfile << "Using file        " << filename        << endl;
   *logfile << "Using denominator " << denomname       << endl;
   *logfile << "Denom histo       " << denomhistoname  << endl;
@@ -1155,14 +1145,18 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , bool print = fa
 void doAll(){
 
   // C&C
-  SMS("T2tt", 1,false,true);
-  // SMS("T2bw",25,false,true);
-  // SMS("T2bw",50,false,true);
-  // SMS("T2bw",75,false,true);
+  //SMS("T2tt", 1,false,""     ,true); //unpolarized
+  SMS("T2tt", 1,false,"left" ,true); //topL
+  SMS("T2tt", 1,false,"right",true); //topR
+  // SMS("T2bw",25,false,"",true);
+  // SMS("T2bw",50,false,"",true);
+  // SMS("T2bw",75,false,"",true);
 
   // BDT
-  SMS("T2tt", 1,true,true);
-  // SMS("T2bw",25,true,true);
-  // SMS("T2bw",50,true,true);
-  // SMS("T2bw",75,true,true);
+  //SMS("T2tt", 1,true,""     ,true);
+  SMS("T2tt", 1,true,"left" ,true);
+  SMS("T2tt", 1,true,"right",true);
+  // SMS("T2bw",25,true,"",true);
+  // SMS("T2bw",50,true,"",true);
+  // SMS("T2bw",75,true,"",true);
 }
