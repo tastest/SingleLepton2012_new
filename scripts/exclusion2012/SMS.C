@@ -304,7 +304,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
       sigcuts.push_back(presel+met250+dphi+chi2);        signames.push_back("T2TT_LM250");   labels.push_back("T2TT_LM250");   uls.push_back(19.0);
       sigcuts.push_back(presel+met300+dphi+chi2);        signames.push_back("T2TT_LM300");   labels.push_back("T2TT_LM300");   uls.push_back( 9.9);
 
-      // high-mass
+      // // high-mass
       sigcuts.push_back(presel+met150+dphi+chi2+mt2w);   signames.push_back("T2TT_HM150");   labels.push_back("T2TT_HM150");   uls.push_back(17.5);
       sigcuts.push_back(presel+met200+dphi+chi2+mt2w);   signames.push_back("T2TT_HM200");   labels.push_back("T2TT_HM200");   uls.push_back(12.3);
       sigcuts.push_back(presel+met250+dphi+chi2+mt2w);   signames.push_back("T2TT_HM250");   labels.push_back("T2TT_HM250");   uls.push_back( 9.0);
@@ -345,6 +345,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   //--------------------------------------------------
   
   TH2F* heff[nsig];
+  TH2F* hnevents[nsig];
   TH2F* heff_noisr[nsig];
   TH2F* heffup[nsig];
   TH2F* heffdn[nsig];
@@ -435,6 +436,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     float ymax    =  1012.5;
 
     heff[i]        = new TH2F(Form("heff_%i",i)          , Form("heff_%i",i)         , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hnevents[i]    = new TH2F(Form("hnevents_%i",i)      , Form("hnevents_%i",i)     , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     heff_noisr[i]  = new TH2F(Form("heff_noisr_%i",i)    , Form("heff_noisr_%i",i)   , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     heffup[i]      = new TH2F(Form("heffup_%i",i)        , Form("heffup_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
     heffdn[i]      = new TH2F(Form("heffdn_%i",i)        , Form("heffdn_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
@@ -464,6 +466,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     ch->Draw(Form("ml:mg>>heff_%i",i),sigcuts.at(i)*weight*isrweight);
     TH2F* hnevents = (TH2F*) heff[i]->Clone(Form("hnevents_%i",i));
     heff[i]->Divide(hdenom);
+
+    // raw number of signal events
+    ch->Draw(Form("ml:mg>>hnevents_%i",i),sigcuts.at(i));
 
     // JES up
     ch->Draw(Form("ml:mg>>heffup_%i",i),jesupcut*weight*isrweight);
@@ -1093,22 +1098,26 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
     int bin = heff[i]->FindBin(300,50);
 
-    cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
-    cout << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
+    cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    cout << "nevents              " << hnevents[i]->GetBinContent(bin)  << endl;
+    cout << "xsec UL              " << hxsec[i]->GetBinContent(bin)     << endl;
     cout << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
-    cout << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
-    cout << "tot err              " << htoterr[i]->GetBinContent(bin) << endl;
-    cout << "btag err             " << hbtagerr[i]->GetBinContent(bin) << endl;
-    cout << "stat err             " << hstaterr[i]->GetBinContent(bin) << endl;
+    cout << "JES                  " << hjes[i]->GetBinContent(bin)      << endl;
+    cout << "tot err              " << htoterr[i]->GetBinContent(bin)   << endl;
+    cout << "btag err             " << hbtagerr[i]->GetBinContent(bin)  << endl;
+    cout << "ISR err              " << hisrerr[i]->GetBinContent(bin)   << endl;
+    cout << "stat err             " << hstaterr[i]->GetBinContent(bin)  << endl;
     cout << endl << endl;
 
-    *logfile << "efficiency (300,50)  " << heff[i]->GetBinContent(bin) << endl;
-    *logfile << "xsec UL              " << hxsec[i]->GetBinContent(bin) << endl;
+    *logfile << "efficiency (300,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    *logfile << "nevents              " << hnevents[i]->GetBinContent(bin)  << endl;
+    *logfile << "xsec UL              " << hxsec[i]->GetBinContent(bin)     << endl;
     *logfile << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
-    *logfile << "JES                  " << hjes[i]->GetBinContent(bin) << endl;
-    *logfile << "tot err              " << htoterr[i]->GetBinContent(bin) << endl;
-    *logfile << "btag err             " << hbtagerr[i]->GetBinContent(bin) << endl;
-    *logfile << "stat err             " << hstaterr[i]->GetBinContent(bin) << endl;
+    *logfile << "JES                  " << hjes[i]->GetBinContent(bin)      << endl;
+    *logfile << "tot err              " << htoterr[i]->GetBinContent(bin)   << endl;
+    *logfile << "btag err             " << hbtagerr[i]->GetBinContent(bin)  << endl;
+    *logfile << "ISR err              " << hisrerr[i]->GetBinContent(bin)   << endl;
+    *logfile << "stat err             " << hstaterr[i]->GetBinContent(bin)  << endl;
     *logfile << endl << endl;
 
   }
@@ -1129,6 +1138,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     hexcl_expp1[i]->Write();
     hexcl_expm1[i]->Write();
     heff[i]->Write();
+    hnevents[i]->Write();
     hjes[i]->Write();
     htoterr[i]->Write();
     hisrerr[i]->Write();
