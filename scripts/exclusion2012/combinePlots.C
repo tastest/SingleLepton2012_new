@@ -233,7 +233,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   char* BDTchar       = (char*) "";
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
+  bool  plotPol       = false;
 
+  if( !TString(sample).Contains("T2tt" ) ) plotPol = false;
   if( x==25 ) plotHCP = false;
 
   //----------------------------------------------
@@ -259,7 +261,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   else if( TString(sample).Contains("T2bw") ){
 
     doRemoveSlice = false;
-    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm} #rightarrow b W #tilde{#chi}_{1}^{0}";
+    //label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm} #rightarrow b W #tilde{#chi}_{1}^{0}";
+    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
 
     if( x==25 ){
       xaxismin        = 360.0;
@@ -781,8 +784,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   //hexcl_exp->Draw("samebox");
   //hexcl->Draw("samebox");
 
+  //------------------------------------
+  // overlay HCP exclusion regions
+  //------------------------------------
+
+  TGraph* HCP = new TGraph();
+
   if( plotHCP ){
-    TGraph* HCP;
     if     ( TString(sample).Contains("T2tt") )             HCP   = T2tt_observed();
     else if( TString(sample).Contains("T2bw") && x == 50 )  HCP   = T2bw_x50_observed();
     else if( TString(sample).Contains("T2bw") && x == 75 )  HCP   = T2bw_x75_observed();
@@ -794,66 +802,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     HCP->Draw();
   }
 
-
-  /*
-  TGraph* gr       = new TGraph();
-  TGraph* gr_exp   = new TGraph();
-  TGraph* gr_expp1 = new TGraph();
-  TGraph* gr_expm1 = new TGraph();
-  TGraph* gr_obsp1 = new TGraph();
-  TGraph* gr_obsm1 = new TGraph();
-
-  if( TString(sample).Contains("T2tt") ){
-    gr       = T2tt_observed();
-    gr_exp   = T2tt_expected();
-    gr_expp1 = T2tt_expectedP1();
-    gr_expm1 = T2tt_expectedM1();
-    gr_obsp1 = T2tt_observedP1();
-    gr_obsm1 = T2tt_observedM1();
-  }
-  else if( TString(sample).Contains("T2bw") && x==75 ){
-    gr       = T2bw_x75_observed();
-    gr_exp   = T2bw_x75_expected();
-    gr_expp1 = T2bw_x75_expectedP1();
-    gr_expm1 = T2bw_x75_expectedM1();
-    gr_obsp1 = T2bw_x75_observedP1();
-    gr_obsm1 = T2bw_x75_observedM1();
-  }
-  else if( TString(sample).Contains("T2bw") && x==50 ){
-    gr       = T2bw_x50_observed();
-    gr_exp   = T2bw_x50_expected();
-    gr_expp1 = T2bw_x50_expectedP1();
-    gr_expm1 = T2bw_x50_expectedM1();
-    gr_obsp1 = T2bw_x50_observedP1();
-    gr_obsm1 = T2bw_x50_observedM1();
-  }
-  */
-
-  gr->SetLineWidth(4);
-
-  gr_exp->SetLineColor(2);
-  gr_exp->SetLineWidth(3);
-  gr_exp->SetLineStyle(1);
-
-  gr_expp1->SetLineWidth(3);
-  gr_expp1->SetLineStyle(3);
-  gr_expm1->SetLineWidth(3);
-  gr_expm1->SetLineStyle(3);
-
-  gr_exp->SetLineColor(4);
-  gr_expp1->SetLineColor(2);
-  gr_expm1->SetLineColor(2);
-
-  gr_obsp1->SetLineStyle(2);
-  gr_obsm1->SetLineStyle(2);
-  gr_obsp1->SetLineWidth(3);
-  gr_obsm1->SetLineWidth(3);
-
-  // gr->Draw();
-  // gr_exp->Draw();
-  // gr_expp1->Draw();
-  // gr_expm1->Draw();
-
   //-------------------------------
   // draw exclusion contours
   //-------------------------------
@@ -862,31 +810,68 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hR_exp->Draw("CONT3SAMEC");
   hR_expp1->Draw("CONT3SAMEC");
   hR_expm1->Draw("CONT3SAMEC");
-  hR_obsp1->Draw("CONT3SAMEC");
-  hR_obsm1->Draw("CONT3SAMEC");
+  if( !plotPol ){
+    hR_obsp1->Draw("CONT3SAMEC");
+    hR_obsm1->Draw("CONT3SAMEC");
+  }
 
   if( TString(sample).Contains("T2tt") ){
     hR_smallDM->Draw("CONT3SAMEC");
     hR_exp_smallDM->Draw("CONT3SAMEC");
     hR_expp1_smallDM->Draw("CONT3SAMEC");
     hR_expm1_smallDM->Draw("CONT3SAMEC");
-    hR_obsp1_smallDM->Draw("CONT3SAMEC");
-    hR_obsm1_smallDM->Draw("CONT3SAMEC");
+    if( !plotPol ){
+      hR_obsp1_smallDM->Draw("CONT3SAMEC");
+      hR_obsm1_smallDM->Draw("CONT3SAMEC");
+    }
   }
 
-  // gr_expp1->Draw();
-  // gr_expm1->Draw();
-  // gr_obsp1->Draw();
-  // gr_obsm1->Draw();
-  // gr->Draw();
+  //------------------------------------
+  // overlay left/right top scenarios
+  //------------------------------------
 
-  // hexcl_exp1->SetContour(1,contours);
-  // hexcl_exp1->SetLineWidth(4);
-  // hexcl_exp1->Draw("SAMECONT3");
+  if( plotPol ){
+    char* f_right = "";
+    char* f_left  = "";
 
-  // hexcl_exp2->SetContour(1,contours);
-  // hexcl_exp2->SetLineWidth(4);
-  // hexcl_exp2->Draw("SAMECONT3");
+    if( doBDT ){
+      f_right = "T2tt_combinePlotsright_BDT.root";
+      f_left  = "T2tt_combinePlotsleft_BDT.root";
+    }
+
+    else{
+      f_right = "T2tt_combinePlotsright.root";
+      f_left  = "T2tt_combinePlotsleft.root";
+    }
+
+    TFile* fR = TFile::Open(f_right);
+    TFile* fL = TFile::Open(f_left);
+
+    TH2F*  h_right = (TH2F*) fR->Get("hR");
+    TH2F*  h_left  = (TH2F*) fL->Get("hR");
+
+    TH2F*  h_right_smallDM = (TH2F*) fR->Get("hR_smallDM");
+    TH2F*  h_left_smallDM  = (TH2F*) fL->Get("hR_smallDM");
+
+    h_right->SetLineStyle(7);
+    h_right->SetLineWidth(1);
+
+    h_left->SetLineStyle(7);
+    h_left->SetLineWidth(1);
+
+    h_right_smallDM->SetLineStyle(7);
+    h_right_smallDM->SetLineWidth(1);
+
+    h_left_smallDM->SetLineStyle(7);
+    h_left_smallDM->SetLineWidth(1);
+
+    h_right->Draw("CONT3SAME");
+    h_left->Draw("CONT3SAME");
+
+    h_right_smallDM->Draw("CONT3SAME");
+    h_left_smallDM->Draw("CONT3SAME");
+  }
+
 
   // cout << endl << "observed" << endl;
   // printGraph(gr);
@@ -901,31 +886,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // cout << endl << "expected (-1)" << endl;
   // printGraph(gr_expm1);
 
-  // TLegend *leg = new TLegend(0.2,0.6,0.65,0.8);
-  // leg->AddEntry(gr,       "observed","l");
-  // leg->AddEntry(gr_exp,   "median expected (#pm1#sigma)","l");
-  // //leg->AddEntry(gr_expp1, "expected (#pm1#sigma)","l");
-  // leg->SetFillColor(0);
-  // leg->SetBorderSize(0);
-  // leg->Draw();
-
-  /*
-  t->SetTextSize(0.04);
-  t->DrawLatex(0.20,0.72  ,"NLO-NLL exclusions");
-  t->DrawLatex(0.27,0.67,"Observed #pm1#sigma^{theory}");
-  t->DrawLatex(0.27,0.62,"Expected #pm1#sigma");
-
-  t->DrawLatex(0.19,0.84,label);
-  t->DrawLatex(0.19,0.79,"unpolarized top quarks");
-  */
-
+  //---------------------------------
+  // print labels
+  //---------------------------------
 
   t->SetTextSize(0.034);
-  if( TString(sample).Contains("T2tt") ){
-    // if     ( TString(pol).Contains("right") )  t->DrawLatex(0.18,0.77,"t_{R} scenario");
-    // else if( TString(pol).Contains("left") )   t->DrawLatex(0.18,0.77,"t_{L} scenario");
-    // else  t->DrawLatex(0.18,0.77,"50 / 50 t_{L} / t_{R} mixture");
-
+  if( TString(sample).Contains("T2tt") && !plotPol ){
     if     ( TString(pol).Contains("right") )  t->DrawLatex(0.19,0.73,"right-handed top");
     else if( TString(pol).Contains("left") )   t->DrawLatex(0.19,0.73,"left-handed top");
     else  t->DrawLatex(0.19,0.73,"unpolarized top");
@@ -935,26 +901,75 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
   t->DrawLatex(0.19,0.83,label);
   t->SetTextSize(0.037);
+
+  //---------------------------------
+  // print legend
+  //---------------------------------
+
+  float ylegmin = 0.7;
+  if( !plotHCP ) ylegmin = 0.76;
+
+  TLegend *leg = new TLegend(0.45,ylegmin,0.80,0.88);
+
+  if( plotPol ){
+    leg->AddEntry(hR       ,"Observed (unpolarized)"   ,"l");
+    leg->AddEntry(hR_obsp1 ,"Observed (t_{L} / t_{R})" ,"l");
+  }
+  else{
+    leg->SetTextSize(0.04);
+    leg->AddEntry(hR       ,"Observed (#pm1#sigma^{theory})"   ,"l");
+  }
+  leg->AddEntry(hR_exp   ,"Expected (#pm1#sigma)"    ,"l");
+  if( plotHCP ) leg->AddEntry(HCP  ,"Observed (9.7 fb^{-1})","l");
+
+  leg->SetBorderSize(0);
+  leg->SetFillColor(0);
+  leg->Draw();
+
+  float xoffset = 0.47*(800-xaxismin)+xaxismin;
+  float yoffset = 356.0;
+  float length  = 0.092*(800-xaxismin);
+  float yspace1 =     5;
+  float yspace2 =    34;
+
+  if( !plotPol ){
+    yoffset = 368;
+  }
+
+  // expected +/-1sigma
+  TLine *line_exp = new TLine();
+  line_exp->SetLineWidth(1);
+  line_exp->SetLineColor(2);
+  line_exp->SetLineStyle(3);
+  line_exp->DrawLine(xoffset,yoffset+yspace1,xoffset+length,yoffset+yspace1);
+  line_exp->DrawLine(xoffset,yoffset-yspace1,xoffset+length,yoffset-yspace1);
+
+  // observed +/-1sigma
+  TLine *line_obs = new TLine();
+  line_obs->SetLineWidth(1);
+  line_obs->SetLineColor(1);
+  line_obs->SetLineStyle(7);
+  if( !plotPol ){
+    line_obs->DrawLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
+    line_obs->DrawLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
+  }
+
   //t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
-  t->DrawLatex(0.55,0.83,"Observed (#pm1#sigma^{theory})");
-  t->DrawLatex(0.55,0.78,"Expected (#pm1#sigma)");
-  if( plotHCP )   t->DrawLatex(0.55,0.73,"Observed (9.7 fb^{-1})");
-  //if( doBDT ) t->DrawLatex(0.55,0.80,"Expected (#pm1#sigma)");
-  //else        t->DrawLatex(0.55,0.80,"C&C expected");
-  //else        t->DrawLatex(0.55,0.80,"cut-and-count");
 
+  /*
+  if( !plotPol ){
+    t->DrawLatex(0.55,0.83,"Observed (#pm1#sigma^{theory})");
+    t->DrawLatex(0.55,0.78,"Expected (#pm1#sigma)");
+    if( plotHCP )   t->DrawLatex(0.55,0.73,"Observed (9.7 fb^{-1})");
+  }
 
-  t->SetTextSize(0.045);
-  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#tilde{#chi}_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#tilde{#chi}_{1}^{0}}");
-
-  // float offset = 40.0;
-  // float xoffset = 405.0;
-  // float yoffset = 213.0;
-  // float length  =  30.0;
-  // float yspace1 =     5;
-  // float yspace2 =    17;
+  else{
+    t->SetTextSize(0.034);
+    t->DrawLatex(0.5,0.84,"Observed (unpolarized)");
+    t->DrawLatex(0.5,0.80,"Observed (t_{L} / t_{R})");
+    t->DrawLatex(0.5,0.76,"Expected (#pm1#sigma)");
+    if( plotHCP )   t->DrawLatex(0.50,0.72,"Observed (9.7 fb^{-1})");
+  }
 
   float xoffset = 0.53*(800-xaxismin)+xaxismin;
   float yoffset = 370.0;
@@ -962,16 +977,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   float yspace1 =     5;
   float yspace2 =    28;
 
-  // if( TString(sample).Contains("T2bw") && x==25 ){
-  //   xoffset -= 130.0;
-  //   length = 20;
-  // }
-  // if( TString(sample).Contains("T2bw") && x==50 ){
-  //   xoffset -= 40.0;
-  //   length = 30;
-  // }
-  //if( TString(sample).Contains("T2bw") && x==75 ) xoffset -= 30.0;
-  
+  t->SetTextSize(0.045);
+  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#tilde{#chi}_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#tilde{#chi}_{1}^{0}}");
+
+
+  if( plotPol ) xoffset -= 30.0;
+
   // median expected
   TLine *line22 = new TLine(xoffset,yoffset,xoffset+length,yoffset);
   line22->SetLineWidth(4);
@@ -1020,7 +1033,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   lineHCP->SetLineColor(6);
   lineHCP->SetLineStyle(3);
   if( plotHCP ) lineHCP->Draw();
-
+  */
 
 
   t->SetTextSize(0.04);
@@ -1043,10 +1056,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   //   t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
   // }
 
+  char* allpolchar = "";
+  if( plotPol ) allpolchar = "_allPol";
+
   if( print ){
-    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar));
-    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar));
-    can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar));
+    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,allpolchar));
+    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,allpolchar));
+    can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,allpolchar));
   }
 
   TFile* fout = TFile::Open(outfilename,"RECREATE");
