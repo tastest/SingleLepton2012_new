@@ -78,6 +78,41 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#tilde{#chi}_{1}^{0}";
   }
 
+  else if( TString(sample).Contains("T2bw_MG") ){
+
+    if( x==25 ){
+      cout << "T2bw x=0.25 MG sample not yet ready" << endl;
+      exit(0);
+      // xchar          = (char*) "_x25";
+      // denomhistoname = (char*) "masses25";
+      // filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x25.root";
+      // denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      // label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.25";
+    }
+
+    else if( x==50 ){
+      xchar          = (char*) "_x50";
+      denomhistoname = (char*) "masses";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/merged*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x50_25GeVbins.root";
+      label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.50";
+    }
+
+    else if( x==75 ){
+      cout << "T2bw x=0.75 MG sample not yet ready" << endl;
+      exit(0);
+      // xchar          = (char*) "_x75";
+      // denomhistoname = (char*) "masses75";
+      // filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
+      // denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      // label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
+    }
+    
+    else{
+      cout << "ERROR! unrecognized x value " << x << ", quitting!!!" << endl;
+    }
+  }
+
   else if( TString(sample).Contains("T2bw") ){
 
     if( x==25 ){
@@ -103,13 +138,13 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
       denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
     }
-    
+
     else{
       cout << "ERROR! unrecognized x value " << x << ", quitting!!!" << endl;
     }
-
   }
 
+ 
   else{
     cout << "ERROR! unrecognized sample " << sample << ", quitting!!!" << endl;
     exit(0);
@@ -382,7 +417,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     jesup.ReplaceAll(" mini_mt"           , "mini_mtup"       );
     jesup.ReplaceAll("mini_chi2"          , "mini_chi2up"     );
     jesup.ReplaceAll("mini_mt2w"          , "mini_mt2wup"     );
-    jesup.ReplaceAll("mini_pt_b"          , "mini_pt_bup"     );
+    jesup.ReplaceAll("mini_pt_b"          , "mini_pt_b_up"     );
     jesup.ReplaceAll("mini_bdt"           , "mini_bdtup"      );
 
     TString jesdown(sigcuts.at(i));
@@ -391,7 +426,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     jesdown.ReplaceAll(" mini_mt"         , "mini_mtdown"     );
     jesdown.ReplaceAll("mini_chi2"        , "mini_chi2down"   );
     jesdown.ReplaceAll("mini_mt2w"        , "mini_mt2wdown"   );
-    jesdown.ReplaceAll("mini_pt_b"        , "mini_pt_bdown"   );
+    jesdown.ReplaceAll("mini_pt_b"        , "mini_pt_b_down"   );
     jesdown.ReplaceAll("mini_bdt"         , "mini_bdtdown"    );
 
     TString btagup(sigcuts.at(i));
