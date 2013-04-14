@@ -272,7 +272,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     }
 
     else if( x==50 ){
-      xaxismin        = 180.0;
+      xaxismin        = 80.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
       if( doBDT ) nSR = 4;
@@ -1047,14 +1047,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
   }
 
-  // if( TString(sample).Contains("T2bw") ){
-  //   if     (x==75) line->DrawLine(108   , 0 , 300+12.5+108   , 300+12.5);
-  //   if     (x==50) line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
-  //   else if(x==25) line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
-  //   t->SetTextAngle(55);
-  //   t->SetTextSize(0.045);
-  //   t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
-  // }
+  if( TString(sample).Contains("T2bw") ){
+    if     (x==75) line->DrawLine(108   , 0 , 300+12.5+108   , 300+12.5);
+    if     (x==50) line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
+    else if(x==25) line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
+    // t->SetTextAngle(55);
+    // t->SetTextSize(0.045);
+    // t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
+  }
 
   char* allpolchar = "";
   if( plotPol ) allpolchar = "_allPol";
