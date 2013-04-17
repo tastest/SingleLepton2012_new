@@ -565,6 +565,8 @@ void singleLeptonLooper::InitBaby(){
   genps_phi_.clear();
   genps_mass_.clear();
 
+  genjets_.clear();
+  genqgs_.clear();
   genbs_.clear();
 
 }
@@ -1451,6 +1453,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	  // require particle is a quark or a gluon
 	  if( !( pid==1 || pid==2 || pid==3 || pid==4 || pid==5 || pid==6 || pid == 21 ) ) continue;
+
+	  // save status 3 quarks/gluons
+	  genqgs_.push_back(genps_p4().at(igen));
 
 	  // require mother is not a top or W
 	  if( mothid == 6 || mothid == 24) continue;
@@ -3018,6 +3023,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    if( ROOT::Math::VectorUtil::DeltaR( vgjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
 	  }
 	  if( rejectJet ) continue;
+
+	  // save gen jets not matched to leptons
+	  genjets_.push_back(vgjet);
 	    
 	  if( vgjet.pt() < 30.                   )  continue;
 	  if( fabs( vgjet.eta() ) > 2.4          )  continue;
@@ -4112,6 +4120,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_mva5xPUid",      "std::vector<float>", &pfjets_mva5xPUid_ );
   outTree->Branch("pfjets_mvaBeta",      "std::vector<float>", &pfjets_mvaBeta_ );
 
+  outTree->Branch("genjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &genjets_ );
+  outTree->Branch("genqgs"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &genqgs_ );
   outTree->Branch("genbs"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &genbs_ );
 
   outTree->Branch("genps_pdgId"        ,   "std::vector<int>"    , &genps_pdgId_         );

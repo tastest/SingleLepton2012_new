@@ -492,6 +492,8 @@ class singleLeptonLooper
 	std::vector<float> pfjets_mva5xPUid_;
 	std::vector<float> pfjets_mvaBeta_;
 
+        VofP4 genjets_;
+        VofP4 genqgs_;
         VofP4 genbs_;
 
 	float chi2min_;
