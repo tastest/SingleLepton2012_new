@@ -768,7 +768,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hR_expm1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
       if( doBDT ) hR_expm1_smallDM->Draw("CONT3SAMEC");
-      T2tt_expm1->Draw("l");
+      else        T2tt_expm1->Draw("l");
     }
     t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
 
