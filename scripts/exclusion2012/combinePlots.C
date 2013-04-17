@@ -25,6 +25,7 @@
 #include <sstream>
 #include <iomanip>
 #include "contours.C"
+#include "handDrawnContours.C"
 #include "smooth.C"
 
 using namespace std;
@@ -70,7 +71,7 @@ void smoothHistogram( TH2F* h ){
 //------------------------------------
 
 TH2F* largeDM( TH2F* hin , char* sample ){
-  TH2F* hout = (TH2F*) hin->Clone("hout");
+  TH2F* hout = (TH2F*) hin->Clone();
 
   if( TString(sample).Contains("T2bw") ) return hout;
 
@@ -79,7 +80,7 @@ TH2F* largeDM( TH2F* hin , char* sample ){
       float mstop = hin->GetXaxis()->GetBinCenter(ibin);
       float mlsp  = hin->GetYaxis()->GetBinCenter(jbin);
 
-      if( mstop - mlsp < 175 )  hout->SetBinContent(ibin,jbin,10000);
+      if( mstop - mlsp <= 175 )  hout->SetBinContent(ibin,jbin,10000);
     }
   }
 
@@ -91,7 +92,7 @@ TH2F* largeDM( TH2F* hin , char* sample ){
 //------------------------------------
 
 TH2F* smallDM( TH2F* hin ){
-  TH2F* hout = (TH2F*) hin->Clone("hout");
+  TH2F* hout = (TH2F*) hin->Clone(Form("%s_smallDM",hin->GetName()));
 
 
   for( int ibin = 1 ; ibin <= hin->GetXaxis()->GetNbins() ; ibin++ ){
@@ -100,7 +101,6 @@ TH2F* smallDM( TH2F* hin ){
       float mlsp  = hin->GetYaxis()->GetBinCenter(jbin);
 
       if( mstop - mlsp >= 175 ) hout->SetBinContent(ibin,jbin,0);
-      if( mstop == 300 && mlsp == 150 ) hout->SetBinContent(ibin,jbin,10000);
     }
   }
 
@@ -233,7 +233,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   char* BDTchar       = (char*) "";
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
-  int   NEVENTS_MIN   = -1;
+  int   NEVENTS_MIN   = 20;
 
   if( x==25 ) plotHCP = false;
 
@@ -658,6 +658,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // print excluded regions and contours
   //------------------------------------------------------------
 
+  TGraph* T2tt_BDT_expp1 = get_T2tt_BDT_expp1();
+  TGraph* T2tt_obs       = get_T2tt_obs();
+  TGraph* T2tt_obsp1     = get_T2tt_obsp1();
+  TGraph* T2tt_obsm1     = get_T2tt_obsm1();
+  TGraph* T2tt_exp       = get_T2tt_exp();
+  TGraph* T2tt_expm1     = get_T2tt_expm1();
+
   bool plotExcludedPoints = true;
 
   TCanvas *can3;
@@ -669,13 +676,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
     t->SetTextSize(0.07);
 
-    // gr->SetMarkerColor(6);
-    // gr_obsp1->SetMarkerColor(6);
-    // gr_obsm1->SetMarkerColor(6);
-    // gr_exp->SetMarkerColor(6);
-    // gr_expp1->SetMarkerColor(6);
-    // gr_expm1->SetMarkerColor(6);
-
     can3->cd(1);
     gPad->SetGridx();
     gPad->SetGridy();
@@ -686,8 +686,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hexcl->Draw("colz");
     //gr->Draw("lp");
     hR->Draw("CONT3SAMEC");
-    if( TString(sample).Contains("T2tt") ) hR_smallDM->Draw("CONT3SAMEC");
-    t->DrawLatex(0.3,0.8,"observed");
+    if( TString(sample).Contains("T2tt") ){
+      if( doBDT )  hR_smallDM->Draw("CONT3SAMEC");
+      else         T2tt_obs->Draw("l");
+    }
+    t->DrawLatex(0.3,0.8,"observed");    
 
     can3->cd(2);
     gPad->SetGridx();
@@ -699,7 +702,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hexcl_obsp1->Draw("colz");
     //gr_obsp1->Draw("lp");
     hR_obsp1->Draw("CONT3SAMEC");
-    if( TString(sample).Contains("T2tt") ) hR_obsp1_smallDM->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ){
+      if( doBDT ) hR_obsp1_smallDM->Draw("CONT3SAMEC");
+      else        T2tt_obsp1->Draw("l");
+    }
     t->DrawLatex(0.3,0.8,"observed (+1#sigma)");
 
     can3->cd(3);
@@ -712,7 +718,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hexcl_obsm1->Draw("colz");
     //gr_obsm1->Draw("lp");
     hR_obsm1->Draw("CONT3SAMEC");
-    if( TString(sample).Contains("T2tt") ) hR_obsm1_smallDM->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ){
+      if( doBDT ) hR_obsm1_smallDM->Draw("CONT3SAMEC");
+      else        T2tt_obsm1->Draw("l");
+    }
     t->DrawLatex(0.3,0.8,"observed (-1#sigma)");
 
     can3->cd(4);
@@ -725,7 +734,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hexcl_exp->Draw("colz");
     //gr_exp->Draw("lp");
     hR_exp->Draw("CONT3SAMEC");
-    if( TString(sample).Contains("T2tt") ) hR_exp_smallDM->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ){
+      if( doBDT ) hR_exp_smallDM->Draw("CONT3SAMEC");
+      else        T2tt_exp->Draw("l");
+    }
     t->DrawLatex(0.3,0.8,"expected");
 
     can3->cd(5);
@@ -738,7 +750,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hexcl_expp1->Draw("colz");
     //gr_expp1->Draw("lp");
     hR_expp1->Draw("CONT3SAMEC");
-    if( TString(sample).Contains("T2tt") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ){
+      //hR_expp1_smallDM->Draw("CONT3SAMEC");
+      if( doBDT ) T2tt_BDT_expp1->Draw("l");
+    }
     t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
 
     can3->cd(6);
@@ -751,7 +766,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hexcl_expm1->Draw("colz");
     //gr_expm1->Draw("lp");
     hR_expm1->Draw("CONT3SAMEC");
-    if( TString(sample).Contains("T2tt") ) hR_expm1_smallDM->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ){
+      if( doBDT ) hR_expm1_smallDM->Draw("CONT3SAMEC");
+      T2tt_expm1->Draw("l");
+    }
     t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
 
   }
@@ -844,12 +862,29 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hR_obsm1->Draw("CONT3SAMEC");
 
   if( TString(sample).Contains("T2tt") ){
-    hR_smallDM->Draw("CONT3SAMEC");
-    hR_exp_smallDM->Draw("CONT3SAMEC");
-    hR_expp1_smallDM->Draw("CONT3SAMEC");
-    hR_expm1_smallDM->Draw("CONT3SAMEC");
-    hR_obsp1_smallDM->Draw("CONT3SAMEC");
-    hR_obsm1_smallDM->Draw("CONT3SAMEC");
+
+    if( doBDT ){
+
+      hR_smallDM->Draw("CONT3SAMEC");
+      hR_exp_smallDM->Draw("CONT3SAMEC");
+      hR_expm1_smallDM->Draw("CONT3SAMEC");
+      hR_obsp1_smallDM->Draw("CONT3SAMEC");
+      hR_obsm1_smallDM->Draw("CONT3SAMEC");
+
+      // draw the expected (-1sigma) contour by hand
+      //hR_expp1_smallDM->Draw("CONT3SAMEC");
+      T2tt_BDT_expp1->Draw("samel");
+    }
+
+    else{
+      T2tt_obsp1->Draw("samel");
+      T2tt_obsm1->Draw("samel");
+      T2tt_exp->Draw("samel");
+      T2tt_expm1->Draw("samel");
+      T2tt_obs->Draw("samel");
+    }
+
+
   }
 
   // cout << endl << "observed" << endl;
