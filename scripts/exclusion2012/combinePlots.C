@@ -233,10 +233,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   char* BDTchar       = (char*) "";
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
-  bool  plotPol       = false;
   int   NEVENTS_MIN   = -1;
 
-  if( !TString(sample).Contains("T2tt" ) ) plotPol = false;
   if( x==25 ) plotHCP = false;
 
   char* nminchar = "";
@@ -811,7 +809,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hxsec_best->SetMaximum(100);
   hdummy->SetMaximum(100);
   hdummy->Draw();
-  if( !plotPol ) hxsec_best->Draw("samecolz");
+  hxsec_best->Draw("samecolz");
   hdummy->Draw("axissame");
   //hexcl_exp->Draw("samebox");
   //hexcl->Draw("samebox");
@@ -842,68 +840,17 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hR_exp->Draw("CONT3SAMEC");
   hR_expp1->Draw("CONT3SAMEC");
   hR_expm1->Draw("CONT3SAMEC");
-  if( !plotPol ){
-    hR_obsp1->Draw("CONT3SAMEC");
-    hR_obsm1->Draw("CONT3SAMEC");
-  }
+  hR_obsp1->Draw("CONT3SAMEC");
+  hR_obsm1->Draw("CONT3SAMEC");
 
   if( TString(sample).Contains("T2tt") ){
     hR_smallDM->Draw("CONT3SAMEC");
     hR_exp_smallDM->Draw("CONT3SAMEC");
     hR_expp1_smallDM->Draw("CONT3SAMEC");
     hR_expm1_smallDM->Draw("CONT3SAMEC");
-    if( !plotPol ){
-      hR_obsp1_smallDM->Draw("CONT3SAMEC");
-      hR_obsm1_smallDM->Draw("CONT3SAMEC");
-    }
+    hR_obsp1_smallDM->Draw("CONT3SAMEC");
+    hR_obsm1_smallDM->Draw("CONT3SAMEC");
   }
-
-  //------------------------------------
-  // overlay left/right top scenarios
-  //------------------------------------
-
-  if( plotPol ){
-    char* f_right = "";
-    char* f_left  = "";
-
-    if( doBDT ){
-      f_right = "T2tt_combinePlotsright_BDT.root";
-      f_left  = "T2tt_combinePlotsleft_BDT.root";
-    }
-
-    else{
-      f_right = "T2tt_combinePlotsright.root";
-      f_left  = "T2tt_combinePlotsleft.root";
-    }
-
-    TFile* fR = TFile::Open(f_right);
-    TFile* fL = TFile::Open(f_left);
-
-    TH2F*  h_right = (TH2F*) fR->Get("hR");
-    TH2F*  h_left  = (TH2F*) fL->Get("hR");
-
-    TH2F*  h_right_smallDM = (TH2F*) fR->Get("hR_smallDM");
-    TH2F*  h_left_smallDM  = (TH2F*) fL->Get("hR_smallDM");
-
-    h_right->SetLineStyle(7);
-    h_right->SetLineWidth(1);
-
-    h_left->SetLineStyle(7);
-    h_left->SetLineWidth(1);
-
-    h_right_smallDM->SetLineStyle(7);
-    h_right_smallDM->SetLineWidth(1);
-
-    h_left_smallDM->SetLineStyle(7);
-    h_left_smallDM->SetLineWidth(1);
-
-    h_right->Draw("CONT3SAME");
-    h_left->Draw("CONT3SAME");
-
-    h_right_smallDM->Draw("CONT3SAME");
-    h_left_smallDM->Draw("CONT3SAME");
-  }
-
 
   // cout << endl << "observed" << endl;
   // printGraph(gr);
@@ -923,7 +870,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   //---------------------------------
 
   t->SetTextSize(0.034);
-  if( TString(sample).Contains("T2tt") && !plotPol ){
+  if( TString(sample).Contains("T2tt") ){
     if     ( TString(pol).Contains("right") )  t->DrawLatex(0.19,0.73,"right-handed top");
     else if( TString(pol).Contains("left") )   t->DrawLatex(0.19,0.73,"left-handed top");
     else  t->DrawLatex(0.19,0.73,"unpolarized top");
@@ -942,15 +889,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   if( !plotHCP ) ylegmin = 0.76;
 
   TLegend *leg = new TLegend(0.45,ylegmin,0.80,0.88);
-
-  if( plotPol ){
-    leg->AddEntry(hR       ,"Observed (unpolarized)"   ,"l");
-    leg->AddEntry(hR_obsp1 ,"Observed (t_{L} / t_{R})" ,"l");
-  }
-  else{
-    leg->SetTextSize(0.04);
-    leg->AddEntry(hR       ,"Observed (#pm1#sigma^{theory})"   ,"l");
-  }
+  leg->SetTextSize(0.04);
+  leg->AddEntry(hR       ,"Observed (#pm1#sigma^{theory})"   ,"l");
   leg->AddEntry(hR_exp   ,"Expected (#pm1#sigma)"    ,"l");
   if( plotHCP ) leg->AddEntry(HCP  ,"Observed (9.7 fb^{-1})","l");
 
@@ -959,14 +899,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   leg->Draw();
 
   float xoffset = 0.47*(800-xaxismin)+xaxismin;
-  float yoffset = 356.0;
+  float yoffset = 368.0;
   float length  = 0.092*(800-xaxismin);
   float yspace1 =     5;
   float yspace2 =    34;
-
-  if( !plotPol ){
-    yoffset = 368;
-  }
 
   // expected +/-1sigma
   TLine *line_exp = new TLine();
@@ -981,10 +917,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   line_obs->SetLineWidth(1);
   line_obs->SetLineColor(1);
   line_obs->SetLineStyle(7);
-  if( !plotPol ){
-    line_obs->DrawLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
-    line_obs->DrawLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
-  }
+  line_obs->DrawLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
+  line_obs->DrawLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
 
   //t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
 
@@ -1088,13 +1022,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     // t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
   }
 
-  char* allpolchar = "";
-  if( plotPol ) allpolchar = "_allPol";
-
   if( print ){
-    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,allpolchar,nminchar));
-    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,allpolchar,nminchar));
-    if( plotExcludedPoints ) can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,allpolchar,nminchar));
+    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,nminchar));
+    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,nminchar));
+    if( plotExcludedPoints ) can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,nminchar));
   }
 
   TFile* fout = TFile::Open(outfilename,"RECREATE");
@@ -1133,17 +1064,21 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 }
 
 void doAll(){
-  combinePlots("T2tt", 1,false,"",true);
-  combinePlots("T2tt", 1,false,"right",true);
-  combinePlots("T2tt", 1,false,"left",true);
-  combinePlots("T2bw",25,false,"",true);
-  combinePlots("T2bw",50,false,"",true);
-  combinePlots("T2bw",75,false,"",true);
 
+  combinePlots("T2tt", 1,false,"",true);
   combinePlots("T2tt", 1,true,"",true);
-  combinePlots("T2tt", 1,true,"right",true);
-  combinePlots("T2tt", 1,true,"left",true);
-  combinePlots("T2bw",25,true,"",true);
-  combinePlots("T2bw",50,true,"",true);
-  combinePlots("T2bw",75,true,"",true);
+
+  // combinePlots("T2tt", 1,false,"",true);
+  // combinePlots("T2tt", 1,false,"right",true);
+  // combinePlots("T2tt", 1,false,"left",true);
+  // combinePlots("T2bw",25,false,"",true);
+  // combinePlots("T2bw",50,false,"",true);
+  // combinePlots("T2bw",75,false,"",true);
+
+  // combinePlots("T2tt", 1,true,"",true);
+  // combinePlots("T2tt", 1,true,"right",true);
+  // combinePlots("T2tt", 1,true,"left",true);
+  // combinePlots("T2bw",25,true,"",true);
+  // combinePlots("T2bw",50,true,"",true);
+  // combinePlots("T2bw",75,true,"",true);
 }
