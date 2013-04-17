@@ -234,9 +234,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
   bool  plotPol       = false;
+  int   NEVENTS_MIN   = -1;
 
   if( !TString(sample).Contains("T2tt" ) ) plotPol = false;
   if( x==25 ) plotHCP = false;
+
+  char* nminchar = "";
+  if( NEVENTS_MIN > 0 ) nminchar = Form("_nmin%i",NEVENTS_MIN);
 
   //----------------------------------------------
   // set up parameters for each scan
@@ -298,7 +302,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
   filename = Form("%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar);
 
-  char* outfilename = Form("%s%s_combinePlots%s%s%s.root",sample,xchar,suffix,pol,BDTchar);
+  char* outfilename = Form("%s%s_combinePlots%s%s%s%s.root",sample,xchar,suffix,pol,BDTchar,nminchar);
 
   cout << "--------------------------------------" << endl;
   cout << "Opening    " << filename << endl;
@@ -318,17 +322,26 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   TH2F* hxsec_exp[ncuts];
   TH2F* hxsec_expp1[ncuts];
   TH2F* hxsec_expm1[ncuts];
+  TH2F* hnevents[ncuts];
+  TH2F* hjeserr[ncuts];
+  TH2F* htoterr[ncuts];
   TH2F* hxsec_best;
   TH2F* hbest;
   TH2F* hxsec_best_exp;
   TH2F* hxsec_best_expp1;
   TH2F* hxsec_best_expm1;
+  TH2F* hnevents_best;
+  TH2F* hjeserr_best;
+  TH2F* htoterr_best;
 
   for( unsigned int i = 0 ; i < ncuts ; ++i ){
     hxsec[i]       = (TH2F*) file->Get(Form("hxsec_%i",i));
     hxsec_exp[i]   = (TH2F*) file->Get(Form("hxsec_exp_%i",i));
     hxsec_expp1[i] = (TH2F*) file->Get(Form("hxsec_expp1_%i",i));
     hxsec_expm1[i] = (TH2F*) file->Get(Form("hxsec_expm1_%i",i));
+    hnevents[i]    = (TH2F*) file->Get(Form("hnevents_%i",i));
+    hjeserr[i]     = (TH2F*) file->Get(Form("hjes_%i",i));
+    htoterr[i]     = (TH2F*) file->Get(Form("htoterr_%i",i));
 
     if( i == 0 ){
       hxsec_best = (TH2F*) hxsec[i]->Clone("hxsec_best");
@@ -341,6 +354,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       hxsec_best_expp1->Reset();
       hxsec_best_expm1 = (TH2F*) hxsec[i]->Clone("hxsec_best_expm1");
       hxsec_best_expm1->Reset();
+      hnevents_best = (TH2F*) hnevents[i]->Clone("hnevents_best");
+      hnevents_best->Reset();
+      hjeserr_best = (TH2F*) hjeserr[i]->Clone("hjeserr_best");
+      hjeserr_best->Reset();
+      htoterr_best = (TH2F*) htoterr[i]->Clone("htoterr_best");
+      htoterr_best->Reset();
+
     }
   }
 
@@ -365,9 +385,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
 	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
 
+	int nevents = hnevents[i]->GetBinContent(xbin,ybin);
+
 	//cout << "exp" << i << " " << hxsec_exp[i]->GetBinContent(xbin,ybin) << endl;
 
-	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < min_exp_ul ){
+	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < min_exp_ul && nevents > NEVENTS_MIN ){
 	  min_exp_ul = hxsec_exp[i]->GetBinContent(xbin,ybin);
 	  best_ul    = i;
 	}
@@ -378,6 +400,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       hxsec_best_exp->SetBinContent(xbin,ybin,hxsec_exp[best_ul]->GetBinContent(xbin,ybin));
       hxsec_best_expp1->SetBinContent(xbin,ybin,hxsec_expp1[best_ul]->GetBinContent(xbin,ybin));
       hxsec_best_expm1->SetBinContent(xbin,ybin,hxsec_expm1[best_ul]->GetBinContent(xbin,ybin));
+      hnevents_best->SetBinContent(xbin,ybin,hnevents[best_ul]->GetBinContent(xbin,ybin));
+      hjeserr_best->SetBinContent(xbin,ybin,hjeserr[best_ul]->GetBinContent(xbin,ybin));
+      htoterr_best->SetBinContent(xbin,ybin,htoterr[best_ul]->GetBinContent(xbin,ybin));
       hbest->SetBinContent(xbin,ybin,best_ul+1);
 
       // cout << "best ul " << best_ul << " " << min_exp_ul << endl;
@@ -429,7 +454,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       else if( x==50 ){
 	t->DrawLatex(0.2,0.75,"1 = BDT1");
 	t->DrawLatex(0.2,0.70,"2 = BDT2loose");
-	t->DrawLatex(0.2,0.65,"3 = BDT3tight");
+	t->DrawLatex(0.2,0.65,"3 = BDT2tight");
 	t->DrawLatex(0.2,0.60,"4 = BDT3");
       } 
 
@@ -635,96 +660,103 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // print excluded regions and contours
   //------------------------------------------------------------
 
-  TCanvas *can3 = new TCanvas("can3","can3",1200,800);
-  can3->Divide(3,2);
+  bool plotExcludedPoints = true;
 
-  t->SetTextSize(0.07);
+  TCanvas *can3;
 
-  // gr->SetMarkerColor(6);
-  // gr_obsp1->SetMarkerColor(6);
-  // gr_obsm1->SetMarkerColor(6);
-  // gr_exp->SetMarkerColor(6);
-  // gr_expp1->SetMarkerColor(6);
-  // gr_expm1->SetMarkerColor(6);
+  if( plotExcludedPoints ){
 
-  can3->cd(1);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  hexcl->GetXaxis()->SetTitle("stop mass [GeV]");
-  hexcl->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl->GetXaxis()->SetRangeUser(xaxismin,800);
-  hexcl->GetYaxis()->SetRangeUser(0,400);
-  hexcl->Draw("colz");
-  //gr->Draw("lp");
-  hR->Draw("CONT3SAMEC");
-  if( TString(sample).Contains("T2tt") ) hR_smallDM->Draw("CONT3SAMEC");
-  t->DrawLatex(0.3,0.8,"observed");
+    can3 = new TCanvas("can3","can3",1200,800);
+    can3->Divide(3,2);
 
-  can3->cd(2);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  hexcl_obsp1->GetXaxis()->SetTitle("stop mass [GeV]");
-  hexcl_obsp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_obsp1->GetXaxis()->SetRangeUser(xaxismin,800);
-  hexcl_obsp1->GetYaxis()->SetRangeUser(0,400);
-  hexcl_obsp1->Draw("colz");
-  //gr_obsp1->Draw("lp");
-  hR_obsp1->Draw("CONT3SAMEC");
-  if( TString(sample).Contains("T2tt") ) hR_obsp1_smallDM->Draw("CONT3SAMEC");
-  t->DrawLatex(0.3,0.8,"observed (+1#sigma)");
+    t->SetTextSize(0.07);
 
-  can3->cd(3);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  hexcl_obsm1->GetXaxis()->SetTitle("stop mass [GeV]");
-  hexcl_obsm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_obsm1->GetXaxis()->SetRangeUser(xaxismin,800);
-  hexcl_obsm1->GetYaxis()->SetRangeUser(0,400);
-  hexcl_obsm1->Draw("colz");
-  //gr_obsm1->Draw("lp");
-  hR_obsm1->Draw("CONT3SAMEC");
-  if( TString(sample).Contains("T2tt") ) hR_obsm1_smallDM->Draw("CONT3SAMEC");
-  t->DrawLatex(0.3,0.8,"observed (-1#sigma)");
+    // gr->SetMarkerColor(6);
+    // gr_obsp1->SetMarkerColor(6);
+    // gr_obsm1->SetMarkerColor(6);
+    // gr_exp->SetMarkerColor(6);
+    // gr_expp1->SetMarkerColor(6);
+    // gr_expm1->SetMarkerColor(6);
 
-  can3->cd(4);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  hexcl_exp->GetXaxis()->SetTitle("stop mass [GeV]");
-  hexcl_exp->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_exp->GetXaxis()->SetRangeUser(xaxismin,800);
-  hexcl_exp->GetYaxis()->SetRangeUser(0,400);
-  hexcl_exp->Draw("colz");
-  //gr_exp->Draw("lp");
-  hR_exp->Draw("CONT3SAMEC");
-  if( TString(sample).Contains("T2tt") ) hR_exp_smallDM->Draw("CONT3SAMEC");
-  t->DrawLatex(0.3,0.8,"expected");
+    can3->cd(1);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    hexcl->GetXaxis()->SetTitle("stop mass [GeV]");
+    hexcl->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
+    hexcl->GetXaxis()->SetRangeUser(xaxismin,800);
+    hexcl->GetYaxis()->SetRangeUser(0,400);
+    hexcl->Draw("colz");
+    //gr->Draw("lp");
+    hR->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ) hR_smallDM->Draw("CONT3SAMEC");
+    t->DrawLatex(0.3,0.8,"observed");
 
-  can3->cd(5);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  hexcl_expp1->GetXaxis()->SetTitle("stop mass [GeV]");
-  hexcl_expp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_expp1->GetXaxis()->SetRangeUser(0,800);
-  hexcl_expp1->GetYaxis()->SetRangeUser(0,400);
-  hexcl_expp1->Draw("colz");
-  //gr_expp1->Draw("lp");
-  hR_expp1->Draw("CONT3SAMEC");
-  if( TString(sample).Contains("T2tt") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
-  t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
+    can3->cd(2);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    hexcl_obsp1->GetXaxis()->SetTitle("stop mass [GeV]");
+    hexcl_obsp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
+    hexcl_obsp1->GetXaxis()->SetRangeUser(xaxismin,800);
+    hexcl_obsp1->GetYaxis()->SetRangeUser(0,400);
+    hexcl_obsp1->Draw("colz");
+    //gr_obsp1->Draw("lp");
+    hR_obsp1->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ) hR_obsp1_smallDM->Draw("CONT3SAMEC");
+    t->DrawLatex(0.3,0.8,"observed (+1#sigma)");
 
-  can3->cd(6);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  hexcl_expm1->GetXaxis()->SetTitle("stop mass [GeV]");
-  hexcl_expm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
-  hexcl_expm1->GetXaxis()->SetRangeUser(0,800);
-  hexcl_expm1->GetYaxis()->SetRangeUser(0,400);
-  hexcl_expm1->Draw("colz");
-  //gr_expm1->Draw("lp");
-  hR_expm1->Draw("CONT3SAMEC");
-  if( TString(sample).Contains("T2tt") ) hR_expm1_smallDM->Draw("CONT3SAMEC");
-  t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
+    can3->cd(3);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    hexcl_obsm1->GetXaxis()->SetTitle("stop mass [GeV]");
+    hexcl_obsm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
+    hexcl_obsm1->GetXaxis()->SetRangeUser(xaxismin,800);
+    hexcl_obsm1->GetYaxis()->SetRangeUser(0,400);
+    hexcl_obsm1->Draw("colz");
+    //gr_obsm1->Draw("lp");
+    hR_obsm1->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ) hR_obsm1_smallDM->Draw("CONT3SAMEC");
+    t->DrawLatex(0.3,0.8,"observed (-1#sigma)");
 
+    can3->cd(4);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    hexcl_exp->GetXaxis()->SetTitle("stop mass [GeV]");
+    hexcl_exp->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
+    hexcl_exp->GetXaxis()->SetRangeUser(xaxismin,800);
+    hexcl_exp->GetYaxis()->SetRangeUser(0,400);
+    hexcl_exp->Draw("colz");
+    //gr_exp->Draw("lp");
+    hR_exp->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ) hR_exp_smallDM->Draw("CONT3SAMEC");
+    t->DrawLatex(0.3,0.8,"expected");
+
+    can3->cd(5);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    hexcl_expp1->GetXaxis()->SetTitle("stop mass [GeV]");
+    hexcl_expp1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
+    hexcl_expp1->GetXaxis()->SetRangeUser(0,800);
+    hexcl_expp1->GetYaxis()->SetRangeUser(0,400);
+    hexcl_expp1->Draw("colz");
+    //gr_expp1->Draw("lp");
+    hR_expp1->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
+    t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
+
+    can3->cd(6);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    hexcl_expm1->GetXaxis()->SetTitle("stop mass [GeV]");
+    hexcl_expm1->GetYaxis()->SetTitle("#chi_{1}^{0} mass [GeV]");
+    hexcl_expm1->GetXaxis()->SetRangeUser(0,800);
+    hexcl_expm1->GetYaxis()->SetRangeUser(0,400);
+    hexcl_expm1->Draw("colz");
+    //gr_expm1->Draw("lp");
+    hR_expm1->Draw("CONT3SAMEC");
+    if( TString(sample).Contains("T2tt") ) hR_expm1_smallDM->Draw("CONT3SAMEC");
+    t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
+
+  }
 
   TCanvas *can1 = new TCanvas("can1","",800,600);
   can1->cd();
@@ -779,7 +811,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hxsec_best->SetMaximum(100);
   hdummy->SetMaximum(100);
   hdummy->Draw();
-  hxsec_best->Draw("samecolz");
+  if( !plotPol ) hxsec_best->Draw("samecolz");
   hdummy->Draw("axissame");
   //hexcl_exp->Draw("samebox");
   //hexcl->Draw("samebox");
@@ -1060,9 +1092,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   if( plotPol ) allpolchar = "_allPol";
 
   if( print ){
-    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,allpolchar));
-    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,allpolchar));
-    can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,allpolchar));
+    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,allpolchar,nminchar));
+    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,allpolchar,nminchar));
+    if( plotExcludedPoints ) can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,allpolchar,nminchar));
   }
 
   TFile* fout = TFile::Open(outfilename,"RECREATE");
@@ -1092,6 +1124,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hR_exp_smallDM->SetTitle("hR_exp_smallDM");
     hR_exp_smallDM->Write();
   }
+
+  hnevents_best->Write();
+  hjeserr_best->Write();
+  htoterr_best->Write();
   fout->Close();
 
 }
