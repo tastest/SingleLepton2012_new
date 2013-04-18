@@ -49,9 +49,17 @@ void doAll() {
     // "merged_T2tt_mStop-675to800_mLSP-0to275",
     // "merged_T2tt_mStop-675to800_mLSP-300to700",
 
-    // T2bw madgraph 
-    "merged_T2bw_mStop_100to475_mLSP_0to375_x050",
-    "merged_T2bw_mStop_500to800_mLSP_0to700_x050"
+    //--------------------
+    // T2bw madgraph
+    //--------------------
+    
+    // x=0.5
+    //"merged_T2bw_mStop_100to475_mLSP_0to375_x050",
+    //"merged_T2bw_mStop_500to800_mLSP_0to700_x050"
+
+    // x=0.25
+    "merged_T2bw_mStop-100to475_mLSP-0to375_x025",
+    "merged_T2bw_mStop-500to800_mLSP-0to700_x025"
 
     // T2bw coarse
     // "merged_T2bw_coarse",
@@ -133,7 +141,7 @@ void doAll() {
 	cout << "Added " << Form("%s/%s*root",path_T2bw_coarse,sampletag[i]) << endl;	
       }
 
-      if( TString(sampletag[i]).Contains("T2bw") && TString(sampletag[i]).Contains("x050") ){
+      if( TString(sampletag[i]).Contains("T2bw") && (TString(sampletag[i]).Contains("x025")||TString(sampletag[i]).Contains("x050")||TString(sampletag[i]).Contains("x075")) ){
 	ch[i]->Add(Form("%s/%s*root",path_T2bw_mad,sampletag[i]));
 	cout << "Added " << Form("%s/%s*root",path_T2bw_mad,sampletag[i]) << endl;	
       }
