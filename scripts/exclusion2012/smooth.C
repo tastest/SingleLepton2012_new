@@ -28,7 +28,7 @@ using namespace std;
 
 TH2F* normalizeTH2( TH2F* hin , TH1F* hxsec , char* type){
 
-  TH2F* hout = (TH2F*) hin->Clone("hout");
+  TH2F* hout = (TH2F*) hin->Clone(Form("%s_normalized",hin->GetName()));
   hout->Reset();
 
   for( int ibin = 1 ; ibin <= hin->GetXaxis()->GetNbins() ; ibin++ ){
@@ -93,7 +93,8 @@ void smoothTH2( TH2F* h , char* sample , bool doBDT = false , float min = 1.0e-1
       int x      = h->GetXaxis()->GetBinCenter(ibin);
       int y      = h->GetYaxis()->GetBinCenter(jbin);
 
-      if( TString(sample).Contains("T2tt") && (int) x-y == 175 ) continue;
+      //if( TString(sample).Contains("T2tt") && (int) x-y <= 175 ) continue;
+      if( TString(sample).Contains("T2tt") && (int) x-y <= 200 ) continue;
       
       // if( x == 400 && y == 175 ) cout << "FOUND IT" << endl;
       // else continue;
@@ -194,12 +195,15 @@ TH2F* exclusionContour( TH2F* hul , char* sample , bool doBDT = false , int nsmo
 
   TH2F*  h_R     = normalizeTH2( hul , h_xsec , type);
 
+  if( TString(type).Contains("up") )   h_R->SetName(Form("%s_obsp1",h_R->GetName()));
+  if( TString(type).Contains("down") ) h_R->SetName(Form("%s_obsm1",h_R->GetName()));
+
   //if( nsmooth > 0 ) h_R->Smooth(nsmooth);
   //if( nsmooth > 0 ) h_R->Smooth(nsmooth,"k3a");
 
   smoothTH2( h_R , sample , doBDT );
 
-  fixupTH2( h_R , sample , doBDT );
+  //fixupTH2( h_R , sample , doBDT );
 
   double contours[1];
   contours[0] = 1.0;
