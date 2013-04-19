@@ -481,51 +481,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	      // if x is buggy, calculate it by hand using the genparticle masses
 	      //---------------------------------------------------------------------
 
-	      /*
-	      if( x_ < -1.0 ){
-
-		//cout << "mstop mlsp " << stopt.mg() << " " << stopt.ml() << endl;
-
-		float mchi = -1;
-
-		for( int i = 0 ; i < stopt.genps_energy().size() ; ++i ){
-		  int   id     = stopt.genps_pdgId().at(i);
-		  float energy = stopt.genps_energy().at(i);
-		  float pt     = stopt.genps_pt().at(i);
-		  float eta    = stopt.genps_eta().at(i);
-		  float mom    = pt * cosh(eta);
-		  float mass2  = energy*energy-mom*mom;
-		  float mass   = -1;
-		  if(mass2>0) mass = sqrt(mass2);
-		  
-		  //cout << setw(10) << id << setw(10) << mass << endl;
-		  if( abs(id) == 1000024 ) mchi = mass;
-		}
-
-		// skip the event if we can't find the chargino mass
-		if( mchi < 0 ){
-		  cout << __FILE__ << " " << __LINE__ << " ERROR! couldn't find the chargino" << endl;
-		  cout << "event number " << stopt.event() << endl;
-		  continue;
-		}
-
-		x_ = ( mchi - stopt.ml() ) / ( stopt.mg() - stopt.ml() );
-
-		if     ( x_ > 0.20 && x_ < 0.30 ) x_ = 0.25;
-		else if( x_ > 0.45 && x_ < 0.55 ) x_ = 0.50;
-		else if( x_ > 0.70 && x_ < 0.80 ) x_ = 0.75;
-		else{
-		  // skip the event if we can't figure out what x should be
-		  cout << __FILE__ << " " << __LINE__ << " ERROR! bad x value " << x_ << endl;
-		  cout << "event number " << stopt.event() << endl;
-		  continue;
-		}
-
-		//cout << "mchi x " << mchi << " " << x_ << endl << endl;
-
-	      } 
-	      */
-
 	      float nevents = 0;
 	      if ( x_ == 0.25 ){
 		int bin = h_nsig25->FindBin(stopt.mg(),stopt.ml());
@@ -1041,7 +996,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         already_seen.clear();
 
         gROOT->cd();
-
     }
 
     //--------------------------------------------
@@ -1052,7 +1006,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        outFile_   = new TFile(Form("output_V00-03-09/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-08/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
