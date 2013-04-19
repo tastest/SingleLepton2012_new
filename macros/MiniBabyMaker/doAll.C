@@ -58,8 +58,14 @@ void doAll() {
     //"merged_T2bw_mStop_500to800_mLSP_0to700_x050"
 
     // x=0.25
-    "merged_T2bw_mStop-100to475_mLSP-0to375_x025",
-    "merged_T2bw_mStop-500to800_mLSP-0to700_x025"
+    //"merged_T2bw_mStop-100to475_mLSP-0to375_x025",
+    //"merged_T2bw_mStop-500to800_mLSP-0to700_x025"
+
+    // x=0.75
+    "merged_T2bw_mStop-100to475_mLSP-0to375_x075.root",
+    "merged_T2bw_mStop-500to800_mLSP-0to700_x075.root"
+
+
 
     // T2bw coarse
     // "merged_T2bw_coarse",
