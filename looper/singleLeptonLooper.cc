@@ -242,8 +242,6 @@ void singleLeptonLooper::InitBaby(){
   //trkmet
   trkmet_              =-999.;
   trkmetphi_           =-999.;
-  trkmet_nolepcorr_    =-999.;
-  trkmetphi_nolepcorr_ =-999.;
 
   //phi corrected type1 mets
   t1metphicorr_	      =-999.;
@@ -2436,6 +2434,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       float jetptx = 0.0;
       float jetpty = 0.0;
 
+      LorentzVector mht15_p4;
+      vector<int> mht15_pfcandIndices;
+
       for (unsigned int ijet = 0 ; ijet < pfjets_p4().size() ; ijet++) {
 	
 	// skip jets with |eta| > 5.0
@@ -2566,6 +2567,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  htDown_ += vjetDown.pt();
 	}
 
+	// calculate MHT quantities: vector sum of jets above some threshold
+	//  apply pileup MVA ID on jets first
+	if ( (fabs( vjet.eta() ) < 4.7) && (passMVAJetId(vjet.pt(), vjet.eta(), pfjets_full5xmvavalue().at(ijet), 0)) ) {
+	  vector<int>::const_iterator pfcandIndices_begin = pfjets_pfcandIndicies().at(ijet).begin();
+	  vector<int>::const_iterator pfcandIndices_end = pfjets_pfcandIndicies().at(ijet).end();
+	  if ( vjet.pt() > 15. ) {
+	    mht15_p4 -= vjet;
+	    // extend vector of pfcand indices with those from this jet - first line supposedly improves speed
+	    mht15_pfcandIndices.reserve(mht15_pfcandIndices.size() + distance(pfcandIndices_begin,pfcandIndices_end));
+	    mht15_pfcandIndices.insert(mht15_pfcandIndices.end(),pfcandIndices_begin,pfcandIndices_end);
+	  }
+	}
+
 	// njets: L1FastL2L3Residual, pt > 30 GeV
 	if(       vjet.pt()    < 30. )           continue;
 	if( fabs( vjet.eta() ) > 2.4 )           continue;
@@ -2678,6 +2692,22 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       
       }
 
+      // store mht values
+      mht15_ = mht15_p4.pt();
+      mht15phi_ = mht15_p4.phi();
+      //      mht15phi_ = TVector2::Phi_mpi_pi(mht15_p4.phi() - TMath::Pi());
+
+      // store corresponding trk met components (lep1)
+      std::pair<float,float> p_trkmet_mht15 = getTrackerMET(lep1_,0.1,true,&mht15_pfcandIndices);
+      trkmet_mht15_ = p_trkmet_mht15.first;
+      trkmetphi_mht15_ = p_trkmet_mht15.second;
+
+      // MET = (-tracks) + (-lepton) + (-jets)
+      //  trkmet and mht already have negative sign
+      float mettlj15_x = mht15_p4.px() + (trkmet_mht15_ * cos(trkmetphi_mht15_)) - lep1_->px();
+      float mettlj15_y = mht15_p4.py() + (trkmet_mht15_ * sin(trkmetphi_mht15_)) - lep1_->py();
+      mettlj15_ = sqrt(mettlj15_x*mettlj15_x + mettlj15_y*mettlj15_y);
+      mettlj15phi_ = atan2( mettlj15_y, mettlj15_x );
 
       // store the lepton jet matching
       
@@ -3081,10 +3111,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       pair<float, float> trkMET = getTrackerMET(lep1_); 
       trkmet_=trkMET.first;
       trkmetphi_=trkMET.second;
-
-      pair<float, float> trkMET_nolepcorr = getTrackerMET(lep1_, 0.1, false); 
-      trkmet_nolepcorr_=trkMET_nolepcorr.first;
-      trkmetphi_nolepcorr_=trkMET_nolepcorr.second;
 
       //---------------------------
       // set event weight
@@ -3657,8 +3683,6 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("calometphi",      &calometphi_,       "calometphi/F");
   outTree->Branch("trkmet",          &trkmet_,           "trkmet/F");
   outTree->Branch("trkmetphi",       &trkmetphi_,        "trkmetphi/F");
-  outTree->Branch("trkmet_nolepcorr",    &trkmet_nolepcorr_,    "trkmet_nolepcorr/F");
-  outTree->Branch("trkmetphi_nolepcorr", &trkmetphi_nolepcorr_, "trkmetphi_nolepcorr/F");
   outTree->Branch("pfmet",           &pfmet_,            "pfmet/F");
   outTree->Branch("pfmetveto",       &pfmetveto_,        "pfmetveto/F");
   outTree->Branch("pfmetsig",        &pfmetsig_,         "pfmetsig/F");
@@ -3745,6 +3769,14 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("t1metphicorr_off"    , &t1metphicorr_off_    , "t1metphicorr_off/F");
   outTree->Branch("t1metphicorrphi_off" , &t1metphicorrphi_off_ , "t1metphicorrphi_off/F");
   outTree->Branch("t1metphicorrmt_off"  , &t1metphicorrmt_off_  , "t1metphicorrmt_off/F");
+
+  //mHT variables
+  outTree->Branch("mht15"           , &mht15_           , "mht15/F");
+  outTree->Branch("mht15phi"        , &mht15phi_        , "mht15phi/F");
+  outTree->Branch("trkmet_mht15"    , &trkmet_mht15_    , "trkmet_mht15/F");
+  outTree->Branch("trkmetphi_mht15" , &trkmetphi_mht15_ , "trkmetphi_mht15/F");
+  outTree->Branch("mettlj15"        , &mettlj15_        , "mettlj15/F");
+  outTree->Branch("mettlj15phi"     , &mettlj15phi_     , "mettlj15phi/F");
 
   // MT2 and CHI2
   outTree->Branch("mt2bmin"           , &mt2bmin_           , "mt2bmin/F");

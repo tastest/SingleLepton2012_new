@@ -73,9 +73,7 @@ pair<float, float> ScaleMET( pair<float, float> p_met, LorentzVector p4_dilep, d
 
 pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc );
 
-pair<float,float> getTrackerMET( P4 *lep, double deltaZCut, bool dolepcorr );
-
-pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true );
+pair<float,float> getTrackerMET( P4 *lep, double deltaZCut = 0.1, bool dolepcorr = true, vector<int>* exclude_indices = 0 );
 
 pair<float,float> Type1PFMET( VofP4 jets_p4 , vector<float> cors , vector<float> l1cors , float minpt );
 
@@ -156,6 +154,8 @@ bool objectPassTrigger(const LorentzVector &obj, const std::vector<LorentzVector
 TString triggerName(TString triggerPattern);
 
 bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax ); 
+
+bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int tightness);
 
 //double weight3D( int pv1, int pv2, int pv3 );
 

@@ -380,6 +380,14 @@ class singleLeptonLooper
 	Float_t t1metphicorrphi_off_;
 	Float_t t1metphicorrmt_off_;
 
+	// MHT met variables
+	Float_t mht15_;
+	Float_t mht15phi_;
+	Float_t trkmet_mht15_;
+	Float_t trkmetphi_mht15_;
+	Float_t mettlj15_;
+	Float_t mettlj15phi_;
+
 	// assorted p4's
 	LorentzVector*  t_;   
 	LorentzVector*  tbar_;   
@@ -583,8 +591,6 @@ class singleLeptonLooper
 
 	Float_t calomet_;
 	Float_t calometphi_;
-	Float_t trkmet_nolepcorr_;
-	Float_t trkmetphi_nolepcorr_;
 	Float_t trkmet_;
 	Float_t trkmetphi_;
 	Float_t trkmetproj_;

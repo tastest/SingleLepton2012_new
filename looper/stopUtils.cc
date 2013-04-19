@@ -135,19 +135,28 @@ pair<float,float> getPhiCorrMET( float met, float metphi, int nvtx, bool ismc ) 
 
 //--------------------------------------------------------------------                                                                                                                                               
 
-pair<float,float> getTrackerMET( P4 *lep, double deltaZCut, bool dolepcorr )
+pair<float,float> getTrackerMET( P4 *lep, double deltaZCut, bool dolepcorr, vector<int>* exclude_indices )
 {
 
   if ( cms2.vtxs_sumpt().empty() ) return make_pair(-999.,-999.);
 
+  vector<int>::const_iterator exclude_indices_begin;
+  vector<int>::const_iterator exclude_indices_end;
+  if (exclude_indices) {
+    exclude_indices_begin = exclude_indices->begin();
+    exclude_indices_end = exclude_indices->end();
+  }
+
   float pX = 0.;
   float pY = 0.;
 
-  if (dolepcorr ) {
-    pX -= lep->px();
-    pY -= lep->py();
-  }
+  // don't add in lepton -> want this variable to contain only "soft" contributions to met
+  // if (dolepcorr ) {
+  //   pX -= lep->px();
+  //   pY -= lep->py();
+  // }
 
+  // this loop is probably expensive -- should move into main looper code, loop once, and calculate all track met variables at once?
   for (unsigned int i=0; i<cms2.pfcands_particleId().size(); ++i){
     if ( cms2.pfcands_charge().at(i)==0 ) continue;
 
@@ -161,6 +170,10 @@ pair<float,float> getTrackerMET( P4 *lep, double deltaZCut, bool dolepcorr )
     double dzpv = trks_dz_pv(trkIndex,0).first;
 
     if ( fabs(dzpv) > deltaZCut) continue;
+
+    if (exclude_indices) {
+      if (std::find(exclude_indices_begin, exclude_indices_end, i) != exclude_indices_end) continue;
+    }
 
     pX -= cms2.pfcands_p4().at(i).px();
     pY -= cms2.pfcands_p4().at(i).py();
@@ -651,6 +664,76 @@ bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax = 0
   return false;
 }
 
+//--------------------------------------------------------------------
+
+// tightness : 2=loose 1=medium 0=tight
+bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int tightness)         
+{
+  if(tightness<0 || tightness>2)
+    {
+      cout << "ERROR : tightness should be 0, 1, or 2. " << endl;
+      return false;
+    }
+
+
+  double fMVACut[3][4][4];
+
+  /*
+  // working points from full_53x_wp defined in 
+  // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CMG/CMGTools/External/python/JetIdParams_cfi.py?revision=1.12&view=markup
+
+  //Tight Id
+  fMVACut[0][0][0] = -0.83; fMVACut[0][0][1] = -0.81; fMVACut[0][0][2] = -0.74; fMVACut[0][0][3] = -0.81;
+  fMVACut[0][1][0] = -0.83; fMVACut[0][1][1] = -0.81; fMVACut[0][1][2] = -0.74; fMVACut[0][1][3] = -0.81;
+  fMVACut[0][2][0] = -0.38; fMVACut[0][2][1] = -0.32; fMVACut[0][2][2] = -0.14; fMVACut[0][2][3] = -0.48;
+  fMVACut[0][3][0] = -0.38; fMVACut[0][3][1] = -0.32; fMVACut[0][3][2] = -0.14; fMVACut[0][3][3] = -0.48;
+  //Medium id
+  fMVACut[1][0][0] = -0.83; fMVACut[1][0][1] = -0.92; fMVACut[1][0][2] = -0.90; fMVACut[1][0][3] = -0.92;
+  fMVACut[1][1][0] = -0.83; fMVACut[1][1][1] = -0.92; fMVACut[1][1][2] = -0.90; fMVACut[1][1][3] = -0.92;
+  fMVACut[1][2][0] = -0.40; fMVACut[1][2][1] = -0.49; fMVACut[1][2][2] = -0.50; fMVACut[1][2][3] = -0.65;
+  fMVACut[1][3][0] = -0.40; fMVACut[1][3][1] = -0.49; fMVACut[1][3][2] = -0.50; fMVACut[1][3][3] = -0.65;
+  //Loose Id 
+  fMVACut[2][0][0] = -0.95; fMVACut[2][0][1] = -0.96; fMVACut[2][0][2] = -0.94; fMVACut[2][0][3] = -0.95;
+  fMVACut[2][1][0] = -0.95; fMVACut[2][1][1] = -0.96; fMVACut[2][1][2] = -0.94; fMVACut[2][1][3] = -0.95;
+  fMVACut[2][2][0] = -0.80; fMVACut[2][2][1] = -0.74; fMVACut[2][2][2] = -0.68; fMVACut[2][2][3] = -0.77;
+  fMVACut[2][3][0] = -0.80; fMVACut[2][3][1] = -0.74; fMVACut[2][3][2] = -0.68; fMVACut[2][3][3] = -0.77;
+  */
+
+  // working points from full_5x_wp defined in 
+  // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CMG/CMGTools/External/python/JetIdParams_cfi.py?revision=1.12&view=markup
+  //Tight Id                                                                                                                                                                       
+  fMVACut[0][0][0] = -0.47; fMVACut[0][0][1] = -0.92; fMVACut[0][0][2] = -0.92; fMVACut[0][0][3] = -0.94;
+  fMVACut[0][1][0] = -0.47; fMVACut[0][1][1] = -0.92; fMVACut[0][1][2] = -0.92; fMVACut[0][1][3] = -0.94;
+  fMVACut[0][2][0] = +0.32; fMVACut[0][2][1] = -0.49; fMVACut[0][2][2] = -0.61; fMVACut[0][2][3] = -0.74;
+  fMVACut[0][3][0] = +0.32; fMVACut[0][3][1] = -0.49; fMVACut[0][3][2] = -0.61; fMVACut[0][3][3] = -0.74;
+  //Medium id
+  fMVACut[1][0][0] = -0.83; fMVACut[1][0][1] = -0.96; fMVACut[1][0][2] = -0.95; fMVACut[1][0][3] = -0.96;
+  fMVACut[1][1][0] = -0.83; fMVACut[1][1][1] = -0.96; fMVACut[1][1][2] = -0.95; fMVACut[1][1][3] = -0.96;
+  fMVACut[1][2][0] = -0.40; fMVACut[1][2][1] = -0.74; fMVACut[1][2][2] = -0.76; fMVACut[1][2][3] = -0.81;
+  fMVACut[1][3][0] = -0.40; fMVACut[1][3][1] = -0.74; fMVACut[1][3][2] = -0.76; fMVACut[1][3][3] = -0.81;
+  //Loose Id 
+  fMVACut[2][0][0] = -0.95; fMVACut[2][0][1] = -0.97; fMVACut[2][0][2] = -0.97; fMVACut[2][0][3] = -0.97;
+  fMVACut[2][1][0] = -0.95; fMVACut[2][1][1] = -0.97; fMVACut[2][1][2] = -0.97; fMVACut[2][1][3] = -0.97;
+  fMVACut[2][2][0] = -0.80; fMVACut[2][2][1] = -0.85; fMVACut[2][2][2] = -0.84; fMVACut[2][2][3] = -0.85;
+  fMVACut[2][3][0] = -0.80; fMVACut[2][3][1] = -0.85; fMVACut[2][3][2] = -0.84; fMVACut[2][3][3] = -0.85;
+
+
+  // pT categorization
+  int ptId = 0;
+  if( corjetpt > 10 && corjetpt < 20 ) ptId = 1;
+  if( corjetpt > 20 && corjetpt < 30 ) ptId = 2;
+  if( corjetpt > 30                  ) ptId = 3;
+
+  // eta categorization
+  int etaId = 0;
+  if( fabs(jeteta) > 2.5  && fabs(jeteta) < 2.75 ) etaId = 1;
+  if( fabs(jeteta) > 2.75 && fabs(jeteta) < 3.0  ) etaId = 2;
+  if( fabs(jeteta) > 3.0  && fabs(jeteta) < 5.0  ) etaId = 3;
+
+  // return  
+  if( mvavalue > fMVACut[tightness][ptId][etaId] ) return true;
+  return false;
+}
 
 //--------------------------------------------------------------------
 
