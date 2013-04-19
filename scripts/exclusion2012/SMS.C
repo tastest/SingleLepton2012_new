@@ -1125,7 +1125,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     */
 
     if( print ){
-      can[i]->          Print(Form("../../plots/%s%s%s_%s%s%s.pdf"       ,sample,xchar,suffix,labels.at(i).c_str(),pol,BDTchar));
+      can[i]->          Print(Form("plots/%s%s%s_%s%s%s.pdf"       ,sample,xchar,suffix,labels.at(i).c_str(),pol,BDTchar));
       //can_exclusion[i]->Print(Form("../../plots/%s%s_%s_points%s.pdf",sample,suffix,labels.at(i).c_str(),pol));
     }
 

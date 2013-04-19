@@ -1070,9 +1070,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   }
 
   if( print ){
-    can1->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,nminchar));
-    can2->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,nminchar));
-    if( plotExcludedPoints ) can3->Print(Form("../../plots/combinePlots_%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,nminchar));
+    can1->Print(Form("plots/combinePlots_%s%s%s%s%s%s.pdf"               ,sample,xchar,suffix,pol,BDTchar,nminchar));
+    can2->Print(Form("plots/combinePlots_%s%s%s%s%s%s_bestRegion.pdf"    ,sample,xchar,suffix,pol,BDTchar,nminchar));
+    if( plotExcludedPoints ) can3->Print(Form("plots/combinePlots_%s%s%s%s%s%s_excludedPoints.pdf",sample,xchar,suffix,pol,BDTchar,nminchar));
   }
 
   TFile* fout = TFile::Open(outfilename,"RECREATE");
