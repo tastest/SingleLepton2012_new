@@ -12,8 +12,14 @@
   //char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_masslessLSP.root";
   //char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_masslessLSP_25GeVbins.root";
 
-  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x50.root";
-  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x50_25GeVbins.root";
+  // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x50.root";
+  // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x50_25GeVbins.root";
+
+  // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x25.root";
+  // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x25_25GeVbins.root";
+
+  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75.root";
+  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
 
   cout << "Reading in  " << filename_in  << endl;
   cout << "Writing out " << filename_out << endl;
@@ -67,12 +73,15 @@
 
   c1->cd(1);
   gPad->SetRightMargin(0.2);
-  hin->Draw("colz");
+  //hin->Draw("colz");
+  //hin25->Draw("colz");
+  hin75->Draw("colz");
 
   c1->cd(2);
   gPad->SetRightMargin(0.2);
-  hout->Draw("colz");
-
+  //hout->Draw("colz");
+  //hout25->Draw("colz");
+  hout75->Draw("colz");
 
 
 
