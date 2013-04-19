@@ -267,7 +267,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
 
     if( x==25 ){
-      xaxismin        = 360.0;
+      xaxismin        = 100.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
       if( doBDT ) nSR = 2;
@@ -863,27 +863,39 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
   if( TString(sample).Contains("T2tt") ){
 
-    if( doBDT ){
-
+    if( TString(pol).Contains("left") || TString(pol).Contains("right") ){
       hR_smallDM->Draw("CONT3SAMEC");
       hR_exp_smallDM->Draw("CONT3SAMEC");
       hR_expm1_smallDM->Draw("CONT3SAMEC");
+      hR_expp1_smallDM->Draw("CONT3SAMEC");
       hR_obsp1_smallDM->Draw("CONT3SAMEC");
       hR_obsm1_smallDM->Draw("CONT3SAMEC");
-
-      // draw the expected (-1sigma) contour by hand
-      //hR_expp1_smallDM->Draw("CONT3SAMEC");
-      T2tt_BDT_expp1->Draw("samel");
     }
 
     else{
-      T2tt_obsp1->Draw("samel");
-      T2tt_obsm1->Draw("samel");
-      T2tt_exp->Draw("samel");
-      T2tt_expm1->Draw("samel");
-      T2tt_obs->Draw("samel");
-    }
 
+      if( doBDT ){
+
+	hR_smallDM->Draw("CONT3SAMEC");
+	hR_exp_smallDM->Draw("CONT3SAMEC");
+	hR_expm1_smallDM->Draw("CONT3SAMEC");
+	hR_obsp1_smallDM->Draw("CONT3SAMEC");
+	hR_obsm1_smallDM->Draw("CONT3SAMEC");
+
+	// draw the expected (-1sigma) contour by hand
+	//hR_expp1_smallDM->Draw("CONT3SAMEC");
+	T2tt_BDT_expp1->Draw("samel");
+      }
+
+      else{
+	T2tt_obsp1->Draw("samel");
+	T2tt_obsm1->Draw("samel");
+	T2tt_exp->Draw("samel");
+	T2tt_expm1->Draw("samel");
+	T2tt_obs->Draw("samel");
+      }
+
+    }
 
   }
 
@@ -1094,6 +1106,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hnevents_best->Write();
   hjeserr_best->Write();
   htoterr_best->Write();
+
+  T2tt_exp->SetName("graph_T2tt_exp");
+  T2tt_exp->SetTitle("graph_T2tt_exp");
+  T2tt_exp->Write();
   fout->Close();
 
 }
