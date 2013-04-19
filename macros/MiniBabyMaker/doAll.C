@@ -62,8 +62,8 @@ void doAll() {
     //"merged_T2bw_mStop-500to800_mLSP-0to700_x025"
 
     // x=0.75
-    "merged_T2bw_mStop-100to475_mLSP-0to375_x075.root",
-    "merged_T2bw_mStop-500to800_mLSP-0to700_x075.root"
+    "merged_T2bw_mStop-100to475_mLSP-0to375_x075",
+    "merged_T2bw_mStop-500to800_mLSP-0to700_x075"
 
 
 
