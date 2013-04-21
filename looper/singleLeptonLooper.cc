@@ -525,6 +525,7 @@ void singleLeptonLooper::InitBaby(){
   pfjets_.clear();
   pfjets_genJet_.clear();
   pfjets_csv_.clear();
+  pfjets_chEfrac_.clear();
   pfjets_chm_.clear();
   pfjets_neu_.clear();
   pfjets_l1corr_.clear();
@@ -2838,6 +2839,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for( int i = 0 ; i < (int)vipfjets_p4.size() ; ++i ){
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
+	pfjets_chEfrac_.push_back(pfjets_chargedHadronE().at(vipfjets_p4.at(i).p4ind) / pfjets_p4().at(vipfjets_p4.at(i).p4ind).energy());
 	pfjets_chm_.push_back(pfjets_chargedMultiplicity().at(vipfjets_p4.at(i).p4ind));
 	pfjets_neu_.push_back(pfjets_neutralMultiplicity().at(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
@@ -4121,6 +4123,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_ );
   outTree->Branch("pfjets_genJet_"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_genJet_ );
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
+  outTree->Branch("pfjets_chEfrac", "std::vector<float>", &pfjets_chEfrac_ );
   outTree->Branch("pfjets_chm", "std::vector<float>", &pfjets_chm_ );
   outTree->Branch("pfjets_neu", "std::vector<float>", &pfjets_neu_ );
   outTree->Branch("pfjets_l1corr",  "std::vector<float>", &pfjets_l1corr_   );

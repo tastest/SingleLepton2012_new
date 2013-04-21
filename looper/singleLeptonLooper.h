@@ -463,6 +463,7 @@ class singleLeptonLooper
 	// CHM and NEU
         std::vector<float> pfjets_chm_;
         std::vector<float> pfjets_neu_;
+        std::vector<float> pfjets_chEfrac_;
 	//jet corrections and ID
 	std::vector<float> pfjets_l1corr_;
 	std::vector<float> pfjets_corr_;
