@@ -5,7 +5,7 @@
 #include "StopTreeLooper.h"
 #endif
 
-void doAll(char* infilename) {
+void doAll_ben(char* infilename) {
 
   cout << "Submitting " << infilename << endl;
 
@@ -34,7 +34,7 @@ void doAll(char* infilename) {
  
   char* path_T2tt        = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad";
   char* path_T2bw_fine   = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_fine";
-  char* path_T2bw_coarse = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_coarse";
+  char* path_T2bw_coarse = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse";
   
 
   const int NSAMPLES = 1;
@@ -127,8 +127,8 @@ void doAll(char* infilename) {
       }
 
       if( TString(sampletag[i]).Contains("T2bw_coarse") ){
-	ch[i]->Add(Form("%s/%s*root",path_T2bw_coarse,sampletag[i]));
-	cout << "Added " << Form("%s/%s*root",path_T2bw_coarse,sampletag[i]) << endl;	
+	ch[i]->Add(Form("%s/%s.root",path_T2bw_coarse,sampletag[i]));
+	cout << "Added " << Form("%s/%s.root",path_T2bw_coarse,sampletag[i]) << endl;	
       }
 
     }
