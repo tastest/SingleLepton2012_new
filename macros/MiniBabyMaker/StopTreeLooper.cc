@@ -150,7 +150,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  }
 
 	  else if( name.Contains("coarse") ){
-	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_coarse/myMassDB_T2bw_coarse.root";
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/myMassDB_T2bw_coarse.root";
 	  }
 
 	  else if( name.Contains("x050") ){
@@ -1006,7 +1006,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        outFile_   = new TFile(Form("output_V00-03-08/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-09/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
