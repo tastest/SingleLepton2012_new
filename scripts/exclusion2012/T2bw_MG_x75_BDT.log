@@ -61,8 +61,8 @@ Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( p
 
 efficiency (300,50)  0.111773
 nevents              11
-xsec UL              0.739065
-xsec UL exp          1.01147
+xsec UL              0.738675
+xsec UL exp          1.00937
 JES                  0.0553312
 tot err              0.113855
 btag err             0
@@ -72,8 +72,8 @@ stat err             0.227508
 
 efficiency (300,50)  0.0489673
 nevents              5
-xsec UL              0.747929
-xsec UL exp          1.21486
+xsec UL              0.743562
+xsec UL exp          1.21483
 JES                  0
 tot err              0.121953
 btag err             0
@@ -83,8 +83,8 @@ stat err             0.343726
 
 efficiency (300,50)  0.0101012
 nevents              1
-xsec UL              2.7679
-xsec UL exp          3.67322
+xsec UL              2.79224
+xsec UL exp          3.6553
 JES                  0
 tot err              0.123839
 btag err             0
@@ -94,8 +94,8 @@ stat err             0.756794
 
 efficiency (300,50)  0.706711
 nevents              69
-xsec UL              0.752892
-xsec UL exp          0.880714
+xsec UL              0.740157
+xsec UL exp          0.866419
 JES                  0.0144652
 tot err              0.0858791
 btag err             0.00687653
