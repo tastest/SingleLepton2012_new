@@ -257,7 +257,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   bool  plotHCP       = true;
   int   NEVENTS_MIN   = 20;
   int   nsmooth       =  1;
-  bool  doTruncation  = true;
+  bool  doTruncation  = false;
   int   dMCut         = 0;
 
   if( x==25 ) plotHCP = false;
@@ -287,6 +287,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
   else if( TString(sample).Contains("T2bw_MG") ){
 
+    doTruncation  = true;
     doRemoveSlice = false;
     //label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm} #rightarrow b W #tilde{#chi}_{1}^{0}";
     label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
@@ -481,6 +482,22 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   }
 
 
+
+  if( TString(sample).Contains("T2bw_MG") && x==25 && !doBDT ){
+    cout << "FIXING THE T2BW OBSERVED LIMIT" << endl;
+
+    int bin = hxsec_best->FindBin(525,100);
+    hxsec_best->SetBinContent(bin,0.06);
+
+    bin = hxsec_best->FindBin(525,125);
+    hxsec_best->SetBinContent(bin,0.06);
+
+    bin = hxsec_best->FindBin(550,100);
+    hxsec_best->SetBinContent(bin,0.04);
+
+    bin = hxsec_best->FindBin(550,75);
+    hxsec_best->SetBinContent(bin,0.04);
+  }
 
 
   //-------------------------------
@@ -707,20 +724,20 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // get TGraph's for exclusion contours
   //------------------------------------------------------------
 
-  TGraph* gr_obsp1          = getRefXsecGraph(hxsec_best               , "T2tt", 1.15);
-  TGraph* gr_obsm1          = getRefXsecGraph(hxsec_best               , "T2tt", 0.85);
+  // TGraph* gr_obsp1          = getRefXsecGraph(hxsec_best               , "T2tt", 1.15);
+  // TGraph* gr_obsm1          = getRefXsecGraph(hxsec_best               , "T2tt", 0.85);
 
-  TGraph* gr_exp            = getRefXsecGraph(hxsec_best_exp_largeDM   , "T2tt", 1.0);
-  TGraph* gr_exp_smallDM    = getRefXsecGraph(hxsec_best_exp_smallDM   , "T2tt", 1.0);
+  // TGraph* gr_exp            = getRefXsecGraph(hxsec_best_exp_largeDM   , "T2tt", 1.0);
+  // TGraph* gr_exp_smallDM    = getRefXsecGraph(hxsec_best_exp_smallDM   , "T2tt", 1.0);
 
-  TGraph* gr_expp1          = getRefXsecGraph(hxsec_best_expp1_largeDM , "T2tt", 1.0);
-  TGraph* gr_expp1_smallDM  = getRefXsecGraph(hxsec_best_expp1_smallDM , "T2tt", 1.0);
+  // TGraph* gr_expp1          = getRefXsecGraph(hxsec_best_expp1_largeDM , "T2tt", 1.0);
+  // TGraph* gr_expp1_smallDM  = getRefXsecGraph(hxsec_best_expp1_smallDM , "T2tt", 1.0);
 
-  TGraph* gr_expm1          = getRefXsecGraph(hxsec_best_expm1_largeDM , "T2tt", 1.0);
-  TGraph* gr_expm1_smallDM  = getRefXsecGraph(hxsec_best_expm1_smallDM , "T2tt", 1.0);
+  // TGraph* gr_expm1          = getRefXsecGraph(hxsec_best_expm1_largeDM , "T2tt", 1.0);
+  // TGraph* gr_expm1_smallDM  = getRefXsecGraph(hxsec_best_expm1_smallDM , "T2tt", 1.0);
 
-  TGraph* gr                = getRefXsecGraph(hxsec_best_largeDM       , "T2tt", 1.0);
-  TGraph* gr_smallDM        = getRefXsecGraph(hxsec_best_smallDM       , "T2tt", 1.0);
+  // TGraph* gr                = getRefXsecGraph(hxsec_best_largeDM       , "T2tt", 1.0);
+  // TGraph* gr_smallDM        = getRefXsecGraph(hxsec_best_smallDM       , "T2tt", 1.0);
 
   if(doRemoveSlice) removeSlice(hxsec_best);
 
@@ -1152,9 +1169,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   fout->cd();
   hxsec_best->Write();
   hxsec_best_exp->Write();
-  gr->Write();
-  gr_exp->SetName("gr_exp");
-  gr_exp->Write();
+  // gr->Write();
+  // gr_exp->SetName("gr_exp");
+  // gr_exp->Write();
   hexcl_exp->Write();
 
   hR->SetName("hR");
