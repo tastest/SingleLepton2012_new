@@ -41,6 +41,29 @@
 #include "limits_T2TT_BDT4.C"
 #include "limits_T2TT_BDT5.C"
 
+#include "limits_T2BW_LM100.C"
+#include "limits_T2BW_LM150.C"
+#include "limits_T2BW_LM200.C"
+#include "limits_T2BW_LM250.C"
+
+#include "limits_T2BW_HM100.C"
+#include "limits_T2BW_HM150.C"
+#include "limits_T2BW_HM200.C"
+#include "limits_T2BW_HM250.C"
+
+#include "limits_T2bw25_BDT2.C"
+#include "limits_T2bw25_BDT3.C"
+
+#include "limits_T2bw50_BDT1.C"
+#include "limits_T2bw50_BDT2L.C"
+#include "limits_T2bw50_BDT2T.C"
+#include "limits_T2bw50_BDT3.C"
+
+#include "limits_T2bw75_BDT1.C"
+#include "limits_T2bw75_BDT2.C"
+#include "limits_T2bw75_BDT3.C"
+#include "limits_T2bw75_BDT4.C"
+
 using namespace std;
 
 void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" , bool print = false){
@@ -687,59 +710,99 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 	//------------------------------------------
 
 	else if( TString(labels.at(i)).Contains("T2BW_LM100") ){
-	  this_ul         = 321.149;
-	  this_ul_exp     = 340.097;
-	  this_ul_expp1   = 476.991;
-	  this_ul_expm1   = 248.095;
+	  // this_ul         = 321.149;
+	  // this_ul_exp     = 340.097;
+	  // this_ul_expp1   = 476.991;
+	  // this_ul_expm1   = 248.095;
+
+	  this_ul       = getUpperLimit_T2BW_LM100( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_LM100( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_LM100( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_LM100( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_LM150") ){
-	  this_ul         = 97.8571;
-	  this_ul_exp     = 121.299;
-	  this_ul_expp1   = 166.086;
-	  this_ul_expm1   = 89.0909;
+	  // this_ul         = 97.8571;
+	  // this_ul_exp     = 121.299;
+	  // this_ul_expp1   = 166.086;
+	  // this_ul_expm1   = 89.0909;
+
+	  this_ul       = getUpperLimit_T2BW_LM150( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_LM150( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_LM150( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_LM150( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_LM200") ){
-	  this_ul         = 35.556;
-	  this_ul_exp     = 48.3854;
-	  this_ul_expp1   = 66.5798;
-	  this_ul_expm1   = 35.6169;
+	  // this_ul         = 35.556;
+	  // this_ul_exp     = 48.3854;
+	  // this_ul_expp1   = 66.5798;
+	  // this_ul_expm1   = 35.6169;
+
+	  this_ul       = getUpperLimit_T2BW_LM200( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_LM200( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_LM200( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_LM200( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_LM250") ){
-	  this_ul         = 17.3482;
-	  this_ul_exp     = 24.0754;
-	  this_ul_expp1   = 33.372;
-	  this_ul_expm1   = 17.1881;
+	  // this_ul         = 17.3482;
+	  // this_ul_exp     = 24.0754;
+	  // this_ul_expp1   = 33.372;
+	  // this_ul_expm1   = 17.1881;
+
+	  this_ul       = getUpperLimit_T2BW_LM250( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_LM250( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_LM250( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_LM250( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM100") ){
-	  this_ul         = 36.9713;
-	  this_ul_exp     = 29.0217;
-	  this_ul_expp1   = 40.1313;
-	  this_ul_expm1   = 21.6054;
+	  // this_ul         = 36.9713;
+	  // this_ul_exp     = 29.0217;
+	  // this_ul_expp1   = 40.1313;
+	  // this_ul_expm1   = 21.6054;
+
+	  this_ul       = getUpperLimit_T2BW_HM100( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_HM100( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_HM100( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_HM100( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM150") ){
-	  this_ul         = 19.3805;
-	  this_ul_exp     = 18.3767;
-	  this_ul_expp1   = 25.448;
-	  this_ul_expm1   = 13.2759;
+	  // this_ul         = 19.3805;
+	  // this_ul_exp     = 18.3767;
+	  // this_ul_expp1   = 25.448;
+	  // this_ul_expm1   = 13.2759;
+
+	  this_ul       = getUpperLimit_T2BW_HM150( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_HM150( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_HM150( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_HM150( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM200") ){
-	  this_ul         = 11.4308;
-	  this_ul_exp     = 11.9613;
-	  this_ul_expp1   = 17.4688;
-	  this_ul_expm1   = 8.99217;
+	  // this_ul         = 11.4308;
+	  // this_ul_exp     = 11.9613;
+	  // this_ul_expp1   = 17.4688;
+	  // this_ul_expm1   = 8.99217;
+
+	  this_ul       = getUpperLimit_T2BW_HM200( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_HM200( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_HM200( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_HM200( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW_HM250") ){
-	  this_ul         = 5.04346;
-	  this_ul_exp     = 7.73816;
-	  this_ul_expp1   = 11.1644;
-	  this_ul_expm1   = 5.39447;
+	  // this_ul         = 5.04346;
+	  // this_ul_exp     = 7.73816;
+	  // this_ul_expp1   = 11.1644;
+	  // this_ul_expm1   = 5.39447;
+
+	  this_ul       = getUpperLimit_T2BW_HM250( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2BW_HM250( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2BW_HM250( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2BW_HM250( toterr );
 	}
 
 	//------------------------------------------
@@ -823,73 +886,123 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 	//------------------------------------------
 
 	else if( TString(labels.at(i)).Contains("T2BW25_BDT2") ){
-	  this_ul         = 6.36826;
-	  this_ul_exp     = 8.05362;
-	  this_ul_expp1   = 11.4484;
-	  this_ul_expm1   = 5.6441;
+	  // this_ul         = 6.36826;
+	  // this_ul_exp     = 8.05362;
+	  // this_ul_expp1   = 11.4484;
+	  // this_ul_expm1   = 5.6441;
+
+	  this_ul       = getUpperLimit_T2bw25_BDT2( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw25_BDT2( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw25_BDT2( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw25_BDT2( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW25_BDT3") ){
-	  this_ul         = 3.99136;
-	  this_ul_exp     = 5.38962;
-	  this_ul_expp1   = 8.48055;
-	  this_ul_expm1   = 3.95123;
+	  // this_ul         = 3.99136;
+	  // this_ul_exp     = 5.38962;
+	  // this_ul_expp1   = 8.48055;
+	  // this_ul_expm1   = 3.95123;
+
+	  this_ul       = getUpperLimit_T2bw25_BDT3( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw25_BDT3( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw25_BDT3( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw25_BDT3( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW50_BDT1") ){
-	  this_ul         = 20.6657;
-	  this_ul_exp     = 26.0337;
-	  this_ul_expp1   = 35.8818;
-	  this_ul_expm1   = 18.7248;
+	  // this_ul         = 20.6657;
+	  // this_ul_exp     = 26.0337;
+	  // this_ul_expp1   = 35.8818;
+	  // this_ul_expm1   = 18.7248;
+
+	  this_ul       = getUpperLimit_T2bw50_BDT1( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT1( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT1( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT1( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW50_BDT2L") ){
-	  this_ul         = 11.6687;
-	  this_ul_exp     = 18.6775;
-	  this_ul_expp1   = 26.1434;
-	  this_ul_expm1   = 13.0451;
+	  // this_ul         = 11.6687;
+	  // this_ul_exp     = 18.6775;
+	  // this_ul_expp1   = 26.1434;
+	  // this_ul_expm1   = 13.0451;
+
+	  this_ul       = getUpperLimit_T2bw50_BDT2L( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT2L( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT2L( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT2L( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW50_BDT2T") ){
-	  this_ul         = 9.68818;
-	  this_ul_exp     = 9.84362;
-	  this_ul_expp1   = 13.8548;
-	  this_ul_expm1   = 7.31892;
+	  // this_ul         = 9.68818;
+	  // this_ul_exp     = 9.84362;
+	  // this_ul_expp1   = 13.8548;
+	  // this_ul_expm1   = 7.31892;
+
+	  this_ul       = getUpperLimit_T2bw50_BDT2T( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT2T( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT2T( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT2T( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW50_BDT3") ){
-	  this_ul         = 8.27178;
-	  this_ul_exp     = 10.6125;
-	  this_ul_expp1   = 16.1522;
-	  this_ul_expm1   = 7.67213;
+	  // this_ul         = 8.27178;
+	  // this_ul_exp     = 10.6125;
+	  // this_ul_expp1   = 16.1522;
+	  // this_ul_expm1   = 7.67213;
+
+	  this_ul       = getUpperLimit_T2bw50_BDT3( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT3( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT3( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT3( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW75_BDT1") ){
-	  this_ul         = 16.1085;
-	  this_ul_exp     = 22.0458;
-	  this_ul_expp1   = 30.6627;
-	  this_ul_expm1   = 15.5538;
+	  // this_ul         = 16.1085;
+	  // this_ul_exp     = 22.0458;
+	  // this_ul_expp1   = 30.6627;
+	  // this_ul_expm1   = 15.5538;
+
+	  this_ul       = getUpperLimit_T2bw75_BDT1( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw75_BDT1( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw75_BDT1( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw75_BDT1( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW75_BDT2") ){
-	  this_ul         = 7.14169;
-	  this_ul_exp     = 11.6002;
-	  this_ul_expp1   = 16.4583;
-	  this_ul_expm1   = 8.26508;
+	  // this_ul         = 7.14169;
+	  // this_ul_exp     = 11.6002;
+	  // this_ul_expp1   = 16.4583;
+	  // this_ul_expm1   = 8.26508;
+
+	  this_ul       = getUpperLimit_T2bw75_BDT2( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw75_BDT2( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw75_BDT2( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw75_BDT2( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW75_BDT3") ){
-	  this_ul         = 5.45205;
-	  this_ul_exp     = 7.23529;
-	  this_ul_expp1   = 10.3813;
-	  this_ul_expm1   = 5.19484;
+	  // this_ul         = 5.45205;
+	  // this_ul_exp     = 7.23529;
+	  // this_ul_expp1   = 10.3813;
+	  // this_ul_expm1   = 5.19484;
+
+	  this_ul       = getUpperLimit_T2bw75_BDT3( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw75_BDT3( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw75_BDT3( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw75_BDT3( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW75_BDT4") ){
-	  this_ul         = 103.755;
-	  this_ul_exp     = 121.37;
-	  this_ul_expp1   = 164.736;
-	  this_ul_expm1   = 88.7762;
+	  // this_ul         = 103.755;
+	  // this_ul_exp     = 121.37;
+	  // this_ul_expp1   = 164.736;
+	  // this_ul_expm1   = 88.7762;
+
+	  this_ul       = getUpperLimit_T2bw75_BDT4( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw75_BDT4( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw75_BDT4( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw75_BDT4( toterr );
 	}
 	else{
 	  cout << "ERROR! UNRECOGNIZED SIGNAL REGION " << labels.at(i) << endl;
@@ -1187,17 +1300,26 @@ void doAll(){
 
   // C&C
   //SMS("T2tt", 1,false,""     ,true); //unpolarized
-  SMS("T2tt", 1,false,"left" ,true); //topL
-  SMS("T2tt", 1,false,"right",true); //topR
+  // SMS("T2tt", 1,false,"left" ,true); //topL
+  // SMS("T2tt", 1,false,"right",true); //topR
   // SMS("T2bw",25,false,"",true);
   // SMS("T2bw",50,false,"",true);
   // SMS("T2bw",75,false,"",true);
 
   // BDT
   //SMS("T2tt", 1,true,""     ,true);
-  SMS("T2tt", 1,true,"left" ,true);
-  SMS("T2tt", 1,true,"right",true);
+  // SMS("T2tt", 1,true,"left" ,true);
+  // SMS("T2tt", 1,true,"right",true);
   // SMS("T2bw",25,true,"",true);
   // SMS("T2bw",50,true,"",true);
   // SMS("T2bw",75,true,"",true);
+
+  SMS("T2bw_MG",25,false,"",true);
+  SMS("T2bw_MG",50,false,"",true);
+  SMS("T2bw_MG",75,false,"",true);
+
+  SMS("T2bw_MG",25,true,"",true);
+  SMS("T2bw_MG",50,true,"",true);
+  SMS("T2bw_MG",75,true,"",true);
+
 }
