@@ -201,7 +201,7 @@ TH2F* exclusionContour( TH2F* hul , char* sample , bool doBDT = false , int nsmo
   //if( nsmooth > 0 ) h_R->Smooth(nsmooth);
   //if( nsmooth > 0 ) h_R->Smooth(nsmooth,"k3a");
 
-  smoothTH2( h_R , sample , doBDT );
+  if( nsmooth > 0 ) smoothTH2( h_R , sample , doBDT );
 
   //fixupTH2( h_R , sample , doBDT );
 
