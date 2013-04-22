@@ -30,6 +30,24 @@
 
 using namespace std;
 
+//-------------------------------------------------
+// remove points in histo with deltaM <= cutval
+//-------------------------------------------------
+
+void truncateHistAtDiagonal(TH2F* h,int cutval){
+
+  for( int ibin = 1 ; ibin <= h->GetXaxis()->GetNbins() ; ibin++ ){
+    for( int jbin = 1 ; jbin <= h->GetYaxis()->GetNbins() ; jbin++ ){
+      float mstop = h->GetXaxis()->GetBinCenter(ibin);
+      float mlsp  = h->GetYaxis()->GetBinCenter(jbin);
+      float dm    = mstop - mlsp;
+
+      if( dm <= cutval ) h->SetBinContent(ibin,jbin,0);
+    }
+  }
+
+}
+
 //------------------------------------
 // remove the LSP = 0 slice
 //------------------------------------
@@ -56,10 +74,14 @@ void smoothHistogram( TH2F* h ){
       float valydown = h->GetBinContent(ibin,jbin-1);
 
       if( val < 1e-10 && valup > 1e-10 && valdown > 1e-10 ){
+	cout << "Found missing bin (horizontal)" << endl;
+	cout << ibin << " " << jbin << endl;
 	h->SetBinContent(ibin,jbin,0.5*(valup+valdown));
       }
 
       if( val < 1e-10 && valyup > 1e-10 && valydown > 1e-10 ){
+	cout << "Found missing bin (vertical)" << endl;
+	cout << ibin << " " << jbin << endl;
 	h->SetBinContent(ibin,jbin,0.5*(valyup+valydown));
       }
     }
@@ -233,7 +255,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   char* BDTchar       = (char*) "";
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
-  int   NEVENTS_MIN   = 20;
+  int   NEVENTS_MIN   = -1;
+  int   nsmooth       =  1;
+  bool  doTruncation  = true;
+  int   dMCut         = 0;
 
   if( x==25 ) plotHCP = false;
 
@@ -260,6 +285,38 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     doRemoveSlice = false;
   }
 
+  else if( TString(sample).Contains("T2bw_MG") ){
+
+    doRemoveSlice = false;
+    //label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm} #rightarrow b W #tilde{#chi}_{1}^{0}";
+    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
+
+    if( x==25 ){
+      xaxismin        = 360.0;
+      xchar           = (char*) "_x25";
+      nSR             = 8;
+      if( doBDT ) nSR = 2;
+      dMCut           = 325;
+    }
+
+    else if( x==50 ){
+      xaxismin        = 80.0;
+      xchar           = (char*) "_x50";
+      nSR             = 8;
+      if( doBDT ) nSR = 4;
+      dMCut           = 175;
+    }
+
+    else if( x==75 ){
+      xaxismin        = 120.0;
+      xchar           = (char*) "_x75";
+      nSR             = 8;
+      if( doBDT ) nSR = 4;
+      dMCut           = 100;
+    }
+
+  }
+
   else if( TString(sample).Contains("T2bw") ){
 
     doRemoveSlice = false;
@@ -267,7 +324,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
 
     if( x==25 ){
-      xaxismin        = 100.0;
+      xaxismin        = 360.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
       if( doBDT ) nSR = 2;
@@ -293,6 +350,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     cout << "ERROR! unrecognized sample " << sample << endl;
     exit(0);
   }
+
+  xaxismin = 0.0;
 
   //----------------------------------------------
   // set up filenames and print them out
@@ -341,6 +400,16 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hjeserr[i]     = (TH2F*) file->Get(Form("hjes_%i",i));
     htoterr[i]     = (TH2F*) file->Get(Form("htoterr_%i",i));
 
+    if( doTruncation ){
+      truncateHistAtDiagonal(hxsec[i]       , dMCut);
+      truncateHistAtDiagonal(hxsec_exp[i]   , dMCut);
+      truncateHistAtDiagonal(hxsec_expp1[i] , dMCut);
+      truncateHistAtDiagonal(hxsec_expm1[i] , dMCut);
+      truncateHistAtDiagonal(hnevents[i]    , dMCut);
+      truncateHistAtDiagonal(hjeserr[i]     , dMCut);
+      truncateHistAtDiagonal(htoterr[i]     , dMCut);
+    }
+
     if( i == 0 ){
       hxsec_best = (TH2F*) hxsec[i]->Clone("hxsec_best");
       hxsec_best->Reset();
@@ -384,6 +453,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
 
 	int nevents = hnevents[i]->GetBinContent(xbin,ybin);
+	//int nevents = 100;
 
 	//cout << "exp" << i << " " << hxsec_exp[i]->GetBinContent(xbin,ybin) << endl;
 
@@ -595,12 +665,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // get exclusion contours
   //------------------------------------------------------------
 
-  TH2F* hR_exp   = exclusionContour(hxsec_best_exp_largeDM   ,sample,doBDT);
-  TH2F* hR_expp1 = exclusionContour(hxsec_best_expp1_largeDM ,sample,doBDT);
-  TH2F* hR_expm1 = exclusionContour(hxsec_best_expm1_largeDM ,sample,doBDT);
-  TH2F* hR       = exclusionContour(hxsec_best_largeDM       ,sample,doBDT);
-  TH2F* hR_obsp1 = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,-1,"up");
-  TH2F* hR_obsm1 = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,-1,"down");
+  TH2F* hR_exp   = exclusionContour(hxsec_best_exp_largeDM   ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_expp1 = exclusionContour(hxsec_best_expp1_largeDM ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_expm1 = exclusionContour(hxsec_best_expm1_largeDM ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR       = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_obsp1 = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,nsmooth,"up");
+  TH2F* hR_obsm1 = exclusionContour(hxsec_best_largeDM       ,sample,doBDT,nsmooth,"down");
 
   hR_exp->SetLineWidth(3);
   hR_exp->SetLineColor(2);
@@ -614,12 +684,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hR_obsm1->SetLineWidth(1);
   hR_obsm1->SetLineStyle(7);
 
-  TH2F* hR_smallDM       = exclusionContour(hxsec_best_smallDM       ,sample,doBDT);
-  TH2F* hR_exp_smallDM   = exclusionContour(hxsec_best_exp_smallDM   ,sample,doBDT);
-  TH2F* hR_expp1_smallDM = exclusionContour(hxsec_best_expp1_smallDM ,sample,doBDT);
-  TH2F* hR_expm1_smallDM = exclusionContour(hxsec_best_expm1_smallDM ,sample,doBDT);
-  TH2F* hR_obsp1_smallDM = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,-1,"up");
-  TH2F* hR_obsm1_smallDM = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,-1,"down");
+  TH2F* hR_smallDM       = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_exp_smallDM   = exclusionContour(hxsec_best_exp_smallDM   ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_expp1_smallDM = exclusionContour(hxsec_best_expp1_smallDM ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_expm1_smallDM = exclusionContour(hxsec_best_expm1_smallDM ,sample,doBDT,nsmooth,"nominal");
+  TH2F* hR_obsp1_smallDM = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,nsmooth,"up");
+  TH2F* hR_obsm1_smallDM = exclusionContour(hxsec_best_smallDM       ,sample,doBDT,nsmooth,"down");
 
   hR_exp_smallDM->SetLineWidth(3);
   hR_exp_smallDM->SetLineColor(2);
@@ -783,10 +853,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // cross section limit
   //-------------------------------
 
-  if( smooth ){
-    smoothHist( hxsec_best );
-    smoothHist( hbest );
-  }
+  // if( smooth ){
+  //   smoothHist( hxsec_best );
+  //   smoothHist( hbest );
+  // }
 
   blankHist( hxsec_best_exp , 300 );
   blankHist( hxsec_best , 300 );
@@ -967,6 +1037,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   line_obs->DrawLine(xoffset,yoffset+yspace1+yspace2,xoffset+length,yoffset+yspace1+yspace2);
   line_obs->DrawLine(xoffset,yoffset-yspace1+yspace2,xoffset+length,yoffset-yspace1+yspace2);
 
+  t->SetTextSize(0.045);
+  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#tilde{#chi}_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
+  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#tilde{#chi}_{1}^{0}}");
+
+
   //t->DrawLatex(0.49,0.85  ,"NLO-NLL exclusions");
 
   /*
@@ -990,10 +1066,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   float yspace1 =     5;
   float yspace2 =    28;
 
-  t->SetTextSize(0.045);
-  if( TString(sample).Contains("T2bw") && x==25 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#tilde{#chi}_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
-  if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.04,"m_{#tilde{#chi}_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#tilde{#chi}_{1}^{0}}");
 
 
   if( plotPol ) xoffset -= 30.0;
@@ -1116,8 +1188,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
 void doAll(){
 
-  combinePlots("T2tt", 1,false,"",true);
-  combinePlots("T2tt", 1,true,"",true);
+  // combinePlots("T2tt", 1,false,"",true);
+  // combinePlots("T2tt", 1,true,"",true);
 
   // combinePlots("T2tt", 1,false,"",true);
   // combinePlots("T2tt", 1,false,"right",true);
@@ -1132,4 +1204,21 @@ void doAll(){
   // combinePlots("T2bw",25,true,"",true);
   // combinePlots("T2bw",50,true,"",true);
   // combinePlots("T2bw",75,true,"",true);
+
+  combinePlots("T2bw",25,false,"",true);
+  combinePlots("T2bw",50,false,"",true);
+  combinePlots("T2bw",75,false,"",true);
+
+  combinePlots("T2bw",25,true,"",true);
+  combinePlots("T2bw",50,true,"",true);
+  combinePlots("T2bw",75,true,"",true);
+
+  // combinePlots("T2bw_MG",25,false,"",true);
+  // combinePlots("T2bw_MG",50,false,"",true);
+  // combinePlots("T2bw_MG",75,false,"",true);
+
+  // combinePlots("T2bw_MG",25,true,"",true);
+  // combinePlots("T2bw_MG",50,true,"",true);
+  // combinePlots("T2bw_MG",75,true,"",true);
+
 }
