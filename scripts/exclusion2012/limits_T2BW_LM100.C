@@ -40,7 +40,7 @@ float getExpectedP1UpperLimit_T2BW_LM100( float seff ){
      if(seff >= 0.35 && seff < 0.40) ul = 609.4;
      if(seff >= 0.40 && seff < 0.45) ul = 644.6;
      if(seff >= 0.45 && seff < 0.50) ul = 675.9;
-     if(seff >= 0.50 && seff < 0.55) ul = 1862.4;
+     if(seff >= 0.50 && seff < 0.55) ul = 1862.2;
      return ul;
 }
 float getExpectedM1UpperLimit_T2BW_LM100( float seff ){
