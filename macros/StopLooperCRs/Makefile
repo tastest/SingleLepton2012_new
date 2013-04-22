@@ -9,7 +9,7 @@ ifeq ($(shell root-config --platform),macosx)
 	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector -lMathMore
 endif
 
-SOURCES = ../Core/PartonCombinatorics.cc StopTreeLooper.cc ../Plotting/PlotUtilities.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/MT2Utility.cc ../Core/stopUtils.cc ../../CORE/Thrust.cc ../../CORE/EventShape.cc ../Core/STOPT.cc 
+SOURCES = ../Core/PartonCombinatorics.cc StopTreeLooper.cc ../Plotting/PlotUtilities.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/MT2Utility.cc ../Core/stopUtils.cc ../../CORE/Thrust.cc ../../CORE/EventShape.cc ../Core/STOPT.cc ../../Tools/BTagReshaping/BTagReshaping.cc ../../Tools/BTagReshaping/btag_payload_light.cc ../../Tools/BTagReshaping/btag_payload_b.cc
 OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libStopTreeLooper.so
 
