@@ -18,8 +18,11 @@
   // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x25.root";
   // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x25_25GeVbins.root";
 
-  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75.root";
-  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
+  // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75.root";
+  // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
+
+  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse.root";
+  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse_25GeVbins.root";
 
   cout << "Reading in  " << filename_in  << endl;
   cout << "Writing out " << filename_out << endl;
@@ -68,20 +71,30 @@
   hout75->Write();
   fout->Close();
 
-  TCanvas* c1 = new TCanvas("c1","",1600,600);
-  c1->Divide(2,1);
+  TCanvas* c1 = new TCanvas("c1","",1500,1000);
+  c1->Divide(3,2);
 
   c1->cd(1);
   gPad->SetRightMargin(0.2);
-  //hin->Draw("colz");
-  //hin25->Draw("colz");
-  hin75->Draw("colz");
+  hin->Draw("colz");
+  c1->cd(4);
+  gPad->SetRightMargin(0.2);
+  hout->Draw("colz");
 
   c1->cd(2);
   gPad->SetRightMargin(0.2);
-  //hout->Draw("colz");
-  //hout25->Draw("colz");
+  hin25->Draw("colz");
+  c1->cd(5);
+  gPad->SetRightMargin(0.2);
+  hout25->Draw("colz");
+
+  c1->cd(3);
+  gPad->SetRightMargin(0.2);
+  hin75->Draw("colz");
+  c1->cd(6);
+  gPad->SetRightMargin(0.2);
   hout75->Draw("colz");
+
 
 
 
