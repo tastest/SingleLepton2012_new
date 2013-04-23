@@ -1163,6 +1163,10 @@ int genLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescal
       ttbar_    = 0;
       mcStop1_ = 0;   
       mcStop2_ = 0;   
+      neutralino_t_ = 0;   
+      neutralino_tbar_ = 0; 
+      W_t_ = 0;   
+      W_tbar_ = 0; 
       b_     = 0;
       bbar_    = 0;
       mcid1_      = -1;
@@ -1242,6 +1246,15 @@ int genLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescal
 	  else if ( id == -1000006 )
 	    mcStop2_ = &(genps_p4().at(igen));   
 
+    //store neutralino
+    if ( genps_id_mother().at(igen) == 1000006  && ( abs(id) == 1000022 ) ) {
+      neutralino_t_ = &(genps_p4().at(igen));
+    }
+    if ( genps_id_mother().at(igen) == -1000006 && ( abs(id) == 1000022 ) ) {
+      neutralino_tbar_ = &(genps_p4().at(igen));
+    }
+
+
 	  //store b
 	  if( id == 5 ){
 	    b_         = &(genps_p4().at(igen));
@@ -1250,6 +1263,18 @@ int genLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescal
 	  if( id == -5 ){
 	    bbar_      = &(genps_p4().at(igen));
 	  }
+
+
+
+	  //store W
+	  if( id == 24 ){
+	    W_t_         = &(genps_p4().at(igen));
+	  }
+
+	  if( id == -24 ){
+	    W_tbar_      = &(genps_p4().at(igen));
+	  }
+
 
 	  //store daughter lepton
 	  if ( abs(mothid) == 24 && (abs(id) == 11 || abs(id) == 13 || abs(id) ==15)) {
@@ -2056,6 +2081,10 @@ void genLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("ttbar"     , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &ttbar_   	);
   outTree->Branch("mcStop1"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &mcStop1_   );
   outTree->Branch("mcStop2"   , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &mcStop2_   );
+  outTree->Branch("neutralino_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_t_    );
+  outTree->Branch("neutralino_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_tbar_ );
+  outTree->Branch("W_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &W_t_    );
+  outTree->Branch("W_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &W_tbar_ );
 
   outTree->Branch("b"         , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &b_   	);
   outTree->Branch("bbar"      , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &bbar_   	);

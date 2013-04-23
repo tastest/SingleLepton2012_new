@@ -309,6 +309,10 @@ class genLooper
 	LorentzVector*  mlep_;   
 	LorentzVector*  mcStop1_;   
 	LorentzVector*  mcStop2_;   
+	LorentzVector*  neutralino_t_;   
+	LorentzVector*  neutralino_tbar_;   
+	LorentzVector*  W_t_;   
+	LorentzVector*  W_tbar_;  
 	LorentzVector*  mclep1_;   
 	LorentzVector*  mclep2_;   
 	LorentzVector*  mctaud1_;   
