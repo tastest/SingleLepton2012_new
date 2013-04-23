@@ -82,6 +82,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   char* BDTchar         = (char*) "";
   char* xchar           = (char*) "";
   char* label           = (char*)"";
+  bool  doISRWeight     = true;
 
   if( doBDT ){
     BDTchar  = (char*) "_BDT";
@@ -134,27 +135,27 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
   else if( TString(sample).Contains("T2bw") ){
 
+    denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse_25GeVbins.root";
+    doISRWeight    = false;
+
     if( x==25 ){
       xchar          = (char*) "_x25";
       denomhistoname = (char*) "masses25";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x25.root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/T2bw_x25.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.25";
     }
 
     else if( x==50 ){
       xchar          = (char*) "_x50";
       denomhistoname = (char*) "masses";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x50.root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/T2bw_x50.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.50";
     }
 
     else if( x==75 ){
       xchar          = (char*) "_x75";
       denomhistoname = (char*) "masses75";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/T2bw_x75.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
     }
 
@@ -264,6 +265,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   presel += mt120;
   if( doBDT ){
     presel += testing;
+  }
+  if( !doISRWeight ){
+    isrweight = TCut("1");
   }
 
   if( TString(sample).Contains("T2bw") && x==25 ) presel += x25;
@@ -518,7 +522,6 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
     // nominal
     ch->Draw(Form("ml:mg>>heff_%i",i),sigcuts.at(i)*weight*isrweight);
-    TH2F* hnevents = (TH2F*) heff[i]->Clone(Form("hnevents_%i",i));
     heff[i]->Divide(hdenom);
 
     // raw number of signal events
@@ -558,7 +561,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
 	// nominal
 	float eff          = heff[i]->GetBinContent(ibin,jbin);
-	float eff_staterr  = 1.0/sqrt(hnevents->GetBinContent(ibin,jbin));
+	float eff_staterr  = 1.0/sqrt(hnevents[i]->GetBinContent(ibin,jbin));
 
 	// JES up/down
 	float effup      = heffup[i]->GetBinContent(ibin,jbin);
@@ -1069,12 +1072,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   t->SetTextSize(0.04);
 
   TCanvas* can[nsig];
-  TCanvas* can_exclusion[nsig];
+  //TCanvas* can_exclusion[nsig];
 
   TGraph* gr[nsig];
   TGraph* gr_exp[nsig];
-  TGraph* gr_expp1[nsig];
-  TGraph* gr_expm1[nsig];
+  //TGraph* gr_expp1[nsig];
+  //TGraph* gr_expm1[nsig];
 
 
   for( unsigned int i = 0 ; i < nsig ; ++i ){
@@ -1242,7 +1245,14 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
     int bin = heff[i]->FindBin(300,50);
 
-    cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    if( TString(sample).Contains("T2bw") ) bin = heff[i]->FindBin(500,50);
+
+    if( TString(sample).Contains("T2bw") ){ 
+      cout << "efficiency (500,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    }
+    else{
+      cout << "efficiency (300,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    }
     cout << "nevents              " << hnevents[i]->GetBinContent(bin)  << endl;
     cout << "xsec UL              " << hxsec[i]->GetBinContent(bin)     << endl;
     cout << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
@@ -1253,7 +1263,12 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     cout << "stat err             " << hstaterr[i]->GetBinContent(bin)  << endl;
     cout << endl << endl;
 
-    *logfile << "efficiency (300,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    if( TString(sample).Contains("T2bw") ){ 
+      *logfile << "efficiency (500,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    }
+    else{
+      *logfile << "efficiency (300,50)  " << heff[i]->GetBinContent(bin)      << endl;
+    }
     *logfile << "nevents              " << hnevents[i]->GetBinContent(bin)  << endl;
     *logfile << "xsec UL              " << hxsec[i]->GetBinContent(bin)     << endl;
     *logfile << "xsec UL exp          " << hxsec_exp[i]->GetBinContent(bin) << endl;
@@ -1299,7 +1314,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 void doAll(){
 
   // C&C
-  //SMS("T2tt", 1,false,""     ,true); //unpolarized
+  // SMS("T2tt", 1,false,""     ,true); //unpolarized
   // SMS("T2tt", 1,false,"left" ,true); //topL
   // SMS("T2tt", 1,false,"right",true); //topR
   // SMS("T2bw",25,false,"",true);
@@ -1307,19 +1322,27 @@ void doAll(){
   // SMS("T2bw",75,false,"",true);
 
   // BDT
-  //SMS("T2tt", 1,true,""     ,true);
+  // SMS("T2tt", 1,true,""     ,true);
   // SMS("T2tt", 1,true,"left" ,true);
   // SMS("T2tt", 1,true,"right",true);
   // SMS("T2bw",25,true,"",true);
   // SMS("T2bw",50,true,"",true);
   // SMS("T2bw",75,true,"",true);
 
-  SMS("T2bw_MG",25,false,"",true);
-  SMS("T2bw_MG",50,false,"",true);
-  SMS("T2bw_MG",75,false,"",true);
+  // SMS("T2bw_MG",25,false,"",true);
+  // SMS("T2bw_MG",50,false,"",true);
+  // SMS("T2bw_MG",75,false,"",true);
 
-  SMS("T2bw_MG",25,true,"",true);
-  SMS("T2bw_MG",50,true,"",true);
-  SMS("T2bw_MG",75,true,"",true);
+  // SMS("T2bw_MG",25,true,"",true);
+  // SMS("T2bw_MG",50,true,"",true);
+  // SMS("T2bw_MG",75,true,"",true);
+
+  SMS("T2bw",25,false,"",true);
+  SMS("T2bw",50,false,"",true);
+  //SMS("T2bw",75,false,"",true);
+
+  SMS("T2bw",25,true,"",true);
+  SMS("T2bw",50,true,"",true);
+  //SMS("T2bw",75,true,"",true);
 
 }
