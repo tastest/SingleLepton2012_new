@@ -256,7 +256,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
   int   NEVENTS_MIN   = 20;
-  int   nsmooth       =  -1;
+  int   nsmooth       =  1;
   bool  doTruncation  = false;
   int   dMCut         = 0;
 
@@ -663,7 +663,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
       bin = hxsec_best->FindBin(350,200);
       hxsec_best->SetBinContent(bin,0.7);
-
     }
   }
 
@@ -1333,12 +1332,12 @@ void doAll(){
   combinePlots("T2bw",50,true,"",true);
   combinePlots("T2bw",75,true,"",true);
 
-  // combinePlots("T2bw_MG",25,false,"",true);
-  // combinePlots("T2bw_MG",50,false,"",true);
-  // combinePlots("T2bw_MG",75,false,"",true);
+  combinePlots("T2bw_MG",25,false,"",true);
+  combinePlots("T2bw_MG",50,false,"",true);
+  combinePlots("T2bw_MG",75,false,"",true);
 
-  // combinePlots("T2bw_MG",25,true,"",true);
-  // combinePlots("T2bw_MG",50,true,"",true);
-  // combinePlots("T2bw_MG",75,true,"",true);
+  combinePlots("T2bw_MG",25,true,"",true);
+  combinePlots("T2bw_MG",50,true,"",true);
+  combinePlots("T2bw_MG",75,true,"",true);
 
 }
