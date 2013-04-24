@@ -25,14 +25,14 @@ TGraph* get_T2tt_obs(){
    float x[8];
    float y[8];
 
-   x[i] =  150.0; y[i++]=0;
+   x[i] =  155.0; y[i++]=0;
    x[i] =  262.5; y[i++]=100.0;
    x[i] =  262.5; y[i++]=105.0;
    x[i] =  255.0; y[i++]=112.5;
    x[i] =  250.0; y[i++]=112.5;
    x[i] =  137.5; y[i++]= 25.0;
    x[i] =  137.5; y[i++]=  0.0;
-   x[i] =  150.0; y[i++]=  0.0;
+   x[i] =  155.0; y[i++]=  0.0;
 
    TGraph *gr = new TGraph(8,x,y);
 
@@ -74,7 +74,7 @@ TGraph* get_T2tt_obsm1(){
    x[i] =  262.5; y[i++]=100.0;
    x[i] =  262.5; y[i++]=112.5;
    x[i] =  250.0; y[i++]=112.5;
-   x[i] =  157.5; y[i++]= 37.5;
+   x[i] =  157.5; y[i++]= 25.0;
    x[i] =  162.5; y[i++]= 12.5;
 
    TGraph *gr = new TGraph(6,x,y);
@@ -89,17 +89,19 @@ TGraph* get_T2tt_obsm1(){
 TGraph* get_T2tt_exp(){
 
    int i = 0;
-   float x[6];
-   float y[6];
+   float x[7];
+   float y[7];
 
-   x[i] =  162.5;   y[i++]=12.5;
-   x[i] =  250.0; y[i++]=100.0;
+   x[i] =  162.5; y[i++]=12.5;
+   x[i] =  167.5; y[i++]=12.5;
+   //x[i] =  250.0; y[i++]=100.0;
+   x[i] =  262.5; y[i++]=107.5;
    x[i] =  262.5; y[i++]=112.5;
    x[i] =  250.0; y[i++]=112.5;
-   x[i] =  162.5; y[i++]= 37.5;
+   x[i] =  162.5; y[i++]= 25.0;
    x[i] =  162.5; y[i++]= 12.5;
 
-   TGraph *gr = new TGraph(6,x,y);
+   TGraph *gr = new TGraph(7,x,y);
 
    gr->SetLineWidth(3);
    gr->SetLineColor(2);;
