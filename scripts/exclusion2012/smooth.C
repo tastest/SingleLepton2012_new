@@ -116,6 +116,13 @@ void smoothTH2( TH2F* h , char* sample , bool doBDT = false , float min = 1.0e-1
 
       if( valnn > 9 ) continue;
 
+      // if( TString(sample).Contains("T2bw") ){
+      // 	if( valdn > 9 ) continue;
+      // 	if( valnd > 9 ) continue;
+      // 	if( valnu > 9 ) continue;
+      // 	if( valun > 9 ) continue;
+      // }
+
       // if( valdd > 9 ) continue;
       // if( valdn > 9 ) continue;
       // if( valdu > 9 ) continue;
