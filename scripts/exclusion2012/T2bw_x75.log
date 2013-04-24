@@ -2,98 +2,196 @@
 Sample            T2bw
 logfile           T2bw_x75.log
 x                 75
-Using file        /tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/Skim_4jets_MET100_MT120/T2bw_x75.root
-Using denominator /tas/cms2/stop/cms2V05-03-25_stoplooperV00-02-18/T2bw/minibabyV00-03-03/myMassDB_T2bw_25GeVbins.root
+pol               
+Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/T2bw_x75.root
+Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse_25GeVbins.root
 Denom histo       masses75
 Using lumi        19500 pb-1
 ----------------------------------------------------
-Using pre-selection   ((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7)
-Using weight          mini_sltrigeff
+Using pre-selection   (((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7)
+Using weight          mini_sltrigeff * 1
+Using ISR weight      1
+Signal region       : T2BW_LM100
 
-Signal Region : 0 T2BW_LM100
-Selection     : ((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(t1metphicorr > 100))&&(mini_dphimjmin>0.8)
-UL            : 79.6
+Selection           : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 100))&&(mini_dphimjmin>0.8)
 
-Signal Region : 1 T2BW_LM150
-Selection     : ((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8)
-UL            : 42.1
+Selection JES up    : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 100))&&(mini_dphimjmin>0.8)
 
-Signal Region : 2 T2BW_LM200
-Selection     : ((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8)
-UL            : 19
+Selection JES down  : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 100))&&(mini_dphimjmin>0.8)
 
-Signal Region : 3 T2BW_LM250
-Selection     : ((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8)
-UL            : 9.9
+Selection btag up   : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 100))&&(mini_dphimjmin>0.8)
 
-Signal Region : 4 T2BW_HM100
-Selection     : ((((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(t1metphicorr > 100))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
-UL            : 17.5
+Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 100))&&(mini_dphimjmin>0.8)
 
-Signal Region : 5 T2BW_HM150
-Selection     : ((((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
-UL            : 12.3
+Signal region       : T2BW_LM150
 
-Signal Region : 6 T2BW_HM200
-Selection     : ((((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
-UL            : 9
+Selection           : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8)
 
-Signal Region : 7 T2BW_HM250
-Selection     : ((((((((((((((rhovor>0 && rhovor<40)&&(isdata==0 || (csc==0 && hbhe==1 && hcallaser==1 && ecaltp==1 && trkfail==1 && eebadsc==1 && hbhenew==1)))&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(t1metphicorr > 100))&&(t1metphicorrmt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
-UL            : 6.4
-efficiency (500,50)  4.53783
-xsec UL              0.362931
-xsec UL exp          0.384344
-JES                  0.1
-tot err              0.1
+Selection JES up    : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 150.0))&&(mini_dphimjmin>0.8)
+
+Selection JES down  : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 150.0))&&(mini_dphimjmin>0.8)
+
+Selection btag up   : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8)
+
+Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8)
+
+Signal region       : T2BW_LM200
+
+Selection           : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8)
+
+Selection JES up    : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 200.0))&&(mini_dphimjmin>0.8)
+
+Selection JES down  : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 200.0))&&(mini_dphimjmin>0.8)
+
+Selection btag up   : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8)
+
+Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8)
+
+Signal region       : T2BW_LM250
+
+Selection           : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8)
+
+Selection JES up    : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 250.0))&&(mini_dphimjmin>0.8)
+
+Selection JES down  : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 250.0))&&(mini_dphimjmin>0.8)
+
+Selection btag up   : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8)
+
+Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8)
+
+Signal region       : T2BW_HM100
+
+Selection           : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 100))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
+
+Selection JES up    : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 100))&&(mini_dphimjmin>0.8))&&(mini_pt_b_up > 100.0))&&(mini_mt2wup>200.0)
+
+Selection JES down  : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 100))&&(mini_dphimjmin>0.8))&&(mini_pt_b_down > 100.0))&&(mini_mt2wdown>200.0)
+
+Selection btag up   : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 100))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bup > 100.0))&&(mini_mt2wbup>200.0)
+
+Selection btag down : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 100))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bdown > 100.0))&&(mini_mt2wbdown>200.0)
+
+Signal region       : T2BW_HM150
+
+Selection           : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
+
+Selection JES up    : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 150.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_up > 100.0))&&(mini_mt2wup>200.0)
+
+Selection JES down  : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 150.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_down > 100.0))&&(mini_mt2wdown>200.0)
+
+Selection btag up   : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bup > 100.0))&&(mini_mt2wbup>200.0)
+
+Selection btag down : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 150.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bdown > 100.0))&&(mini_mt2wbdown>200.0)
+
+Signal region       : T2BW_HM200
+
+Selection           : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
+
+Selection JES up    : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 200.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_up > 100.0))&&(mini_mt2wup>200.0)
+
+Selection JES down  : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 200.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_down > 100.0))&&(mini_mt2wdown>200.0)
+
+Selection btag up   : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bup > 100.0))&&(mini_mt2wbup>200.0)
+
+Selection btag down : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 200.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bdown > 100.0))&&(mini_mt2wbdown>200.0)
+
+Signal region       : T2BW_HM250
+
+Selection           : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b > 100.0))&&(mini_mt2w>200.0)
+
+Selection JES up    : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(x > 0.7))&&(mini_metup > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_up > 100.0))&&(mini_mt2wup>200.0)
+
+Selection JES down  : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(x > 0.7))&&(mini_metdown > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_down > 100.0))&&(mini_mt2wdown>200.0)
+
+Selection btag up   : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bup > 100.0))&&(mini_mt2wbup>200.0)
+
+Selection btag down : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bdown > 100.0))&&(mini_mt2wbdown>200.0)
+
+efficiency (500,50)  4.25509
+nevents              2307
+xsec UL              0.381685
+xsec UL exp          0.407115
+JES                  0.0196685
+tot err              0.0761696
+btag err             0.00888616
+ISR err              0
+stat err             0.0208198
 
 
-efficiency (500,50)  3.86057
-xsec UL              0.129989
-xsec UL exp          0.161128
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  3.62812
+nevents              1968
+xsec UL              0.136258
+xsec UL exp          0.168767
+JES                  0.0232629
+tot err              0.0771788
+btag err             0.0089111
+ISR err              0
+stat err             0.0225417
 
 
-efficiency (500,50)  2.94402
-xsec UL              0.0619353
-xsec UL exp          0.0842829
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  2.78319
+nevents              1510
+xsec UL              0.0650424
+xsec UL exp          0.0877059
+JES                  0.0321505
+tot err              0.0803932
+btag err             0.00966528
+ISR err              0
+stat err             0.0257343
 
 
-efficiency (500,50)  1.97876
-xsec UL              0.04496
-xsec UL exp          0.0623944
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  1.86594
+nevents              1010
+xsec UL              0.0478209
+xsec UL exp          0.0651354
+JES                  0.0382559
+tot err              0.0833116
+btag err             0.0118873
+ISR err              0
+stat err             0.0314658
 
 
-efficiency (500,50)  1.39868
-xsec UL              0.135554
-xsec UL exp          0.106407
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  1.28461
+nevents              696
+xsec UL              0.14531
+xsec UL exp          0.113773
+JES                  0.0376395
+tot err              0.0838482
+btag err             0.0166673
+ISR err              0
+stat err             0.0379049
 
 
-efficiency (500,50)  1.27123
-xsec UL              0.0781818
-xsec UL exp          0.0741324
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  1.16451
+nevents              631
+xsec UL              0.0836714
+xsec UL exp          0.0792677
+JES                  0.040242
+tot err              0.0847962
+btag err             0.015329
+ISR err              0
+stat err             0.0398094
 
 
-efficiency (500,50)  1.04126
-xsec UL              0.0562966
-xsec UL exp          0.0589093
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  0.970259
+nevents              526
+xsec UL              0.0602535
+xsec UL exp          0.0628962
+JES                  0.0467317
+tot err              0.0881026
+btag err             0.0155634
+ISR err              0
+stat err             0.0436021
 
 
-efficiency (500,50)  0.768771
-xsec UL              0.0336432
-xsec UL exp          0.0516186
-JES                  0.1
-tot err              0.1
+efficiency (500,50)  0.719989
+nevents              390
+xsec UL              0.0356131
+xsec UL exp          0.0548441
+JES                  0.0461831
+tot err              0.087617
+btag err             0.0144174
+ISR err              0
+stat err             0.050637
 
 
