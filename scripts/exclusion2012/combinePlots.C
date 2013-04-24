@@ -256,7 +256,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   if( doBDT ) BDTchar = (char*) "_BDT";
   bool  plotHCP       = true;
   int   NEVENTS_MIN   = 20;
-  int   nsmooth       =  1;
+  int   nsmooth       =  -1;
   bool  doTruncation  = false;
   int   dMCut         = 0;
 
@@ -293,7 +293,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
 
     if( x==25 ){
-      xaxismin        = 360.0;
+      xaxismin        = 320.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
       if( doBDT ) nSR = 2;
@@ -301,7 +301,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     }
 
     else if( x==50 ){
-      xaxismin        = 80.0;
+      xaxismin        = 160.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
       if( doBDT ) nSR = 4;
@@ -325,14 +325,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
 
     if( x==25 ){
-      xaxismin        = 360.0;
+      xaxismin        = 320.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
       if( doBDT ) nSR = 2;
     }
 
     else if( x==50 ){
-      xaxismin        = 80.0;
+      xaxismin        = 160.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
       if( doBDT ) nSR = 4;
@@ -352,7 +352,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     exit(0);
   }
 
-  xaxismin = 0.0;
+  //xaxismin = 0.0;
+  cout << "doTruncation " << doTruncation << endl;
 
   //----------------------------------------------
   // set up filenames and print them out
@@ -402,6 +403,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     htoterr[i]     = (TH2F*) file->Get(Form("htoterr_%i",i));
 
     if( doTruncation ){
+      if( i == 0 ) cout << "Truncating histograms at dM <= " << dMCut << endl;
       truncateHistAtDiagonal(hxsec[i]       , dMCut);
       truncateHistAtDiagonal(hxsec_exp[i]   , dMCut);
       truncateHistAtDiagonal(hxsec_expp1[i] , dMCut);
@@ -481,103 +483,189 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   }
 
   //-------------------------------
+  // make TH2's of excluded regions
+  //-------------------------------
+
+  int   nbinsx  =     41;
+  float xmin    =  -12.5;
+  float xmax    = 1012.5;
+  int   nbinsy  =     41;
+  float ymin    =  -12.5;
+  float ymax    = 1012.5 ;
+
+  TFile* f = TFile::Open("stop_xsec.root");
+  TH1F* refxsec = (TH1F*) f->Get("h_stop_xsec");
+
+  TH2F* hexcl       = new TH2F("hexcl"         , "hexcl"        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+  TH2F* hexcl_obsp1 = new TH2F("hexcl_obsp1"   , "hexcl_obsp1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+  TH2F* hexcl_obsm1 = new TH2F("hexcl_obsm1"   , "hexcl_obsm1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+  TH2F* hexcl_exp   = new TH2F("hexcl_exp"     , "hexcl_exp"    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+  TH2F* hexcl_expp1 = new TH2F("hexcl_expp1"   , "hexcl_expp1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+  TH2F* hexcl_expm1 = new TH2F("hexcl_expm1"   , "hexcl_expm1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+  
+  hexcl->Reset();
+  hexcl_obsp1->Reset();
+  hexcl_obsm1->Reset();
+  hexcl_exp->Reset();
+  hexcl_expp1->Reset();
+  hexcl_expm1->Reset();
+
+  for( unsigned int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
+    for( unsigned int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
+
+      float mg      = hexcl->GetXaxis()->GetBinCenter(ibin);
+      float ml      = hexcl->GetYaxis()->GetBinCenter(jbin);
+      
+      int   bin     = refxsec->FindBin(mg);
+      float xsec    = refxsec->GetBinContent(bin);
+
+      float xsec_up = refxsec->GetBinContent(bin) + refxsec->GetBinError(bin);
+      float xsec_dn = refxsec->GetBinContent(bin) - refxsec->GetBinError(bin);
+      
+      float xsecul       = hxsec_best->GetBinContent(ibin,jbin);
+      float xsecul_exp   = hxsec_best_exp->GetBinContent(ibin,jbin);
+      float xsecul_expp1 = hxsec_best_expp1->GetBinContent(ibin,jbin);
+      float xsecul_expm1 = hxsec_best_expm1->GetBinContent(ibin,jbin);
+
+      // cout << endl;
+      // cout << "mg xsec " << mg << " " << xsec << endl;
+      // cout << "xsec: obs exp expp1 expm1 " << xsecul << " " << xsecul_exp << " " << xsecul_expp1 << " " << xsecul_expm1 << endl;
+
+      if( xsecul < 1.e-10 ) continue;
+
+      hexcl->SetBinContent(ibin,jbin,0);
+      if( xsec > xsecul && xsecul > 1e-10 ){
+	hexcl->SetBinContent(ibin,jbin,1);
+	//cout << "observed point is excluded" << endl;
+      }
+
+      hexcl_exp->SetBinContent(ibin,jbin,0);
+      if( xsec > xsecul_exp && xsecul_exp > 1e-10 ){
+	hexcl_exp->SetBinContent(ibin,jbin,1);
+	//cout << "expected point is excluded" << endl;
+      }
+
+      hexcl_expp1->SetBinContent(ibin,jbin,0);
+      if( xsec > xsecul_expp1 && xsecul_expp1 > 1e-10 ){
+	hexcl_expp1->SetBinContent(ibin,jbin,1);
+	//cout << "expected point (+1) is excluded" << endl;      
+      }
+
+      hexcl_expm1->SetBinContent(ibin,jbin,0);
+      if( xsec > xsecul_expm1 && xsecul_expm1 > 1e-10 ){
+	hexcl_expm1->SetBinContent(ibin,jbin,1);
+	//cout << "expected point (-1) is excluded" << endl;            
+      }
+
+      hexcl_obsp1->SetBinContent(ibin,jbin,0);
+      if( xsec_up > xsecul )      hexcl_obsp1->SetBinContent(ibin,jbin,1);
+      
+      hexcl_obsm1->SetBinContent(ibin,jbin,0);
+      if( xsec_dn > xsecul )      hexcl_obsm1->SetBinContent(ibin,jbin,1);
+    }
+  }
+
+  //-------------------------------
   // various fix-ups
   //-------------------------------
 
-  if( TString(sample).Contains("T2bw_MG") && x==25 && !doBDT ){
-    cout << "FIXING THE T2BW X=0.25 CUT-BASED LIMITS" << endl;
+  bool doFixups = true;
 
-    int bin = hxsec_best->FindBin(525,100);
-    hxsec_best->SetBinContent(bin,0.06);
+  if( doFixups ){
 
-    bin = hxsec_best->FindBin(525,125);
-    hxsec_best->SetBinContent(bin,0.06);
+    if( TString(sample).Contains("T2bw_MG") && x==25 && !doBDT ){
+      cout << "FIXING THE T2BW X=0.25 CUT-BASED LIMITS" << endl;
 
-    bin = hxsec_best->FindBin(550,100);
-    hxsec_best->SetBinContent(bin,0.04);
+      int bin = hxsec_best->FindBin(525,100);
+      hxsec_best->SetBinContent(bin,0.06);
 
-    bin = hxsec_best->FindBin(550,75);
-    hxsec_best->SetBinContent(bin,0.04);
+      bin = hxsec_best->FindBin(525,125);
+      hxsec_best->SetBinContent(bin,0.06);
+
+      bin = hxsec_best->FindBin(550,100);
+      hxsec_best->SetBinContent(bin,0.04);
+
+      bin = hxsec_best->FindBin(550,75);
+      hxsec_best->SetBinContent(bin,0.04);
+    }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
+      cout << "FIXING THE T2BW X=0.25 BDT LIMITS" << endl;
+
+      int bin = hxsec_best->FindBin(350,0);
+      hxsec_best_exp->SetBinContent(bin,9999);
+
+      bin = hxsec_best->FindBin(375,0);
+      hxsec_best_exp->SetBinContent(bin,9999);
+
+      bin = hxsec_best->FindBin(475,0);
+      hxsec_best_exp->SetBinContent(bin,0.2);
+
+      bin = hxsec_best->FindBin(450,75);
+      hxsec_best_expp1->SetBinContent(bin,0.15);
+    }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==50 && doBDT ){
+      cout << "FIXING THE T2BW X=0.5 BDT LIMITS" << endl;
+
+      // set these 2 points to the pythia values
+      int bin = hxsec_best->FindBin(225,0);
+      hxsec_best->SetBinContent(bin,7.50);
+      hxsec_best_exp->SetBinContent(bin,9.7);
+
+      bin = hxsec_best->FindBin(225,25);
+      hxsec_best->SetBinContent(bin,9.33);
+      hxsec_best_exp->SetBinContent(bin,12.0);
+      hxsec_best_expm1->SetBinContent(bin,9.0);
+
+      bin = hxsec_best->FindBin(475,250);
+      hxsec_best->SetBinContent(bin,0.13);
+
+    }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==75 && doBDT ){
+      cout << "FIXING THE T2BW X=0.75 BDT LIMITS" << endl;
+
+      //int bin = 1;
+
+      // set these 2 points to the pythia values
+      int bin = hxsec_best->FindBin(150,0);
+
+      bin = hxsec_best->FindBin(175,0);
+      hxsec_best->SetBinContent(bin,5.35);
+      hxsec_best_exp->SetBinContent(bin,6.26);
+      hxsec_best_expp1->SetBinContent(bin,6.26);
+      hxsec_best_expm1->SetBinContent(bin,6.26);
+
+      bin = hxsec_best->FindBin(200,0);
+      hxsec_best->SetBinContent(bin,3.11);
+      hxsec_best_exp->SetBinContent(bin,3.65);
+      hxsec_best_expm1->SetBinContent(bin,3.65);
+      hxsec_best_expp1->SetBinContent(bin,3.65);
+
+      bin = hxsec_best->FindBin(150,25);
+      hxsec_best->SetBinContent(bin,26);
+      hxsec_best_exp->SetBinContent(bin,34);
+      hxsec_best_expp1->SetBinContent(bin,34);
+      hxsec_best_expm1->SetBinContent(bin,34);
+
+      bin = hxsec_best->FindBin(175,25);
+      hxsec_best->SetBinContent(bin,6.2);
+      hxsec_best_exp->SetBinContent(bin,7.3);
+      hxsec_best_expp1->SetBinContent(bin,7.3);
+      hxsec_best_expm1->SetBinContent(bin,7.3);
+
+      bin = hxsec_best->FindBin(175,50);
+      hxsec_best->SetBinContent(bin,12);
+      hxsec_best_exp->SetBinContent(bin,16);
+      hxsec_best_expp1->SetBinContent(bin,16);
+      hxsec_best_expm1->SetBinContent(bin,16);
+
+      bin = hxsec_best->FindBin(350,200);
+      hxsec_best->SetBinContent(bin,0.7);
+
+    }
   }
-
-  else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
-    cout << "FIXING THE T2BW X=0.25 BDT LIMITS" << endl;
-
-    int bin = hxsec_best->FindBin(350,0);
-    hxsec_best_exp->SetBinContent(bin,9999);
-
-    bin = hxsec_best->FindBin(375,0);
-    hxsec_best_exp->SetBinContent(bin,9999);
-
-    bin = hxsec_best->FindBin(475,0);
-    hxsec_best_exp->SetBinContent(bin,0.2);
-
-    bin = hxsec_best->FindBin(450,75);
-    hxsec_best_expp1->SetBinContent(bin,0.15);
-  }
-
-  else if( TString(sample).Contains("T2bw_MG") && x==50 && doBDT ){
-    cout << "FIXING THE T2BW X=0.5 BDT LIMITS" << endl;
-
-    // set these 2 points to the pythia values
-    int bin = hxsec_best->FindBin(225,0);
-    hxsec_best->SetBinContent(bin,4.05);
-    hxsec_best_exp->SetBinContent(bin,6.49);
-
-    bin = hxsec_best->FindBin(225,25);
-    hxsec_best->SetBinContent(bin,9.36);
-    hxsec_best_exp->SetBinContent(bin,11.79);
-    hxsec_best_expm1->SetBinContent(bin,9.0);
-
-  }
-
-  else if( TString(sample).Contains("T2bw_MG") && x==75 && doBDT ){
-    cout << "FIXING THE T2BW X=0.75 BDT LIMITS" << endl;
-
-    //int bin = 1;
-
-    // set these 2 points to the pythia values
-    int bin = hxsec_best->FindBin(150,0);
-    hxsec_best->SetBinContent(bin,12.3);
-    hxsec_best_exp->SetBinContent(bin,14.3);
-    hxsec_best_expp1->SetBinContent(bin,14.3);
-    hxsec_best_expm1->SetBinContent(bin,14.3);
-
-    bin = hxsec_best->FindBin(175,0);
-    hxsec_best->SetBinContent(bin,4.68);
-    hxsec_best_exp->SetBinContent(bin,5.47);
-    hxsec_best_expp1->SetBinContent(bin,5.47);
-    hxsec_best_expm1->SetBinContent(bin,5.47);
-
-    bin = hxsec_best->FindBin(200,0);
-    hxsec_best->SetBinContent(bin,2.92);
-    hxsec_best_exp->SetBinContent(bin,3.41);
-    hxsec_best_expm1->SetBinContent(bin,3.41);
-    hxsec_best_expp1->SetBinContent(bin,3.41);
-
-    bin = hxsec_best->FindBin(150,25);
-    hxsec_best->SetBinContent(bin,11.29);
-    hxsec_best_exp->SetBinContent(bin,13.21);
-    hxsec_best_expp1->SetBinContent(bin,13.21);
-    hxsec_best_expm1->SetBinContent(bin,13.21);
-
-    bin = hxsec_best->FindBin(175,25);
-    hxsec_best->SetBinContent(bin,4.95);
-    hxsec_best_exp->SetBinContent(bin,5.79);
-    hxsec_best_expp1->SetBinContent(bin,5.79);
-    hxsec_best_expm1->SetBinContent(bin,5.79);
-
-    bin = hxsec_best->FindBin(175,50);
-    hxsec_best->SetBinContent(bin,10.93);
-    hxsec_best_exp->SetBinContent(bin,14.95);
-    hxsec_best_expp1->SetBinContent(bin,14.95);
-    hxsec_best_expm1->SetBinContent(bin,14.95);
-
-    bin = hxsec_best->FindBin(350,200);
-    hxsec_best->SetBinContent(bin,0.7);
-
-  }
-
 
   //-------------------------------
   // best signal region
@@ -670,96 +758,12 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   if( TString(sample).Contains("T2bw") && x==50 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#chi_{1}^{0}}");
   if( TString(sample).Contains("T2bw") && x==75 ) t->DrawLatex(0.15,0.03,"m_{#chi_{1}^{#pm}} = 0.75 m_{ #tilde{t}} + 0.25 m_{#chi_{1}^{0}}");
 
-
   // if( TString(sample).Contains("T2bw") && x == 75 ){
   //   smoothHistogram( hxsec_best );
   //   smoothHistogram( hxsec_best_exp );
   //   smoothHistogram( hxsec_best_expp1 );
   //   smoothHistogram( hxsec_best_expm1 );
   // }
-
-  //-------------------------------
-  // make TH2's of excluded regions
-  //-------------------------------
-
-  int   nbinsx  =     41;
-  float xmin    =  -12.5;
-  float xmax    = 1012.5;
-  int   nbinsy  =     41;
-  float ymin    =  -12.5;
-  float ymax    = 1012.5 ;
-
-  TFile* f = TFile::Open("stop_xsec.root");
-  TH1F* refxsec = (TH1F*) f->Get("h_stop_xsec");
-
-  TH2F* hexcl       = new TH2F("hexcl"         , "hexcl"        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-  TH2F* hexcl_obsp1 = new TH2F("hexcl_obsp1"   , "hexcl_obsp1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-  TH2F* hexcl_obsm1 = new TH2F("hexcl_obsm1"   , "hexcl_obsm1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-  TH2F* hexcl_exp   = new TH2F("hexcl_exp"     , "hexcl_exp"    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-  TH2F* hexcl_expp1 = new TH2F("hexcl_expp1"   , "hexcl_expp1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-  TH2F* hexcl_expm1 = new TH2F("hexcl_expm1"   , "hexcl_expm1"  , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-  
-  hexcl->Reset();
-  hexcl_obsp1->Reset();
-  hexcl_obsm1->Reset();
-  hexcl_exp->Reset();
-  hexcl_expp1->Reset();
-  hexcl_expm1->Reset();
-
-  for( unsigned int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
-    for( unsigned int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
-
-      float mg      = hexcl->GetXaxis()->GetBinCenter(ibin);
-      float ml      = hexcl->GetYaxis()->GetBinCenter(jbin);
-      
-      int   bin     = refxsec->FindBin(mg);
-      float xsec    = refxsec->GetBinContent(bin);
-
-      float xsec_up = refxsec->GetBinContent(bin) + refxsec->GetBinError(bin);
-      float xsec_dn = refxsec->GetBinContent(bin) - refxsec->GetBinError(bin);
-      
-      float xsecul       = hxsec_best->GetBinContent(ibin,jbin);
-      float xsecul_exp   = hxsec_best_exp->GetBinContent(ibin,jbin);
-      float xsecul_expp1 = hxsec_best_expp1->GetBinContent(ibin,jbin);
-      float xsecul_expm1 = hxsec_best_expm1->GetBinContent(ibin,jbin);
-
-      // cout << endl;
-      // cout << "mg xsec " << mg << " " << xsec << endl;
-      // cout << "xsec: obs exp expp1 expm1 " << xsecul << " " << xsecul_exp << " " << xsecul_expp1 << " " << xsecul_expm1 << endl;
-
-      if( xsecul < 1.e-10 ) continue;
-
-      hexcl->SetBinContent(ibin,jbin,0);
-      if( xsec > xsecul && xsecul > 1e-10 ){
-	hexcl->SetBinContent(ibin,jbin,1);
-	//cout << "observed point is excluded" << endl;
-      }
-
-      hexcl_exp->SetBinContent(ibin,jbin,0);
-      if( xsec > xsecul_exp && xsecul_exp > 1e-10 ){
-	hexcl_exp->SetBinContent(ibin,jbin,1);
-	//cout << "expected point is excluded" << endl;
-      }
-
-      hexcl_expp1->SetBinContent(ibin,jbin,0);
-      if( xsec > xsecul_expp1 && xsecul_expp1 > 1e-10 ){
-	hexcl_expp1->SetBinContent(ibin,jbin,1);
-	//cout << "expected point (+1) is excluded" << endl;      
-      }
-
-      hexcl_expm1->SetBinContent(ibin,jbin,0);
-      if( xsec > xsecul_expm1 && xsecul_expm1 > 1e-10 ){
-	hexcl_expm1->SetBinContent(ibin,jbin,1);
-	//cout << "expected point (-1) is excluded" << endl;            
-      }
-
-      hexcl_obsp1->SetBinContent(ibin,jbin,0);
-      if( xsec_up > xsecul )      hexcl_obsp1->SetBinContent(ibin,jbin,1);
-      
-      hexcl_obsm1->SetBinContent(ibin,jbin,0);
-      if( xsec_dn > xsecul )      hexcl_obsm1->SetBinContent(ibin,jbin,1);
-    }
-  }
 
   //------------------------------------------------------------
   // split histograms into dM > mtop and dM < mtop regions
@@ -1321,20 +1325,20 @@ void doAll(){
   // combinePlots("T2bw",50,true,"",true);
   // combinePlots("T2bw",75,true,"",true);
 
-  // combinePlots("T2bw",25,false,"",true);
-  // combinePlots("T2bw",50,false,"",true);
-  // combinePlots("T2bw",75,false,"",true);
+  combinePlots("T2bw",25,false,"",true);
+  combinePlots("T2bw",50,false,"",true);
+  combinePlots("T2bw",75,false,"",true);
 
-  // combinePlots("T2bw",25,true,"",true);
-  // combinePlots("T2bw",50,true,"",true);
-  // combinePlots("T2bw",75,true,"",true);
+  combinePlots("T2bw",25,true,"",true);
+  combinePlots("T2bw",50,true,"",true);
+  combinePlots("T2bw",75,true,"",true);
 
-  combinePlots("T2bw_MG",25,false,"",true);
-  combinePlots("T2bw_MG",50,false,"",true);
-  combinePlots("T2bw_MG",75,false,"",true);
+  // combinePlots("T2bw_MG",25,false,"",true);
+  // combinePlots("T2bw_MG",50,false,"",true);
+  // combinePlots("T2bw_MG",75,false,"",true);
 
-  combinePlots("T2bw_MG",25,true,"",true);
-  combinePlots("T2bw_MG",50,true,"",true);
-  combinePlots("T2bw_MG",75,true,"",true);
+  // combinePlots("T2bw_MG",25,true,"",true);
+  // combinePlots("T2bw_MG",50,true,"",true);
+  // combinePlots("T2bw_MG",75,true,"",true);
 
 }
