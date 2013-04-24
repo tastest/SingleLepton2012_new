@@ -1337,12 +1337,12 @@ void doAll(){
   // SMS("T2bw_MG",50,true,"",true);
   // SMS("T2bw_MG",75,true,"",true);
 
-  SMS("T2bw",25,false,"",true);
-  SMS("T2bw",50,false,"",true);
-  //SMS("T2bw",75,false,"",true);
+  // SMS("T2bw",25,false,"",true);
+  // SMS("T2bw",50,false,"",true);
+  SMS("T2bw",75,false,"",true);
 
-  SMS("T2bw",25,true,"",true);
-  SMS("T2bw",50,true,"",true);
-  //SMS("T2bw",75,true,"",true);
+  // SMS("T2bw",25,true,"",true);
+  // SMS("T2bw",50,true,"",true);
+  SMS("T2bw",75,true,"",true);
 
 }
