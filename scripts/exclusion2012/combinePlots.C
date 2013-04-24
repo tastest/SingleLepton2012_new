@@ -617,9 +617,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       hxsec_best->SetBinContent(bin,9.33);
       hxsec_best_exp->SetBinContent(bin,12.0);
       hxsec_best_expm1->SetBinContent(bin,9.0);
+      hbest->SetBinContent(bin,1);
 
       bin = hxsec_best->FindBin(475,250);
       hxsec_best->SetBinContent(bin,0.13);
+
 
     }
 
@@ -636,30 +638,35 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       hxsec_best_exp->SetBinContent(bin,6.26);
       hxsec_best_expp1->SetBinContent(bin,6.26);
       hxsec_best_expm1->SetBinContent(bin,6.26);
+      hbest->SetBinContent(bin,1);
 
       bin = hxsec_best->FindBin(200,0);
       hxsec_best->SetBinContent(bin,3.11);
       hxsec_best_exp->SetBinContent(bin,3.65);
       hxsec_best_expm1->SetBinContent(bin,3.65);
       hxsec_best_expp1->SetBinContent(bin,3.65);
+      hbest->SetBinContent(bin,1);
 
       bin = hxsec_best->FindBin(150,25);
       hxsec_best->SetBinContent(bin,26);
       hxsec_best_exp->SetBinContent(bin,34);
       hxsec_best_expp1->SetBinContent(bin,34);
       hxsec_best_expm1->SetBinContent(bin,34);
+      hbest->SetBinContent(bin,1);
 
       bin = hxsec_best->FindBin(175,25);
       hxsec_best->SetBinContent(bin,6.2);
       hxsec_best_exp->SetBinContent(bin,7.3);
       hxsec_best_expp1->SetBinContent(bin,7.3);
       hxsec_best_expm1->SetBinContent(bin,7.3);
+      hbest->SetBinContent(bin,1);
 
       bin = hxsec_best->FindBin(175,50);
       hxsec_best->SetBinContent(bin,12);
       hxsec_best_exp->SetBinContent(bin,16);
       hxsec_best_expp1->SetBinContent(bin,16);
       hxsec_best_expm1->SetBinContent(bin,16);
+      hbest->SetBinContent(bin,1);
 
       bin = hxsec_best->FindBin(350,200);
       hxsec_best->SetBinContent(bin,0.7);
