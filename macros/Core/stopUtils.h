@@ -98,6 +98,7 @@ void minuitFunction(int&, double* , double &result, double par[], int);
 double getChi2(LorentzVector& jets_b, LorentzVector& jets_j1, LorentzVector& jets_j2, float sigma_b, float sigma_j1, float sigma_j2);
 
 int getRegionNumber(float mstep, float mlsp);
+double TopPtWeight(double topPt);
 
 
 static const float BTAG_MED = 0.679;
