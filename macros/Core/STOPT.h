@@ -248,12 +248,6 @@ protected:
 	float	trkmetphi_;
 	TBranch *trkmetphi_branch;
 	bool trkmetphi_isLoaded;
-	float	trkmet_nolepcorr_;
-	TBranch *trkmet_nolepcorr_branch;
-	bool trkmet_nolepcorr_isLoaded;
-	float	trkmetphi_nolepcorr_;
-	TBranch *trkmetphi_nolepcorr_branch;
-	bool trkmetphi_nolepcorr_isLoaded;
 	float	pfmet_;
 	TBranch *pfmet_branch;
 	bool pfmet_isLoaded;
@@ -473,6 +467,24 @@ protected:
 	float	t1metphicorrmt_off_;
 	TBranch *t1metphicorrmt_off_branch;
 	bool t1metphicorrmt_off_isLoaded;
+	float	mht15_;
+	TBranch *mht15_branch;
+	bool mht15_isLoaded;
+	float	mht15phi_;
+	TBranch *mht15phi_branch;
+	bool mht15phi_isLoaded;
+	float	trkmet_mht15_;
+	TBranch *trkmet_mht15_branch;
+	bool trkmet_mht15_isLoaded;
+	float	trkmetphi_mht15_;
+	TBranch *trkmetphi_mht15_branch;
+	bool trkmetphi_mht15_isLoaded;
+	float	mettlj15_;
+	TBranch *mettlj15_branch;
+	bool mettlj15_isLoaded;
+	float	mettlj15phi_;
+	TBranch *mettlj15phi_branch;
+	bool mettlj15phi_isLoaded;
 	float	mt2bmin_;
 	TBranch *mt2bmin_branch;
 	bool mt2bmin_isLoaded;
@@ -821,13 +833,13 @@ protected:
 	float	mt_;
 	TBranch *mt_branch;
 	bool mt_isLoaded;
-	int	run_;
+	unsigned int	run_;
 	TBranch *run_branch;
 	bool run_isLoaded;
-	int	lumi_;
+	unsigned int	lumi_;
 	TBranch *lumi_branch;
 	bool lumi_isLoaded;
-	int	event_;
+	unsigned int	event_;
 	TBranch *event_branch;
 	bool event_isLoaded;
 	float	y_;
@@ -1406,6 +1418,9 @@ protected:
 	vector<float> *pfjets_csv_;
 	TBranch *pfjets_csv_branch;
 	bool pfjets_csv_isLoaded;
+	vector<float> *pfjets_chEfrac_;
+	TBranch *pfjets_chEfrac_branch;
+	bool pfjets_chEfrac_isLoaded;
 	vector<float> *pfjets_chm_;
 	TBranch *pfjets_chm_branch;
 	bool pfjets_chm_isLoaded;
@@ -1478,6 +1493,12 @@ protected:
 	vector<float> *pfjets_mvaBeta_;
 	TBranch *pfjets_mvaBeta_branch;
 	bool pfjets_mvaBeta_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *genjets_;
+	TBranch *genjets_branch;
+	bool genjets_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *genqgs_;
+	TBranch *genqgs_branch;
+	bool genqgs_isLoaded;
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *genbs_;
 	TBranch *genbs_branch;
 	bool genbs_isLoaded;
@@ -1499,6 +1520,9 @@ protected:
 	vector<float> *genps_phi_;
 	TBranch *genps_phi_branch;
 	bool genps_phi_isLoaded;
+	vector<float> *genps_mass_;
+	TBranch *genps_mass_branch;
+	bool genps_mass_isLoaded;
 public: 
 void Init(TTree *tree) {
 	mclep_branch = 0;
@@ -1755,6 +1779,16 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfjets_genJet_") != 0) {
 		pfjets_genJet__branch = tree->GetBranch("pfjets_genJet_");
 		if (pfjets_genJet__branch) {pfjets_genJet__branch->SetAddress(&pfjets_genJet__);}
+	}
+	genjets_branch = 0;
+	if (tree->GetBranch("genjets") != 0) {
+		genjets_branch = tree->GetBranch("genjets");
+		if (genjets_branch) {genjets_branch->SetAddress(&genjets_);}
+	}
+	genqgs_branch = 0;
+	if (tree->GetBranch("genqgs") != 0) {
+		genqgs_branch = tree->GetBranch("genqgs");
+		if (genqgs_branch) {genqgs_branch->SetAddress(&genqgs_);}
 	}
 	genbs_branch = 0;
 	if (tree->GetBranch("genbs") != 0) {
@@ -2147,16 +2181,6 @@ void Init(TTree *tree) {
 		trkmetphi_branch = tree->GetBranch("trkmetphi");
 		if (trkmetphi_branch) {trkmetphi_branch->SetAddress(&trkmetphi_);}
 	}
-	trkmet_nolepcorr_branch = 0;
-	if (tree->GetBranch("trkmet_nolepcorr") != 0) {
-		trkmet_nolepcorr_branch = tree->GetBranch("trkmet_nolepcorr");
-		if (trkmet_nolepcorr_branch) {trkmet_nolepcorr_branch->SetAddress(&trkmet_nolepcorr_);}
-	}
-	trkmetphi_nolepcorr_branch = 0;
-	if (tree->GetBranch("trkmetphi_nolepcorr") != 0) {
-		trkmetphi_nolepcorr_branch = tree->GetBranch("trkmetphi_nolepcorr");
-		if (trkmetphi_nolepcorr_branch) {trkmetphi_nolepcorr_branch->SetAddress(&trkmetphi_nolepcorr_);}
-	}
 	pfmet_branch = 0;
 	if (tree->GetBranch("pfmet") != 0) {
 		pfmet_branch = tree->GetBranch("pfmet");
@@ -2521,6 +2545,36 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("t1metphicorrmt_off") != 0) {
 		t1metphicorrmt_off_branch = tree->GetBranch("t1metphicorrmt_off");
 		if (t1metphicorrmt_off_branch) {t1metphicorrmt_off_branch->SetAddress(&t1metphicorrmt_off_);}
+	}
+	mht15_branch = 0;
+	if (tree->GetBranch("mht15") != 0) {
+		mht15_branch = tree->GetBranch("mht15");
+		if (mht15_branch) {mht15_branch->SetAddress(&mht15_);}
+	}
+	mht15phi_branch = 0;
+	if (tree->GetBranch("mht15phi") != 0) {
+		mht15phi_branch = tree->GetBranch("mht15phi");
+		if (mht15phi_branch) {mht15phi_branch->SetAddress(&mht15phi_);}
+	}
+	trkmet_mht15_branch = 0;
+	if (tree->GetBranch("trkmet_mht15") != 0) {
+		trkmet_mht15_branch = tree->GetBranch("trkmet_mht15");
+		if (trkmet_mht15_branch) {trkmet_mht15_branch->SetAddress(&trkmet_mht15_);}
+	}
+	trkmetphi_mht15_branch = 0;
+	if (tree->GetBranch("trkmetphi_mht15") != 0) {
+		trkmetphi_mht15_branch = tree->GetBranch("trkmetphi_mht15");
+		if (trkmetphi_mht15_branch) {trkmetphi_mht15_branch->SetAddress(&trkmetphi_mht15_);}
+	}
+	mettlj15_branch = 0;
+	if (tree->GetBranch("mettlj15") != 0) {
+		mettlj15_branch = tree->GetBranch("mettlj15");
+		if (mettlj15_branch) {mettlj15_branch->SetAddress(&mettlj15_);}
+	}
+	mettlj15phi_branch = 0;
+	if (tree->GetBranch("mettlj15phi") != 0) {
+		mettlj15phi_branch = tree->GetBranch("mettlj15phi");
+		if (mettlj15phi_branch) {mettlj15phi_branch->SetAddress(&mettlj15phi_);}
 	}
 	mt2bmin_branch = 0;
 	if (tree->GetBranch("mt2bmin") != 0) {
@@ -3822,6 +3876,11 @@ void Init(TTree *tree) {
 		pfjets_csv_branch = tree->GetBranch("pfjets_csv");
 		if (pfjets_csv_branch) {pfjets_csv_branch->SetAddress(&pfjets_csv_);}
 	}
+	pfjets_chEfrac_branch = 0;
+	if (tree->GetBranch("pfjets_chEfrac") != 0) {
+		pfjets_chEfrac_branch = tree->GetBranch("pfjets_chEfrac");
+		if (pfjets_chEfrac_branch) {pfjets_chEfrac_branch->SetAddress(&pfjets_chEfrac_);}
+	}
 	pfjets_chm_branch = 0;
 	if (tree->GetBranch("pfjets_chm") != 0) {
 		pfjets_chm_branch = tree->GetBranch("pfjets_chm");
@@ -3972,6 +4031,11 @@ void Init(TTree *tree) {
 		genps_phi_branch = tree->GetBranch("genps_phi");
 		if (genps_phi_branch) {genps_phi_branch->SetAddress(&genps_phi_);}
 	}
+	genps_mass_branch = 0;
+	if (tree->GetBranch("genps_mass") != 0) {
+		genps_mass_branch = tree->GetBranch("genps_mass");
+		if (genps_mass_branch) {genps_mass_branch->SetAddress(&genps_mass_);}
+	}
   tree->SetMakeClass(0);
 }
 void GetEntry(unsigned int idx) 
@@ -4055,8 +4119,6 @@ void GetEntry(unsigned int idx)
 		calometphi_isLoaded = false;
 		trkmet_isLoaded = false;
 		trkmetphi_isLoaded = false;
-		trkmet_nolepcorr_isLoaded = false;
-		trkmetphi_nolepcorr_isLoaded = false;
 		pfmet_isLoaded = false;
 		pfmetveto_isLoaded = false;
 		pfmetsig_isLoaded = false;
@@ -4130,6 +4192,12 @@ void GetEntry(unsigned int idx)
 		t1metphicorr_off_isLoaded = false;
 		t1metphicorrphi_off_isLoaded = false;
 		t1metphicorrmt_off_isLoaded = false;
+		mht15_isLoaded = false;
+		mht15phi_isLoaded = false;
+		trkmet_mht15_isLoaded = false;
+		trkmetphi_mht15_isLoaded = false;
+		mettlj15_isLoaded = false;
+		mettlj15phi_isLoaded = false;
 		mt2bmin_isLoaded = false;
 		mt2blmin_isLoaded = false;
 		mt2wmin_isLoaded = false;
@@ -4441,6 +4509,7 @@ void GetEntry(unsigned int idx)
 		pfjets_isLoaded = false;
 		pfjets_genJet__isLoaded = false;
 		pfjets_csv_isLoaded = false;
+		pfjets_chEfrac_isLoaded = false;
 		pfjets_chm_isLoaded = false;
 		pfjets_neu_isLoaded = false;
 		pfjets_l1corr_isLoaded = false;
@@ -4465,6 +4534,8 @@ void GetEntry(unsigned int idx)
 		pfjets_mvaPUid_isLoaded = false;
 		pfjets_mva5xPUid_isLoaded = false;
 		pfjets_mvaBeta_isLoaded = false;
+		genjets_isLoaded = false;
+		genqgs_isLoaded = false;
 		genbs_isLoaded = false;
 		genps_pdgId_isLoaded = false;
 		genps_firstMother_isLoaded = false;
@@ -4472,6 +4543,7 @@ void GetEntry(unsigned int idx)
 		genps_pt_isLoaded = false;
 		genps_eta_isLoaded = false;
 		genps_phi_isLoaded = false;
+		genps_mass_isLoaded = false;
 	}
 
 void LoadAllBranches() 
@@ -4554,8 +4626,6 @@ void LoadAllBranches()
 	if (calometphi_branch != 0) calometphi();
 	if (trkmet_branch != 0) trkmet();
 	if (trkmetphi_branch != 0) trkmetphi();
-	if (trkmet_nolepcorr_branch != 0) trkmet_nolepcorr();
-	if (trkmetphi_nolepcorr_branch != 0) trkmetphi_nolepcorr();
 	if (pfmet_branch != 0) pfmet();
 	if (pfmetveto_branch != 0) pfmetveto();
 	if (pfmetsig_branch != 0) pfmetsig();
@@ -4629,6 +4699,12 @@ void LoadAllBranches()
 	if (t1metphicorr_off_branch != 0) t1metphicorr_off();
 	if (t1metphicorrphi_off_branch != 0) t1metphicorrphi_off();
 	if (t1metphicorrmt_off_branch != 0) t1metphicorrmt_off();
+	if (mht15_branch != 0) mht15();
+	if (mht15phi_branch != 0) mht15phi();
+	if (trkmet_mht15_branch != 0) trkmet_mht15();
+	if (trkmetphi_mht15_branch != 0) trkmetphi_mht15();
+	if (mettlj15_branch != 0) mettlj15();
+	if (mettlj15phi_branch != 0) mettlj15phi();
 	if (mt2bmin_branch != 0) mt2bmin();
 	if (mt2blmin_branch != 0) mt2blmin();
 	if (mt2wmin_branch != 0) mt2wmin();
@@ -4940,6 +5016,7 @@ void LoadAllBranches()
 	if (pfjets_branch != 0) pfjets();
 	if (pfjets_genJet__branch != 0) pfjets_genJet_();
 	if (pfjets_csv_branch != 0) pfjets_csv();
+	if (pfjets_chEfrac_branch != 0) pfjets_chEfrac();
 	if (pfjets_chm_branch != 0) pfjets_chm();
 	if (pfjets_neu_branch != 0) pfjets_neu();
 	if (pfjets_l1corr_branch != 0) pfjets_l1corr();
@@ -4964,6 +5041,8 @@ void LoadAllBranches()
 	if (pfjets_mvaPUid_branch != 0) pfjets_mvaPUid();
 	if (pfjets_mva5xPUid_branch != 0) pfjets_mva5xPUid();
 	if (pfjets_mvaBeta_branch != 0) pfjets_mvaBeta();
+	if (genjets_branch != 0) genjets();
+	if (genqgs_branch != 0) genqgs();
 	if (genbs_branch != 0) genbs();
 	if (genps_pdgId_branch != 0) genps_pdgId();
 	if (genps_firstMother_branch != 0) genps_firstMother();
@@ -4971,6 +5050,7 @@ void LoadAllBranches()
 	if (genps_pt_branch != 0) genps_pt();
 	if (genps_eta_branch != 0) genps_eta();
 	if (genps_phi_branch != 0) genps_phi();
+	if (genps_mass_branch != 0) genps_mass();
 }
 
 	int &acc_2010()
@@ -5974,32 +6054,6 @@ void LoadAllBranches()
 		}
 		return trkmetphi_;
 	}
-	float &trkmet_nolepcorr()
-	{
-		if (not trkmet_nolepcorr_isLoaded) {
-			if (trkmet_nolepcorr_branch != 0) {
-				trkmet_nolepcorr_branch->GetEntry(index);
-			} else { 
-				printf("branch trkmet_nolepcorr_branch does not exist!\n");
-				exit(1);
-			}
-			trkmet_nolepcorr_isLoaded = true;
-		}
-		return trkmet_nolepcorr_;
-	}
-	float &trkmetphi_nolepcorr()
-	{
-		if (not trkmetphi_nolepcorr_isLoaded) {
-			if (trkmetphi_nolepcorr_branch != 0) {
-				trkmetphi_nolepcorr_branch->GetEntry(index);
-			} else { 
-				printf("branch trkmetphi_nolepcorr_branch does not exist!\n");
-				exit(1);
-			}
-			trkmetphi_nolepcorr_isLoaded = true;
-		}
-		return trkmetphi_nolepcorr_;
-	}
 	float &pfmet()
 	{
 		if (not pfmet_isLoaded) {
@@ -6948,6 +7002,84 @@ void LoadAllBranches()
 			t1metphicorrmt_off_isLoaded = true;
 		}
 		return t1metphicorrmt_off_;
+	}
+	float &mht15()
+	{
+		if (not mht15_isLoaded) {
+			if (mht15_branch != 0) {
+				mht15_branch->GetEntry(index);
+			} else { 
+				printf("branch mht15_branch does not exist!\n");
+				exit(1);
+			}
+			mht15_isLoaded = true;
+		}
+		return mht15_;
+	}
+	float &mht15phi()
+	{
+		if (not mht15phi_isLoaded) {
+			if (mht15phi_branch != 0) {
+				mht15phi_branch->GetEntry(index);
+			} else { 
+				printf("branch mht15phi_branch does not exist!\n");
+				exit(1);
+			}
+			mht15phi_isLoaded = true;
+		}
+		return mht15phi_;
+	}
+	float &trkmet_mht15()
+	{
+		if (not trkmet_mht15_isLoaded) {
+			if (trkmet_mht15_branch != 0) {
+				trkmet_mht15_branch->GetEntry(index);
+			} else { 
+				printf("branch trkmet_mht15_branch does not exist!\n");
+				exit(1);
+			}
+			trkmet_mht15_isLoaded = true;
+		}
+		return trkmet_mht15_;
+	}
+	float &trkmetphi_mht15()
+	{
+		if (not trkmetphi_mht15_isLoaded) {
+			if (trkmetphi_mht15_branch != 0) {
+				trkmetphi_mht15_branch->GetEntry(index);
+			} else { 
+				printf("branch trkmetphi_mht15_branch does not exist!\n");
+				exit(1);
+			}
+			trkmetphi_mht15_isLoaded = true;
+		}
+		return trkmetphi_mht15_;
+	}
+	float &mettlj15()
+	{
+		if (not mettlj15_isLoaded) {
+			if (mettlj15_branch != 0) {
+				mettlj15_branch->GetEntry(index);
+			} else { 
+				printf("branch mettlj15_branch does not exist!\n");
+				exit(1);
+			}
+			mettlj15_isLoaded = true;
+		}
+		return mettlj15_;
+	}
+	float &mettlj15phi()
+	{
+		if (not mettlj15phi_isLoaded) {
+			if (mettlj15phi_branch != 0) {
+				mettlj15phi_branch->GetEntry(index);
+			} else { 
+				printf("branch mettlj15phi_branch does not exist!\n");
+				exit(1);
+			}
+			mettlj15phi_isLoaded = true;
+		}
+		return mettlj15phi_;
 	}
 	float &mt2bmin()
 	{
@@ -8457,7 +8589,7 @@ void LoadAllBranches()
 		}
 		return mt_;
 	}
-	int &run()
+	unsigned int &run()
 	{
 		if (not run_isLoaded) {
 			if (run_branch != 0) {
@@ -8470,7 +8602,7 @@ void LoadAllBranches()
 		}
 		return run_;
 	}
-	int &lumi()
+	unsigned int &lumi()
 	{
 		if (not lumi_isLoaded) {
 			if (lumi_branch != 0) {
@@ -8483,7 +8615,7 @@ void LoadAllBranches()
 		}
 		return lumi_;
 	}
-	int &event()
+	unsigned int &event()
 	{
 		if (not event_isLoaded) {
 			if (event_branch != 0) {
@@ -10992,6 +11124,19 @@ void LoadAllBranches()
 		}
 		return *pfjets_csv_;
 	}
+	vector<float> &pfjets_chEfrac()
+	{
+		if (not pfjets_chEfrac_isLoaded) {
+			if (pfjets_chEfrac_branch != 0) {
+				pfjets_chEfrac_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_chEfrac_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_chEfrac_isLoaded = true;
+		}
+		return *pfjets_chEfrac_;
+	}
 	vector<float> &pfjets_chm()
 	{
 		if (not pfjets_chm_isLoaded) {
@@ -11304,6 +11449,32 @@ void LoadAllBranches()
 		}
 		return *pfjets_mvaBeta_;
 	}
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genjets()
+	{
+		if (not genjets_isLoaded) {
+			if (genjets_branch != 0) {
+				genjets_branch->GetEntry(index);
+			} else { 
+				printf("branch genjets_branch does not exist!\n");
+				exit(1);
+			}
+			genjets_isLoaded = true;
+		}
+		return *genjets_;
+	}
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genqgs()
+	{
+		if (not genqgs_isLoaded) {
+			if (genqgs_branch != 0) {
+				genqgs_branch->GetEntry(index);
+			} else { 
+				printf("branch genqgs_branch does not exist!\n");
+				exit(1);
+			}
+			genqgs_isLoaded = true;
+		}
+		return *genqgs_;
+	}
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs()
 	{
 		if (not genbs_isLoaded) {
@@ -11394,6 +11565,19 @@ void LoadAllBranches()
 			genps_phi_isLoaded = true;
 		}
 		return *genps_phi_;
+	}
+	vector<float> &genps_mass()
+	{
+		if (not genps_mass_isLoaded) {
+			if (genps_mass_branch != 0) {
+				genps_mass_branch->GetEntry(index);
+			} else { 
+				printf("branch genps_mass_branch does not exist!\n");
+				exit(1);
+			}
+			genps_mass_isLoaded = true;
+		}
+		return *genps_mass_;
 	}
 
   static void progress( int nEventsTotal, int nEventsChain ){
@@ -11500,8 +11684,6 @@ namespace Stop {
 	float &calometphi();
 	float &trkmet();
 	float &trkmetphi();
-	float &trkmet_nolepcorr();
-	float &trkmetphi_nolepcorr();
 	float &pfmet();
 	float &pfmetveto();
 	float &pfmetsig();
@@ -11575,6 +11757,12 @@ namespace Stop {
 	float &t1metphicorr_off();
 	float &t1metphicorrphi_off();
 	float &t1metphicorrmt_off();
+	float &mht15();
+	float &mht15phi();
+	float &trkmet_mht15();
+	float &trkmetphi_mht15();
+	float &mettlj15();
+	float &mettlj15phi();
 	float &mt2bmin();
 	float &mt2blmin();
 	float &mt2wmin();
@@ -11691,9 +11879,9 @@ namespace Stop {
 	float &phil2();
 	float &meff();
 	float &mt();
-	int &run();
-	int &lumi();
-	int &event();
+	unsigned int &run();
+	unsigned int &lumi();
+	unsigned int &event();
 	float &y();
 	float &ht();
 	float &htgen();
@@ -11886,6 +12074,7 @@ namespace Stop {
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_genJet_();
 	vector<float> &pfjets_csv();
+	vector<float> &pfjets_chEfrac();
 	vector<float> &pfjets_chm();
 	vector<float> &pfjets_neu();
 	vector<float> &pfjets_l1corr();
@@ -11910,6 +12099,8 @@ namespace Stop {
 	vector<float> &pfjets_mvaPUid();
 	vector<float> &pfjets_mva5xPUid();
 	vector<float> &pfjets_mvaBeta();
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genjets();
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genqgs();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genbs();
 	vector<int> &genps_pdgId();
 	vector<int> &genps_firstMother();
@@ -11917,5 +12108,6 @@ namespace Stop {
 	vector<float> &genps_pt();
 	vector<float> &genps_eta();
 	vector<float> &genps_phi();
+	vector<float> &genps_mass();
 }
 #endif
