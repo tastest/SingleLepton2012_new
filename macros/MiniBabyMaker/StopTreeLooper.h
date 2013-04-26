@@ -95,6 +95,21 @@ class StopTreeLooper {
 	Float_t mt2wbup_;
 	Float_t mt2wbdown_;
 
+	Float_t mini_weightleft_;
+	Float_t mini_weightright_;
+
+	Float_t mini_t2bwweight_lr_;
+	Float_t mini_t2bwweight_ls_;
+	Float_t mini_t2bwweight_ll_;
+
+	Float_t mini_t2bwweight_sr_;
+	Float_t mini_t2bwweight_ss_;
+	Float_t mini_t2bwweight_sl_;
+
+	Float_t mini_t2bwweight_rr_;
+	Float_t mini_t2bwweight_rs_;
+	Float_t mini_t2bwweight_rl_;
+
 	// event shapes
 	Float_t htssl_;
 	Float_t htosl_;
