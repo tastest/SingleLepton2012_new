@@ -454,6 +454,18 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    x_ = stopt.x();
 
+            if( name.Contains("T2") ) {
+	      if( stopt.mg() < -1 || stopt.ml() < -1 || stopt.x() < -1 ){
+		cout << "ERROR! negative SUSY mass! Skip event!" << endl;
+		cout << "run lumi event " << stopt.run() << " " << stopt.lumi() << " " << stopt.event() << endl;
+		cout << "mstop " << stopt.mg() << endl;
+		cout << "mLSP  " << stopt.ml() << endl;
+		cout << "x     " << stopt.x()  << endl;
+		continue;
+	      }
+	    }
+
+
             if( name.Contains("T2tt") ) {
                 int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
                 float nevents = h_nsig->GetBinContent(bin);
