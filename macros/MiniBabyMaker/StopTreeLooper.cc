@@ -601,7 +601,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	      if( name.Contains("T2bw") ) {
 		float pi = acos(-1.0);
-		cout << "pi " << pi << endl;
 
 		mini_t2bwweight_lr_ = Reweight_T2bW( 0 , 0      , genParticles );
 		mini_t2bwweight_ls_ = Reweight_T2bW( 0 , pi/4.0 , genParticles );
