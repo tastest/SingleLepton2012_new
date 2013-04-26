@@ -593,10 +593,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       cout << "FIXING THE T2BW X=0.25 BDT LIMITS" << endl;
 
       int bin = hxsec_best->FindBin(350,0);
-      hxsec_best_exp->SetBinContent(bin,9999);
+      hxsec_best_exp->SetBinContent(bin,0.9);
 
       bin = hxsec_best->FindBin(375,0);
-      hxsec_best_exp->SetBinContent(bin,9999);
+      hxsec_best_exp->SetBinContent(bin,0.6);
 
       bin = hxsec_best->FindBin(475,0);
       hxsec_best_exp->SetBinContent(bin,0.2);
