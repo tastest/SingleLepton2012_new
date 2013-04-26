@@ -36,7 +36,7 @@ void doAll() {
   char* path_T2bw_mad    = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad";
   
 
-  const int NSAMPLES = 11;
+  const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
 
     //--------------------
@@ -72,17 +72,17 @@ void doAll() {
     // T2bw pythia
     //--------------------
 
-    "merged_T2bw_coarse",
-    "merged_T2bw_coarse_1",
-    "merged_T2bw_coarse_2",
-    "merged_T2bw_coarse_3",
-    "merged_T2bw_coarse_4",
+    // "merged_T2bw_coarse",
+    // "merged_T2bw_coarse_1",
+    // "merged_T2bw_coarse_2",
+    // "merged_T2bw_coarse_3",
+    // "merged_T2bw_coarse_4",
     "merged_T2bw_coarse_5",
-    "merged_T2bw_coarse_6",
-    "merged_T2bw_coarse_7",
-    "merged_T2bw_coarse_8",
-    "merged_T2bw_coarse_9",
-    "merged_T2bw_coarse_10",
+    // "merged_T2bw_coarse_6",
+    // "merged_T2bw_coarse_7",
+    // "merged_T2bw_coarse_8",
+    // "merged_T2bw_coarse_9",
+    // "merged_T2bw_coarse_10",
 
     // T2bw fine
     // "merged_T2bw_fine",
