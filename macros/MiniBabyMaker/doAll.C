@@ -52,6 +52,8 @@ void doAll() {
     // "merged_T2tt_mStop-675to800_mLSP-0to275",
     // "merged_T2tt_mStop-675to800_mLSP-300to700",
 
+    //"T2ttPoint_650_1"
+
     //--------------------
     // T2bw madgraph
     //--------------------
@@ -68,6 +70,8 @@ void doAll() {
     //"merged_T2bw_mStop-100to475_mLSP-0to375_x075",
     //"merged_T2bw_mStop-500to800_mLSP-0to700_x075"
 
+    "T2bwx050Point_650_0",
+
     //--------------------
     // T2bw pythia
     //--------------------
@@ -77,7 +81,7 @@ void doAll() {
     // "merged_T2bw_coarse_2",
     // "merged_T2bw_coarse_3",
     // "merged_T2bw_coarse_4",
-    "merged_T2bw_coarse_5",
+    // "merged_T2bw_coarse_5",
     // "merged_T2bw_coarse_6",
     // "merged_T2bw_coarse_7",
     // "merged_T2bw_coarse_8",
