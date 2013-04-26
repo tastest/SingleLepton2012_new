@@ -1313,36 +1313,40 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
 void doAll(){
 
-  // C&C
-  // SMS("T2tt", 1,false,""     ,true); //unpolarized
-  // SMS("T2tt", 1,false,"left" ,true); //topL
-  // SMS("T2tt", 1,false,"right",true); //topR
-  // SMS("T2bw",25,false,"",true);
-  // SMS("T2bw",50,false,"",true);
-  // SMS("T2bw",75,false,"",true);
+  //--------------------------
+  // T2tt
+  //--------------------------
 
-  // BDT
-  // SMS("T2tt", 1,true,""     ,true);
-  // SMS("T2tt", 1,true,"left" ,true);
-  // SMS("T2tt", 1,true,"right",true);
-  // SMS("T2bw",25,true,"",true);
-  // SMS("T2bw",50,true,"",true);
-  // SMS("T2bw",75,true,"",true);
+  SMS("T2tt", 1,false,""     ,true);
+  SMS("T2tt", 1,false,"left" ,true);
+  SMS("T2tt", 1,false,"right",true);
 
-  // SMS("T2bw_MG",25,false,"",true);
-  // SMS("T2bw_MG",50,false,"",true);
-  // SMS("T2bw_MG",75,false,"",true);
+  SMS("T2tt", 1,true,""     ,true);
+  SMS("T2tt", 1,true,"left" ,true);
+  SMS("T2tt", 1,true,"right",true);
 
-  // SMS("T2bw_MG",25,true,"",true);
-  // SMS("T2bw_MG",50,true,"",true);
-  // SMS("T2bw_MG",75,true,"",true);
+  //--------------------------
+  // T2bw madgraph
+  //--------------------------
 
-  // SMS("T2bw",25,false,"",true);
-  // SMS("T2bw",50,false,"",true);
+  SMS("T2bw_MG",25,false,"",true);
+  SMS("T2bw_MG",50,false,"",true);
+  SMS("T2bw_MG",75,false,"",true);
+
+  SMS("T2bw_MG",25,true,"",true);
+  SMS("T2bw_MG",50,true,"",true);
+  SMS("T2bw_MG",75,true,"",true);
+
+  //--------------------------
+  // T2bw pythia
+  //--------------------------
+
+  SMS("T2bw",25,false,"",true);
+  SMS("T2bw",50,false,"",true);
   SMS("T2bw",75,false,"",true);
 
-  // SMS("T2bw",25,true,"",true);
-  // SMS("T2bw",50,true,"",true);
+  SMS("T2bw",25,true,"",true);
+  SMS("T2bw",50,true,"",true);
   SMS("T2bw",75,true,"",true);
 
 }
