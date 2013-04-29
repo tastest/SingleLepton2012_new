@@ -1331,13 +1331,37 @@ void doAll(){
   // combinePlots("T2bw",50,true,"",true);
   // combinePlots("T2bw",75,true,"",true);
 
-  combinePlots("T2bw",25,false,"",true);
-  combinePlots("T2bw",50,false,"",true);
-  combinePlots("T2bw",75,false,"",true);
+  // combinePlots("T2bw",25,false,"",true);
+  // combinePlots("T2bw",50,false,"",true);
+  // combinePlots("T2bw",75,false,"",true);
 
-  combinePlots("T2bw",25,true,"",true);
-  combinePlots("T2bw",50,true,"",true);
-  combinePlots("T2bw",75,true,"",true);
+  // combinePlots("T2bw",25,true,"",true);
+  // combinePlots("T2bw",50,true,"",true);
+  // combinePlots("T2bw",75,true,"",true);
+
+  // combinePlots("T2bw_MG",25,false,"",true);
+  // combinePlots("T2bw_MG",50,false,"",true);
+  // combinePlots("T2bw_MG",75,false,"",true);
+
+  // combinePlots("T2bw_MG",25,true,"",true);
+  // combinePlots("T2bw_MG",50,true,"",true);
+  // combinePlots("T2bw_MG",75,true,"",true);
+
+  //--------------------------
+  // T2tt
+  //--------------------------
+
+  combinePlots("T2tt", 1,false,""     ,true);
+  combinePlots("T2tt", 1,false,"left" ,true);
+  combinePlots("T2tt", 1,false,"right",true);
+
+  combinePlots("T2tt", 1,true,""     ,true);
+  combinePlots("T2tt", 1,true,"left" ,true);
+  combinePlots("T2tt", 1,true,"right",true);
+
+  //--------------------------
+  // T2bw madgraph
+  //--------------------------
 
   combinePlots("T2bw_MG",25,false,"",true);
   combinePlots("T2bw_MG",50,false,"",true);
@@ -1346,5 +1370,17 @@ void doAll(){
   combinePlots("T2bw_MG",25,true,"",true);
   combinePlots("T2bw_MG",50,true,"",true);
   combinePlots("T2bw_MG",75,true,"",true);
+
+  //--------------------------
+  // T2bw pythia
+  //--------------------------
+
+  combinePlots("T2bw",25,false,"",true);
+  combinePlots("T2bw",50,false,"",true);
+  combinePlots("T2bw",75,false,"",true);
+
+  combinePlots("T2bw",25,true,"",true);
+  combinePlots("T2bw",50,true,"",true);
+  combinePlots("T2bw",75,true,"",true);
 
 }
