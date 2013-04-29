@@ -542,6 +542,8 @@ void singleLeptonLooper::InitBaby(){
   pfjets_genJetDr_.clear();
   pfjets_sigma_.clear();
   pfjets_lepjet_.clear();
+  pfjets_tobtecmult_.clear();
+  pfjets_tobtecfrac_.clear();
   pfjets_beta_.clear();
   pfjets_beta2_.clear();
   pfjets_beta_0p1_.clear();
@@ -2845,6 +2847,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
 	pfjets_lrm_.push_back(getLRM(vipfjets_p4.at(i).p4ind,1));
 	pfjets_lrm2_.push_back(getLRM(vipfjets_p4.at(i).p4ind,2));
+	std::pair<int,float> tobtectracks = getTobTecTracks(vipfjets_p4.at(i).p4ind);
+	pfjets_tobtecmult_.push_back(tobtectracks.first);
+	pfjets_tobtecfrac_.push_back(tobtectracks.second/pfjets_p4().at(vipfjets_p4.at(i).p4ind).energy());
 
 	pfUncertainty->setJetEta(vipfjets_p4.at(i).p4obj.eta());
 	pfUncertainty->setJetPt(vipfjets_p4.at(i).p4obj.pt());   // here you must use the CORRECTED jet pt
@@ -4140,6 +4145,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_genJetDr","std::vector<float>", &pfjets_genJetDr_ );
   outTree->Branch("pfjets_sigma",   "std::vector<float>", &pfjets_sigma_    );
   outTree->Branch("pfjets_lepjet",  "std::vector<int>"  , &pfjets_lepjet_   );
+  outTree->Branch("pfjets_tobtecmult", "std::vector<float>", &pfjets_tobtecmult_ );
+  outTree->Branch("pfjets_tobtecfrac", "std::vector<float>", &pfjets_tobtecfrac_ );
  
   outTree->Branch("pfjets_beta",      "std::vector<float>", &pfjets_beta_      );
   outTree->Branch("pfjets_beta2",     "std::vector<float>", &pfjets_beta2_     );

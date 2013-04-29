@@ -737,6 +737,41 @@ bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int 
 
 //--------------------------------------------------------------------
 
+pair<int,float> getTobTecTracks(const int& jet_idx, const bool& verbose) {
+
+  int mult = 0;
+  float sumE = 0.;
+
+  // loop over (charged) pfcands in jet
+  for (unsigned int icand = 0; icand < pfjets_pfcandIndicies().at(jet_idx).size(); ++icand) {
+    int cand_idx = pfjets_pfcandIndicies().at(jet_idx).at(icand);
+    if ( cms2.pfcands_charge().at(cand_idx)==0 ) continue;
+    int trk_idx = cms2.pfcands_trkidx().at(cand_idx);
+
+    // taken from beta calculation in jetSelections.cc
+    if( (trk_idx >= (int) cms2.trks_trk_p4().size()) || (trk_idx < 0) ){
+      if( verbose ){
+	std::cout << __FILE__ << " " << __LINE__ << " WARNING! skipping electron with pt " << cms2.pfcands_p4().at(cand_idx).pt() 
+		  << ", particleId: " << cms2.pfcands_particleId().at(cand_idx) << endl;
+      }
+      //note: this should only happen for electrons which do not have a matched track
+      //currently we are just ignoring these guys
+      continue;
+    }
+
+    // check track algorithm: only interested in algo 10 (TOB/TEC seeded)
+    if (cms2.trks_algo().at(trk_idx) != 10) continue;
+
+    sumE += cms2.pfcands_p4().at(cand_idx).energy();
+    ++mult;
+  }
+
+  pair<int,float> result = make_pair(mult,sumE);
+  return result;
+}
+
+//--------------------------------------------------------------------
+
 void fillUnderOverFlow(TH1F *h1, float value, float weight)
 {
   float min = h1->GetXaxis()->GetXmin();

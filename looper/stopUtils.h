@@ -157,6 +157,8 @@ bool objectPassTrigger(const LorentzVector &obj, char* trigname, float drmax );
 
 bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int tightness);
 
+std::pair<int,float> getTobTecTracks(const int& jet_idx, const bool& verbose = false);
+
 //double weight3D( int pv1, int pv2, int pv3 );
 
 //void weight3D_init( std::string WeightFileName );

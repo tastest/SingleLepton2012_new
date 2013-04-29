@@ -480,6 +480,9 @@ class singleLeptonLooper
 	//jet shape
 	std::vector<float> pfjets_lrm_;
 	std::vector<float> pfjets_lrm2_;
+	//mult/energy frac from TOB/TOC seeded tracks
+	std::vector<float> pfjets_tobtecmult_;
+	std::vector<float> pfjets_tobtecfrac_;
 	//gen jet matching
 	std::vector<float> pfjets_genJetDr_;
 	//truth lepton matching
