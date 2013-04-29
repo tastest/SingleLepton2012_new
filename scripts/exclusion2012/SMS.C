@@ -1245,9 +1245,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
     int bin = heff[i]->FindBin(300,50);
 
-    if( TString(sample).Contains("T2bw") && !TString(sample).Contains("T2bw_MG") ) bin = heff[i]->FindBin(500,50);
+    if( TString(sample).Contains("T2bw") ) bin = heff[i]->FindBin(500,50);
 
-    if( TString(sample).Contains("T2bw") && !TString(sample).Contains("T2bw_MG") ){ 
+    if( TString(sample).Contains("T2bw") ){ 
       cout << "efficiency (500,50)  " << heff[i]->GetBinContent(bin)      << endl;
     }
     else{
@@ -1263,7 +1263,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     cout << "stat err             " << hstaterr[i]->GetBinContent(bin)  << endl;
     cout << endl << endl;
 
-    if( TString(sample).Contains("T2bw") && !TString(sample).Contains("T2bw_MG") ){ 
+    if( TString(sample).Contains("T2bw") ){ 
       *logfile << "efficiency (500,50)  " << heff[i]->GetBinContent(bin)      << endl;
     }
     else{
