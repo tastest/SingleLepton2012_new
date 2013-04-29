@@ -1245,9 +1245,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
     int bin = heff[i]->FindBin(300,50);
 
-    if( TString(sample).Contains("T2bw") ) bin = heff[i]->FindBin(500,50);
+    if( TString(sample).Contains("T2bw") && !TString(sample).Contains("T2bw_MG") ) bin = heff[i]->FindBin(500,50);
 
-    if( TString(sample).Contains("T2bw") ){ 
+    if( TString(sample).Contains("T2bw") && !TString(sample).Contains("T2bw_MG") ){ 
       cout << "efficiency (500,50)  " << heff[i]->GetBinContent(bin)      << endl;
     }
     else{
@@ -1263,7 +1263,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     cout << "stat err             " << hstaterr[i]->GetBinContent(bin)  << endl;
     cout << endl << endl;
 
-    if( TString(sample).Contains("T2bw") ){ 
+    if( TString(sample).Contains("T2bw") && !TString(sample).Contains("T2bw_MG") ){ 
       *logfile << "efficiency (500,50)  " << heff[i]->GetBinContent(bin)      << endl;
     }
     else{
@@ -1329,13 +1329,13 @@ void doAll(){
   // T2bw madgraph
   //--------------------------
 
-  SMS("T2bw_MG",25,false,"",true);
-  SMS("T2bw_MG",50,false,"",true);
-  SMS("T2bw_MG",75,false,"",true);
-
   SMS("T2bw_MG",25,true,"",true);
   SMS("T2bw_MG",50,true,"",true);
   SMS("T2bw_MG",75,true,"",true);
+
+  SMS("T2bw_MG",25,false,"",true);
+  SMS("T2bw_MG",50,false,"",true);
+  SMS("T2bw_MG",75,false,"",true);
 
   //--------------------------
   // T2bw pythia

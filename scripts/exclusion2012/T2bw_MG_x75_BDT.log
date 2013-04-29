@@ -67,7 +67,7 @@ JES                  0.0553312
 tot err              0.113855
 btag err             0
 ISR err              0.0675675
-stat err             0.227508
+stat err             0.301511
 
 
 efficiency (300,50)  0.0489673
@@ -78,7 +78,7 @@ JES                  0
 tot err              0.121953
 btag err             0
 ISR err              0.0976546
-stat err             0.343726
+stat err             0.447214
 
 
 efficiency (300,50)  0.0101012
@@ -89,7 +89,7 @@ JES                  0
 tot err              0.123839
 btag err             0
 ISR err              0.1
-stat err             0.756794
+stat err             1
 
 
 efficiency (300,50)  0.706711
@@ -100,6 +100,6 @@ JES                  0.0144652
 tot err              0.0858791
 btag err             0.00687653
 ISR err              0.042222
-stat err             0.0904783
+stat err             0.120386
 
 
