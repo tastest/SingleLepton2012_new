@@ -103,17 +103,21 @@ void plotPolarization( bool doBDT = true , bool print = false){
   // format histograms
   //-------------------------------
 
+  c_right->SetLineWidth(2);
   c_right->SetLineColor(2);
+  c_right->SetLineStyle(7);
+
+  c_right_smallDM->SetLineWidth(2);
   c_right_smallDM->SetLineColor(2);
+  c_right_smallDM->SetLineStyle(7);
 
+  c_left->SetLineWidth(2);
   c_left->SetLineColor(4);
+  c_left->SetLineStyle(2);
+
+  c_left_smallDM->SetLineWidth(2);
   c_left_smallDM->SetLineColor(4);
-
-  // c_right->SetLineStyle(7);
-  // c_right_smallDM->SetLineStyle(7);
-
-  // c_left->SetLineStyle(2);
-  // c_left_smallDM->SetLineStyle(2);
+  c_left_smallDM->SetLineStyle(2);
 
   TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,430);
   hdummy->Reset();
@@ -165,10 +169,10 @@ void plotPolarization( bool doBDT = true , bool print = false){
 
   float ylegmin = 0.72;
 
-  TLegend *leg = new TLegend(0.5,ylegmin,0.90,0.88);
-  leg->AddEntry(c_nom       ,"Observed (unpolarized)"   ,"l");
-  leg->AddEntry(c_right     ,"Observed (t_{R})" ,"l");
-  leg->AddEntry(c_left     ,"Observed (t_{L})" ,"l");
+  TLegend *leg = new TLegend(0.45,ylegmin,0.90,0.88);
+  leg->AddEntry(c_nom       ,"Observed (unpolarized top)"   ,"l");
+  leg->AddEntry(c_right     ,"Observed (right-handed top)" ,"l");
+  leg->AddEntry(c_left      ,"Observed (left-handed top)" ,"l");
 
   leg->SetBorderSize(0);
   leg->SetFillColor(0);
