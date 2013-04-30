@@ -107,24 +107,24 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     if( x==25 ){
       xchar          = (char*) "_x25";
       denomhistoname = (char*) "masses25";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/merged*x025*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x25_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x025*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x25_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.25";
     }
 
     else if( x==50 ){
       xchar          = (char*) "_x50";
       denomhistoname = (char*) "masses";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/merged*x050*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x50_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x050*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x50_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.50";
     }
 
     else if( x==75 ){
       xchar          = (char*) "_x75";
       denomhistoname = (char*) "masses75";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/merged*x075*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x075*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
     }
     
@@ -174,7 +174,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   // set up logfile
   //--------------------------------------------------
 
-  char* logfilename = Form("%s%s%s%s%s.log",sample,xchar,suffix,pol,BDTchar);
+  char* logfilename = Form("logfiles/%s%s%s%s%s.log",sample,xchar,suffix,pol,BDTchar);
   ofstream* logfile = new ofstream();
   logfile->open(logfilename,ios::trunc);
 
@@ -280,6 +280,18 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   TCut weight(Form("mini_sltrigeff * %i",BDTweight)); 
   if( TString(pol).Contains("left") )  weight = TCut(Form("mini_sltrigeff * weightleft  * %i",BDTweight));
   if( TString(pol).Contains("right") ) weight = TCut(Form("mini_sltrigeff * weightright * %i",BDTweight));
+
+  if( TString(pol).Contains("T2BW_LR") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_lr * %i",BDTweight));
+  if( TString(pol).Contains("T2BW_LS") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_ls * %i",BDTweight));
+  if( TString(pol).Contains("T2BW_LL") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_ll * %i",BDTweight));
+
+  if( TString(pol).Contains("T2BW_SR") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_sr * %i",BDTweight));
+  if( TString(pol).Contains("T2BW_SS") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_ss * %i",BDTweight));
+  if( TString(pol).Contains("T2BW_SL") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_sl * %i",BDTweight));
+
+  if( TString(pol).Contains("T2BW_RR") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_rr * %i",BDTweight));
+  if( TString(pol).Contains("T2BW_RS") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_rs * %i",BDTweight));
+  if( TString(pol).Contains("T2BW_RL") ) weight = TCut(Form("mini_sltrigeff * mini_t2bwweight_rl * %i",BDTweight));
 
   cout << "Using pre-selection   " << presel.GetTitle()    << endl;
   cout << "Using weight          " << weight.GetTitle()    << endl;
@@ -1282,7 +1294,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   }
 
 
-  TFile *outfile = TFile::Open(Form("%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar),"RECREATE");
+  TFile *outfile = TFile::Open(Form("rootfiles/%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar),"RECREATE");
 
   outfile->cd();
   for( unsigned int i = 0 ; i < nsig ; ++i ){
@@ -1312,6 +1324,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
 
 void doAll(){
+
 
   //--------------------------
   // T2tt
@@ -1348,5 +1361,31 @@ void doAll(){
   SMS("T2bw",25,true,"",true);
   SMS("T2bw",50,true,"",true);
   SMS("T2bw",75,true,"",true);
+
+  //--------------------------
+  // T2bw madgraph reweighted
+  //--------------------------
+
+  char* weights[9]={
+    "T2BW_LR",
+    "T2BW_LS",
+    "T2BW_LL",
+    "T2BW_SR",
+    "T2BW_SS",
+    "T2BW_SL",
+    "T2BW_RR",
+    "T2BW_RS",
+    "T2BW_RL"
+  };
+
+  for( int i = 0 ; i < 9 ; i++ ){
+    SMS("T2bw_MG",25,true,weights[i],true);
+    SMS("T2bw_MG",50,true,weights[i],true);
+    SMS("T2bw_MG",75,true,weights[i],true);
+
+    SMS("T2bw_MG",25,false,weights[i],true);
+    SMS("T2bw_MG",50,false,weights[i],true);
+    SMS("T2bw_MG",75,false,weights[i],true);
+  }
 
 }
