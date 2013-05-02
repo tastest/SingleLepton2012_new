@@ -195,7 +195,7 @@ void plotPolarization( bool doBDT = true , bool print = false){
   }
 
   if( print ){
-    can1->Print(Form("../../plots/plotPolarization%s.pdf",BDTchar));
+    can1->Print(Form("plots/plotPolarization%s.pdf",BDTchar));
   }
 
 }
