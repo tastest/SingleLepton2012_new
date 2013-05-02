@@ -359,9 +359,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // set up filenames and print them out
   //----------------------------------------------
 
-  filename = Form("%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar);
+  filename = Form("rootfiles/%s%s%s%s%s_histos.root",sample,xchar,suffix,pol,BDTchar);
 
-  char* outfilename = Form("%s%s_combinePlots%s%s%s%s.root",sample,xchar,suffix,pol,BDTchar,nminchar);
+  char* outfilename = Form("rootfiles/%s%s_combinePlots%s%s%s%s.root",sample,xchar,suffix,pol,BDTchar,nminchar);
 
   cout << "--------------------------------------" << endl;
   cout << "Opening    " << filename << endl;
@@ -622,6 +622,16 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       bin = hxsec_best->FindBin(475,250);
       hxsec_best->SetBinContent(bin,0.13);
 
+      if( TString(pol).Contains("T2BW_SS") ){
+	cout << "FIXING T2BW X=0.5 LIMITS FOR T2BW_SS" << endl;
+
+	bin = hxsec_best->FindBin(250,25);
+	hxsec_best->SetBinContent(bin,3.7);
+	hxsec_best_exp->SetBinContent(bin,3.7);
+	hxsec_best_expp1->SetBinContent(bin,3.7);
+	hxsec_best_expm1->SetBinContent(bin,3.7);
+
+      }
 
     }
 
@@ -828,6 +838,21 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   hR_obsp1_smallDM->SetLineStyle(7);
   hR_obsm1_smallDM->SetLineWidth(1);
   hR_obsm1_smallDM->SetLineStyle(7);
+
+  if( doFixups ){
+
+    if( TString(sample).Contains("T2bw_MG") && x==25 && !doBDT && TString(pol).Contains("T2BW_SS")){
+      cout << "FIXING THE T2BW X=0.5 CUT-BASED T2BW_SS LIMITS" << endl;
+
+      // set these 2 points to the pythia values
+      int bin = hR->FindBin(575,175);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(550,25);
+      hR_obsp1->SetBinContent(bin,1.1);
+    }
+
+  }
 
   //------------------------------------------------------------
   // get TGraph's for exclusion contours
@@ -1313,40 +1338,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 }
 
 void doAll(){
-
-  // combinePlots("T2tt", 1,false,"",true);
-  // combinePlots("T2tt", 1,true,"",true);
-
-  // combinePlots("T2tt", 1,false,"",true);
-  // combinePlots("T2tt", 1,false,"right",true);
-  // combinePlots("T2tt", 1,false,"left",true);
-  // combinePlots("T2bw",25,false,"",true);
-  // combinePlots("T2bw",50,false,"",true);
-  // combinePlots("T2bw",75,false,"",true);
-
-  // combinePlots("T2tt", 1,true,"",true);
-  // combinePlots("T2tt", 1,true,"right",true);
-  // combinePlots("T2tt", 1,true,"left",true);
-  // combinePlots("T2bw",25,true,"",true);
-  // combinePlots("T2bw",50,true,"",true);
-  // combinePlots("T2bw",75,true,"",true);
-
-  // combinePlots("T2bw",25,false,"",true);
-  // combinePlots("T2bw",50,false,"",true);
-  // combinePlots("T2bw",75,false,"",true);
-
-  // combinePlots("T2bw",25,true,"",true);
-  // combinePlots("T2bw",50,true,"",true);
-  // combinePlots("T2bw",75,true,"",true);
-
-  // combinePlots("T2bw_MG",25,false,"",true);
-  // combinePlots("T2bw_MG",50,false,"",true);
-  // combinePlots("T2bw_MG",75,false,"",true);
-
-  // combinePlots("T2bw_MG",25,true,"",true);
-  // combinePlots("T2bw_MG",50,true,"",true);
-  // combinePlots("T2bw_MG",75,true,"",true);
-
+  /*
   //--------------------------
   // T2tt
   //--------------------------
@@ -1382,5 +1374,31 @@ void doAll(){
   combinePlots("T2bw",25,true,"",true);
   combinePlots("T2bw",50,true,"",true);
   combinePlots("T2bw",75,true,"",true);
+  */
+  //--------------------------
+  // T2bw madgraph reweighted
+  //--------------------------
+
+  char* weights[9]={
+    "T2BW_LR",
+    "T2BW_LS",
+    "T2BW_LL",
+    "T2BW_SR",
+    "T2BW_SS",
+    "T2BW_SL",
+    "T2BW_RR",
+    "T2BW_RS",
+    "T2BW_RL"
+  };
+
+  for( int i = 0 ; i < 9 ; i++ ){
+    combinePlots("T2bw_MG",25,true,weights[i],true);
+    combinePlots("T2bw_MG",50,true,weights[i],true);
+    combinePlots("T2bw_MG",75,true,weights[i],true);
+
+    combinePlots("T2bw_MG",25,false,weights[i],true);
+    combinePlots("T2bw_MG",50,false,weights[i],true);
+    combinePlots("T2bw_MG",75,false,weights[i],true);
+  }
 
 }
