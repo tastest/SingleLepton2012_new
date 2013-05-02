@@ -467,6 +467,8 @@ namespace Stop {
 	int &lep_tbar_id() { return stopt.lep_tbar_id(); }
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets() { return stopt.pfjets(); }
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_genJet_() { return stopt.pfjets_genJet_(); }
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_failjetid() { return stopt.pfjets_failjetid(); }
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_faillepolap() { return stopt.pfjets_faillepolap(); }
 	vector<float> &pfjets_csv() { return stopt.pfjets_csv(); }
 	vector<float> &pfjets_chEfrac() { return stopt.pfjets_chEfrac(); }
 	vector<float> &pfjets_chm() { return stopt.pfjets_chm(); }
@@ -484,6 +486,8 @@ namespace Stop {
 	vector<float> &pfjets_genJetDr() { return stopt.pfjets_genJetDr(); }
 	vector<float> &pfjets_sigma() { return stopt.pfjets_sigma(); }
 	vector<int> &pfjets_lepjet() { return stopt.pfjets_lepjet(); }
+	vector<float> &pfjets_tobtecmult() { return stopt.pfjets_tobtecmult(); }
+	vector<float> &pfjets_tobtecfrac() { return stopt.pfjets_tobtecfrac(); }
 	vector<float> &pfjets_beta() { return stopt.pfjets_beta(); }
 	vector<float> &pfjets_beta2() { return stopt.pfjets_beta2(); }
 	vector<float> &pfjets_beta_0p1() { return stopt.pfjets_beta_0p1(); }

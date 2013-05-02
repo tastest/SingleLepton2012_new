@@ -1415,6 +1415,12 @@ protected:
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *pfjets_genJet__;
 	TBranch *pfjets_genJet__branch;
 	bool pfjets_genJet__isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *pfjets_failjetid_;
+	TBranch *pfjets_failjetid_branch;
+	bool pfjets_failjetid_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *pfjets_faillepolap_;
+	TBranch *pfjets_faillepolap_branch;
+	bool pfjets_faillepolap_isLoaded;
 	vector<float> *pfjets_csv_;
 	TBranch *pfjets_csv_branch;
 	bool pfjets_csv_isLoaded;
@@ -1466,6 +1472,12 @@ protected:
 	vector<int> *pfjets_lepjet_;
 	TBranch *pfjets_lepjet_branch;
 	bool pfjets_lepjet_isLoaded;
+	vector<float> *pfjets_tobtecmult_;
+	TBranch *pfjets_tobtecmult_branch;
+	bool pfjets_tobtecmult_isLoaded;
+	vector<float> *pfjets_tobtecfrac_;
+	TBranch *pfjets_tobtecfrac_branch;
+	bool pfjets_tobtecfrac_isLoaded;
 	vector<float> *pfjets_beta_;
 	TBranch *pfjets_beta_branch;
 	bool pfjets_beta_isLoaded;
@@ -1779,6 +1791,16 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfjets_genJet_") != 0) {
 		pfjets_genJet__branch = tree->GetBranch("pfjets_genJet_");
 		if (pfjets_genJet__branch) {pfjets_genJet__branch->SetAddress(&pfjets_genJet__);}
+	}
+	pfjets_failjetid_branch = 0;
+	if (tree->GetBranch("pfjets_failjetid") != 0) {
+		pfjets_failjetid_branch = tree->GetBranch("pfjets_failjetid");
+		if (pfjets_failjetid_branch) {pfjets_failjetid_branch->SetAddress(&pfjets_failjetid_);}
+	}
+	pfjets_faillepolap_branch = 0;
+	if (tree->GetBranch("pfjets_faillepolap") != 0) {
+		pfjets_faillepolap_branch = tree->GetBranch("pfjets_faillepolap");
+		if (pfjets_faillepolap_branch) {pfjets_faillepolap_branch->SetAddress(&pfjets_faillepolap_);}
 	}
 	genjets_branch = 0;
 	if (tree->GetBranch("genjets") != 0) {
@@ -3956,6 +3978,16 @@ void Init(TTree *tree) {
 		pfjets_lepjet_branch = tree->GetBranch("pfjets_lepjet");
 		if (pfjets_lepjet_branch) {pfjets_lepjet_branch->SetAddress(&pfjets_lepjet_);}
 	}
+	pfjets_tobtecmult_branch = 0;
+	if (tree->GetBranch("pfjets_tobtecmult") != 0) {
+		pfjets_tobtecmult_branch = tree->GetBranch("pfjets_tobtecmult");
+		if (pfjets_tobtecmult_branch) {pfjets_tobtecmult_branch->SetAddress(&pfjets_tobtecmult_);}
+	}
+	pfjets_tobtecfrac_branch = 0;
+	if (tree->GetBranch("pfjets_tobtecfrac") != 0) {
+		pfjets_tobtecfrac_branch = tree->GetBranch("pfjets_tobtecfrac");
+		if (pfjets_tobtecfrac_branch) {pfjets_tobtecfrac_branch->SetAddress(&pfjets_tobtecfrac_);}
+	}
 	pfjets_beta_branch = 0;
 	if (tree->GetBranch("pfjets_beta") != 0) {
 		pfjets_beta_branch = tree->GetBranch("pfjets_beta");
@@ -4508,6 +4540,8 @@ void GetEntry(unsigned int idx)
 		lep_tbar_id_isLoaded = false;
 		pfjets_isLoaded = false;
 		pfjets_genJet__isLoaded = false;
+		pfjets_failjetid_isLoaded = false;
+		pfjets_faillepolap_isLoaded = false;
 		pfjets_csv_isLoaded = false;
 		pfjets_chEfrac_isLoaded = false;
 		pfjets_chm_isLoaded = false;
@@ -4525,6 +4559,8 @@ void GetEntry(unsigned int idx)
 		pfjets_genJetDr_isLoaded = false;
 		pfjets_sigma_isLoaded = false;
 		pfjets_lepjet_isLoaded = false;
+		pfjets_tobtecmult_isLoaded = false;
+		pfjets_tobtecfrac_isLoaded = false;
 		pfjets_beta_isLoaded = false;
 		pfjets_beta2_isLoaded = false;
 		pfjets_beta_0p1_isLoaded = false;
@@ -5015,6 +5051,8 @@ void LoadAllBranches()
 	if (lep_tbar_id_branch != 0) lep_tbar_id();
 	if (pfjets_branch != 0) pfjets();
 	if (pfjets_genJet__branch != 0) pfjets_genJet_();
+	if (pfjets_failjetid_branch != 0) pfjets_failjetid();
+	if (pfjets_faillepolap_branch != 0) pfjets_faillepolap();
 	if (pfjets_csv_branch != 0) pfjets_csv();
 	if (pfjets_chEfrac_branch != 0) pfjets_chEfrac();
 	if (pfjets_chm_branch != 0) pfjets_chm();
@@ -5032,6 +5070,8 @@ void LoadAllBranches()
 	if (pfjets_genJetDr_branch != 0) pfjets_genJetDr();
 	if (pfjets_sigma_branch != 0) pfjets_sigma();
 	if (pfjets_lepjet_branch != 0) pfjets_lepjet();
+	if (pfjets_tobtecmult_branch != 0) pfjets_tobtecmult();
+	if (pfjets_tobtecfrac_branch != 0) pfjets_tobtecfrac();
 	if (pfjets_beta_branch != 0) pfjets_beta();
 	if (pfjets_beta2_branch != 0) pfjets_beta2();
 	if (pfjets_beta_0p1_branch != 0) pfjets_beta_0p1();
@@ -11111,6 +11151,32 @@ void LoadAllBranches()
 		}
 		return *pfjets_genJet__;
 	}
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_failjetid()
+	{
+		if (not pfjets_failjetid_isLoaded) {
+			if (pfjets_failjetid_branch != 0) {
+				pfjets_failjetid_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_failjetid_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_failjetid_isLoaded = true;
+		}
+		return *pfjets_failjetid_;
+	}
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_faillepolap()
+	{
+		if (not pfjets_faillepolap_isLoaded) {
+			if (pfjets_faillepolap_branch != 0) {
+				pfjets_faillepolap_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_faillepolap_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_faillepolap_isLoaded = true;
+		}
+		return *pfjets_faillepolap_;
+	}
 	vector<float> &pfjets_csv()
 	{
 		if (not pfjets_csv_isLoaded) {
@@ -11331,6 +11397,32 @@ void LoadAllBranches()
 			pfjets_lepjet_isLoaded = true;
 		}
 		return *pfjets_lepjet_;
+	}
+	vector<float> &pfjets_tobtecmult()
+	{
+		if (not pfjets_tobtecmult_isLoaded) {
+			if (pfjets_tobtecmult_branch != 0) {
+				pfjets_tobtecmult_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_tobtecmult_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_tobtecmult_isLoaded = true;
+		}
+		return *pfjets_tobtecmult_;
+	}
+	vector<float> &pfjets_tobtecfrac()
+	{
+		if (not pfjets_tobtecfrac_isLoaded) {
+			if (pfjets_tobtecfrac_branch != 0) {
+				pfjets_tobtecfrac_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_tobtecfrac_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_tobtecfrac_isLoaded = true;
+		}
+		return *pfjets_tobtecfrac_;
 	}
 	vector<float> &pfjets_beta()
 	{
@@ -12073,6 +12165,8 @@ namespace Stop {
 	int &lep_tbar_id();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_genJet_();
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_failjetid();
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_faillepolap();
 	vector<float> &pfjets_csv();
 	vector<float> &pfjets_chEfrac();
 	vector<float> &pfjets_chm();
@@ -12090,6 +12184,8 @@ namespace Stop {
 	vector<float> &pfjets_genJetDr();
 	vector<float> &pfjets_sigma();
 	vector<int> &pfjets_lepjet();
+	vector<float> &pfjets_tobtecmult();
+	vector<float> &pfjets_tobtecfrac();
 	vector<float> &pfjets_beta();
 	vector<float> &pfjets_beta2();
 	vector<float> &pfjets_beta_0p1();
