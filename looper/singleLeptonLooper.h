@@ -459,6 +459,8 @@ class singleLeptonLooper
 
         VofP4 pfjets_;
         VofP4 pfjets_genJet_;
+	VofP4 pfjets_failjetid_;
+	VofP4 pfjets_faillepolap_;
         std::vector<float> pfjets_csv_;
 	// CHM and NEU
         std::vector<float> pfjets_chm_;

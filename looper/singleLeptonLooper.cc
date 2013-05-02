@@ -524,6 +524,8 @@ void singleLeptonLooper::InitBaby(){
   //clear vectors
   pfjets_.clear();
   pfjets_genJet_.clear();
+  pfjets_failjetid_.clear();
+  pfjets_faillepolap_.clear();
   pfjets_csv_.clear();
   pfjets_chEfrac_.clear();
   pfjets_chm_.clear();
@@ -2512,10 +2514,14 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
 	  if( ROOT::Math::VectorUtil::DeltaR( vjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
 	}
-	if( rejectJet ) continue;
-	          
+	if( rejectJet ) {
+	  if( vjet.pt() > 20 && fabs( vjet.eta() ) < 4.7 ) pfjets_faillepolap_.push_back(vjet);
+	  continue;         
+	}
+
 	// PFJetID
 	if( !passesPFJetID(ijet) ){
+	  if( vjet.pt() > 20 && fabs( vjet.eta() ) < 4.7 ) pfjets_failjetid_.push_back(vjet);
 	  jetid_ = 0;
 	  if( vjet.pt() > 30 && fabs( vjet.eta() ) < 2.4 ) jetid30_ = 0;
 	  continue;
@@ -3055,15 +3061,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    
 	  LorentzVector vgjet = genjets_p4().at(igjet);
 
+	  // save gen jets even if near lepton
+	  genjets_.push_back(vgjet);
+	    
 	  bool rejectJet = false;
 	  for( int ilep = 0 ; ilep < (int)goodLeptons.size() ; ilep++ ){
 	    if( ROOT::Math::VectorUtil::DeltaR( vgjet , goodLeptons.at(ilep) ) < 0.4 ) rejectJet = true;  
 	  }
 	  if( rejectJet ) continue;
 
-	  // save gen jets not matched to leptons
-	  genjets_.push_back(vgjet);
-	    
 	  if( vgjet.pt() < 30.                   )  continue;
 	  if( fabs( vgjet.eta() ) > 2.4          )  continue;
 	    
@@ -4127,6 +4133,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
 
   outTree->Branch("pfjets"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_ );
   outTree->Branch("pfjets_genJet_"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_genJet_ );
+  outTree->Branch("pfjets_failjetid"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_failjetid_ );
+  outTree->Branch("pfjets_faillepolap"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_faillepolap_ );
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
   outTree->Branch("pfjets_chEfrac", "std::vector<float>", &pfjets_chEfrac_ );
   outTree->Branch("pfjets_chm", "std::vector<float>", &pfjets_chm_ );
