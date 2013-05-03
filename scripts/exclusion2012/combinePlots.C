@@ -275,7 +275,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   gStyle->SetPaintTextFormat(".0f");
 
   if( TString(sample).Contains("T2tt") ){
-    label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #tilde{#chi}_{1}^{0}";
+    label       = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow t #tilde{#chi}_{1}^{0}";
     xaxismin    = 150.0;
     yaxismax    = 250.0;
 
@@ -290,7 +290,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     doTruncation  = true;
     doRemoveSlice = false;
     //label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm} #rightarrow b W #tilde{#chi}_{1}^{0}";
-    label         = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{#pm}";
+    label         = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{+}";
 
     if( x==25 ){
       xaxismin        = 320.0;
@@ -1281,15 +1281,41 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
   if( TString(sample).Contains("T2tt") ){
     line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
+    line->DrawLine(  150,150-81,300+12.5+81,300+12.5);
+
+    t->SetTextAngle(55);
+    t->SetTextSize(0.035);
+    t->DrawLatex(0.38,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{t}");
+    t->DrawLatex(0.29,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{W}");
+
   }
 
   if( TString(sample).Contains("T2bw") ){
-    if     (x==75) line->DrawLine(108   , 0 , 300+12.5+108   , 300+12.5);
-    if     (x==50) line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
-    else if(x==25) line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
+    // if     (x==75) line->DrawLine(108   , 0 , 300+12.5+108   , 300+12.5);
+    // if     (x==50) line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
+    // else if(x==25) line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
     // t->SetTextAngle(55);
     // t->SetTextSize(0.045);
     // t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
+
+    t->SetTextSize(0.04);
+
+    if( x==25 ){
+      line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
+      t->SetTextAngle(42);
+      t->DrawLatex(0.32,0.40,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    }
+    else if( x==50 ){
+      line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
+      t->SetTextAngle(52);
+      t->DrawLatex(0.26,0.375,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    }
+    else if( x==75 ){
+      line->DrawLine(120   , 12 , 300+12.5+108   , 300+12.5);
+      t->SetTextAngle(53);
+      t->DrawLatex(0.24,0.375,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    }
+
   }
 
   if( print ){
@@ -1400,5 +1426,17 @@ void doAll(){
     combinePlots("T2bw_MG",50,false,weights[i],true);
     combinePlots("T2bw_MG",75,false,weights[i],true);
   }
+
+  // PAS plots
+  combinePlots("T2tt", 1,false,""     ,true);
+  combinePlots("T2tt", 1,true ,""     ,true);
+
+  combinePlots("T2bw_MG",25,false,"T2BW_SS",true);
+  combinePlots("T2bw_MG",50,false,"T2BW_SS",true);
+  combinePlots("T2bw_MG",75,false,"T2BW_SS",true);
+
+  combinePlots("T2bw_MG",25,true,"T2BW_SS",true);
+  combinePlots("T2bw_MG",50,true,"T2BW_SS",true);
+  combinePlots("T2bw_MG",75,true,"T2BW_SS",true);
 
 }
