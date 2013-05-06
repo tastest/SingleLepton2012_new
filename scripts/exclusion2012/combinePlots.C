@@ -852,7 +852,23 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       hR_obsp1->SetBinContent(bin,1.1);
     }
 
+    if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("right")){
+      cout << "FIXING T2TT BDT RIGHT LIMITS" << endl;
+
+      int bin = hR->FindBin(150,25);
+      hR_expp1_smallDM->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(300,150);
+      hR_expp1_smallDM->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(375,225);
+      hR_expm1_smallDM->SetBinContent(bin,1.1);
+      hR_obsp1_smallDM->SetBinContent(bin,1.1);
+
+    }
   }
+
+  
 
   //------------------------------------------------------------
   // get TGraph's for exclusion contours
@@ -972,8 +988,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     //gr_expp1->Draw("lp");
     hR_expp1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
-      //hR_expp1_smallDM->Draw("CONT3SAMEC");
-      if( doBDT ) T2tt_BDT_expp1->Draw("l");
+      if( doBDT ){
+	if( TString(pol).Contains("left") || TString(pol).Contains("right") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
+	else T2tt_BDT_expp1->Draw("l");
+      }
     }
     t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
 
