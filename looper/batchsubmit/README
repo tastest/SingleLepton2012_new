@@ -5,7 +5,9 @@
 for example, from the looper directory
 > cp -r BtagFuncs.h processBaby.C jetCorrections jetSmearData QGTaggerConfig jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
 
-*) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
+*** note that after copying the latest source files into the job_input subdir, you must run one of the writeConfig scripts below to recreate the input tarball which is used for the batch jobs!
+
+2) modify writeConfig.sh script for personal setup. Variables that should be modified by the user are
 PROXY (not nedded anymore unless you have a special location for your proxy file)
 COPYDIR to point to the desired output directory in hadoop ( default to /hadoop/cms/store/user/${USERNAME}/babies/) where $USERNAME is your username
 
@@ -58,8 +60,11 @@ where <CONFIGDIR> is something like configs_V00-02-21_2012/
 
 This creates resubmit configs for just the missing jobs, with names *_resubmit.cmd, in <CONFIGDIR>.  
 
-To resubmit jobs:
+To create the resubmit file for a single config:
 > ./resubmitConfig.sh <CMDFILE>
+
+Then submit the jobs again as before:
+> condor_submit <NEWCMDFILE>
 
 You may have to iterate this process to get all jobs to converge..
 
