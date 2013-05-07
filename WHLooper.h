@@ -32,6 +32,7 @@ class WHLooper {
 
   void fillHists1DWrapper(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "");
   void fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
+  void fillJetAccHists(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
 
   float getCSVCut(const csvpoint csv = WHLooper::CSVM);
 
@@ -96,6 +97,8 @@ class WHLooper {
   // internal flags
   bool isWjets_;
   bool isWNjets_;
+  bool isWNjets_nobb_;
+  bool isWNjets_onlybb_;
   bool isTChiwh_;
   bool isttmg_;
   bool isttsl_;

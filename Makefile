@@ -5,9 +5,9 @@ INCLUDE = -I../ -I./
 CFLAGS = -Wall -g -fPIC $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS) -DTOOLSLIB
 LINKER = g++
 
-LINKERFLAGS = $(shell root-config --ldflags)
+LINKERFLAGS = $(shell root-config --ldflags) $(shell root-config --libs) -lMathMore
 ifeq ($(shell root-config --platform),macosx)
-	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector
+	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector -lMathMore
 endif
 
 SOURCES = WHLooper.cc ../Core/PartonCombinatorics.cc ../Plotting/PlotUtilities.cc ../Core/MT2Utility.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/stopUtils.cc ../Core/STOPT.cc
@@ -45,7 +45,8 @@ clean:
 	rm -f *.o \
 	rm -f */*.d \
 	rm -f */*.o \
-	rm -f *.so
+	rm -f *.so \
+	rm -f LinkDef_out* 
 
 -include $(SOURCES:.cc=.d)
 -include $(LIBDIR)/LinkDef_out.d
