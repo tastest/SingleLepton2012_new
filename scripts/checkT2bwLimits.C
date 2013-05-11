@@ -80,10 +80,15 @@
   // point[10] = TCut("mg==375 && ml==200 && x==0.75");  BDT[10] = TCut("mini_bdt[17] > 0.3");
   // point[11] = TCut("mg==150 && ml==0   && x==0.75");  BDT[11] = TCut("mini_bdt[17] > 0.3");
 
-  point[0] = TCut("mg==250 && ml==50   && x==0.5");    BDT[0] = TCut("mini_bdt[12] > 0.35");
-  point[1] = TCut("mg==250 && ml==50   && x==0.5");    BDT[1] = TCut("mini_bdt[13] > 0.45");
-  point[2] = TCut("mg==250 && ml==50   && x==0.5");    BDT[2] = TCut("mini_bdt[13] > 0.55");
-  point[3] = TCut("mg==250 && ml==50   && x==0.5");    BDT[3] = TCut("mini_bdt[14] > 0.35");
+  // point[0] = TCut("mg==250 && ml==50   && x==0.5");    BDT[0] = TCut("mini_bdt[12] > 0.35");
+  // point[1] = TCut("mg==250 && ml==50   && x==0.5");    BDT[1] = TCut("mini_bdt[13] > 0.45");
+  // point[2] = TCut("mg==250 && ml==50   && x==0.5");    BDT[2] = TCut("mini_bdt[13] > 0.55");
+  // point[3] = TCut("mg==250 && ml==50   && x==0.5");    BDT[3] = TCut("mini_bdt[14] > 0.35");
+
+  point[0] = TCut("mg==650 && ml==0 && x==0.5");    BDT[0] = TCut("mini_bdt[12] > 0.35");
+  point[1] = TCut("mg==650 && ml==0 && x==0.5");    BDT[1] = TCut("mini_bdt[13] > 0.45");
+  point[2] = TCut("mg==650 && ml==0 && x==0.5");    BDT[2] = TCut("mini_bdt[13] > 0.55");
+  point[3] = TCut("mg==650 && ml==0 && x==0.5");    BDT[3] = TCut("mini_bdt[14] > 0.35");
 
 				       
   TH1F* h = new TH1F("h","",1,0,1);
