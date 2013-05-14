@@ -198,4 +198,34 @@ void plotPolarization( bool doBDT = true , bool print = false){
     can1->Print(Form("plots/plotPolarization%s.pdf",BDTchar));
   }
 
+  TFile* f = TFile::Open("electronic/topneutralino_polarization.root","RECREATE");
+  f->cd();
+
+  c_nom->SetName("observed_unpolarized");
+  c_nom->SetTitle("observed_unpolarized");
+
+  c_right->SetName("observed_righthanded");
+  c_right->SetTitle("observed_righthanded");
+
+  c_left->SetName("observed_lefthanded");
+  c_left->SetTitle("observed_lefthanded");
+
+  c_nom_smallDM->SetName("observed_unpolarized_offshelltop");
+  c_nom_smallDM->SetTitle("observed_unpolarized_offshelltop");
+
+  c_right_smallDM->SetName("observed_righthanded_offshelltop");
+  c_right_smallDM->SetTitle("observed_righthanded_offshelltop");
+
+  c_left_smallDM->SetName("observed_lefthanded_offshelltop");
+  c_left_smallDM->SetTitle("observed_lefthanded_offshelltop");
+
+  c_nom->Write();
+  c_right->Write();
+  c_left->Write();
+
+  c_nom_smallDM->Write();
+  c_right_smallDM->Write();
+  c_left_smallDM->Write();
+
+  f->Close();
 }
