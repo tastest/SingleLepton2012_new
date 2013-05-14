@@ -1351,6 +1351,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   // gr_exp->SetName("gr_exp");
   // gr_exp->Write();
   hexcl_exp->Write();
+  hbest->Write();
 
   hR->SetName("hR");
   hR->SetTitle("hR");
@@ -1377,6 +1378,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   T2tt_exp->SetName("graph_T2tt_exp");
   T2tt_exp->SetTitle("graph_T2tt_exp");
   T2tt_exp->Write();
+
+  T2tt_obs->SetName("graph_T2tt");
+  T2tt_obs->SetTitle("graph_T2tt");
+  T2tt_obs->Write();
+
   fout->Close();
 
 }
