@@ -167,15 +167,15 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  }
 
 	  else if( name.Contains("x050") ){
-	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_x50.root";
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_combined_x50.root";
 	  }
 
 	  else if( name.Contains("x025") ){
-	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_x25.root";
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_combined_x25.root";
 	  }
 
 	  else if( name.Contains("x075") ){
-	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_x75.root";
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/myMassDB_mStop_combined_x75.root";
 	  }
 
 	  else{
@@ -1103,7 +1103,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
-        outFile_   = new TFile(Form("output_V00-03-10/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-11/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
