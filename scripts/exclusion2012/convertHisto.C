@@ -21,22 +21,27 @@
   // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75.root";
   // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
 
-  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse.root";
-  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse_25GeVbins.root";
+  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75.root";
+  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75_25GeVbins.root";
+
+  // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse.root";
+  // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse_25GeVbins.root";
 
   cout << "Reading in  " << filename_in  << endl;
   cout << "Writing out " << filename_out << endl;
 
   TFile* fin = TFile::Open(filename_in);
 
-  TH2F*  hin    = (TH2F*) fin->Get("masses");
-  TH2F*  hout   = new TH2F("masses","masses",41,-12.5,1012.5,41,-12.5,1012.5); 
+  TH2F*  hin    = (TH2F*) fin->Get("masses75");
+  TH2F*  hout   = new TH2F("masses75","masses75",41,-12.5,1012.5,41,-12.5,1012.5); 
 
+  /*
   TH2F*  hin25  = (TH2F*) fin->Get("masses25");
   TH2F*  hout25 = new TH2F("masses25","masses25",41,-12.5,1012.5,41,-12.5,1012.5); 
 
   TH2F*  hin75  = (TH2F*) fin->Get("masses75");
   TH2F*  hout75 = new TH2F("masses75","masses75",41,-12.5,1012.5,41,-12.5,1012.5); 
+  */
 
   for( int ibin = 1 ; ibin <= 41 ; ibin++ ){
     for( int jbin = 1 ; jbin <= 41 ; jbin++ ){
@@ -53,11 +58,13 @@
       
       hout->SetBinContent(ibin,jbin,nevents);
 
+      /*
       int nevents25 = hin25->GetBinContent(bin);
       int nevents75 = hin75->GetBinContent(bin);
 
       hout25->SetBinContent(ibin,jbin,nevents25);
       hout75->SetBinContent(ibin,jbin,nevents75);
+      */
 
     }
   }
@@ -67,10 +74,13 @@
   TFile *fout = TFile::Open(filename_out,"RECREATE");
   fout->cd();
   hout->Write();
+  /*
   hout25->Write();
   hout75->Write();
+  */
   fout->Close();
 
+  /*
   TCanvas* c1 = new TCanvas("c1","",1500,1000);
   c1->Divide(3,2);
 
@@ -94,6 +104,17 @@
   c1->cd(6);
   gPad->SetRightMargin(0.2);
   hout75->Draw("colz");
+  */
+
+  TCanvas* c1 = new TCanvas("c1","",1200,450);
+  c1->Divide(2,1);
+
+  c1->cd(1);
+  gPad->SetRightMargin(0.2);
+  hin->Draw("colz");
+  c1->cd(2);
+  gPad->SetRightMargin(0.2);
+  hout->Draw("colz");
 
 
 
