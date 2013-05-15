@@ -115,7 +115,7 @@ JES                  0.0604047
 tot err              0.106017
 btag err             0.00595543
 ISR err              0.0471112
-stat err             0.0337292
+stat err             0.0310832
 
 
 efficiency (300,50)  0.299499
@@ -126,7 +126,7 @@ JES                  0.0716967
 tot err              0.123443
 btag err             0.00390115
 ISR err              0.0688946
-stat err             0.0526316
+stat err             0.0493534
 
 
 efficiency (300,50)  0.0890932
@@ -137,7 +137,7 @@ JES                  0.0807561
 tot err              0.152423
 btag err             0.00499523
 ISR err              0.106537
-stat err             0.0898027
+stat err             0.0904883
 
 
 efficiency (300,50)  0.0368996
@@ -148,7 +148,7 @@ JES                  0.0412203
 tot err              0.135828
 btag err             0.0120609
 ISR err              0.106154
-stat err             0.145865
+stat err             0.140606
 
 
 efficiency (300,50)  0.105315
@@ -159,7 +159,7 @@ JES                  0.0820448
 tot err              0.118283
 btag err             0.0067732
 ISR err              0.0433305
-stat err             0.0873704
+stat err             0.0832279
 
 
 efficiency (300,50)  0.0494971
@@ -170,7 +170,7 @@ JES                  0.0701599
 tot err              0.119591
 btag err             0.00951678
 ISR err              0.0628727
-stat err             0.119523
+stat err             0.121402
 
 
 efficiency (300,50)  0.0251677
@@ -181,7 +181,7 @@ JES                  0.0805136
 tot err              0.139443
 btag err             0.017683
 ISR err              0.0855178
-stat err             0.171499
+stat err             0.170252
 
 
 efficiency (300,50)  0.0128217
@@ -192,6 +192,6 @@ JES                  0.165575
 tot err              0.200756
 btag err             0.0347099
 ISR err              0.0796701
-stat err             0.258199
+stat err             0.238529
 
 

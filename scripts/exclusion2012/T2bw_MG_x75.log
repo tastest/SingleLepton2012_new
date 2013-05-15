@@ -107,91 +107,91 @@ Selection btag up   : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs(
 
 Selection btag down : (((((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(x > 0.7))&&(mini_met > 250.0))&&(mini_dphimjmin>0.8))&&(mini_pt_b_bdown > 100.0))&&(mini_mt2wbdown>200.0)
 
-efficiency (500,50)  4.42723
-nevents              774
-xsec UL              0.366844
-xsec UL exp          0.391284
-JES                  0.0169443
-tot err              0.0906628
-btag err             0.00763175
-ISR err              0.0503824
-stat err             0.0359443
+efficiency (300,50)  1.32444
+nevents              258
+xsec UL              1.22626
+xsec UL exp          1.30796
+JES                  0.0447562
+tot err              0.0949724
+btag err             0.00385493
+ISR err              0.040814
+stat err             0.0660921
 
 
-efficiency (500,50)  3.75897
-nevents              660
-xsec UL              0.131514
-xsec UL exp          0.162892
-JES                  0.0263031
-tot err              0.094305
-btag err             0.0081557
-ISR err              0.0529063
-stat err             0.0389249
+efficiency (300,50)  0.817159
+nevents              161
+xsec UL              0.614386
+xsec UL exp          0.761236
+JES                  0.0564777
+tot err              0.106424
+btag err             0.006248
+ISR err              0.0525488
+stat err             0.0841418
 
 
-efficiency (500,50)  2.96349
-nevents              523
-xsec UL              0.0610853
-xsec UL exp          0.08237
-JES                  0.0252056
-tot err              0.0963262
-btag err             0.00560048
-ISR err              0.0572367
-stat err             0.0437269
+efficiency (300,50)  0.322548
+nevents              65
+xsec UL              0.566005
+xsec UL exp          0.769513
+JES                  0.0984305
+tot err              0.143436
+btag err             0
+ISR err              0.0744937
+stat err             0.133927
 
 
-efficiency (500,50)  1.98594
-nevents              355
-xsec UL              0.0446731
-xsec UL exp          0.0622325
-JES                  0.0471777
-tot err              0.110699
-btag err             0.0067811
-ISR err              0.0681655
-stat err             0.0530745
+efficiency (300,50)  0.138522
+nevents              29
+xsec UL              0.640462
+xsec UL exp          0.892204
+JES                  0.070917
+tot err              0.149088
+btag err             0
+ISR err              0.108913
+stat err             0.204365
 
 
-efficiency (500,50)  1.40412
-nevents              246
-xsec UL              0.135134
-xsec UL exp          0.105916
-JES                  0.0405768
-tot err              0.10114
-btag err             0.0249724
-ISR err              0.0512164
-stat err             0.0637577
+efficiency (300,50)  0.0860573
+nevents              17
+xsec UL              2.20485
+xsec UL exp          1.72813
+JES                  0.124639
+tot err              0.149824
+btag err             0
+ISR err              0.0397031
+stat err             0.259281
 
 
-efficiency (500,50)  1.30251
-nevents              228
-xsec UL              0.0763813
-xsec UL exp          0.0724441
-JES                  0.0418997
-tot err              0.102541
-btag err             0.0269205
-ISR err              0.0519465
-stat err             0.0662266
+efficiency (300,50)  0.0811976
+nevents              16
+xsec UL              1.2442
+xsec UL exp          1.17472
+JES                  0.132098
+tot err              0.156679
+btag err             0
+ISR err              0.0419796
+stat err             0.266928
 
 
-efficiency (500,50)  1.0602
-nevents              186
-xsec UL              0.0551419
-xsec UL exp          0.0580441
-JES                  0.04534
-tot err              0.103564
-btag err             0.0223902
-ISR err              0.0532207
-stat err             0.0733236
+efficiency (300,50)  0.0339716
+nevents              7
+xsec UL              1.72089
+xsec UL exp          1.81147
+JES                  0.0705041
+tot err              0.122156
+btag err             0
+ISR err              0.0679366
+stat err             0.412674
 
 
-efficiency (500,50)  0.784727
-nevents              139
-xsec UL              0.0326751
-xsec UL exp          0.0503197
-JES                  0.065044
-tot err              0.11899
-btag err             0.0262195
-ISR err              0.0624854
-stat err             0.0848189
+efficiency (300,50)  0.00932601
+nevents              2
+xsec UL              2.8044
+xsec UL exp          4.39906
+JES                  0.208437
+tot err              0.240187
+btag err             0
+ISR err              0.094382
+stat err             0.787621
 
 
