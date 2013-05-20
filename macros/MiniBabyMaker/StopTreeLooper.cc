@@ -301,7 +301,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             }
             for (int i=1; i < NREG_T2bw ; i++){
                 if ( j==0 && i==1 ) continue;
-                if ( j!=2 && i==4 ) continue;
                 reader_T2bw[j][i] = new TMVA::Reader( "!Color:!Silent" );
                 reader_T2bw[j][i]->AddVariable("mini_met", &met_);
                 reader_T2bw[j][i]->AddVariable("mini_mt2w", &mt2w_);
@@ -309,6 +308,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 reader_T2bw[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw[j][i]->AddVariable("mini_pt_b", &pt_b_);
                 reader_T2bw[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
+                if ( j!=2 && i==4 )
+                reader_T2bw[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// JES up
                 reader_T2bw_up[j][i] = new TMVA::Reader( "!Color:!Silent" );
@@ -318,6 +319,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 reader_T2bw_up[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_up[j][i]->AddVariable("mini_pt_b", &pt_b_up_);
                 reader_T2bw_up[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_up[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// JES down
                 reader_T2bw_down[j][i] = new TMVA::Reader( "!Color:!Silent" );
@@ -327,6 +330,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 reader_T2bw_down[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_down[j][i]->AddVariable("mini_pt_b", &pt_b_down_);
                 reader_T2bw_down[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_down[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// btagging up
                 reader_T2bw_bup[j][i] = new TMVA::Reader( "!Color:!Silent" );
@@ -336,6 +341,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 reader_T2bw_bup[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_pt_b", &pt_b_bup_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_bup_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_bup[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// btagging down
                 reader_T2bw_bdown[j][i] = new TMVA::Reader( "!Color:!Silent" );
@@ -345,6 +352,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 reader_T2bw_bdown[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_pt_b", &pt_b_bdown_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_bdown_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_bdown[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
                 TString dir    = "/home/users/magania/stop/SingleLepton2012/MVA/weights/";
                 TString weightfile = Form("classification_T2bw_%d_%.2f_BDT.weights.xml",i,x);
@@ -1103,6 +1112,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
         rootdir->cd();
 
+//        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_   = new TFile(Form("output_V00-03-11/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
