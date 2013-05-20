@@ -16,7 +16,7 @@ XPATH=/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/
 
 for tag in `ls -1 $XPATH | grep merged |  cut -d'.' -f1`;
  do echo root -b -q -l doFile.C\(\"$XPATH\",\"$tag\"\)
- nohup root -b -q -l doFile.C\(\"${XPATH}\",\"${tag}\"\) > output/log/${tag}.log &
+# nohup root -b -q -l doFile.C\(\"${XPATH}\",\"${tag}\"\) > output/log/${tag}.log &
 done
 
 #let "FAIL=0"

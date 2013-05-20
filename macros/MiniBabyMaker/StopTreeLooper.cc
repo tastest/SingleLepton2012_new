@@ -304,56 +304,56 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 reader_T2bw[j][i] = new TMVA::Reader( "!Color:!Silent" );
                 reader_T2bw[j][i]->AddVariable("mini_met", &met_);
                 reader_T2bw[j][i]->AddVariable("mini_mt2w", &mt2w_);
+                if ( j!=2 && i==4 )
+                reader_T2bw[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
                 reader_T2bw[j][i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
                 reader_T2bw[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw[j][i]->AddVariable("mini_pt_b", &pt_b_);
                 reader_T2bw[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
-                if ( j!=2 && i==4 )
-                reader_T2bw[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// JES up
                 reader_T2bw_up[j][i] = new TMVA::Reader( "!Color:!Silent" );
                 reader_T2bw_up[j][i]->AddVariable("mini_met", &metup_);
                 reader_T2bw_up[j][i]->AddVariable("mini_mt2w", &mt2wup_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_up[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
                 reader_T2bw_up[j][i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiomup_);
                 reader_T2bw_up[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_up[j][i]->AddVariable("mini_pt_b", &pt_b_up_);
                 reader_T2bw_up[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
-                if ( j!=2 && i==4 )
-                reader_T2bw_up[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// JES down
                 reader_T2bw_down[j][i] = new TMVA::Reader( "!Color:!Silent" );
                 reader_T2bw_down[j][i]->AddVariable("mini_met", &metdown_);
                 reader_T2bw_down[j][i]->AddVariable("mini_mt2w", &mt2wdown_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_down[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
                 reader_T2bw_down[j][i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiomdown_);
                 reader_T2bw_down[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_down[j][i]->AddVariable("mini_pt_b", &pt_b_down_);
                 reader_T2bw_down[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_);
-                if ( j!=2 && i==4 )
-                reader_T2bw_down[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// btagging up
                 reader_T2bw_bup[j][i] = new TMVA::Reader( "!Color:!Silent" );
                 reader_T2bw_bup[j][i]->AddVariable("mini_met", &met_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_mt2w", &mt2wbup_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_bup[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_pt_b", &pt_b_bup_);
                 reader_T2bw_bup[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_bup_);
-                if ( j!=2 && i==4 )
-                reader_T2bw_bup[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
 		// btagging down
                 reader_T2bw_bdown[j][i] = new TMVA::Reader( "!Color:!Silent" );
                 reader_T2bw_bdown[j][i]->AddVariable("mini_met", &met_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_mt2w", &mt2wbdown_);
+                if ( j!=2 && i==4 )
+                reader_T2bw_bdown[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_htssm/(mini_htosm+mini_htssm)", &htratiom_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_dphimjmin", &dphimjmin_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_pt_b", &pt_b_bdown_);
                 reader_T2bw_bdown[j][i]->AddVariable("mini_dRleptB1", &dRleptB1_bdown_);
-                if ( j!=2 && i==4 )
-                reader_T2bw_bdown[j][i]->AddVariable("mini_lep1pt", &lep1pt_);
 
                 TString dir    = "/home/users/magania/stop/SingleLepton2012/MVA/weights/";
                 TString weightfile = Form("classification_T2bw_%d_%.2f_BDT.weights.xml",i,x);
