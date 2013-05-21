@@ -21,6 +21,7 @@
 #include "TStyle.h"
 #include "TLine.h"
 #include "TMath.h"
+#include "TF1.h"
 #include <sstream>
 #include <iomanip>
 
@@ -192,6 +193,71 @@ void SMS_projection(char* sample = "T2tt" , int x = 1, bool doBDT = true , char*
 
   TFile* fdenom = TFile::Open(denomname);
   TH2F*  hdenom = (TH2F*) fdenom->Get(denomhistoname);
+
+  //--------------------------------------------------
+  // cross section ratio
+  //--------------------------------------------------
+
+  TH1F* hratio = new TH1F("hratio","hratio",1000,0,1000);
+
+  hratio->Fill(   150 , 3.67 );
+  hratio->Fill(   175 , 3.92 );
+
+  hratio->Fill(   200 , 7.200e+01 / 1.730e+01 );
+  hratio->Fill(   225 , 4.100e+01 / 9.280e+00 );
+  hratio->Fill(   250 , 2.450e+01 / 5.240e+00 );
+  hratio->Fill(   275 , 1.530e+01 / 3.090e+00 );
+  hratio->Fill(   300 , 9.790e+00 / 1.880e+00 );
+  hratio->Fill(   325 , 6.510e+00 / 1.190e+00 );
+  hratio->Fill(   350 , 4.410e+00 / 7.640e-01 );
+  hratio->Fill(   375 , 3.070e+00 / 5.080e-01 );
+  hratio->Fill(   400 , 2.180e+00 / 3.420e-01 );
+  hratio->Fill(   425 , 1.570e+00 / 2.350e-01 );
+  hratio->Fill(   450 , 1.140e+00 / 1.630e-01 );
+  hratio->Fill(   475 , 8.470e-01 / 1.150e-01 );
+  hratio->Fill(   500 , 6.340e-01 / 8.230e-02 );
+  hratio->Fill(   525 , 4.800e-01 / 5.940e-02 );
+  hratio->Fill(   550 , 3.670e-01 / 4.330e-02 );
+  hratio->Fill(   575 , 2.830e-01 / 3.180e-02 );
+  hratio->Fill(   600 , 2.220e-01 / 2.350e-02 );
+  hratio->Fill(   625 , 1.730e-01 / 1.760e-02 );
+  hratio->Fill(   650 , 1.360e-01 / 1.320e-02 );
+  hratio->Fill(   675 , 1.080e-01 / 9.970e-03 );
+  hratio->Fill(   700 , 8.640e-02 / 7.650e-03 );
+  hratio->Fill(   725 , 6.940e-02 / 5.860e-03 );
+  hratio->Fill(   750 , 5.610e-02 / 4.510e-03 );
+  hratio->Fill(   775 , 4.550e-02 / 3.480e-03 );
+  hratio->Fill(   800 , 3.710e-02 / 2.700e-03 );
+  hratio->Fill(   825 , 3.160e-02 / 2.110e-03 );
+  hratio->Fill(   850 , 2.510e-02 / 1.640e-03 );
+  hratio->Fill(   875 , 2.070e-02 / 1.280e-03 );
+  hratio->Fill(   900 , 1.720e-02 / 1.010e-03 );
+  hratio->Fill(   925 , 1.450e-02 / 8.010e-04 );
+  hratio->Fill(   950 , 1.230e-02 / 6.350e-04 );
+  hratio->Fill(   975 , 1.080e-02 / 5.090e-04 );
+  hratio->Fill(  1000 , 8.330e-03 / 4.000e-04 );
+  hratio->Fill(  1025 , 7.060e-03 / 3.200e-04 );
+  hratio->Fill(  1050 , 6.030e-03 / 2.560e-04 );
+  hratio->Fill(  1075 , 5.320e-03 / 2.060e-04 );
+  hratio->Fill(  1100 , 4.250e-03 / 1.640e-04 );
+  hratio->Fill(  1125 , 3.600e-03 / 1.320e-04 );
+  hratio->Fill(  1150 , 3.110e-03 / 1.070e-04 );
+  hratio->Fill(  1175 , 2.700e-03 / 8.640e-05 );
+  hratio->Fill(  1200 , 2.370e-03 / 6.970e-05 );
+
+  // TH1F* h = new TH1F("h","h",8,250,1050);
+
+  // h->SetBinContent(1, 527.0	/ 98.6           );	         
+  // h->SetBinContent(2, 115.0	/ 17.6	         );	                 
+  // h->SetBinContent(3,  32.9	/ 4.22	         );	         
+  // h->SetBinContent(4,  11.3	/ 1.22	         );	         
+  // h->SetBinContent(5,  4.41	/ 0.397	         );	         
+  // h->SetBinContent(6,  1.89	/ 0.142	         );	         
+  // h->SetBinContent(7, 0.871	/ 0.545E-01	 );	         
+  // h->SetBinContent(7, 0.425     / 0.219E-01	 );	         
+		   
+  // TF1* p2 = new TF1("p2","[0] + [1]*x + [2]*x*x");
+  // h->Fit(p2);
 
   //--------------------------------------------------
   // read in TChain
@@ -413,6 +479,8 @@ void SMS_projection(char* sample = "T2tt" , int x = 1, bool doBDT = true , char*
   
   TH2F* hyield[nsig];
   TH2F* hsignificance[nsig];
+  TH2F* hsignificance_opt[nsig];
+  TH2F* hsignificance_pess[nsig];
   TH2F* hdisc[nsig];
   
   TCanvas *ctemp = new TCanvas();
@@ -434,28 +502,47 @@ void SMS_projection(char* sample = "T2tt" , int x = 1, bool doBDT = true , char*
     float ymin    =   -12.5;
     float ymax    =  1012.5;
 
-    hyield[i]      = new TH2F(Form("hyield_%i",i)        , Form("hyield_%i",i)       , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hsignificance[i]        = new TH2F(Form("hsignificance_%i",i)          , Form("hsignificance_%i",i)         , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
-    hdisc[i]       = new TH2F(Form("hdisc_%i",i)         , Form("hdisc_%i",i)        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hyield[i]             = new TH2F(Form("hyield_%i",i)             , Form("hyield_%i",i)               , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hsignificance[i]      = new TH2F(Form("hsignificance_%i",i)      , Form("hsignificance_%i",i)        , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hsignificance_opt[i]  = new TH2F(Form("hsignificance_opt_%i",i)  , Form("hsignificance_opt_%i",i)    , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hsignificance_pess[i] = new TH2F(Form("hsignificance_pess_%i",i) , Form("hsignificance_pess_%i",i)   , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
+    hdisc[i]              = new TH2F(Form("hdisc_%i",i)              , Form("hdisc_%i",i)                , nbinsx , xmin , xmax , nbinsy , ymin , ymax );
 
     ch->Draw(Form("ml:mg>>hyield_%i",i),sigcuts.at(i)*weight*isrweight);
 
     for( int ibin = 1 ; ibin <= nbinsx ; ibin++ ){
       for( int jbin = 1 ; jbin <= nbinsy ; jbin++ ){
 
-	float yield          = hyield[i]->GetBinContent(ibin,jbin);
+	float mstop       = hyield[i]->GetXaxis()->GetBinCenter(ibin);
+	float yield       = hyield[i]->GetBinContent(ibin,jbin);
+	float Rbkg        = (300.0/20.0) * ( 964.6 / 248.9 );
+
+	int stop_bin = hratio->FindBin(mstop);
+	float Rsig        = (300.0/20.0) * hratio->GetBinContent(stop_bin);
+
+	cout << "mstop " << mstop << " ratio " << hratio->GetBinContent(stop_bin) << endl;
+
+	//float Rsig        = (300.0/20.0) * p2->Eval(mstop);
+
+	//float yield_14TeV = hyield[i]->GetBinContent(ibin,jbin) * (300.0/20.0) * p2->Eval(mstop);
+	//cout << "mstop " << mstop << " ratio " <<  << endl;
 
 	hsignificance[i]->SetBinContent(ibin,jbin,0);
+	hsignificance_opt[i]->SetBinContent(ibin,jbin,0);
+	hsignificance_pess[i]->SetBinContent(ibin,jbin,0);
 	hdisc[i]->SetBinContent(ibin,jbin,0);
 
 	if( yield   < 1e-20 ) continue;
 
-	//float my_zbi = zbi( yield + nbkg.at(i) , nbkg.at(i) , sbkg.at(i) );
-	float my_zbi = simple_significance( yield , nbkg.at(i) , sbkg.at(i) );
+	float significance      = simple_significance( yield        , nbkg.at(i)        , sbkg.at(i) );
+	float significance_opt  = simple_significance( yield * Rsig , nbkg.at(i) * Rbkg , TMath::Max( sbkg.at(i) * sqrt(Rbkg) , 0.1 * nbkg.at(i) * Rbkg ) );
+	float significance_pess = simple_significance( yield * Rsig , nbkg.at(i) * Rbkg , sbkg.at(i) * Rbkg);
 
-	hsignificance[i]->SetBinContent(ibin,jbin,my_zbi);
+	hsignificance[i]->SetBinContent(ibin,jbin,significance);
+	hsignificance_opt[i]->SetBinContent(ibin,jbin,significance_opt);
+	hsignificance_pess[i]->SetBinContent(ibin,jbin,significance_pess);
 
-	if( my_zbi > 5.0 ) hdisc[i]->SetBinContent(ibin,jbin,1);	
+	if( significance > 5.0 ) hdisc[i]->SetBinContent(ibin,jbin,1);	
       }
     }
   }
@@ -514,7 +601,7 @@ void SMS_projection(char* sample = "T2tt" , int x = 1, bool doBDT = true , char*
     hsignificance[i]->GetYaxis()->SetLabelSize(0.035);
     hsignificance[i]->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}}  [GeV]");
     hsignificance[i]->GetXaxis()->SetTitle("m_{#tilde{t}}  [GeV]");
-    hsignificance[i]->GetZaxis()->SetTitle("Z_{bi} Significance");
+    hsignificance[i]->GetZaxis()->SetTitle("Significance");
     hsignificance[i]->GetZaxis()->SetTitleOffset(1.2);
     hsignificance[i]->GetYaxis()->SetTitleOffset(1.1);
     hsignificance[i]->Draw("colz");
@@ -556,6 +643,8 @@ void SMS_projection(char* sample = "T2tt" , int x = 1, bool doBDT = true , char*
   for( unsigned int i = 0 ; i < nsig ; ++i ){
     hyield[i]->Write();
     hsignificance[i]->Write();
+    hsignificance_opt[i]->Write();
+    hsignificance_pess[i]->Write();
   }
   outfile->Close();
 
