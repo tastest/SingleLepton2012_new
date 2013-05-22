@@ -240,3 +240,19 @@ void smooth(){
   hexcl->Draw("samebox");
   //h_R->Draw("colz");
 }
+
+TH2F* simple_exclusionContour( TH2F* hul , int nsmooth = -1 ){
+
+  TH2F* h_R = (TH2F*) hul->Clone("contour");
+
+  if( nsmooth == 1 ) smoothTH2( h_R , "T2tt" , true );
+  if( nsmooth == 2 ) h_R->Smooth(1);
+  if( nsmooth == 3 ) h_R->Smooth(1,"k3a");
+
+  double contours[1];
+  contours[0] = 5.0;
+
+  h_R->SetContour(1,contours);
+
+  return h_R;
+}
