@@ -550,8 +550,8 @@ void combinePlots_projection(char* sample = "T2tt" , char* scenario = "optimisti
   hbest->GetZaxis()->SetLabelSize(0.035);
   hbest->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}}  [GeV]");
   hbest->GetXaxis()->SetTitle("m_{ #tilde{t}}  [GeV]");
-  hbest->GetXaxis()->SetRangeUser(xaxismin,800);
-  hbest->GetYaxis()->SetRangeUser(0,800);
+  hbest->GetXaxis()->SetRangeUser(xaxismin,1000);
+  hbest->GetYaxis()->SetRangeUser(0,1000);
   hbest->GetZaxis()->SetTitle("best signal region");
 
   t->SetTextSize(0.035);
@@ -635,8 +635,8 @@ void combinePlots_projection(char* sample = "T2tt" , char* scenario = "optimisti
   //-------------------------------
 
   blankHist( hsignificance_best , 500 );
-  hsignificance_best->GetXaxis()->SetRangeUser(0,800);
-  TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,600);
+  hsignificance_best->GetXaxis()->SetRangeUser(0,1000);
+  TH2F* hdummy = new TH2F("hdummy","",100,0,1000,100,0,600);
   hdummy->Reset();
 
   gPad->SetTopMargin(0.1);
@@ -649,7 +649,7 @@ void combinePlots_projection(char* sample = "T2tt" , char* scenario = "optimisti
   hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}}  [GeV]");
   hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
   hdummy->GetZaxis()->SetTitleOffset(0.8);
-  hdummy->GetXaxis()->SetRangeUser(xaxismin,800);
+  hdummy->GetXaxis()->SetRangeUser(xaxismin,1000);
   hdummy->GetYaxis()->SetRangeUser(0,600);
   hdummy->SetMinimum(0.001);
   hdummy->SetMaximum(100);
@@ -722,10 +722,10 @@ void combinePlots_projection(char* sample = "T2tt" , char* scenario = "optimisti
     line->DrawLine(173.5 ,      0 , 500+12.5+173.5 , 500+12.5);
     line->DrawLine(  150 , 150-81 , 500+12.5+81    , 500+12.5);
 
-    t->SetTextAngle(43);
+    t->SetTextAngle(50);
     t->SetTextSize(0.04);
-    t->DrawLatex(0.455,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{t}");
-    t->DrawLatex(0.37,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{W}");
+    t->DrawLatex(0.39,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{t}");
+    t->DrawLatex(0.32,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{W}");
 
   }
 
