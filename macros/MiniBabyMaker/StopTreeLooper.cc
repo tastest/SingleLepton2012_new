@@ -1061,7 +1061,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		float bdtvalbup   = 0;
 		float bdtvalbdown = 0;
 
-		if ( __apply_mva && i>0 && !(j==0&&i==1) && !(j!=2 && i==4)){
+		if ( __apply_mva && i>0 && !(j==0&&i==1) ){
 		  bdtval      = reader_T2bw[j][i]      ->EvaluateMVA( "BDT" );
 		  bdtvalup    = reader_T2bw_up[j][i]   ->EvaluateMVA( "BDT" );
 		  bdtvaldown  = reader_T2bw_down[j][i] ->EvaluateMVA( "BDT" );
