@@ -66,6 +66,7 @@ class WHLooper {
   std::vector<int> jets_idx_;
   std::vector<int> jets_fwd_idx_;
   std::vector<int> bjets_idx_;
+  std::vector<float> jets_smearcorrs_;
   int njets_;
   int njetsalleta_;
   int nbjets_;
@@ -105,6 +106,9 @@ class WHLooper {
   bool isttdl_;
   bool istsl_;
   bool istdl_;
+  bool isttvsl_;
+  bool isttvdl_;
+  bool isttvother_;
 
 };
 
