@@ -1403,13 +1403,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  else if ( id == -1000006 )
 	    stop_tbar_ = &(genps_p4().at(igen));   
 
-    //store neutralino
-    if ( genps_id_mother().at(igen) == 1000006  && ( abs(id) == 1000022 ) ) {
-      neutralino_t_ = &(genps_p4().at(igen));
-    }
-    if ( genps_id_mother().at(igen) == -1000006 && ( abs(id) == 1000022 ) ) {
-      neutralino_tbar_ = &(genps_p4().at(igen));
-    }
+	  //store neutralino
+	  if ( genps_id_mother().at(igen) == 1000006  && ( abs(id) == 1000022 ) ) {
+	    neutralino_t_ = &(genps_p4().at(igen));
+	  }
+	  if ( genps_id_mother().at(igen) == -1000006 && ( abs(id) == 1000022 ) ) {
+	    neutralino_tbar_ = &(genps_p4().at(igen));
+	  }
 
 	  //store daughter lepton
 	  if ( abs(mothid) == 24 && (abs(id) == 11 || abs(id) == 13 || abs(id) ==15)) {
@@ -4100,7 +4100,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfTau"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_	);
   outTree->Branch("pfTau_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_leadPtcand_	);
 
-  outTree->Branch("pfTauLoose_leadPtcandID",        &pfTauLoose_leadPtcandID_,        "pfTau_leadPtcandID/I");
+  outTree->Branch("pfTauLoose_leadPtcandID",        &pfTauLoose_leadPtcandID_,        "pfTauLoose_leadPtcandID/I");
   outTree->Branch("pfTauLoose"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauLoose_	);
   outTree->Branch("pfTauLoose_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauLoose_leadPtcand_	);
 
