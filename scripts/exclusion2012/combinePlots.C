@@ -102,6 +102,7 @@ TH2F* largeDM( TH2F* hin , char* sample ){
       float mstop = hin->GetXaxis()->GetBinCenter(ibin);
       float mlsp  = hin->GetYaxis()->GetBinCenter(jbin);
 
+      //if( mstop - mlsp <= 175 )  hout->SetBinContent(ibin,jbin,10000);
       if( mstop - mlsp <= 175 )  hout->SetBinContent(ibin,jbin,10000);
     }
   }
@@ -122,7 +123,8 @@ TH2F* smallDM( TH2F* hin ){
       float mstop = hin->GetXaxis()->GetBinCenter(ibin);
       float mlsp  = hin->GetYaxis()->GetBinCenter(jbin);
 
-      if( mstop - mlsp >= 175 ) hout->SetBinContent(ibin,jbin,0);
+      //if( mstop - mlsp >= 175 ) hout->SetBinContent(ibin,jbin,0);
+      if( mstop - mlsp >= 175 ) hout->SetBinContent(ibin,jbin,1000);
     }
   }
 
@@ -237,7 +239,7 @@ void smoothHist(TH2F* h){
 // main function
 //------------------------------------ 
 
-void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* pol = "" , bool print = false){
+void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* pol = "" , bool print = false){
 
   //----------------------------------------------
   // input parameters
@@ -254,8 +256,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   char* xchar         = (char*) "";
   char* BDTchar       = (char*) "";
   if( doBDT ) BDTchar = (char*) "_BDT";
-  bool  plotHCP       = true;
-  int   NEVENTS_MIN   = 20;
+  bool  plotHCP       = false;
+  int   NEVENTS_MIN   = -1;
   int   nsmooth       =  1;
   bool  doTruncation  = false;
   int   dMCut         = 0;
@@ -276,7 +278,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow t #tilde{#chi}_{1}^{0}";
-    xaxismin    = 150.0;
+    xaxismin    =  80.0;
     yaxismax    = 250.0;
 
     if( doBDT ) nSR = 6;
@@ -293,27 +295,29 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     label         = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{+}";
 
     if( x==25 ){
-      xaxismin        = 320.0;
+      xaxismin        = 275.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
-      if( doBDT ) nSR = 2;
-      dMCut           = 325;
+      //if( doBDT ) nSR = 2;
+      if( doBDT ) nSR = 4;
+      dMCut           = 200;
+      //dMCut           = 325;
     }
 
     else if( x==50 ){
-      xaxismin        = 160.0;
+      xaxismin        = 150.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
       if( doBDT ) nSR = 4;
-      dMCut           = 175;
+      dMCut           = 125;
     }
 
     else if( x==75 ){
-      xaxismin        = 120.0;
+      xaxismin        = 125.0;
       xchar           = (char*) "_x75";
       nSR             = 8;
       if( doBDT ) nSR = 4;
-      dMCut           = 100;
+      dMCut           = 0;
     }
 
   }
@@ -443,15 +447,39 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
       //cout << "xbin ybin " << xbin << " " << ybin << endl;
       //cout << "mstop mlsp " << hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) << " " << hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin) << endl;
-     
-      if( hxsec_exp[0]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
-      
+
+      // if( hxsec_exp[0]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
+
+      bool skip = true;
+      for( unsigned int i = 1 ; i < ncuts ; ++i ){     
+      	if( hxsec_exp[i]->GetBinContent(xbin,ybin) > 1e-10 ) skip = false;
+      }      
+      if( skip ) continue;
+
       int   best_ul    = 0;
       float min_exp_ul = hxsec_exp[0]->GetBinContent(xbin,ybin);
+
+      if( min_exp_ul < 1e-10 ){
+	cout << endl;
+	cout << "mstop mlsp " << hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) << " " << hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin) << endl;
+	cout << "resetting UL to 99999" << endl;
+	min_exp_ul = 999999;
+      }
 
       //cout << "exp0 " << hxsec_exp[0]->GetBinContent(xbin,ybin) << endl;
 
       for( unsigned int i = 1 ; i < ncuts ; ++i ){
+
+
+	if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
+	  float dM     = hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) - hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin);
+	  float mstop  = hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin);
+	  float mlsp   = hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin);
+	  float deltaM = mstop-mlsp;
+	  
+	  if( deltaM >= 350 && i > 1 ) continue;
+	}
+
 
 	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
 
@@ -603,11 +631,31 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
       bin = hxsec_best->FindBin(450,75);
       hxsec_best_expp1->SetBinContent(bin,0.15);
+
+      bin = hxsec_best->FindBin(275,25);
+
+      int bin0  = hxsec_best->FindBin(275,0);
+      int bin50 = hxsec_best->FindBin(275,50);
+
+      float val0  = hxsec_best->GetBinContent(bin0);
+      float val50 = hxsec_best->GetBinContent(bin50);
+
+      hxsec_best->SetBinContent(bin,0.5*(val0+val50));
     }
 
     else if( TString(sample).Contains("T2bw_MG") && x==50 && doBDT ){
       cout << "FIXING THE T2BW X=0.5 BDT LIMITS" << endl;
 
+      int bin150= hxsec_best->FindBin(150,0);
+      int bin175= hxsec_best->FindBin(175,0);
+      int bin200= hxsec_best->FindBin(200,0);
+
+      float val150 = hxsec_best->GetBinContent(bin150);
+      float val200 = hxsec_best->GetBinContent(bin200);
+
+      hxsec_best->SetBinContent(bin175,0.5*(val150+val200));
+
+      /*
       // set these 2 points to the pythia values
       int bin = hxsec_best->FindBin(225,0);
       hxsec_best->SetBinContent(bin,7.50);
@@ -632,9 +680,11 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 	hxsec_best_expm1->SetBinContent(bin,3.7);
 
       }
+      */
 
     }
 
+    /*
     else if( TString(sample).Contains("T2bw_MG") && x==75 && doBDT ){
       cout << "FIXING THE T2BW X=0.75 BDT LIMITS" << endl;
 
@@ -681,6 +731,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       bin = hxsec_best->FindBin(350,200);
       hxsec_best->SetBinContent(bin,0.7);
     }
+      */
   }
 
   //-------------------------------
@@ -717,6 +768,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       if( x==25 ){
 	t->DrawLatex(0.2,0.75,"1 = BDT2");
 	t->DrawLatex(0.2,0.70,"2 = BDT3");
+
+	t->DrawLatex(0.2,0.65,"3 = HM100");
+	t->DrawLatex(0.2,0.60,"4 = HM150");
       }
 
       else if( x==50 ){
@@ -866,6 +920,31 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
       hR_obsp1_smallDM->SetBinContent(bin,1.1);
 
     }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==50 && !doBDT && TString(pol).Contains("T2BW_SS")){
+      cout << "FIXING THE T2BW X=0.5 CUT-BASED LIMITS" << endl;
+
+      int bin= hR->FindBin(250,75);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin= hR->FindBin(225,75);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin= hR->FindBin(225,50);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin= hR->FindBin(300,150);
+      hR->SetBinContent(bin,10);
+
+      bin= hR->FindBin(325,150);
+      hR->SetBinContent(bin,1.1);
+
+      bin= hR->FindBin(275,125);
+      hR->SetBinContent(bin,1.1);
+
+    }
+
+
   }
 
   
@@ -989,8 +1068,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
     hR_expp1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
       if( doBDT ){
-	if( TString(pol).Contains("left") || TString(pol).Contains("right") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
-	else T2tt_BDT_expp1->Draw("l");
+	hR_expp1_smallDM->Draw("CONT3SAMEC");
+	// if( TString(pol).Contains("left") || TString(pol).Contains("right") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
+	// else T2tt_BDT_expp1->Draw("l");
       }
     }
     t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
@@ -1122,8 +1202,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 	hR_obsm1_smallDM->Draw("CONT3SAMEC");
 
 	// draw the expected (-1sigma) contour by hand
-	//hR_expp1_smallDM->Draw("CONT3SAMEC");
-	T2tt_BDT_expp1->Draw("samel");
+	hR_expp1_smallDM->Draw("CONT3SAMEC");
+	//T2tt_BDT_expp1->Draw("samel");
       }
 
       else{
@@ -1298,13 +1378,16 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
   line->SetLineStyle(2);
 
   if( TString(sample).Contains("T2tt") ){
-    line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
-    line->DrawLine(  150,150-81,300+12.5+81,300+12.5);
+    line->DrawLine(175,0,300+12.5+175,300+12.5);
+    //line->DrawLine(175,0,300+12.5+175,300+12.5);
+    //line->DrawLine(  150,150-81,300+12.5+81,300+12.5);
+    line->DrawLine(  81,0,300+12.5+81,300+12.5);
 
     t->SetTextAngle(55);
-    t->SetTextSize(0.035);
-    t->DrawLatex(0.38,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{t}");
-    t->DrawLatex(0.29,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = M_{W}");
+    t->SetTextSize(0.04);
+    t->DrawLatex(0.325,0.51,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = m_{W}");
+    t->DrawLatex(0.405,0.51,"m_{#tilde{t}} - m_{#tilde{#chi}^{0}_{1}} = m_{t}");
+
 
   }
 
@@ -1320,18 +1403,18 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = false, char* p
 
     if( x==25 ){
       line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
-      t->SetTextAngle(42);
-      t->DrawLatex(0.32,0.40,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+      t->SetTextAngle(47);
+      t->DrawLatex(0.43,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
     else if( x==50 ){
       line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
       t->SetTextAngle(52);
-      t->DrawLatex(0.26,0.375,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+      t->DrawLatex(0.33,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
     else if( x==75 ){
       line->DrawLine(120   , 12 , 300+12.5+108   , 300+12.5);
       t->SetTextAngle(53);
-      t->DrawLatex(0.24,0.375,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+      t->DrawLatex(0.3,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
 
   }
