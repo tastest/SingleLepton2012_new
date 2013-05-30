@@ -78,6 +78,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   char* suffix          = (char*) "";
   char* denomhistoname  = (char*) "masses";
   char* filename        = (char*) "";
+  char* filename_extra  = (char*) "";
   char* denomname       = (char*) "";
   char* BDTchar         = (char*) "";
   char* xchar           = (char*) "";
@@ -97,7 +98,9 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
   if( TString(sample).Contains("T2tt") ){    
     filename  = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged*root";
-    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root";
+    //denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root";
+    denomname = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/minibabies_V00-03-12/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_lowmass_25GeVbins.root";
+    filename_extra = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/minibabies_V00-03-12/Skim_4jets_MET100_MT120/merged*root";
 
     label     = (char*)"pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow t+#tilde{#chi}_{1}^{0}";
   }
@@ -107,24 +110,24 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     if( x==25 ){
       xchar          = (char*) "_x25";
       denomhistoname = (char*) "masses25";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x025*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x25_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x025*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x25_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.25";
     }
 
     else if( x==50 ){
       xchar          = (char*) "_x50";
       denomhistoname = (char*) "masses";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x050*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x50_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x050*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x50_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.50";
     }
 
     else if( x==75 ){
       xchar          = (char*) "_x75";
       denomhistoname = (char*) "masses75";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x075*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x075*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75_25GeVbins.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
     }
     
@@ -184,6 +187,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   cout << "x                 " << x               << endl;
   cout << "pol               " << pol             << endl;
   cout << "Using file        " << filename        << endl;
+  cout << "Using file        " << filename_extra  << endl;
   cout << "Using denominator " << denomname       << endl;
   cout << "Denom histo       " << denomhistoname  << endl;
   cout << "Using lumi        " << lumi            << " pb-1" << endl;
@@ -195,6 +199,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
   *logfile << "x                 " << x               << endl;
   *logfile << "pol               " << pol             << endl;
   *logfile << "Using file        " << filename        << endl;
+  *logfile << "Using file        " << filename_extra  << endl;
   *logfile << "Using denominator " << denomname       << endl;
   *logfile << "Denom histo       " << denomhistoname  << endl;
   *logfile << "Using lumi        " << lumi            << " pb-1" << endl;
@@ -209,6 +214,7 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
   TChain *ch = new TChain("t");
   ch->Add(filename);
+  if( TString(sample).Contains("T2tt") ) ch->Add(filename_extra);
 
   //--------------------------------------------------
   // read in reference cross section
@@ -339,6 +345,10 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
       if( x==25 ){
 	sigcuts.push_back(TCut(presel+"mini_bdt[8]  > 0.30"));  signames.push_back("T2BW25_BDT2");   labels.push_back("T2BW25_BDT2");   uls.push_back(8.73);
 	sigcuts.push_back(TCut(presel+"mini_bdt[9]  > 0.45"));  signames.push_back("T2BW25_BDT3");   labels.push_back("T2BW25_BDT3");   uls.push_back(5.97);
+
+	// ADDING IN CUT-BASED SIGNAL REGIONS
+	//sigcuts.push_back(presel+met100+dphi+bpt100+mt2w);      signames.push_back("T2BW_HM100");    labels.push_back("T2BW_HM100");   uls.push_back(17.5);
+	//sigcuts.push_back(presel+met150+dphi+bpt100+mt2w);      signames.push_back("T2BW_HM150");    labels.push_back("T2BW_HM150");   uls.push_back(12.3);
       }
 
       else if( x==50 ){
@@ -1325,6 +1335,16 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 
 void doAll(){
 
+  // SMS("T2bw_MG",75,true ,"T2BW_SS",true);
+  // SMS("T2bw_MG",75,false,"T2BW_SS",true);
+
+  // SMS("T2bw_MG",25,true ,"T2BW_SS",true);
+  // SMS("T2bw_MG",25,false,"T2BW_SS",true);
+
+  // SMS("T2bw_MG",50,true ,"T2BW_SS",true);
+  // SMS("T2bw_MG",50,false,"T2BW_SS",true);
+
+
 
   //--------------------------
   // T2tt
@@ -1338,6 +1358,7 @@ void doAll(){
   SMS("T2tt", 1,true,"left" ,true);
   SMS("T2tt", 1,true,"right",true);
 
+  /*
   //--------------------------
   // T2bw madgraph
   //--------------------------
@@ -1387,5 +1408,6 @@ void doAll(){
     SMS("T2bw_MG",50,false,weights[i],true);
     SMS("T2bw_MG",75,false,weights[i],true);
   }
+  */
 
 }
