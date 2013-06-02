@@ -295,21 +295,20 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     label         = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{+}";
 
     if( x==25 ){
-      xaxismin        = 275.0;
+      xaxismin        = 0.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
-      //if( doBDT ) nSR = 2;
-      if( doBDT ) nSR = 4;
-      dMCut           = 200;
+      if( doBDT ) nSR = 3;
+      dMCut           = 0;
       //dMCut           = 325;
     }
 
     else if( x==50 ){
-      xaxismin        = 150.0;
+      xaxismin        = 100.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
-      if( doBDT ) nSR = 4;
-      dMCut           = 125;
+      if( doBDT ) nSR = 5;
+      dMCut           = 0;
     }
 
     else if( x==75 ){
@@ -460,26 +459,23 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       float min_exp_ul = hxsec_exp[0]->GetBinContent(xbin,ybin);
 
       if( min_exp_ul < 1e-10 ){
-	cout << endl;
-	cout << "mstop mlsp " << hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) << " " << hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin) << endl;
-	cout << "resetting UL to 99999" << endl;
-	min_exp_ul = 999999;
+      	cout << endl;
+      	cout << "mstop mlsp " << hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) << " " << hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin) << endl;
+      	cout << "resetting UL to 99999" << endl;
+      	min_exp_ul = 999999;
       }
 
       //cout << "exp0 " << hxsec_exp[0]->GetBinContent(xbin,ybin) << endl;
 
       for( unsigned int i = 1 ; i < ncuts ; ++i ){
 
-
-	if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
-	  float dM     = hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) - hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin);
-	  float mstop  = hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin);
-	  float mlsp   = hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin);
-	  float deltaM = mstop-mlsp;
-	  
-	  if( deltaM >= 350 && i > 1 ) continue;
-	}
-
+	// if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
+	//   float dM     = hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin) - hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin);
+	//   float mstop  = hxsec_exp[0]->GetXaxis()->GetBinCenter(xbin);
+	//   float mlsp   = hxsec_exp[0]->GetYaxis()->GetBinCenter(ybin);
+	//   float deltaM = mstop-mlsp;	  
+	//   if( deltaM >= 350 && i > 1 ) continue;
+	// }
 
 	if( hxsec_exp[i]->GetBinContent(xbin,ybin) < 1e-10 ) continue;
 
@@ -766,11 +762,15 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
     if( TString(sample).Contains("T2bw") ){
       if( x==25 ){
-	t->DrawLatex(0.2,0.75,"1 = BDT2");
-	t->DrawLatex(0.2,0.70,"2 = BDT3");
+	t->DrawLatex(0.2,0.75,"1 = BDT1");
+	t->DrawLatex(0.2,0.70,"2 = BDT2");
+	t->DrawLatex(0.2,0.65,"3 = BDT3");
 
-	t->DrawLatex(0.2,0.65,"3 = HM100");
-	t->DrawLatex(0.2,0.60,"4 = HM150");
+	//t->DrawLatex(0.2,0.75,"1 = BDT2");
+	//t->DrawLatex(0.2,0.70,"2 = BDT3");
+
+	//t->DrawLatex(0.2,0.65,"3 = HM100");
+	//t->DrawLatex(0.2,0.60,"4 = HM150");
       }
 
       else if( x==50 ){
@@ -906,18 +906,37 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       hR_obsp1->SetBinContent(bin,1.1);
     }
 
-    if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("right")){
+    else if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("right")){
       cout << "FIXING T2TT BDT RIGHT LIMITS" << endl;
 
-      int bin = hR->FindBin(150,25);
-      hR_expp1_smallDM->SetBinContent(bin,0.9);
+      //int bin = hR->FindBin(150,25);
+      //hR_expp1_smallDM->SetBinContent(bin,0.9);
 
-      bin = hR->FindBin(300,150);
-      hR_expp1_smallDM->SetBinContent(bin,1.1);
+      //bin = hR->FindBin(300,150);
+      //hR_expp1_smallDM->SetBinContent(bin,1.1);
 
-      bin = hR->FindBin(375,225);
+      int bin = hR->FindBin(375,225);
       hR_expm1_smallDM->SetBinContent(bin,1.1);
       hR_obsp1_smallDM->SetBinContent(bin,1.1);
+
+    }
+
+    else if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("left")){
+      cout << "FIXING T2TT BDT LEFT LIMITS" << endl;
+
+      int bin = hR->FindBin(375,225);
+      hR_obsp1_smallDM->SetBinContent(bin,1.1);
+
+    }
+
+    else if( TString(sample).Contains("T2tt") && !doBDT ){
+      cout << "FIXING T2TT CUT-BASED NOMINAL LIMITS" << endl;
+
+      int bin = hR->FindBin(325,175);
+      hR_obsp1_smallDM->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(300,150);
+      hR_expm1_smallDM->SetBinContent(bin,1.1);
 
     }
 
@@ -974,12 +993,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   // print excluded regions and contours
   //------------------------------------------------------------
 
-  TGraph* T2tt_BDT_expp1 = get_T2tt_BDT_expp1();
-  TGraph* T2tt_obs       = get_T2tt_obs();
-  TGraph* T2tt_obsp1     = get_T2tt_obsp1();
+  // TGraph* T2tt_BDT_expp1 = get_T2tt_BDT_expp1();
+  // TGraph* T2tt_obs       = get_T2tt_obs();
+  // TGraph* T2tt_obsp1     = get_T2tt_obsp1();
   TGraph* T2tt_obsm1     = get_T2tt_obsm1();
   TGraph* T2tt_exp       = get_T2tt_exp();
   TGraph* T2tt_expm1     = get_T2tt_expm1();
+  TGraph* T2tt_expp1     = get_T2tt_expp1();
 
   bool plotExcludedPoints = true;
 
@@ -1003,8 +1023,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //gr->Draw("lp");
     hR->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
-      if( doBDT )  hR_smallDM->Draw("CONT3SAMEC");
-      else         T2tt_obs->Draw("l");
+      hR_smallDM->Draw("CONT3SAMEC");
+      //if( doBDT )  hR_smallDM->Draw("CONT3SAMEC");
+      //else         T2tt_obs->Draw("l");
     }
     t->DrawLatex(0.3,0.8,"observed");    
 
@@ -1019,8 +1040,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //gr_obsp1->Draw("lp");
     hR_obsp1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
-      if( doBDT ) hR_obsp1_smallDM->Draw("CONT3SAMEC");
-      else        T2tt_obsp1->Draw("l");
+      hR_obsp1_smallDM->Draw("CONT3SAMEC");
+      //if( doBDT ) hR_obsp1_smallDM->Draw("CONT3SAMEC");
+      //else        T2tt_obsp1->Draw("l");
     }
     t->DrawLatex(0.3,0.8,"observed (+1#sigma)");
 
@@ -1035,6 +1057,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //gr_obsm1->Draw("lp");
     hR_obsm1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
+      //hR_obsm1_smallDM->Draw("CONT3SAMEC");
       if( doBDT ) hR_obsm1_smallDM->Draw("CONT3SAMEC");
       else        T2tt_obsm1->Draw("l");
     }
@@ -1051,6 +1074,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //gr_exp->Draw("lp");
     hR_exp->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
+      //hR_exp_smallDM->Draw("CONT3SAMEC");
       if( doBDT ) hR_exp_smallDM->Draw("CONT3SAMEC");
       else        T2tt_exp->Draw("l");
     }
@@ -1067,11 +1091,14 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //gr_expp1->Draw("lp");
     hR_expp1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
-      if( doBDT ){
-	hR_expp1_smallDM->Draw("CONT3SAMEC");
-	// if( TString(pol).Contains("left") || TString(pol).Contains("right") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
-	// else T2tt_BDT_expp1->Draw("l");
-      }
+      if( doBDT ) hR_expp1_smallDM->Draw("CONT3SAMEC");
+      else        T2tt_expp1->Draw("l");
+      //hR_expp1_smallDM->Draw("CONT3SAMEC");
+      // if( doBDT ){
+      // 	hR_expp1_smallDM->Draw("CONT3SAMEC");
+      // 	// if( TString(pol).Contains("left") || TString(pol).Contains("right") ) hR_expp1_smallDM->Draw("CONT3SAMEC");
+      // 	// else T2tt_BDT_expp1->Draw("l");
+      // }
     }
     t->DrawLatex(0.3,0.8,"expected (+1#sigma)");
 
@@ -1086,8 +1113,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //gr_expm1->Draw("lp");
     hR_expm1->Draw("CONT3SAMEC");
     if( TString(sample).Contains("T2tt") ){
-      if( doBDT ) hR_expm1_smallDM->Draw("CONT3SAMEC");
-      else        T2tt_expm1->Draw("l");
+      hR_expm1_smallDM->Draw("CONT3SAMEC");
+      //if( doBDT ) hR_expm1_smallDM->Draw("CONT3SAMEC");
+      //else        T2tt_expm1->Draw("l");
     }
     t->DrawLatex(0.3,0.8,"expected (-1#sigma)");
 
@@ -1207,11 +1235,21 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       }
 
       else{
-	T2tt_obsp1->Draw("samel");
+	// T2tt_obsp1->Draw("samel");
 	T2tt_obsm1->Draw("samel");
 	T2tt_exp->Draw("samel");
 	T2tt_expm1->Draw("samel");
-	T2tt_obs->Draw("samel");
+	T2tt_expp1->Draw("samel");
+	// T2tt_obs->Draw("samel");
+
+
+	hR_smallDM->Draw("CONT3SAMEC");
+	//hR_exp_smallDM->Draw("CONT3SAMEC");
+	//hR_expm1_smallDM->Draw("CONT3SAMEC");
+	hR_obsp1_smallDM->Draw("CONT3SAMEC");
+	//hR_obsm1_smallDM->Draw("CONT3SAMEC");
+	//hR_expp1_smallDM->Draw("CONT3SAMEC");
+
       }
 
     }
@@ -1458,13 +1496,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   hjeserr_best->Write();
   htoterr_best->Write();
 
-  T2tt_exp->SetName("graph_T2tt_exp");
-  T2tt_exp->SetTitle("graph_T2tt_exp");
-  T2tt_exp->Write();
+  // T2tt_exp->SetName("graph_T2tt_exp");
+  // T2tt_exp->SetTitle("graph_T2tt_exp");
+  // T2tt_exp->Write();
 
-  T2tt_obs->SetName("graph_T2tt");
-  T2tt_obs->SetTitle("graph_T2tt");
-  T2tt_obs->Write();
+  // T2tt_obs->SetName("graph_T2tt");
+  // T2tt_obs->SetTitle("graph_T2tt");
+  // T2tt_obs->Write();
 
   fout->Close();
 
