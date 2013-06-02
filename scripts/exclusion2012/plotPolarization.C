@@ -53,7 +53,7 @@ void plotPolarization( bool doBDT = true , bool print = false){
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #tilde{#chi}_{1}^{0}";
-    xaxismin    = 150.0;
+    xaxismin    =  80.0;
     yaxismax    = 250.0;
   }
 
@@ -66,9 +66,13 @@ void plotPolarization( bool doBDT = true , bool print = false){
   // set up filenames and print them out
   //----------------------------------------------
 
-  char* filename_nom    = Form("rootfiles/T2tt_combinePlots%s_nmin20.root"     ,BDTchar);
-  char* filename_right  = Form("rootfiles/T2tt_combinePlotsright%s_nmin20.root",BDTchar);
-  char* filename_left   = Form("rootfiles/T2tt_combinePlotsleft%s_nmin20.root" ,BDTchar);
+  // char* filename_nom    = Form("rootfiles/T2tt_combinePlots%s_nmin20.root"     ,BDTchar);
+  // char* filename_right  = Form("rootfiles/T2tt_combinePlotsright%s_nmin20.root",BDTchar);
+  // char* filename_left   = Form("rootfiles/T2tt_combinePlotsleft%s_nmin20.root" ,BDTchar);
+
+  char* filename_nom    = Form("rootfiles/T2tt_combinePlots%s.root"     ,BDTchar);
+  char* filename_right  = Form("rootfiles/T2tt_combinePlotsright%s.root",BDTchar);
+  char* filename_left   = Form("rootfiles/T2tt_combinePlotsleft%s.root" ,BDTchar);
 
   char* outfilename = Form("rootfiles/plotPolarization%s.root",BDTchar);
 
@@ -187,11 +191,13 @@ void plotPolarization( bool doBDT = true , bool print = false){
 
   if( TString(sample).Contains("T2tt") ){
     line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
-    line->DrawLine(   150,150-81,300+12.5+81.0,300+12.5);
+    //line->DrawLine(   150,150-81,300+12.5+81.0,300+12.5);
+    line->DrawLine(   80,0,300+12.5+80,300+12.5);
 
-    t->SetTextAngle(46);
-    t->DrawLatex(0.41,0.5,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{t}");
-    t->DrawLatex(0.30,0.5,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    t->SetTextAngle(49);
+    t->DrawLatex(0.35,0.5,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    t->DrawLatex(0.45,0.5,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{t}");
+
   }
 
   if( print ){
