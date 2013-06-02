@@ -1,10 +1,11 @@
 ----------------------------------------------------
 Sample            T2tt
-logfile           T2ttright_BDT.log
+logfile           logfiles/T2ttright_BDT.log
 x                 1
 pol               right
 Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/merged*root
-Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/minibaby_V00-03-06/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_25GeVbins.root
+Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/minibabies_V00-03-12/Skim_4jets_MET100_MT120/merged*root
+Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/minibabies_V00-03-12/Skim_4jets_MET100_MT120/myMassDB_T2tt_combined_lowmass_25GeVbins.root
 Denom histo       masses
 Using lumi        19500 pb-1
 ----------------------------------------------------
@@ -91,7 +92,7 @@ JES                  0.0586746
 tot err              0.107909
 btag err             0.010273
 ISR err              0.0525365
-stat err             0.0220132
+stat err             0.0333519
 
 
 efficiency (300,50)  0.431127
@@ -102,7 +103,7 @@ JES                  0.115636
 tot err              0.150023
 btag err             0.00725412
 ISR err              0.0612109
-stat err             0.041135
+stat err             0.0613139
 
 
 efficiency (300,50)  0.227076
@@ -113,7 +114,7 @@ JES                  0.0655642
 tot err              0.134006
 btag err             0.0132237
 ISR err              0.0902665
-stat err             0.0566798
+stat err             0.0790569
 
 
 efficiency (300,50)  0.0492308
@@ -124,7 +125,7 @@ JES                  0.126397
 tot err              0.170542
 btag err             0
 ISR err              0.0881608
-stat err             0.12173
+stat err             0.171499
 
 
 efficiency (300,50)  0.00341335
@@ -135,7 +136,7 @@ JES                  0.0484091
 tot err              0.20043
 btag err             0
 ISR err              0.180258
-stat err             0.462301
+stat err             0.447214
 
 
 efficiency (300,50)  0.146806
@@ -146,6 +147,6 @@ JES                  0.10207
 tot err              0.143964
 btag err             0.0151387
 ISR err              0.0688636
-stat err             0.0704924
+stat err             0.109109
 
 
