@@ -490,6 +490,14 @@ int isGenQGLMatched ( LorentzVector p4, float dR ) {
     if (abs(id)==15 && abs(mothid)==24)
       return (mothid>0) ? 15 : -15;
 
+    // B from the Higgs
+    if (abs(id)==5 && abs(mothid)==25)
+      return (id>0) ? 7 : -7;
+    
+    // B from the Z
+    if (abs(id)==5 && abs(mothid)==23)
+      return (id>0) ? 6 : -6;
+
     if (abs(id)==21) return 3;
     if (abs(id)<6) return 4;
 
