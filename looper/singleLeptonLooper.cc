@@ -369,6 +369,10 @@ void singleLeptonLooper::InitBaby(){
   pfTau_leadPtcand_  = 0;
   pfTau_leadPtcandID_ = -1;
 
+  pfTauSS_       = 0;
+  pfTauSS_leadPtcand_  = 0;
+  pfTauSS_leadPtcandID_ = -1;
+
   pfTau15_       = 0;
   pfTau15_leadPtcand_  = 0;
   pfTau15_leadPtcandID_ = -1;
@@ -528,6 +532,7 @@ void singleLeptonLooper::InitBaby(){
   pfjets_faillepolap_.clear();
   pfjets_csv_.clear();
   pfjets_chEfrac_.clear();
+  pfjets_muofrac_.clear();
   pfjets_chm_.clear();
   pfjets_neu_.clear();
   pfjets_l1corr_.clear();
@@ -1410,7 +1415,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  if ( genps_id_mother().at(igen) == -1000006 && ( abs(id) == 1000022 ) ) {
 	    neutralino_tbar_ = &(genps_p4().at(igen));
 	  }
-
+	  
 	  //store daughter lepton
 	  if ( abs(mothid) == 24 && (abs(id) == 11 || abs(id) == 13 || abs(id) ==15)) {
 
@@ -1981,7 +1986,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       trkpt5loose_     = -1.0;
       trkreliso5loose_ = 1000.;
 
-
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 
 	if( pfcands_p4().at(ipf).pt() < 5  ) continue;
@@ -2251,6 +2255,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       int indexTauMax=-1;
       double ptTauMax=0.;
 
+      int indexTauMaxSS=-1;
+      double ptTauMaxSS=0.;
+
       int indexTauLooseMax=-1;
       double ptTauLooseMax=0.;
 
@@ -2261,8 +2268,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       for (unsigned int itau=0; itau < taus_pf_p4().size(); itau++) {
 
 	if(taus_pf_p4().at(itau).pt()<15) continue;
-	/// Use only OS charge
-	if((taus_pf_charge().at(itau)*id1_)>0) continue;
 
 	///
 	bool isLeadLepton = ( ROOT::Math::VectorUtil::DeltaR( taus_pf_p4().at(itau) ,
@@ -2271,6 +2276,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if(isLeadLepton) continue;
 	if(!taus_pf_byDecayModeFinding().at(itau)) continue;
 
+
+	// store SS TAU to study fakes
+	if((taus_pf_charge().at(itau)*id1_)>0 && taus_pf_p4().at(itau).pt()>=20 && taus_pf_byMediumIsolationMVA2().at(itau)) {
+	  
+	  if(taus_pf_p4().at(itau).pt()>ptTauMaxSS) {
+	    ptTauMaxSS = taus_pf_p4().at(itau).pt();
+	    indexTauMaxSS = itau;
+	  }	
+	  
+	}
+
+
+	/// Use only OS charge
+	if((taus_pf_charge().at(itau)*id1_)>0) continue;
 
 	// isolation Medium ; pt > 15
 	if(taus_pf_byMediumIsolationMVA2().at(itau)) {
@@ -2344,6 +2363,26 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	}
       }
+
+
+      if(indexTauMaxSS!=-1) {
+
+	pfTauSS_=&taus_pf_p4().at(indexTauMaxSS);
+	for(int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauMaxSS).size(); ipf ++) {	  
+
+	  int index=(taus_pf_pfcandIndicies().at(indexTauMaxSS)).at(ipf);
+	  //	  cout << "part  " << ipf << " with pt " << pfcands_p4().at(index).pt() << " eta " << pfcands_p4().at(index).eta()  << endl;
+
+	}	
+
+	if(taus_pf_pfcandIndicies().at(indexTauMaxSS).size()>0) {
+	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauMaxSS)).at(0);
+	  pfTauSS_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
+	  pfTauSS_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
+
+	}
+      }
+
 
 
       if(indexTauLooseMax!=-1) {
@@ -2848,6 +2887,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	pfjets_.push_back(vipfjets_p4.at(i).p4obj);
 	pfjets_csv_.push_back(pfjets_combinedSecondaryVertexBJetTag().at(vipfjets_p4.at(i).p4ind));
 	pfjets_chEfrac_.push_back(pfjets_chargedHadronE().at(vipfjets_p4.at(i).p4ind) / pfjets_p4().at(vipfjets_p4.at(i).p4ind).energy());
+	pfjets_muofrac_.push_back(pfjets_muonE().at(vipfjets_p4.at(i).p4ind) / pfjets_p4().at(vipfjets_p4.at(i).p4ind).energy());
 	pfjets_chm_.push_back(pfjets_chargedMultiplicity().at(vipfjets_p4.at(i).p4ind));
 	pfjets_neu_.push_back(pfjets_neutralMultiplicity().at(vipfjets_p4.at(i).p4ind));
 	pfjets_qgtag_.push_back(QGtagger(vipfjets_p4.at(i).p4obj,vipfjets_p4.at(i).p4ind,qglikeli_));
@@ -4100,6 +4140,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfTau"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_	);
   outTree->Branch("pfTau_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_leadPtcand_	);
 
+  outTree->Branch("pfTauSS_leadPtcandID",        &pfTauSS_leadPtcandID_,        "pfTauSS_leadPtcandID/I");
+  outTree->Branch("pfTauSS"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauSS_	);
+  outTree->Branch("pfTauSS_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauSS_leadPtcand_	);
+
   outTree->Branch("pfTauLoose_leadPtcandID",        &pfTauLoose_leadPtcandID_,        "pfTauLoose_leadPtcandID/I");
   outTree->Branch("pfTauLoose"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauLoose_	);
   outTree->Branch("pfTauLoose_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauLoose_leadPtcand_	);
@@ -4137,6 +4181,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfjets_faillepolap"    , "std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >", &pfjets_faillepolap_ );
   outTree->Branch("pfjets_csv", "std::vector<float>", &pfjets_csv_ );
   outTree->Branch("pfjets_chEfrac", "std::vector<float>", &pfjets_chEfrac_ );
+  outTree->Branch("pfjets_muofrac", "std::vector<float>", &pfjets_muofrac_ );
   outTree->Branch("pfjets_chm", "std::vector<float>", &pfjets_chm_ );
   outTree->Branch("pfjets_neu", "std::vector<float>", &pfjets_neu_ );
   outTree->Branch("pfjets_l1corr",  "std::vector<float>", &pfjets_l1corr_   );

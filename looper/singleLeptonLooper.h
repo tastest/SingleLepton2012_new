@@ -424,6 +424,10 @@ class singleLeptonLooper
         LorentzVector*  pfTau_leadPtcand_;
         Int_t pfTau_leadPtcandID_;
 
+        LorentzVector*  pfTauSS_;
+        LorentzVector*  pfTauSS_leadPtcand_;
+        Int_t pfTauSS_leadPtcandID_;
+
         LorentzVector*  pfTauLoose_;
         LorentzVector*  pfTauLoose_leadPtcand_;
         Int_t pfTauLoose_leadPtcandID_;
@@ -466,6 +470,7 @@ class singleLeptonLooper
         std::vector<float> pfjets_chm_;
         std::vector<float> pfjets_neu_;
         std::vector<float> pfjets_chEfrac_;
+        std::vector<float> pfjets_muofrac_;
 	//jet corrections and ID
 	std::vector<float> pfjets_l1corr_;
 	std::vector<float> pfjets_corr_;
