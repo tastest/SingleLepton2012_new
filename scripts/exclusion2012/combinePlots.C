@@ -1541,13 +1541,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   hjeserr_best->Write();
   htoterr_best->Write();
 
-  // T2tt_exp->SetName("graph_T2tt_exp");
-  // T2tt_exp->SetTitle("graph_T2tt_exp");
-  // T2tt_exp->Write();
+  T2tt_exp->SetName("graph_T2tt_exp");
+  T2tt_exp->SetTitle("graph_T2tt_exp");
+  T2tt_exp->Write();
 
-  // T2tt_obs->SetName("graph_T2tt");
-  // T2tt_obs->SetTitle("graph_T2tt");
-  // T2tt_obs->Write();
+  T2tt_obs->SetName("graph_T2tt");
+  T2tt_obs->SetTitle("graph_T2tt");
+  T2tt_obs->Write();
 
   fout->Close();
 
