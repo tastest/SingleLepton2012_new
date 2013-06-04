@@ -42,8 +42,10 @@ void compareBDT(char* sample = "T2tt", int x = 1){
   float xmin      = 0.0;
 
   if( TString(sample).Contains("T2tt") ){
-    file_CC   = "rootfiles/T2tt_combinePlots_nmin20.root";
-    file_BDT  = "rootfiles/T2tt_combinePlots_BDT_nmin20.root";
+    //file_CC   = "rootfiles/T2tt_combinePlots_nmin20.root";
+    //file_BDT  = "rootfiles/T2tt_combinePlots_BDT_nmin20.root";
+    file_CC   = "rootfiles/T2tt_combinePlots.root";
+    file_BDT  = "rootfiles/T2tt_combinePlots_BDT.root";
     file_PDF  = "compareBDT_T2tt.pdf";
     doSmallDM = true;
   }
@@ -53,26 +55,32 @@ void compareBDT(char* sample = "T2tt", int x = 1){
       // file_CC   = "T2bw_x25_combinePlots.root";
       // file_BDT  = "T2bw_x25_combinePlots_BDT.root";
       // file_PDF  = "compareBDT_T2bw_x25.pdf";
-      file_CC   = "rootfiles/T2bw_MG_x25_combinePlotsT2BW_SS_nmin20.root";
-      file_BDT  = "rootfiles/T2bw_MG_x25_combinePlotsT2BW_SS_BDT_nmin20.root";
+      //file_CC   = "rootfiles/T2bw_MG_x25_combinePlotsT2BW_SS_nmin20.root";
+      //file_BDT  = "rootfiles/T2bw_MG_x25_combinePlotsT2BW_SS_BDT_nmin20.root";
+      file_CC   = "rootfiles/T2bw_MG_x25_combinePlotsT2BW_SS.root";
+      file_BDT  = "rootfiles/T2bw_MG_x25_combinePlotsT2BW_SS_BDT.root";
       file_PDF  = "compareBDT_T2bw_MG_x25.pdf";
-      xmin      = 320.0;
+      xmin      = 200.0;
     }
     else if( x==50){
       // file_CC   = "T2bw_x50_combinePlots.root";
       // file_BDT  = "T2bw_x50_combinePlots_BDT.root";
       // file_PDF  = "compareBDT_T2bw_x50.pdf";
-      file_CC   = "rootfiles/T2bw_MG_x50_combinePlotsT2BW_SS_nmin20.root";
-      file_BDT  = "rootfiles/T2bw_MG_x50_combinePlotsT2BW_SS_BDT_nmin20.root";
+      //file_CC   = "rootfiles/T2bw_MG_x50_combinePlotsT2BW_SS_nmin20.root";
+      //file_BDT  = "rootfiles/T2bw_MG_x50_combinePlotsT2BW_SS_BDT_nmin20.root";
+      file_CC   = "rootfiles/T2bw_MG_x50_combinePlotsT2BW_SS.root";
+      file_BDT  = "rootfiles/T2bw_MG_x50_combinePlotsT2BW_SS_BDT.root";
       file_PDF  = "compareBDT_T2bw_MG_x50.pdf";
-      xmin      = 160.0;
+      xmin      = 100.0;
     }
     else if( x==75){
       // file_CC   = "T2bw_x75_combinePlots.root";
       // file_BDT  = "T2bw_x75_combinePlots_BDT.root";
       // file_PDF  = "compareBDT_T2bw_x75.pdf";
-      file_CC   = "rootfiles/T2bw_MG_x75_combinePlotsT2BW_SS_nmin20.root";
-      file_BDT  = "rootfiles/T2bw_MG_x75_combinePlotsT2BW_SS_BDT_nmin20.root";
+      //file_CC   = "rootfiles/T2bw_MG_x75_combinePlotsT2BW_SS_nmin20.root";
+      //file_BDT  = "rootfiles/T2bw_MG_x75_combinePlotsT2BW_SS_BDT_nmin20.root";
+      file_CC   = "rootfiles/T2bw_MG_x75_combinePlotsT2BW_SS.root";
+      file_BDT  = "rootfiles/T2bw_MG_x75_combinePlotsT2BW_SS_BDT.root";
       file_PDF  = "compareBDT_T2bw_MG_x75.pdf";
       xmin      = 0.0;
     }
