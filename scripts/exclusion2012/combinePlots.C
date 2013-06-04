@@ -1545,9 +1545,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   T2tt_exp->SetTitle("graph_T2tt_exp");
   T2tt_exp->Write();
 
-  T2tt_obs->SetName("graph_T2tt");
-  T2tt_obs->SetTitle("graph_T2tt");
-  T2tt_obs->Write();
+  // T2tt_obs->SetName("graph_T2tt");
+  // T2tt_obs->SetTitle("graph_T2tt");
+  // T2tt_obs->Write();
 
   fout->Close();
 
@@ -1629,4 +1629,43 @@ void doAll(){
   combinePlots("T2bw_MG",50,true,"T2BW_SS",true);
   combinePlots("T2bw_MG",75,true,"T2BW_SS",true);
   */
+}
+
+
+void doAllPlots(){
+
+  //--------------------------
+  // T2bw MG
+  //--------------------------
+
+  char* weights[5]={
+    "T2BW_LR",
+    "T2BW_LL",
+    "T2BW_SS",
+    "T2BW_RR",
+    "T2BW_RL"
+  };
+
+  for( int i = 0 ; i < 5 ; i++ ){
+    combinePlots("T2bw_MG",25,true,weights[i],true);
+    combinePlots("T2bw_MG",50,true,weights[i],true);
+    combinePlots("T2bw_MG",75,true,weights[i],true);
+
+    combinePlots("T2bw_MG",25,false,weights[i],true);
+    combinePlots("T2bw_MG",50,false,weights[i],true);
+    combinePlots("T2bw_MG",75,false,weights[i],true);
+  }
+
+  //--------------------------
+  // T2tt
+  //--------------------------
+
+  // combinePlots("T2tt", 1,false,""     ,true);
+  // combinePlots("T2tt", 1,false,"left" ,true);
+  // combinePlots("T2tt", 1,false,"right",true);
+
+  // combinePlots("T2tt", 1,true,""     ,true);
+  // combinePlots("T2tt", 1,true,"left" ,true);
+  // combinePlots("T2tt", 1,true,"right",true);
+
 }
