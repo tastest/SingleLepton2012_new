@@ -777,7 +777,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   hbest->GetZaxis()->SetTitle("best signal region");
 
   t->SetTextSize(0.035);
-  t->DrawLatex(0.18,0.92,"CMS Preliminary   #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
+  t->DrawLatex(0.18,0.92,"CMS                    #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
   
   t->SetTextSize(0.045);
   t->DrawLatex(0.21,0.83,label);
@@ -830,25 +830,27 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   else{
 
     if( TString(sample).Contains("T2bw") ){
+      t->SetTextSize(0.038);
       t->DrawLatex(0.2,0.75," 1 = LM100");
-      t->DrawLatex(0.2,0.70," 2 = LM150");
-      t->DrawLatex(0.2,0.65," 3 = LM200");
-      t->DrawLatex(0.2,0.60," 4 = LM250");
-      t->DrawLatex(0.2,0.55," 5 = HM100");
-      t->DrawLatex(0.2,0.50," 6 = HM150");
-      t->DrawLatex(0.2,0.45," 7 = HM200");
-      t->DrawLatex(0.2,0.40," 8 = HM250");
+      t->DrawLatex(0.2,0.71," 2 = LM150");
+      t->DrawLatex(0.2,0.67," 3 = LM200");
+      t->DrawLatex(0.2,0.63," 4 = LM250");
+      t->DrawLatex(0.2,0.59," 5 = HM100");
+      t->DrawLatex(0.2,0.55," 6 = HM150");
+      t->DrawLatex(0.2,0.51," 7 = HM200");
+      t->DrawLatex(0.2,0.47," 8 = HM250");
     }
 
     else{
+      t->SetTextSize(0.038);
       t->DrawLatex(0.2,0.75,"1 = LM150");
-      t->DrawLatex(0.2,0.70,"2 = LM200");
-      t->DrawLatex(0.2,0.65,"3 = LM250");
-      t->DrawLatex(0.2,0.60,"4 = LM300");
-      t->DrawLatex(0.2,0.55,"5 = HM150");
-      t->DrawLatex(0.2,0.50,"6 = HM200");
-      t->DrawLatex(0.2,0.45,"7 = HM250");
-      t->DrawLatex(0.2,0.40,"8 = HM300");
+      t->DrawLatex(0.2,0.71,"2 = LM200");
+      t->DrawLatex(0.2,0.67,"3 = LM250");
+      t->DrawLatex(0.2,0.63,"4 = LM300");
+      t->DrawLatex(0.2,0.59,"5 = HM150");
+      t->DrawLatex(0.2,0.55,"6 = HM200");
+      t->DrawLatex(0.2,0.51,"7 = HM250");
+      t->DrawLatex(0.2,0.47,"8 = HM300");
     }
 
   }
@@ -1451,7 +1453,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
 
   t->SetTextSize(0.04);
-  t->DrawLatex(0.18,0.94,"CMS Preliminary                 #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
+  t->DrawLatex(0.18,0.94,"CMS                                      #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
 
   TLine *line = new TLine();
   line->SetLineWidth(2);
@@ -1552,47 +1554,47 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 }
 
 void doAll(){
-  /*
+
   //--------------------------
   // T2tt
   //--------------------------
 
   combinePlots("T2tt", 1,false,""     ,true);
-  combinePlots("T2tt", 1,false,"left" ,true);
-  combinePlots("T2tt", 1,false,"right",true);
+  // combinePlots("T2tt", 1,false,"left" ,true);
+  // combinePlots("T2tt", 1,false,"right",true);
 
   combinePlots("T2tt", 1,true,""     ,true);
-  combinePlots("T2tt", 1,true,"left" ,true);
-  combinePlots("T2tt", 1,true,"right",true);
+  // combinePlots("T2tt", 1,true,"left" ,true);
+  // combinePlots("T2tt", 1,true,"right",true);
 
   //--------------------------
   // T2bw madgraph
   //--------------------------
 
-  combinePlots("T2bw_MG",25,false,"",true);
-  combinePlots("T2bw_MG",50,false,"",true);
-  combinePlots("T2bw_MG",75,false,"",true);
+  combinePlots("T2bw_MG",25,false,"T2BW_SS",true);
+  combinePlots("T2bw_MG",50,false,"T2BW_SS",true);
+  combinePlots("T2bw_MG",75,false,"T2BW_SS",true);
 
-  combinePlots("T2bw_MG",25,true,"",true);
-  combinePlots("T2bw_MG",50,true,"",true);
-  combinePlots("T2bw_MG",75,true,"",true);
+  combinePlots("T2bw_MG",25,true,"T2BW_SS",true);
+  combinePlots("T2bw_MG",50,true,"T2BW_SS",true);
+  combinePlots("T2bw_MG",75,true,"T2BW_SS",true);
 
   //--------------------------
   // T2bw pythia
   //--------------------------
 
-  combinePlots("T2bw",25,false,"",true);
-  combinePlots("T2bw",50,false,"",true);
-  combinePlots("T2bw",75,false,"",true);
+  // combinePlots("T2bw",25,false,"",true);
+  // combinePlots("T2bw",50,false,"",true);
+  // combinePlots("T2bw",75,false,"",true);
 
-  combinePlots("T2bw",25,true,"",true);
-  combinePlots("T2bw",50,true,"",true);
-  combinePlots("T2bw",75,true,"",true);
-  */
+  // combinePlots("T2bw",25,true,"",true);
+  // combinePlots("T2bw",50,true,"",true);
+  // combinePlots("T2bw",75,true,"",true);
+
   //--------------------------
   // T2bw madgraph reweighted
   //--------------------------
-
+  /*
   char* weights[9]={
     "T2BW_LR",
     "T2BW_LS",
@@ -1626,5 +1628,5 @@ void doAll(){
   combinePlots("T2bw_MG",25,true,"T2BW_SS",true);
   combinePlots("T2bw_MG",50,true,"T2BW_SS",true);
   combinePlots("T2bw_MG",75,true,"T2BW_SS",true);
-
+  */
 }
