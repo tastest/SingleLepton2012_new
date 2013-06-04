@@ -195,7 +195,7 @@ void compareBDT(char* sample = "T2tt", int x = 1){
   leg->SetFillColor(0);
   leg->Draw();
 
-  c1->Print(Form("../../plots/%s",file_PDF));
+  c1->Print(Form("plots/%s",file_PDF));
 
 
 
