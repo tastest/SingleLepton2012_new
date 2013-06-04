@@ -1419,13 +1419,13 @@ void doAll(){
   // T2tt
   //--------------------------
 
-  // SMS("T2tt", 1,false,""     ,true);
-  // SMS("T2tt", 1,false,"left" ,true);
-  // SMS("T2tt", 1,false,"right",true);
+  SMS("T2tt", 1,false,""     ,true);
+  SMS("T2tt", 1,false,"left" ,true);
+  SMS("T2tt", 1,false,"right",true);
 
-  // SMS("T2tt", 1,true,""     ,true);
-  // SMS("T2tt", 1,true,"left" ,true);
-  // SMS("T2tt", 1,true,"right",true);
+  SMS("T2tt", 1,true,""     ,true);
+  SMS("T2tt", 1,true,"left" ,true);
+  SMS("T2tt", 1,true,"right",true);
 
   /*
   //--------------------------
@@ -1481,11 +1481,49 @@ void doAll(){
 
   // SMS("T2bw_MG",25,true,"T2BW_SS",true);
   // SMS("T2bw_MG",50,true,"T2BW_SS",true);
-  SMS("T2bw_MG",75,true,"T2BW_SS",true);
+  // SMS("T2bw_MG",75,true,"T2BW_SS",true);
 
   // SMS("T2bw_MG",25,false,"T2BW_SS",true);
   // SMS("T2bw_MG",50,false,"T2BW_SS",true);
-  SMS("T2bw_MG",75,false,"T2BW_SS",true);
+  // SMS("T2bw_MG",75,false,"T2BW_SS",true);
 
+
+}
+
+void doAllPlots(){
+
+  //--------------------------
+  // T2bw MG
+  //--------------------------
+
+  char* weights[5]={
+    "T2BW_LR",
+    "T2BW_LL",
+    "T2BW_SS",
+    "T2BW_RR",
+    "T2BW_RL"
+  };
+
+  for( int i = 0 ; i < 5 ; i++ ){
+    SMS("T2bw_MG",25,true,weights[i],true);
+    SMS("T2bw_MG",50,true,weights[i],true);
+    SMS("T2bw_MG",75,true,weights[i],true);
+
+    SMS("T2bw_MG",25,false,weights[i],true);
+    SMS("T2bw_MG",50,false,weights[i],true);
+    SMS("T2bw_MG",75,false,weights[i],true);
+  }
+
+  //--------------------------
+  // T2tt
+  //--------------------------
+
+  SMS("T2tt", 1,false,""     ,true);
+  SMS("T2tt", 1,false,"left" ,true);
+  SMS("T2tt", 1,false,"right",true);
+
+  SMS("T2tt", 1,true,""     ,true);
+  SMS("T2tt", 1,true,"left" ,true);
+  SMS("T2tt", 1,true,"right",true);
 
 }
