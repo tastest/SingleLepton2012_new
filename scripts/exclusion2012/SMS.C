@@ -61,6 +61,13 @@
 #include "limits_T2bw50_BDT3.C"
 #include "limits_T2bw50_BDT4.C"
 
+#include "limits_T2bw50_BDT4L.C"
+#include "limits_T2bw50_BDT4M.C"
+
+#include "limits_T2bw50_BDT4_20.C"
+#include "limits_T2bw50_BDT4_25.C"
+#include "limits_T2bw50_BDT4_30.C"
+
 #include "limits_T2bw75_BDT1.C"
 #include "limits_T2bw75_BDT2.C"
 #include "limits_T2bw75_BDT3.C"
@@ -359,7 +366,15 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 	sigcuts.push_back(TCut(presel+"mini_bdt[13] > 0.45"));  signames.push_back("T2BW50_BDT2L");  labels.push_back("T2BW50_BDT2L");  uls.push_back(21.8);
 	sigcuts.push_back(TCut(presel+"mini_bdt[13] > 0.55"));  signames.push_back("T2BW50_BDT2T");  labels.push_back("T2BW50_BDT2T");  uls.push_back(10.4);
 	sigcuts.push_back(TCut(presel+"mini_bdt[14] > 0.35"));  signames.push_back("T2BW50_BDT3");   labels.push_back("T2BW50_BDT3");   uls.push_back(11.5);
-	sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.425")); signames.push_back("T2BW50_BDT4");   labels.push_back("T2BW50_BDT4");   uls.push_back(11.5);
+	//sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.425")); signames.push_back("T2BW50_BDT4T");   labels.push_back("T2BW50_BDT4T");   uls.push_back(11.5);
+
+	// //TEMPORARY
+	//sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.40")); signames.push_back("T2BW50_BDT4M");   labels.push_back("T2BW50_BDT4M");   uls.push_back(11.5);
+	sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.35")); signames.push_back("T2BW50_BDT4L");   labels.push_back("T2BW50_BDT4L");   uls.push_back(11.5);
+
+	// sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.30")); signames.push_back("T2BW50_BDT4_30");   labels.push_back("T2BW50_BDT4_30");   uls.push_back(11.5);
+	// sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.25")); signames.push_back("T2BW50_BDT4_25");   labels.push_back("T2BW50_BDT4_25");   uls.push_back(11.5);
+	// sigcuts.push_back(TCut(presel+"mini_bdt[15] > 0.20")); signames.push_back("T2BW50_BDT4_20");   labels.push_back("T2BW50_BDT4_20");   uls.push_back(11.5);
       }
 
       else if( x==75 ){
@@ -993,11 +1008,47 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
 	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT3( toterr );
 	}
 
-	else if( TString(labels.at(i)).Contains("T2BW50_BDT4") ){
+	else if( TString(labels.at(i)).Contains("T2BW50_BDT4T") ){
 	  this_ul       = getUpperLimit_T2bw50_BDT4( toterr );
 	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT4( toterr );
 	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT4( toterr );
 	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT4( toterr );
+	}
+
+	// TEMPORARY
+	else if( TString(labels.at(i)).Contains("T2BW50_BDT4M") ){
+	  this_ul       = getUpperLimit_T2bw50_BDT4M( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT4M( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT4M( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT4M( toterr );
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW50_BDT4L") ){
+	  this_ul       = getUpperLimit_T2bw50_BDT4L( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT4L( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT4L( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT4L( toterr );
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW50_BDT4_20") ){
+	  this_ul       = getUpperLimit_T2bw50_BDT4_20( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT4_20( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT4_20( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT4_20( toterr );
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW50_BDT4_25") ){
+	  this_ul       = getUpperLimit_T2bw50_BDT4_25( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT4_25( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT4_25( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT4_25( toterr );
+	}
+
+	else if( TString(labels.at(i)).Contains("T2BW50_BDT4_30") ){
+	  this_ul       = getUpperLimit_T2bw50_BDT4_30( toterr );
+	  this_ul_exp   = getExpectedUpperLimit_T2bw50_BDT4_30( toterr );
+	  this_ul_expp1 = getExpectedP1UpperLimit_T2bw50_BDT4_30( toterr );
+	  this_ul_expm1 = getExpectedM1UpperLimit_T2bw50_BDT4_30( toterr );
 	}
 
 	else if( TString(labels.at(i)).Contains("T2BW75_BDT1") ){
@@ -1430,7 +1481,11 @@ void doAll(){
 
   // SMS("T2bw_MG",25,true,"T2BW_SS",true);
   // SMS("T2bw_MG",50,true,"T2BW_SS",true);
+  SMS("T2bw_MG",75,true,"T2BW_SS",true);
 
-  SMS("T2bw_MG",25,false,"T2BW_SS",true);
-  SMS("T2bw_MG",50,false,"T2BW_SS",true);
+  // SMS("T2bw_MG",25,false,"T2BW_SS",true);
+  // SMS("T2bw_MG",50,false,"T2BW_SS",true);
+  SMS("T2bw_MG",75,false,"T2BW_SS",true);
+
+
 }
