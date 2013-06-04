@@ -1,4 +1,4 @@
-#include "Utils/SMS_utils.C"
+//#include "Utils/SMS_utils.C"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -295,16 +295,15 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     label         = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{+}";
 
     if( x==25 ){
-      xaxismin        = 0.0;
+      xaxismin        = 200.0;
       xchar           = (char*) "_x25";
       nSR             = 8;
       if( doBDT ) nSR = 3;
-      dMCut           = 0;
-      //dMCut           = 325;
+      dMCut           = 175;
     }
 
     else if( x==50 ){
-      xaxismin        = 100.0;
+      xaxismin        = 200.0;
       xchar           = (char*) "_x50";
       nSR             = 8;
       if( doBDT ) nSR = 5;
@@ -613,34 +612,59 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       hxsec_best->SetBinContent(bin,0.04);
     }
 
+
     else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
       cout << "FIXING THE T2BW X=0.25 BDT LIMITS" << endl;
 
-      int bin = hxsec_best->FindBin(350,0);
+      int bin = hxsec_best->FindBin(325,0);
+      hxsec_best_exp->SetBinContent(bin,1.3);
+
+      bin = hxsec_best->FindBin(300,0);
+      hxsec_best_exp->SetBinContent(bin,2.1);
+
+      bin = hxsec_best->FindBin(350,0);
       hxsec_best_exp->SetBinContent(bin,0.9);
 
       bin = hxsec_best->FindBin(375,0);
       hxsec_best_exp->SetBinContent(bin,0.6);
 
-      bin = hxsec_best->FindBin(475,0);
-      hxsec_best_exp->SetBinContent(bin,0.2);
-
       bin = hxsec_best->FindBin(450,75);
       hxsec_best_expp1->SetBinContent(bin,0.15);
 
-      bin = hxsec_best->FindBin(275,25);
+      bin = hxsec_best->FindBin(475,0);
+      hxsec_best_exp->SetBinContent(bin,0.2);
 
-      int bin0  = hxsec_best->FindBin(275,0);
-      int bin50 = hxsec_best->FindBin(275,50);
+      bin = hxsec_best->FindBin(325,75);
+      hxsec_best_expp1->SetBinContent(bin,1.0);
 
-      float val0  = hxsec_best->GetBinContent(bin0);
-      float val50 = hxsec_best->GetBinContent(bin50);
+      bin = hxsec_best->FindBin(325,50);
+      hxsec_best_expp1->SetBinContent(bin,1.0);
 
-      hxsec_best->SetBinContent(bin,0.5*(val0+val50));
+      bin = hxsec_best->FindBin(325,100);
+      hxsec_best_expp1->SetBinContent(bin,1.0);
+
+      // bin = hxsec_best->FindBin(275,25);
+
+      // int bin0  = hxsec_best->FindBin(275,0);
+      // int bin50 = hxsec_best->FindBin(275,50);
+
+      // float val0  = hxsec_best->GetBinContent(bin0);
+      // float val50 = hxsec_best->GetBinContent(bin50);
+
+      // hxsec_best->SetBinContent(bin,0.5*(val0+val50));
     }
+
 
     else if( TString(sample).Contains("T2bw_MG") && x==50 && doBDT ){
       cout << "FIXING THE T2BW X=0.5 BDT LIMITS" << endl;
+
+      int bin = hxsec_best->FindBin(200,0);
+      hxsec_best_exp->SetBinContent(bin,18);
+      hxsec_best->SetBinContent(bin,18);
+
+      bin = hxsec_best->FindBin(200,25);
+      hxsec_best_exp->SetBinContent(bin,18);
+      hxsec_best->SetBinContent(bin,18);
 
       int bin150= hxsec_best->FindBin(150,0);
       int bin175= hxsec_best->FindBin(175,0);
@@ -649,7 +673,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       float val150 = hxsec_best->GetBinContent(bin150);
       float val200 = hxsec_best->GetBinContent(bin200);
 
-      hxsec_best->SetBinContent(bin175,0.5*(val150+val200));
+      //hxsec_best->SetBinContent(bin175,0.5*(val150+val200));
 
       /*
       // set these 2 points to the pythia values
@@ -679,6 +703,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       */
 
     }
+
 
     /*
     else if( TString(sample).Contains("T2bw_MG") && x==75 && doBDT ){
@@ -778,6 +803,10 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 	t->DrawLatex(0.2,0.70,"2 = BDT2loose");
 	t->DrawLatex(0.2,0.65,"3 = BDT2tight");
 	t->DrawLatex(0.2,0.60,"4 = BDT3");
+	t->DrawLatex(0.2,0.55,"5 = BDT4");
+	// t->DrawLatex(0.2,0.55,"5 = BDT4(0.425)");
+	// t->DrawLatex(0.2,0.50,"6 = BDT4(0.4)");
+	// t->DrawLatex(0.2,0.45,"7 = BDT4(0.35)");
       } 
 
       else if( x==75 ){
@@ -905,6 +934,19 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       bin = hR->FindBin(550,25);
       hR_obsp1->SetBinContent(bin,1.1);
     }
+
+    // else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_SS")){
+    //   cout << "FIXING THE T2BW X=0.5 BDT T2BW_SS LIMITS" << endl;
+
+    //   int bin = hR->FindBin(475,0);
+    //   hR_exp->SetBinContent(bin,1.1);
+
+    //   bin = hR->FindBin(4750,0);
+    //   hR_exp->SetBinContent(bin,1.1);
+
+    //   // bin = hR->FindBin(550,25);
+    //   // hR_obsp1->SetBinContent(bin,1.1);
+    // }
 
     else if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("right")){
       cout << "FIXING T2TT BDT RIGHT LIMITS" << endl;
@@ -1437,21 +1479,22 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     // t->SetTextSize(0.045);
     // t->DrawLatex(0.4,0.4,"m_{#chi^{#pm}_{1}} - m_{#chi^{0}_{1}} < M_{W}");
 
-    t->SetTextSize(0.04);
+    t->SetTextSize(0.035);
 
     if( x==25 ){
       line->DrawLine(162*2 , 0 , 300+12.5+162*2 , 300+12.5);
-      t->SetTextAngle(47);
-      t->DrawLatex(0.43,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+      t->SetTextAngle(50);
+      t->DrawLatex(0.50,0.53,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
     else if( x==50 ){
-      line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
-      t->SetTextAngle(52);
-      t->DrawLatex(0.33,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+      //line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
+      line->DrawLine(200   , 200-162 , 300+12.5+162   , 300+12.5);
+      t->SetTextAngle(50);
+      t->DrawLatex(0.31,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
     else if( x==75 ){
       line->DrawLine(120   , 12 , 300+12.5+108   , 300+12.5);
-      t->SetTextAngle(53);
+      t->SetTextAngle(55);
       t->DrawLatex(0.3,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
 
