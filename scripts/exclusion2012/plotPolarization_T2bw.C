@@ -1,4 +1,4 @@
-#include "Utils/SMS_utils.C"
+//#include "Utils/SMS_utils.C"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -56,9 +56,9 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
 
   label       = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{+}";
 
-  if(x==25) xaxismin = 320.0;
-  if(x==50) xaxismin = 160.0;
-  if(x==75) xaxismin = 120.0;
+  if(x==25) xaxismin = 200.0;
+  if(x==50) xaxismin = 200.0;
+  if(x==75) xaxismin = 125.0;
 
   yaxismax    = 250.0;
 
@@ -66,7 +66,8 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
   // read in the nominal rootfile and histo
   //----------------------------------------------
 
-  char*  filename_nom  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s_nmin20.root",x,BDTchar);
+  char*  filename_nom  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s.root",x,BDTchar);
+  //char*  filename_nom  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s_nmin20.root",x,BDTchar);
   //char*  filename_nom  = Form("rootfiles/T2bw_MG_x%i_combinePlots%s_nmin20.root",x,BDTchar);
 
   TFile* file_nom      = TFile::Open(filename_nom);
@@ -89,28 +90,49 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
 		    "#tilde{#chi}^{#pm}_{R}, right W#tilde{#chi}_{1}^{0}#tilde{#chi}_{1}^{#pm}",
 		    "#tilde{#chi}^{#pm}_{R}, W_{M}",
 		    "#tilde{#chi}^{#pm}_{R}, left W#tilde{#chi}_{1}^{0}#tilde{#chi}_{1}^{#pm}"
-};
+  };
 
   char*  filename_pol[9];
   TFile* file_pol[9];
   TH2F*  c_pol[9];
 
   for( int i = 0 ; i < 9 ; ++i ){
-    filename_pol[i] = Form("rootfiles/T2bw_MG_x%i_combinePlots%s%s_nmin20.root",x,weights[i],BDTchar);
+
+    if( i==1 || i==3 || i==5 || i==7 ) continue;
+
+    //filename_pol[i] = Form("rootfiles/T2bw_MG_x%i_combinePlots%s%s_nmin20.root",x,weights[i],BDTchar);
+    filename_pol[i] = Form("rootfiles/T2bw_MG_x%i_combinePlots%s%s.root",x,weights[i],BDTchar);
     file_pol[i]     = TFile::Open(filename_pol[i]);
     c_pol[i]        = (TH2F*) file_pol[i]->Get("hR");
     cout << "Opened " << filename_pol[i] << endl;
 
-    if( x==50 ){
-      cout << "FIXING 250,25 POINT!" << endl;
-      int bin = c_pol[i]->FindBin(250,25);
-      c_pol[i]->SetBinContent(bin,0.99);
-    }
-    if( x==75 ){
-      cout << "FIXING 225,75 POINT!" << endl;
-      c_pol[i]->SetBinContent(182,0.99);
-    }
+    // if( x==50 ){
+    //   cout << "FIXING 250,25 POINT!" << endl;
+    //   int bin = c_pol[i]->FindBin(250,25);
+    //   c_pol[i]->SetBinContent(bin,0.99);
+    // }
+    // if( x==75 ){
+    //   cout << "FIXING 225,75 POINT!" << endl;
+    //   c_pol[i]->SetBinContent(182,0.99);
+    // }
   }
+
+  if( x==50 ){
+    cout << "x=0.5 limits for chiR WL" << endl;
+
+    int bin = c_pol[8]->FindBin(200,100);
+    c_pol[8]->SetBinContent(bin,1.01);
+
+    bin = c_pol[8]->FindBin(225,100);
+    c_pol[8]->SetBinContent(bin,1.01);
+
+    bin = c_pol[8]->FindBin(225,125);
+    c_pol[8]->SetBinContent(bin,1.01);
+
+    bin = c_pol[8]->FindBin(225,75);
+    c_pol[8]->SetBinContent(bin,1.01);
+  }
+
 
   //----------------------------------------------
   // set up output file
@@ -133,10 +155,11 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
 
   int colors[9]={2,3,4,5,6,7,8,9,kOrange};
 
-  for( int i = 0 ; i < 9 ; i++ ){
-    c_pol[i]->SetLineColor(colors[i]);
-    c_pol[i]->SetLineWidth(2);
-  }
+  // for( int i = 0 ; i < 9 ; i++ ){
+  //   if( i==1 || i==3 || i==5 || i==6 ) continue;
+  //   c_pol[i]->SetLineColor(colors[i]);
+  //   c_pol[i]->SetLineWidth(2);
+  // }
 
   c_pol[6]->SetLineColor(2);
   c_pol[8]->SetLineColor(4);
@@ -217,7 +240,7 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
   line->SetLineWidth(2);
   line->SetLineStyle(2);
 
-  t->SetTextSize(0.05);
+  t->SetTextSize(0.04);
 
   if( x==25 ) t->DrawLatex(0.15,0.05,"m_{#tilde{#chi}_{1}^{#pm}} = 0.25 m_{ #tilde{t}} + 0.75 m_{#tilde{#chi}_{1}^{0}}");
   if( x==50 ) t->DrawLatex(0.15,0.05,"m_{#tilde{#chi}_{1}^{#pm}} = 0.5 m_{ #tilde{t}} + 0.5 m_{#tilde{#chi}_{1}^{0}}");
@@ -225,16 +248,16 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
 
   if( x==25 ){
     line->DrawLine(162*2 , 0 , 250+12.5+162*2 , 250+12.5);
-    t->SetTextAngle(37);
-    t->DrawLatex(0.35,0.40,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    t->SetTextAngle(45);
+    t->DrawLatex(0.35,0.21,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
   }
   else if( x==50 ){
-    line->DrawLine(162   , 0 , 250+12.5+162   , 250+12.5);
-    t->SetTextAngle(46);
-    t->DrawLatex(0.275,0.375,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    line->DrawLine(200   , 200-162 , 250+12.5+162   , 250+12.5);
+    t->SetTextAngle(44);
+    t->DrawLatex(0.31,0.46,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
   }
   else if( x==75 ){
-    line->DrawLine(108   , 0 , 250+12.5+108   , 250+12.5);
+    line->DrawLine(125   , 125-108 , 250+12.5+108   , 250+12.5);
     t->SetTextAngle(48);
     t->DrawLatex(0.25,0.375,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
   }
