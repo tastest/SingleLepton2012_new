@@ -1,10 +1,11 @@
 ----------------------------------------------------
 Sample            T2bw_MG
-logfile           T2bw_MG_x75T2BW_LL_BDT.log
+logfile           logfiles/T2bw_MG_x75T2BW_LL_BDT.log
 x                 75
 pol               T2BW_LL
-Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x075*root
-Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root
+Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x075*root
+Using file        
+Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75_25GeVbins.root
 Denom histo       masses75
 Using lumi        19500 pb-1
 ----------------------------------------------------

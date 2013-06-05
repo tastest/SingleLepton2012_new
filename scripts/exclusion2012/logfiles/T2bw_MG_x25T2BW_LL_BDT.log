@@ -1,16 +1,29 @@
 ----------------------------------------------------
 Sample            T2bw_MG
-logfile           T2bw_MG_x25T2BW_LL_BDT.log
+logfile           logfiles/T2bw_MG_x25T2BW_LL_BDT.log
 x                 25
 pol               T2BW_LL
-Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/merged*x025*root
-Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-10/Skim_4jets_MET100_MT120/myMassDB_mStop_x25_25GeVbins.root
+Using file        /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x025*root
+Using file        
+Using denominator /tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x25_25GeVbins.root
 Denom histo       masses25
 Using lumi        19500 pb-1
 ----------------------------------------------------
 Using pre-selection   ((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3)
 Using weight          mini_sltrigeff * mini_t2bwweight_ll * 2
 Using ISR weight      mini_isrweight
+Signal region       : T2BW25_BDT1
+
+Selection           : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdt[10] > 0.45)
+
+Selection JES up    : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsup >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metup > 100))&&(mini_mtup > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdtup[10] > 0.45)
+
+Selection JES down  : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njetsdown >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_metdown > 100))&&(mini_mtdown > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdtdown[10] > 0.45)
+
+Selection btag up   : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdtbup[10] > 0.45)
+
+Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdtbdown[10] > 0.45)
+
 Signal region       : T2BW25_BDT2
 
 Selection           : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nb >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdt[8]  > 0.30)
@@ -34,6 +47,17 @@ Selection JES down  : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( p
 Selection btag up   : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbupBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdtbup[9]  > 0.45)
 
 Selection btag down : (((((((((((rhovor>0 && rhovor<40)&&(ngoodlep > 0 && abs( pflep1.Pt() - lep1.Pt() ) < 10.0 && abs(isopf1 * lep1.Pt() ) < 5.0))&&((leptype==0 && abs(lep1->Eta())<1.4442 && lep1->Pt()>30.0 && eoverpin < 4.0 && (isdata==0 || ele27wp80==1))||(leptype==1 && abs(lep1->Eta())<2.1    && lep1->Pt()>25.0 && (isdata==0 || isomu24==1))))&&(mini_njets >= 4))&&(mini_nbdownBC >= 1))&&(mini_passisotrk==1))&&(mini_passtauveto == 1))&&(mini_met > 100))&&( mini_mt > 120))&&(event%2==0))&&(x < 0.3))&&(mini_bdtbdown[9]  > 0.45)
+
+efficiency (500,50)  1.17057
+nevents              78
+xsec UL              0.0525714
+xsec UL exp          0.0679047
+JES                  0.00877947
+tot err              0.0989262
+btag err             0.0459887
+ISR err              0.0475221
+stat err             0.113228
+
 
 efficiency (500,50)  0.796004
 nevents              62
