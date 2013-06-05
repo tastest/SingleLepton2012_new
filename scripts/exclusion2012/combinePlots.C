@@ -1660,12 +1660,12 @@ void doAllPlots(){
   // T2tt
   //--------------------------
 
-  // combinePlots("T2tt", 1,false,""     ,true);
-  // combinePlots("T2tt", 1,false,"left" ,true);
-  // combinePlots("T2tt", 1,false,"right",true);
+  combinePlots("T2tt", 1,false,""     ,true);
+  combinePlots("T2tt", 1,false,"left" ,true);
+  combinePlots("T2tt", 1,false,"right",true);
 
-  // combinePlots("T2tt", 1,true,""     ,true);
-  // combinePlots("T2tt", 1,true,"left" ,true);
-  // combinePlots("T2tt", 1,true,"right",true);
+  combinePlots("T2tt", 1,true,""     ,true);
+  combinePlots("T2tt", 1,true,"left" ,true);
+  combinePlots("T2tt", 1,true,"right",true);
 
 }
