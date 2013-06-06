@@ -1,5 +1,6 @@
 #include "stopUtils.h"
 
+#include "TLorentzVector.h"
 #include "Math/LorentzVector.h"
 #include "Math/VectorUtil.h"
 #include "Math/Point3D.h"
@@ -24,6 +25,40 @@ using namespace Stop;
 using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+
+float getThetaStar(LorentzVector& vec1, LorentzVector& vec2 )
+{
+
+  float costheta=9999;
+
+  TLorentzVector pair;
+  pair.SetPtEtaPhiE((vec1+vec2).pt(), (vec1+vec2).eta(), (vec1+vec2).phi(), (vec1+vec2).energy());
+
+  TLorentzVector child;
+  child.SetPtEtaPhiE(vec1.pt(), vec1.eta(), vec1.phi(), vec1.energy());
+  child.Boost(-pair.BoostVector());
+
+  TLorentzVector child2;
+  child2.SetPtEtaPhiE(vec2.pt(), vec2.eta(), vec2.phi(), vec2.energy());
+  child2.Boost(-pair.BoostVector());
+
+  // Do not reweight if by any reason top/fermion directions are undefined 
+  // This should be pathological if things are fine                                                                                                                                                   
+  if (pair.P()<=0 || child.P()<=0) {
+    printf("Warning: particles at rest, no weight applied: pPAIR: %.3e, pf: %.3e\n", pair.P(), child.P());
+
+    return costheta;
+
+  }
+
+  costheta =cos(deltaPhi(child.Phi(),pair.Phi()));
+
+  return costheta;
+
+}
+
+
+
 
 float passLRM(double pt) {
 
@@ -103,6 +138,97 @@ int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1
 
   return imaxpt;
 }
+
+//------------------------------------------------------------------------------------------------
+//this is for the Mbb
+//------------------------------------------------------------------------------------------------
+
+pair<int, int> getIndexPair(vector<int> listBJetIndex,vector<LorentzVector> jets, bool docleaning,int skip1, int skip2)
+{
+
+  bool doMin=false;
+  bool doDR=false;
+  bool doMass=true;
+
+  Float_t maxptbb=-1;
+  Float_t minDRbb=10.;
+  Float_t minptbb=999999.;
+  Float_t minMassbb=999999.;
+
+  //  vector<pair<int, int>> index_pair_Vec;                                                                                                                                                   
+
+  pair<int, int> index_pair=make_pair(-1.,-1.);
+
+  for ( int i=0; i< (int) listBJetIndex.size() ; i++) {
+
+    for ( int j=0; j< (int) listBJetIndex.size() ; j++) {
+
+      if(i>=j) continue;
+
+      if(i==skip1 || j==skip2 || i==skip2 || j==skip1) continue;
+
+
+      double deltaRHbb = deltaR(jets.at(i).eta(),jets.at(i).phi(), jets.at(j).eta(),jets.at(j).phi());
+      double massHbb = (jets.at(i)+jets.at(j)).M();
+      double ptHbb = (jets.at(i)+jets.at(j)).pt();
+      double deltaPhibb=deltaPhi(jets.at(i).phi(),jets.at(j).phi());
+
+      //      float condition = (massHbb/ptHbb)*deltaRHbb;                                                                                                                                     
+      //      if(condition>1.5 && docleaning) continue;                                                                                                                                        
+      float conditionAngle = (massHbb/ptHbb)/deltaRHbb;
+      //      float conditionAngle = (massHbb/ptHbb)/deltaPhibb;                                                                                                                               
+      float conditionPt = min(jets.at(i).pt(),jets.at(j).pt())/((jets.at(i)+jets.at(j)).pt());
+      float conditionRapidity = fabs(jets.at(i).Rapidity()-jets.at(j).Rapidity());
+
+      float dPhiHL=deltaPhi((jets.at(i)+jets.at(j)).phi(),stopt.lep1().phi());
+
+      //      if((conditionAngle>0.65 || conditionPt>0.6 ) && docleaning) continue;                                                                                                            
+      //      if((conditionAngle>0.65 || conditionPt>0.6 || conditionRapidity>1.5) && docleaning) continue;                                                                                    
+      //      if((conditionAngle>0.65) && docleaning) continue;                                                                                                                                
+      //      if((conditionAngle>0.65 || conditionPt>0.6 || deltaPhibb>=2) && docleaning) continue;                                                                                            
+      //      if((deltaPhibb>(TMath::Pi()/2)|| conditionRapidity>1.5) && docleaning) continue;                                                                                                 
+      //      if(dPhiHL>(2*TMath::Pi()/3) && (listBJetIndex.size()==3) && docleaning) continue;                                                                                                
+      if((deltaRHbb>(2*TMath::Pi()/3) || conditionAngle>0.65) && docleaning) continue;
+
+      if(!doMin && !doMass && !doDR && (jets.at(i) + jets.at(j)).pt()>maxptbb) {
+
+        maxptbb=(jets.at(i) + jets.at(j)).pt();
+        index_pair = make_pair(i,j);
+
+      }
+
+      if(doMin && !doMass && !doDR && (jets.at(i) + jets.at(j)).pt()<minptbb) {
+
+        minptbb=(jets.at(i) + jets.at(j)).pt();
+        index_pair = make_pair(i,j);
+
+      }
+
+      if(doMass && fabs((jets.at(i) + jets.at(j)).M()-125)<minMassbb) {
+
+        minMassbb=fabs((jets.at(i) + jets.at(j)).M()-125);
+        index_pair = make_pair(i,j);
+
+      }
+
+      /*                                                                                                                                                                                       
+      if(doDR && deltaRHbb < minDRbb) {                                                                                                                                                        
+        minDRbb= deltaRHbb;                                                                                                                                                                    
+        //        minMassbb=fabs((jets.at(i) + jets.at(j)).M()-125);                                                                                                                           
+        index_pair = make_pair(i,j);                                                                                                                                                           
+      }                                                                                                                                                                                        
+      */
+
+    }
+
+  }
+
+  return index_pair;
+
+}
+
+
+
 
 //------------------------------------------------------------------------------------------------
 //this is for the jetResolutions
@@ -445,7 +571,7 @@ float getisoeffweight(int id1, float pt, float eta)
 bool passEvtSelection(TString name) 
 {
 
-  if (!name.Contains("T2")  && !name.Contains("TChiwh")) {
+  if (!name.Contains("T2")  && !name.Contains("TChiwh") && !name.Contains("T6tt")) {
 
     //rho requirement
     if ( stopt.rhovor()<0. || stopt.rhovor()>=40. ) return false;
@@ -458,6 +584,7 @@ bool passEvtSelection(TString name)
     if ( stopt.trkfail()  != 1 ) return false;
     if ( stopt.eebadsc()  != 1 ) return false;
     if ( stopt.hbhenew()  != 1 ) return false;
+    /// to comment for now for the met>50 search
     if (getdphi(stopt.t1metphicorrphi(), stopt.calometphi())>1.5) return false;
   }
 
@@ -671,7 +798,7 @@ bool passSingleLeptonSelection(bool isData)
 }
 
 //-------------------------------------------
-// the dilepton selection
+// the dilepton OS selection
 //-------------------------------------------
 
 bool passDileptonSelection(bool isData) 
@@ -683,6 +810,54 @@ bool passDileptonSelection(bool isData)
 
   //opposite sign
   if ( stopt.id1()*stopt.id2()>0 ) return false;
+
+  //pass trigger if data - dilepton
+  if ( isData && stopt.mm() != 1 && stopt.me() != 1 
+       && stopt.em() != 1 && stopt.ee() != 1 ) return false;
+
+  //passes pt and eta requirements
+  if ( stopt.lep1().Pt() < 20 )          return false;
+  if ( stopt.lep2().Pt() < 20 )          return false;
+  if ( fabs(stopt.lep1().Eta() ) > 2.4)  return false;
+  if ( fabs(stopt.lep2().Eta() ) > 2.4)  return false;
+
+  //consistency with pf leptons
+  if ( fabs( stopt.pflep1().Pt() - stopt.lep1().Pt() ) > 10. )  return false;
+  if ( fabs( stopt.pflep2().Pt() - stopt.lep2().Pt() ) > 10. )  return false;
+
+  //requirement for leading lepton
+  if ( ( stopt.isopf1() * stopt.lep1().Pt() ) > 5. )  return false; 
+  if ( fabs(stopt.id1())==11 && stopt.eoverpin() > 4. ) return false;
+
+  //requirement for trailing lepton
+  if ( ( stopt.isopf2() * stopt.lep2().Pt() ) > 5. )  return false; 
+  if ( fabs(stopt.id2())==11 && stopt.eoverpin2() > 4. ) return false;
+
+  //barrel only electrons
+  if (fabs(stopt.id1())==11 && fabs(stopt.lep1().Eta() ) > 1.4442) return false;
+  if (fabs(stopt.id2())==11 && fabs(stopt.lep2().Eta() ) > 1.4442) return false;
+
+  //if have more than 1 lepton, remove cases where have 2 close together
+  if ( stopt.ngoodlep() > 1 && 
+       dRbetweenVectors( stopt.lep1() ,  stopt.lep2() )<0.1 ) return false;
+
+  return true;
+
+}
+
+//-------------------------------------------
+// the dilepton SS selection
+//-------------------------------------------
+
+bool passDileptonSSSelection(bool isData) 
+{
+  //two lepton selection for 8 TeV 53 analysis
+
+  //exactly 2 leptons
+  if ( stopt.ngoodlep() != 2 ) return false;
+
+  //same sign
+  if ( stopt.id1()*stopt.id2()<0 ) return false;
 
   //pass trigger if data - dilepton
   if ( isData && stopt.mm() != 1 && stopt.me() != 1 
@@ -817,6 +992,35 @@ bool passLepPlusTauSelection(bool isData)
   return true;
 
 }
+
+
+bool passLepPlusTauSelection_v2(bool isData) 
+{
+  //single lepton plus iso trk selection for 8 TeV 53 analysis
+  
+  //at least one lepton
+  if ( !passSingleLeptonSelection(isData) ) return false;
+  
+  // veto the second lepton 
+  if(stopt.ngoodlep()>1) return false;
+  
+  /*
+  // this should be redundant at this stage
+  if( stopt.id2()!=(-1) ) {
+    if(stopt.lep2().pt() > 20) return false;
+    if(deltaR(stopt.lep2().eta() , stopt.lep2().phi() , stopt.pfTau().eta(), stopt.pfTau().phi())<0.4) return false;
+  }
+  */
+  
+  //pass tauVeto
+  if ( passTauVeto() ) return false;
+
+  if(fabs(stopt.pfTau().eta())> 2.3) return false;
+
+  return true;
+
+}
+
 
 
 bool pass_T2tt_LM(bool isData, TString name){

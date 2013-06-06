@@ -20,6 +20,13 @@
 #include "TFile.h"
 #include "TBits.h"
 
+#include "../../Tools/BTagReshaping/BTagReshaping.h"
+#include "../Core/MT2.h"
+#include "../Core/mt2bl_bisect.h"
+#include "../Core/mt2w_bisect.h"
+
+#include "../../CORE/utilities.h"
+
 using namespace std;
 
 class Candidate : public TObject {
@@ -34,11 +41,16 @@ class Candidate : public TObject {
 
 typedef vector<Candidate> CANDIDATES;
 
+float getThetaStar(LorentzVector& vec1, LorentzVector& vec2 );
+
 float passLRM(double pt);
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1, int iskip2);
 unsigned int getNJets(const float etacut = 2.4);
-vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector> jets, vector<float> csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM);
+vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector> jets, vector<float> csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM, bool doTAU);
+
+pair<int, int> getIndexPair(vector<int> listBJetIndex, vector<LorentzVector> jets, bool docleaning,int iskip1, int iskip2);
+
 
 float getdltrigweight(int id1, int id2);
 float getsltrigweight(int id1, float pt, float eta);
@@ -56,7 +68,9 @@ bool passIsoTrkVeto_v3();
 bool passIsoTrkVeto_v4();
 bool passSingleLeptonSelection(bool isData);
 bool passDileptonSelection(bool isData);
+bool passDileptonSSSelection(bool isData);
 bool passLepPlusTauSelection(bool isData);
+bool passLepPlusTauSelection_v2(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
 bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
 bool passLepPlusSSPionTrkSelection(bool isData);
