@@ -195,7 +195,7 @@ void smoothTH2( TH2F* h , char* sample , bool doBDT = false , float min = 1.0e-1
 
 }
 
-TH2F* exclusionContour( TH2F* hul , char* sample , bool doBDT = false , int nsmooth = -1 , char* type = "nominal" ){
+TH2F* exclusionContour( TH2F* hul , char* sample , bool doBDT = false , int nsmooth = -1 , char* type = "nominal" , float level = 1.0 ){
 
   TFile* f_xsec  = TFile::Open("stop_xsec.root");
   TH1F*  h_xsec  = (TH1F*) f_xsec->Get("h_stop_xsec");
@@ -213,7 +213,7 @@ TH2F* exclusionContour( TH2F* hul , char* sample , bool doBDT = false , int nsmo
   //fixupTH2( h_R , sample , doBDT );
 
   double contours[1];
-  contours[0] = 1.0;
+  contours[0] = level;
 
   h_R->SetContour(1,contours);
 
