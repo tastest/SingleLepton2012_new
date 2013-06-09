@@ -91,30 +91,36 @@ unsigned int getNJets(const float etacut){
 
 }
 
-vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector>jets, vector<float>csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM)
+vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector>jets, vector<float>csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM, bool doTAU)
 {
 
   vector<int> btagJets;
-
+  
   for ( int i=0; i< (int) jets.size() ; i++) {
-
+    
     if( jets.at(i).pt() < ptTH)  continue;
     if( fabs(jets.at(i).eta()) > etaTH )  continue;
     if( csv.at(i)      < discr   ) continue;
     if( doLRM && lrm.at(i) < passLRM(jets.at(i).pt())) continue;
-
-    // skip these indices                                                                                                                                                          \
-                                                                                                                                                                                    
-      if( int(i) == iskip1 ) continue;
-      if( int(i) == iskip2 ) continue;
-
-      //    nbtags++;                                                                                                                                                                 
-      btagJets.push_back(i);
+    
+    if( doTAU && stopt.pfTau_leadPtcandID()!=(-1) ) {
+      
+      if(deltaR(jets.at(i).eta() , jets.at(i).phi() , stopt.pfTau().eta(), stopt.pfTau().phi())<0.4) continue;
+      
+    }
+    
+    // skip these indices			\
+      
+    if( int(i) == iskip1 ) continue;
+    if( int(i) == iskip2 ) continue;
+      
+    //    nbtags++;                                                                                                                                                                 
+    btagJets.push_back(i);
 
   }
 
   return btagJets;
-
+  
 }
 
 int leadingJetIndex(vector<LorentzVector> jets, int iskip1 = -1, int iskip2 = -1){
@@ -1004,6 +1010,10 @@ bool passLepPlusTauSelection_v2(bool isData)
   // veto the second lepton 
   if(stopt.ngoodlep()>1) return false;
   
+  // veto looser e/mu veto
+  if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==13 && stopt.pfcandiso5looseZ() < 0.2) return false;
+  if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==11 && stopt.pfcandiso5looseZ() < 0.2) return false;
+
   /*
   // this should be redundant at this stage
   if( stopt.id2()!=(-1) ) {
