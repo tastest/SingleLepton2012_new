@@ -381,6 +381,14 @@ void singleLeptonLooper::InitBaby(){
   pfTauLoose_leadPtcand_  = 0;
   pfTauLoose_leadPtcandID_ = -1;
 
+  pfTauTight_       = 0;
+  pfTauTight_leadPtcand_  = 0;
+  pfTauTight_leadPtcandID_ = -1;
+
+  pfTauTightSS_       = 0;
+  pfTauTightSS_leadPtcand_  = 0;
+  pfTauTightSS_leadPtcandID_ = -1;
+
   pfcandid5_       =-1; 
   pfcandid10_      =-1;
   pfcanddirid10_      =-1;
@@ -2255,15 +2263,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       int indexTauMax=-1;
       double ptTauMax=0.;
 
-      int indexTauMaxSS=-1;
-      double ptTauMaxSS=0.;
+      int indexTauSSMax=-1;
+      double ptTauSSMax=0.;
 
       int indexTauLooseMax=-1;
       double ptTauLooseMax=0.;
 
+      int indexTauTightMax=-1;
+      double ptTauTightMax=0.;
+
+      int indexTauTightSSMax=-1;
+      double ptTauTightSSMax=0.;
+
       int indexTauMax15=-1;
       double ptTauMax15=0.;
-
 
       for (unsigned int itau=0; itau < taus_pf_p4().size(); itau++) {
 
@@ -2278,11 +2291,16 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 
 	// store SS TAU to study fakes
-	if((taus_pf_charge().at(itau)*id1_)>0 && taus_pf_p4().at(itau).pt()>=20 && taus_pf_byMediumIsolationMVA2().at(itau)) {
-	  
-	  if(taus_pf_p4().at(itau).pt()>ptTauMaxSS) {
-	    ptTauMaxSS = taus_pf_p4().at(itau).pt();
-	    indexTauMaxSS = itau;
+	if((taus_pf_charge().at(itau)*id1_)>0 && taus_pf_p4().at(itau).pt()>=20) {
+	 
+	  if(taus_pf_byMediumIsolationMVA2().at(itau) && taus_pf_p4().at(itau).pt()>ptTauSSMax) {
+	    ptTauSSMax = taus_pf_p4().at(itau).pt();
+	    indexTauSSMax = itau;
+	  }	
+
+	  if(taus_pf_byTightIsolationMVA2().at(itau) && taus_pf_p4().at(itau).pt()>ptTauTightSSMax) {
+	    ptTauTightSSMax = taus_pf_p4().at(itau).pt();
+	    indexTauTightSSMax = itau;
 	  }	
 	  
 	}
@@ -2318,6 +2336,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  }	
 	}
 
+	// isolation Tight ; pt > 20    
+	if(taus_pf_byTightIsolationMVA2().at(itau)) {
+	  if(taus_pf_p4().at(itau).pt()>ptTauTightMax) {
+	    ptTauTightMax = taus_pf_p4().at(itau).pt();
+	    indexTauTightMax = itau;
+	  }	
+	}
+
+
 	/*
 	std::cout << "pt "<< taus_pf_p4().at(itau).pt() << " decayModeFinding " << taus_pf_byDecayModeFinding().at(itau)
 		  << " isoMVA2 " << taus_pf_byMediumIsolationMVA2().at(itau) 
@@ -2330,12 +2357,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       if(indexTauMax15!=-1) {
 
 	pfTau15_=&taus_pf_p4().at(indexTauMax15);
-	for(int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauMax15).size(); ipf ++) {	  
-
-	  int index=(taus_pf_pfcandIndicies().at(indexTauMax15)).at(ipf);
-	  //	  cout << "part  " << ipf << " with pt " << pfcands_p4().at(index).pt() << " eta " << pfcands_p4().at(index).eta()  << endl;
-
-	}	
 
 	if(taus_pf_pfcandIndicies().at(indexTauMax15).size()>0) {
 	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauMax15)).at(0);
@@ -2349,12 +2370,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       if(indexTauMax!=-1) {
 
 	pfTau_=&taus_pf_p4().at(indexTauMax);
-	for(int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauMax).size(); ipf ++) {	  
-
+	/*
+	for(unsigned int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauMax).size(); ipf ++) {	  
 	  int index=(taus_pf_pfcandIndicies().at(indexTauMax)).at(ipf);
 	  //	  cout << "part  " << ipf << " with pt " << pfcands_p4().at(index).pt() << " eta " << pfcands_p4().at(index).eta()  << endl;
-
 	}	
+	*/
 
 	if(taus_pf_pfcandIndicies().at(indexTauMax).size()>0) {
 	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauMax)).at(0);
@@ -2365,18 +2386,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       }
 
 
-      if(indexTauMaxSS!=-1) {
+      if(indexTauSSMax!=-1) {
 
-	pfTauSS_=&taus_pf_p4().at(indexTauMaxSS);
-	for(int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauMaxSS).size(); ipf ++) {	  
+	pfTauSS_=&taus_pf_p4().at(indexTauSSMax);
 
-	  int index=(taus_pf_pfcandIndicies().at(indexTauMaxSS)).at(ipf);
-	  //	  cout << "part  " << ipf << " with pt " << pfcands_p4().at(index).pt() << " eta " << pfcands_p4().at(index).eta()  << endl;
-
-	}	
-
-	if(taus_pf_pfcandIndicies().at(indexTauMaxSS).size()>0) {
-	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauMaxSS)).at(0);
+	if(taus_pf_pfcandIndicies().at(indexTauSSMax).size()>0) {
+	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauSSMax)).at(0);
 	  pfTauSS_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
 	  pfTauSS_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
 
@@ -2388,17 +2403,37 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       if(indexTauLooseMax!=-1) {
 
 	pfTauLoose_=&taus_pf_p4().at(indexTauLooseMax);
-	for(int ipf=0; ipf<taus_pf_pfcandIndicies().at(indexTauLooseMax).size(); ipf ++) {	  
-
-	  int index=(taus_pf_pfcandIndicies().at(indexTauLooseMax)).at(ipf);
-	  //	  cout << "part  " << ipf << " with pt " << pfcands_p4().at(index).pt() << " eta " << pfcands_p4().at(index).eta()  << endl;
-
-	}	
 
 	if(taus_pf_pfcandIndicies().at(indexTauLooseMax).size()>0) {
 	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauLooseMax)).at(0);
 	  pfTauLoose_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
 	  pfTauLoose_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
+
+	}
+      }
+
+
+      if(indexTauTightMax!=-1) {
+
+	pfTauTight_=&taus_pf_p4().at(indexTauTightMax);
+
+	if(taus_pf_pfcandIndicies().at(indexTauTightMax).size()>0) {
+	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauTightMax)).at(0);
+	  pfTauTight_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
+	  pfTauTight_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
+
+	}
+      }
+
+
+      if(indexTauTightSSMax!=-1) {
+
+	pfTauTightSS_=&taus_pf_p4().at(indexTauTightSSMax);
+
+	if(taus_pf_pfcandIndicies().at(indexTauTightSSMax).size()>0) {
+	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauTightSSMax)).at(0);
+	  pfTauTightSS_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
+	  pfTauTightSS_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
 
 	}
       }
@@ -4147,6 +4182,14 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfTauLoose_leadPtcandID",        &pfTauLoose_leadPtcandID_,        "pfTauLoose_leadPtcandID/I");
   outTree->Branch("pfTauLoose"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauLoose_	);
   outTree->Branch("pfTauLoose_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauLoose_leadPtcand_	);
+
+  outTree->Branch("pfTauTight_leadPtcandID",        &pfTauTight_leadPtcandID_,        "pfTauTight_leadPtcandID/I");
+  outTree->Branch("pfTauTight"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauTight_	);
+  outTree->Branch("pfTauTight_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauTight_leadPtcand_	);
+
+  outTree->Branch("pfTauTightSS_leadPtcandID",        &pfTauTightSS_leadPtcandID_,        "pfTauTightSS_leadPtcandID/I");
+  outTree->Branch("pfTauTightSS"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauTightSS_	);
+  outTree->Branch("pfTauTightSS_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauTightSS_leadPtcand_	);
 
   outTree->Branch("pfcandOS10"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandOS10_	);
   outTree->Branch("pfcandOS10looseZ"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfcandOS10looseZ_	);
