@@ -18,32 +18,30 @@ void doAll() {
 
   StopTreeLooper *looper = new StopTreeLooper();
     
-  // 
-  // samples to run over
-  //
- 
-  //  char* path = "/nfs-3/userdata/stop/output_V00-02-11_2012_4jskim";
-  char* path = "/nfs-7/userdata/stop/output_V00-02-20_2012_4jskim";
 
-  const int NSAMPLES = 14;
+  char* path = "/nfs-7/userdata/stop/output_V00-02-24_2012_4jskim";
+
+  const int NSAMPLES = 16;
   char* sampletag[NSAMPLES] = {
+
+    "ttdl_lmgtau",
+    "ttsl_lmgtau",
 
     "data_diel",
     "data_dimu",
-    "data_ele",
     "data_mueg",
+    "data_ele",
     "data_muo",
-
-    "ttdl_lmg",
-    "ttsl_lmg",
 
     "diboson",
     "triboson",
-    "ttV",
+    //    "ttV",
+    "ttV_dl",
+    "ttV_sl",
     "tW_lepdl",
     "tW_lepsl",
-    "w1to4jets",
     "DY1to4Jtot",
+    "w1to4jets",
 
   };
 
