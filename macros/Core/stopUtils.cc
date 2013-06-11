@@ -91,6 +91,33 @@ unsigned int getNJets(const float etacut){
 
 }
 
+Float_t getCSVNonb(vector<LorentzVector> jets, vector<float> csv, float discr, double ptTH, double etaTH, bool doTAU) {
+
+  Float_t max=-1.;
+
+  for( unsigned int i = 0 ; i < jets.size() ; ++i ){
+
+    if( jets.at(i).pt() < ptTH)  continue;
+    if( fabs(jets.at(i).eta()) > etaTH )  continue;
+
+    if(csv.at(i)>=discr) continue;
+
+    if( doTAU && stopt.pfTau_leadPtcandID()!=(-1) ) {
+
+      if(deltaR(jets.at(i).eta() , jets.at(i).phi() , stopt.pfTau().eta(), stopt.pfTau().phi())<0.4) continue;
+
+    }
+
+    if(csv.at(i)>max) max=csv.at(i);
+
+  }
+
+  return max;
+
+}
+
+
+
 vector<int> getBJetIndex(double discr, int iskip1, int iskip2, vector<LorentzVector>jets, vector<float>csv, vector<float> lrm, double ptTH, double etaTH, bool doLRM, bool doTAU)
 {
 
