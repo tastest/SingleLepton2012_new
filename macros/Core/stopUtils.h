@@ -59,7 +59,7 @@ float getsltrigweight(int id1, float pt, float eta);
 float getideffweight(int id1, float pt, float eta);
 float getisoeffweight(int id1, float pt, float eta);
 
-bool passEvtSelection(TString name);
+bool passEvtSelection(TString name, bool dometdphi=true);
 bool passOneLeptonSelection(bool isData);
 bool passTwoLeptonSelection(bool isData);
 bool passMVAJetId(double corjetpt, double jeteta, double mvavalue, unsigned int tightness);

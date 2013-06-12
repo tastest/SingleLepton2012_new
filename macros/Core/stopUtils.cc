@@ -601,7 +601,7 @@ float getisoeffweight(int id1, float pt, float eta)
 // >=1 good lepton, rho cut, MET filters, remove 2 nearby lepton events
 //-----------------------------------------------------------------------
 
-bool passEvtSelection(TString name) 
+bool passEvtSelection(TString name, bool dometdphi) 
 {
 
   if (!name.Contains("T2")  && !name.Contains("TChiwh") && !name.Contains("T6tt")) {
@@ -618,7 +618,7 @@ bool passEvtSelection(TString name)
     if ( stopt.eebadsc()  != 1 ) return false;
     if ( stopt.hbhenew()  != 1 ) return false;
     /// to comment for now for the met>50 search
-    if (getdphi(stopt.t1metphicorrphi(), stopt.calometphi())>1.5) return false;
+    if (dometdphi && (getdphi(stopt.t1metphicorrphi(), stopt.calometphi())>1.5)) return false;
   }
 
   //at least 1 lepton
