@@ -293,8 +293,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       chm.clear();
       neu.clear();
 
-      csvNonbMax=-1;
-      csvNonbTauMax=-1;
+      csvNonbMax=(-1);
+      csvNonbTauMax=(-1);
 
       minMassbbCut=100;
       maxMassbbCut=150;
@@ -415,8 +415,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       indexLooseB40Tau=getBJetIndex(looseDiscr, -1., -1., jetsP4, csv, lrm , 40.,2.1, doLRM, true);
       indexTightB40Tau=getBJetIndex(tightDiscr, -1., -1., jetsP4, csv, lrm , 40., 2.1, doLRM, true); // this is for the 1l + 3b
 
-      csvNonbMax = getCSVNonb(jetsP4, csv, looseDiscr, 30., 2.1, false);
-      csvNonbTauMax = getCSVNonb(jetsP4, csv, looseDiscr, 30., 2.1, true);
+      csvNonbMax = getCSVNonb(jetsP4, csv, looseDiscr, 40., 2.1, false);
+      csvNonbTauMax = getCSVNonb(jetsP4, csv, looseDiscr, 40., 2.1, true);
 
       //////////                                                                                                                                                     
       /// invariant mass selection                                                                                                                                  
@@ -431,8 +431,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       double deltaPhibb=-1.;
 
       if(indexLooseB40.size()>1) {
+
 	pair<int, int> index=getIndexPair(indexLooseB40,jetsP4,true,-1,-1);
-	//        pair<int, int> index=getIndexPair(indexJetsP4,jetsP4,true,-1,-1);
 
         if(index.first!=(-1)) {
 	  deltaRHbb= deltaR(jetsP4.at(index.first).eta(),jetsP4.at(index.first).phi() , jetsP4.at(index.second).eta(),jetsP4.at(index.second).phi());
@@ -447,7 +447,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
       if(indexTightB40.size()>1) {
 	pair<int, int> index=getIndexPair(indexTightB40,jetsP4,true,-1,-1);
-	//        pair<int, int> index=getIndexPair(indexJetsP4,jetsP4,true,-1,-1);
 
         if(index.first!=(-1)) {
 	  massHbbTight= (jetsP4.at(index.first)+jetsP4.at(index.second)).M();
@@ -508,8 +507,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             if(indexTightB40.size()>2 && jetsP4.size()>=5) plotCR1(evtweight*trigweight, "_3bT", h_1d_cr1, isData); // this is for the 1l search 
           }
 
-	  if(indexLooseB40.size()==3 && dostudyMass) studyMassbb(evtweight*trigweight, "_1l_eq3bLoose40" , h_1d, h_2d, isData) ;
-	  if(indexLooseB40.size()>3 && dostudyMass) studyMassbb(evtweight*trigweight, "_1l_4bLoose40" , h_1d, h_2d, isData) ;
+	  //	  if(indexLooseB40.size()==3 && dostudyMass) studyMassbb(evtweight*trigweight, "_1l_eq3bLoose40" , h_1d, h_2d, isData) ;
+	  //	  if(indexLooseB40.size()>3 && dostudyMass) studyMassbb(evtweight*trigweight, "_1l_4bLoose40" , h_1d, h_2d, isData) ;
 
         }
 
@@ -878,12 +877,18 @@ void StopTreeLooper::fillSignalYieldTable(float evtweight, string tag_selection 
       plot1D("h_TABLE_2l",  0  ,       evtweight*trigweight, h_1d, 5, 0, 5);
       if(indexLooseB40.size()>2) plot1D("h_TABLE_2l",  1  ,       evtweight*trigweight, h_1d, 5, 0, 5);
       if(indexLooseB40.size()>2 && jetsP4.size()>=5) plot1D("h_TABLE_2l",  2  ,       evtweight*trigweight, h_1d, 5, 0, 5);
+
       if(indexLooseB40.size()==3 && jetsP4.size()>=5 && massHbb>minMassbbCut && massHbb<maxMassbbCut) plot1D("h_TABLE_2l",  3  ,       evtweight*trigweight, h_1d, 5, 0, 5);
       if(indexLooseB30.size()>3 && massHbb>minMassbbCut && massHbb<maxMassbbCut) plot1D("h_TABLE_2l",  4  ,       evtweight*trigweight, h_1d, 5, 0, 5);
-      
+
       if(indexLooseB40.size()>2 && jetsP4.size()>=5) plot1D("h_massHbb"+tag_selection, massHbb ,       evtweight, h_1d, 102, -10, 500);
+      if(indexLooseB40.size()==3 && jetsP4.size()>=5) plot1D("h_massHbb_eq3b"+tag_selection, massHbb ,       evtweight, h_1d, 102, -10, 500);
+      if(indexLooseB40.size()>3) plot1D("h_massHbb_ge4b"+tag_selection, massHbb ,       evtweight, h_1d, 102, -10, 500);
       if(indexLooseB40.size()>2) classify3B(evtweight, "_OS_met50_4j_3bM" , h_1d_qg, h_2d_qg, isData,doLRM);
-      
+
+      //      if(indexLooseB40.size()==3 && dostudyMass ) studyMassbb(evtweight*trigweight, "_2l_eq3bLoose40" , h_1d, h_2d, isData) ;
+      //      if(indexLooseB40.size()==3 && dostudyMass && massHbb>minMassbbCut && massHbb<maxMassbbCut) studyMassbb(evtweight*trigweight, "_2l_eq3bLoose40_Mass150" , h_1d, h_2d, isData) ;
+
     }
     
   ///////                                                                                                                                                     

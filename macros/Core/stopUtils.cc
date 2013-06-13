@@ -192,14 +192,16 @@ pair<int, int> getIndexPair(vector<int> listBJetIndex,vector<LorentzVector> jets
 
   pair<int, int> index_pair=make_pair(-1.,-1.);
 
-  for ( int i=0; i< (int) listBJetIndex.size() ; i++) {
+  for ( int k=0; k < (int) listBJetIndex.size() ; k++) {
 
-    for ( int j=0; j< (int) listBJetIndex.size() ; j++) {
+    for ( int l=0; l < (int) listBJetIndex.size() ; l++) {
 
-      if(i>=j) continue;
+      if(l>=k) continue;
 
-      if(i==skip1 || j==skip2 || i==skip2 || j==skip1) continue;
+      //      if(i==skip1 || j==skip2 || i==skip2 || j==skip1) continue;
 
+      int i=listBJetIndex.at(k);
+      int j=listBJetIndex.at(l);
 
       double deltaRHbb = deltaR(jets.at(i).eta(),jets.at(i).phi(), jets.at(j).eta(),jets.at(j).phi());
       double massHbb = (jets.at(i)+jets.at(j)).M();
@@ -221,7 +223,9 @@ pair<int, int> getIndexPair(vector<int> listBJetIndex,vector<LorentzVector> jets
       //      if((conditionAngle>0.65 || conditionPt>0.6 || deltaPhibb>=2) && docleaning) continue;                                                                                            
       //      if((deltaPhibb>(TMath::Pi()/2)|| conditionRapidity>1.5) && docleaning) continue;                                                                                                 
       //      if(dPhiHL>(2*TMath::Pi()/3) && (listBJetIndex.size()==3) && docleaning) continue;                                                                                                
-      if((deltaRHbb>(2*TMath::Pi()/3) || conditionAngle>0.65) && docleaning) continue;
+      ///      if((deltaRHbb>(2.*TMath::Pi()/3.) || conditionAngle>0.65) && docleaning) continue;
+      if((deltaRHbb>(2*TMath::Pi()/3) || conditionAngle>0.65 || conditionRapidity>1.2) && docleaning) continue;
+      //      if((deltaRHbb>(2*TMath::Pi()/3) || conditionAngle>0.65 || conditionPt>0.6) && docleaning) continue;
 
       if(!doMin && !doMass && !doDR && (jets.at(i) + jets.at(j)).pt()>maxptbb) {
 
@@ -237,9 +241,9 @@ pair<int, int> getIndexPair(vector<int> listBJetIndex,vector<LorentzVector> jets
 
       }
 
-      if(doMass && fabs((jets.at(i) + jets.at(j)).M()-125)<minMassbb) {
+      if(doMass && fabs((jets.at(i) + jets.at(j)).M()-125.)<minMassbb) {
 
-        minMassbb=fabs((jets.at(i) + jets.at(j)).M()-125);
+        minMassbb=fabs((jets.at(i) + jets.at(j)).M()-125.);
         index_pair = make_pair(i,j);
 
       }
@@ -619,6 +623,7 @@ bool passEvtSelection(TString name, bool dometdphi)
     if ( stopt.hbhenew()  != 1 ) return false;
     /// to comment for now for the met>50 search
     if (dometdphi && (getdphi(stopt.t1metphicorrphi(), stopt.calometphi())>1.5)) return false;
+
   }
 
   //at least 1 lepton
