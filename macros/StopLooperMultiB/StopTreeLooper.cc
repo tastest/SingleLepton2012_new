@@ -249,8 +249,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       float nEts=100000;
       float BR=0.60*0.60;
       float lumi= 19.5;
+      /* // for inclusive sample
       if(name.Contains("T6tthh_450")) evtweight = isData ? 1. : ( ( BR * 0.169668 * 1000.0 * lumi ) / nEts);
       if(name.Contains("T6tthh_350")) evtweight = isData ? 1. : ( ( BR * 0.807323 * 1000.0 * lumi ) / nEts);
+      */
+      if(name.Contains("T6tthh450")) evtweight = isData ? 1. : ( ( 1. * 0.169668 * 1000.0 * lumi ) / 499969);
+      if(name.Contains("T6tthh350")) evtweight = isData ? 1. : ( ( 1. * 0.807323 * 1000.0 * lumi ) / 412464);
 
       if(name.Contains("T6ttzz_450")) evtweight = isData ? 1. : ( ( 0.169668 * 1000.0 * lumi ) / (5*nEts));
       if(name.Contains("T6ttzz_350")) evtweight = isData ? 1. : ( ( 0.807323 * 1000.0 * lumi ) / (5*nEts));
@@ -266,7 +270,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // rho 0-40 GeV, MET filters, >=1 good lepton, veto 2 leptons dR < 0.1
       //----------------------------------------------------------------------------
 
-      if ( !passEvtSelection(name) ) continue;
+      if ( !passEvtSelection(name,false) ) continue;
 
       //----------------------------------------------------------------------------
       // Function to perform MET phi corrections on-the-fly
@@ -500,11 +504,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
           if(stopt.t1metphicorrmt()>50 && stopt.t1metphicorrmt()<100) {
             if(indexLooseB30.size()>0) plotCR1(evtweight*trigweight, "_1bM", h_1d_cr1, isData);
-            if(indexLooseB30.size()==2) plotCR1(evtweight*trigweight, "_2bM", h_1d_cr1, isData);
+            if(indexLooseB30.size()==2) plotCR1(evtweight*trigweight, "_eq2bM", h_1d_cr1, isData);
             if(indexLooseB40.size()==3) plotCR1(evtweight*trigweight, "_eq3bM", h_1d_cr1, isData);
+
             if(indexLooseB30.size()>3) plotCR1(evtweight*trigweight, "_4bM", h_1d_cr1, isData);
-            if(indexLooseB40.size()>2) plotCR1(evtweight*trigweight, "_3bM", h_1d_cr1, isData); // this is for the 2l search 
-            if(indexTightB40.size()>2 && jetsP4.size()>=5) plotCR1(evtweight*trigweight, "_3bT", h_1d_cr1, isData); // this is for the 1l search 
+            if(indexLooseB40.size()==3 && csvNonbMax>0.240) plotCR1(evtweight*trigweight, "_3bM", h_1d_cr1, isData); // this is for the 2l search 
+	    //            if(indexTightB40.size()>2 && jetsP4.size()>=5) plotCR1(evtweight*trigweight, "_3bT", h_1d_cr1, isData); // this is for the 1l search 
           }
 
 	  //	  if(indexLooseB40.size()==3 && dostudyMass) studyMassbb(evtweight*trigweight, "_1l_eq3bLoose40" , h_1d, h_2d, isData) ;
@@ -515,6 +520,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //----------------------------------------------------------------------------
       // CONTROL REGION study --- dilepton 
       //----------------------------------------------------------------------------
+
+      // do outside of the loop to gain statistics
+      if(indexLooseB40.size()==3 && dostudyMass) studyMassbb(1, "_2l_eq3bLoose40" , h_1d, h_2d, isData) ;
+      if(indexLooseB40.size()>3 && dostudyMass) studyMassbb(1, "_2l_4bLoose40" , h_1d, h_2d, isData) ;
 
       ///////                                                                                                                                                  
       /// CONTROL REGION OS + 3b                                                                                                                                
@@ -528,8 +537,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         {
           float trigweight = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
 	  
-	  if(indexLooseB40.size()==3 && dostudyMass) studyMassbb(evtweight*trigweight, "_2l_eq3bLoose40" , h_1d, h_2d, isData) ;
-	  if(indexLooseB40.size()>3 && dostudyMass) studyMassbb(evtweight*trigweight, "_2l_4bLoose40" , h_1d, h_2d, isData) ;
 	  
 	  if(indexLooseB30.size()>0 && indexLooseB30.size()<3) plot1D("cr4_mt_12bM",   stopt.t1metphicorrmt() ,       evtweight*trigweight , h_1d_cr4, 100,  0, 300);
 	  
@@ -537,26 +544,31 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  
 	  if(indexLooseB30.size()==2)  plotCR4(evtweight*trigweight, "_eq2bM", h_1d_cr4, isData,doLRM,doTAU);
 	  
-	  if(!isData && indexLooseB40.size()>2 && n_ljets>=5) plot1D("h_cr4_massHbb_3bM",  massHbb ,       evtweight*trigweight, h_1d_cr4, 51, 0, 500);
+	  if(!isData && indexLooseB40.size()==3 && n_ljets>=5) plot1D("h_cr4_massHbb_3bM",  massHbb ,       evtweight*trigweight, h_1d_cr4, 51, 0, 500);
 	  if(!isData && indexLooseB30.size()>3 ) plot1D("h_cr4_massHbb_4bM",  massHbbTau ,       evtweight*trigweight, h_1d_cr4, 51, 0, 500);
 	  
+	  /*
 	  if(!isData && indexLooseB40.size()==3 && n_ljets==4) plot2D("h_njets_vs_nb", 0, 0,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
 	  if(!isData && indexLooseB40.size()>3 && n_ljets==4) plot2D("h_njets_vs_nb", 1, 0,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
 	  
 	  if(!isData && indexLooseB40.size()==3 && n_ljets>4) plot2D("h_njets_vs_nb", 0, 1,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
 	  if(!isData && indexLooseB40.size()>3 && n_ljets>4) plot2D("h_njets_vs_nb", 1, 1,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
-	  
+	  */
+
+	  if((massHbb < minMassbbCut || massHbb > maxMassbbCut) && indexLooseB30.size()>3 ) plotCR4(evtweight*trigweight, "_4bM_lowMassbb", h_1d_cr4, isData,doLRM,doTAU); // this is for the 2l search
+	  if((massHbb < minMassbbCut) && indexLooseB40.size()==3 && n_ljets>=5) plotCR4(evtweight*trigweight, "_3bM_lowMassbb", h_1d_cr4, isData,doLRM,doTAU); // this is for the 2l search
+
 	  if(massHbb < minMassbbCut || massHbb > maxMassbbCut) {
 
+	    /*
 	    if(indexLooseB40.size()==3 && n_ljets==4) plot2D("h_njets_vs_nb_lowMassbb", 0, 0,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
 	    if(indexLooseB40.size()>3 && n_ljets==4) plot2D("h_njets_vs_nb_lowMassbb", 1, 0,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
 
 	    if(indexLooseB40.size()==3 && n_ljets>4) plot2D("h_njets_vs_nb_lowMassb", 0, 1,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
 	    if(indexLooseB40.size()>3 && n_ljets>4) plot2D("h_njets_vs_nb_lowMassbb", 1, 1,       evtweight, h_2d, 2, -0.5, 1.5,2, -0.5, 1.5);
+	    */
 
-	    if(indexLooseB30.size()>3 ) plotCR4(evtweight*trigweight, "_4bM_lowMassbb", h_1d_cr4, isData,doLRM,doTAU); // this is for the 2l search
-	    if(indexLooseB40.size()>2 && n_ljets>=5) plotCR4(evtweight*trigweight, "_3bM_lowMassbb", h_1d_cr4, isData,doLRM,doTAU); // this is for the 2l search
-	    if(indexTightB40.size()>2 && n_ljets>=5) plotCR4(evtweight*trigweight, "_3bT_lowMassbb", h_1d_cr4, isData,doLRM,doTAU); // this is for the 1l search
+	    //	    if(indexTightB40.size()>2 && n_ljets>=5) plotCR4(evtweight*trigweight, "_3bT_lowMassbb", h_1d_cr4, isData,doLRM,doTAU); // this is for the 1l search
 
 	    /*
 	    if(n_ljets==4 && indexLooseB30.size()==4) {
@@ -950,7 +962,7 @@ void StopTreeLooper::studyMassbb(float evtweight, string tag_selection , std::ma
       plot1D("h_theta_Pair1_NotgoodMatch"+tag_selection, theta ,  evtweight, h_1d, 100, -1., 1.);
 
       plot1D("h_massHbb_Pair1_NotgoodMatch"+tag_selection, massHbb1 ,       evtweight, h_1d, 102, -10, 500);
-      plot1D("h_deltaRap_Pair1_NotgoodMatch"+tag_selection, fabs(jetsP4.at(index.first).Rapidity()-jetsP4.at(index.second).Rapidity()) , evtweight, h_1d, 100, 0, 10);
+      plot1D("h_deltaRap_Pair1_NotgoodMatch"+tag_selection, fabs(jetsP4.at(index.first).Rapidity()-jetsP4.at(index.second).Rapidity()) , evtweight, h_1d, 100, 0, 10.);
       plot1D("h_deltaPhi_Pair1_NotgoodMatch"+tag_selection, deltaPhi(jetsP4.at(index.first).phi(),jetsP4.at(index.second).phi()) ,  evtweight, h_1d, 100, 0, 10);
 
       plot1D("h_RapHbb_Pair1_NotgoodMatch"+tag_selection, (jetsP4.at(index.first)+jetsP4.at(index.second)).Rapidity() , evtweight, h_1d, 100, -5., 5.);
@@ -1072,12 +1084,12 @@ void StopTreeLooper::studyMassbb(float evtweight, string tag_selection , std::ma
 	//	plot1D("h_averagePtPair_notgoodMatch"+tag_selection, average ,       evtweight, h_1d, 100, 0, 2);
 	//	if(!goodMatch1) plot1D("h_pt2_nongoodMatch"+tag_selection,  pt2  ,       evtweight, h_1d, 50, 0, 500);
 
-	plot1D("h_massHbb_Pair2_notgoodMatch"+tag_selection, massHbb2 ,       evtweight, h_1d, 102, -10, 500);
-	plot1D("h_deltaRap_Pair2_notgoodMatch"+tag_selection, fabs(jetsP4.at(index_Pair2.first).Rapidity()-jetsP4.at(index_Pair2.second).Rapidity()) , evtweight, h_1d, 100, 0, 10);
-	plot1D("h_deltaPhi_Pair2_notgoodMatch"+tag_selection, deltaPhi(jetsP4.at(index_Pair2.first).phi(),jetsP4.at(index_Pair2.second).phi()) ,  evtweight, h_1d, 100, 0, 10);
+	plot1D("h_massHbb_Pair2_NotgoodMatch"+tag_selection, massHbb2 ,       evtweight, h_1d, 102, -10, 500);
+	plot1D("h_deltaRap_Pair2_NotgoodMatch"+tag_selection, fabs(jetsP4.at(index_Pair2.first).Rapidity()-jetsP4.at(index_Pair2.second).Rapidity()) , evtweight, h_1d, 100, 0, 10);
+	plot1D("h_deltaPhi_Pair2_NotgoodMatch"+tag_selection, deltaPhi(jetsP4.at(index_Pair2.first).phi(),jetsP4.at(index_Pair2.second).phi()) ,  evtweight, h_1d, 100, 0, 10);
 
-	plot2D("h_mass1_vs_mass2_notgoodMatch"+tag_selection, massHbb1 , massHbb2,    evtweight, h_2d, 50, 0, 500, 50, 0, 500);
-	plot2D("h_mass1_vs_DMmass12_notgoodMatch"+tag_selection, massHbb1 , massHbb2-massHbb1,    evtweight, h_2d, 50, 0, 500, 50, 0, 500);
+	plot2D("h_mass1_vs_mass2_NotgoodMatch"+tag_selection, massHbb1 , massHbb2,    evtweight, h_2d, 50, 0, 500, 50, 0, 500);
+	plot2D("h_mass1_vs_DMmass12_NotgoodMatch"+tag_selection, massHbb1 , massHbb2-massHbb1,    evtweight, h_2d, 50, 0, 500, 50, 0, 500);
 
       }
     }
@@ -1094,6 +1106,9 @@ void StopTreeLooper::studyMassbb(float evtweight, string tag_selection , std::ma
     float deltaRap_noclean = fabs(jetsP4.at(indexOS_noClean.first).Rapidity()-jetsP4.at(indexOS_noClean.second).Rapidity());
     float deltaPhibb_noclean = deltaPhi(jetsP4.at(indexOS_noClean.first).phi(),jetsP4.at(indexOS_noClean.second).phi());
 
+    float deltaRapHb1_noclean = fabs((jetsP4.at(indexOS_noClean.first)+jetsP4.at(indexOS_noClean.second)).Rapidity()-jetsP4.at(indexOS_noClean.first).Rapidity());
+    float deltaRapHb2_noclean = fabs((jetsP4.at(indexOS_noClean.first)+jetsP4.at(indexOS_noClean.second)).Rapidity()-jetsP4.at(indexOS_noClean.second).Rapidity());
+
     bool goodMatch1 = ((mc3.at(indexOS_noClean.first)==7 && mc3.at(indexOS_noClean.second)==-7) || (mc3.at(indexOS_noClean.first)==-7 && mc3.at(indexOS_noClean.second)==7));
 
     float dropPt=min(jetsP4.at(indexOS_noClean.first).pt(),jetsP4.at(indexOS_noClean.second).pt())/((jetsP4.at(indexOS_noClean.first)+jetsP4.at(indexOS_noClean.second)).pt());
@@ -1102,32 +1117,39 @@ void StopTreeLooper::studyMassbb(float evtweight, string tag_selection , std::ma
     //    if(massHbb_noclean > 100 && massHbb_noclean<150) {
       
     float minInvPt=min(1/(jetsP4.at(indexOS_noClean.first).pt()*jetsP4.at(indexOS_noClean.first).pt()), 1/(jetsP4.at(indexOS_noClean.second).pt()*jetsP4.at(indexOS_noClean.second).pt()));
-    float dropKt=minInvPt*deltaRHbb_noclean*deltaRHbb_noclean;                                             
+    float dropKt=minInvPt*(deltaRHbb_noclean*deltaRHbb_noclean);                                             
     
     if(goodMatch1) {
       
       //              plot2D("h_DR_vs_ptbb", ptHbb_noclean , deltaRHbb,    evtweight, h_2d, 50, 0, 500, 100, 0, 6);                                                       
       
       plot1D("h_minInvPt_noclean_goodMatch"+tag_selection,  minInvPt  ,       evtweight, h_1d, 100, 0, 0.1);                                                                       
-	plot1D("h_deltaR_noclean_goodMatch"+tag_selection,  deltaRHbb_noclean  ,       evtweight, h_1d, 100, 0, 10);
-	plot1D("h_dropKt_noclean_goodMatch"+tag_selection,  dropKt  ,       evtweight, h_1d, 100, 0, 10);
-	plot1D("h_deltaRap_noclean_goodMatch"+tag_selection,  deltaRap_noclean  ,       evtweight, h_1d, 100, 0, 10);
-	plot1D("h_minJetPt_noclean_goodMatch"+tag_selection,  min(jetsP4.at(indexOS_noClean.first).pt(),jetsP4.at(indexOS_noClean.second).pt())  ,       evtweight, h_1d, 100, 0, 500);
-	plot1D("h_ptMax_noclean_goodMatch"+tag_selection,  ptHbb_noclean  ,       evtweight, h_1d, 100, 0, 500);
-	plot1D("h_deltaPhibb_noclean_goodMatch"+tag_selection,  deltaPhibb_noclean ,       evtweight, h_1d, 100, 0, 4);
-	
-	plot1D("h_dropPt_noclean_goodMatch"+tag_selection,  dropPt  ,       evtweight, h_1d, 100, 0, 2);
-	
-	plot1D("h_dropAngle_noclean_goodMatch"+tag_selection,  dropAngle  ,       evtweight, h_1d, 100, 0, 10);
-	plot2D("h_dR_vs_Pt_noclean_goodMatch"+tag_selection,  ptHbb_noclean, deltaRHbb_noclean  ,       evtweight, h_2d, 100, 0, 500, 100, 0, 10);
-	plot2D("h_dropAngle_vs_Pt_noclean_goodMatch"+tag_selection,  ptHbb_noclean, dropAngle  ,       evtweight, h_2d, 100, 0, 500, 100, 0, 2.5);
-	
-      } else {
-	
+      plot1D("h_deltaR_noclean_goodMatch"+tag_selection,  deltaRHbb_noclean  ,       evtweight, h_1d, 100, 0, 5);
+      plot1D("h_dropKt_noclean_goodMatch"+tag_selection,  dropKt  ,       evtweight, h_1d, 100, 0, 10);
+      plot1D("h_deltaRap_noclean_goodMatch"+tag_selection,  deltaRap_noclean  ,       evtweight, h_1d, 100, 0, 5.);
+      
+      plot1D("h_deltaRapHb1_noclean_goodMatch"+tag_selection,  deltaRapHb1_noclean  ,       evtweight, h_1d, 100, 0, 5.);
+      plot1D("h_deltaRapHb2_noclean_goodMatch"+tag_selection,  deltaRapHb2_noclean  ,       evtweight, h_1d, 100, 0, 5.);
+      
+      plot1D("h_minJetPt_noclean_goodMatch"+tag_selection,  min(jetsP4.at(indexOS_noClean.first).pt(),jetsP4.at(indexOS_noClean.second).pt())  ,       evtweight, h_1d, 100, 0, 500);
+      plot1D("h_ptbb_noclean_goodMatch"+tag_selection,  ptHbb_noclean  ,       evtweight, h_1d, 100, 0, 500);
+      plot1D("h_deltaPhi_noclean_goodMatch"+tag_selection,  deltaPhibb_noclean ,       evtweight, h_1d, 100, 0, 4);
+      
+      plot1D("h_dropPt_noclean_goodMatch"+tag_selection,  dropPt  ,       evtweight, h_1d, 100, 0, 2);
+      
+      plot1D("h_dropAngle_noclean_goodMatch"+tag_selection,  dropAngle  ,       evtweight, h_1d, 100, 0, 10);
+      plot2D("h_dR_vs_Pt_noclean_goodMatch"+tag_selection,  ptHbb_noclean, deltaRHbb_noclean  ,       evtweight, h_2d, 100, 0, 500, 100, 0, 10);
+      plot2D("h_dropAngle_vs_Pt_noclean_goodMatch"+tag_selection,  ptHbb_noclean, dropAngle  ,       evtweight, h_2d, 100, 0, 500, 100, 0, 2.5);
+      
+    } else {
+      
 	plot1D("h_minInvPt_noclean_NotgoodMatch"+tag_selection,  minInvPt  ,       evtweight, h_1d, 100, 0, 0.1);
 	plot1D("h_dropKt_noclean_NotgoodMatch"+tag_selection,  dropKt  ,       evtweight, h_1d, 100, 0, 10);
+	
+	plot1D("h_deltaRapHb1_noclean_NotgoodMatch"+tag_selection,  deltaRapHb1_noclean  ,       evtweight, h_1d, 100, 0, 5.);
+	plot1D("h_deltaRapHb2_noclean_NotgoodMatch"+tag_selection,  deltaRapHb2_noclean  ,       evtweight, h_1d, 100, 0, 5.);
 
-	plot1D("h_deltaR_noclean_NotgoodMatch"+tag_selection,  deltaRHbb_noclean  ,       evtweight, h_1d, 100, 0, 10);
+	plot1D("h_deltaR_noclean_NotgoodMatch"+tag_selection,  deltaRHbb_noclean  ,       evtweight, h_1d, 100, 0, 5.);
 	plot1D("h_deltaRap_noclean_NotgoodMatch"+tag_selection,  deltaRap_noclean  ,       evtweight, h_1d, 100, 0, 10);
 	plot1D("h_minJetPt_noclean_NotgoodMatch"+tag_selection,  min(jetsP4.at(indexOS_noClean.first).pt(),jetsP4.at(indexOS_noClean.second).pt())  ,       evtweight, h_1d, 100, 0, 500);
 	plot1D("h_ptMax_noclean_NotgoodMatch"+tag_selection,  ptHbb_noclean  ,       evtweight, h_1d, 100, 0, 500);
