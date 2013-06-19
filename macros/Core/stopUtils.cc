@@ -1015,6 +1015,49 @@ bool passLepPlusIsoTrkSelection(bool isData)
 }
 
 //-------------------------------------------
+// lepton + isolated track selection CR5
+//-------------------------------------------
+
+bool passLepPlusIsoTrkSelectionWHMet(bool isData) 
+{
+  //single lepton plus iso trk selection for 8 TeV WH+MET analysis
+
+  //at least one lepton
+  if ( !passSingleLeptonSelection(isData) ) return false;
+
+  // exactly one good lepton
+  if ( stopt.ngoodlep() != 1 ) return false;
+
+  //pass isolated track requirement
+  if ( !passIsoTrkVeto_v4() ) return true;
+
+  //unfortunately changed default value to 9999.
+  //  if ( pfcandpt10() > 9990. || pfcandiso10() > 0.1 ) return false;
+
+  // // if we have an isolated track cand, check eta for electron and muon cands
+  // if ( !passIsoTrkVeto_v4() ) {
+  //   if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==13 && stopt.pfcandiso5looseZ() < 0.2) {
+  //     if (fabs(stopt.pfcand5looseZ().eta()) < 2.1) return true;
+  //     else return false;
+  //   }
+  //   else if ( stopt.pfcandpt5looseZ()  <9998. && abs(stopt.pfcandid5looseZ())==11 && stopt.pfcandiso5looseZ() < 0.2) {
+  //     if (fabs(stopt.pfcand5looseZ().eta()) < 1.4442) return true;
+  //     else return false;
+  //   }
+
+  //   // isolated track with pt > 10: don't restrict eta?
+  //   //    if ( stopt.pfcandptOS10looseZ() <9998. && abs(stopt.pfcandid5looseZ())!=13 && abs(stopt.pfcandid5looseZ())!=11 && stopt.pfcandisoOS10looseZ() < 0.1 ) return false;
+  //   else return true;
+
+  // }
+
+  // allow isolated tau cands, if they weren't already covered by previous cases
+  if ( !passTauVeto() ) return true;
+
+  return false;
+}
+
+//-------------------------------------------
 // lepton + taus selection CR5
 //-------------------------------------------
 
@@ -1901,5 +1944,35 @@ double TopPtWeight(double topPt){
 
   double result = p0 + p2 * topPt * ( topPt - 2 * p1 );
   return result;
+}
+
+//--------------------------------------------------------------------
+
+// btag POG recommended SFs from Moriond 2013 recommendations, located here:
+//  https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#Recommendation_for_b_c_tagging_a
+
+// in particular, using (flat) ttbar results for b and c
+// using functional form for light from code linked to twiki above
+//  https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/SFlightFuncs_Moriond2013.C
+
+// !!! for CVSM only!
+float getBtagSF(float pt, float eta, int id){
+
+  // same SF for b and c
+  if ((abs(id) == 4) || (abs(id) == 5)) return 0.963;
+
+  // otherwise use functional forms for light
+  if( fabs(eta) < 0.8 )
+    return ((1.06238+(0.00198635*pt))+(-4.89082e-06*(pt*pt)))+(3.29312e-09*(pt*(pt*pt)));
+
+  if( fabs(eta) >= 0.8 && fabs(eta) < 1.6 )
+    return ((1.08048+(0.00110831*pt))+(-2.96189e-06*(pt*pt)))+(2.16266e-09*(pt*(pt*pt)));
+
+  if( fabs(eta) >= 1.6 && fabs(eta) < 2.4 )
+    return ((1.09145+(0.000687171*pt))+(-2.45054e-06*(pt*pt)))+(1.7844e-09*(pt*(pt*pt)));
+
+  std::cout << __FILE__ << " " << __LINE__ << ":getBtagSF: invalid eta: " << eta << ", or invalid id: " << id << std::endl;
+  return 1.;
+
 }
 

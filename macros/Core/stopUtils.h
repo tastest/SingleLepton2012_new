@@ -74,6 +74,7 @@ bool passDileptonSSSelection(bool isData);
 bool passLepPlusTauSelection(bool isData);
 bool passLepPlusTauSelection_v2(bool isData);
 bool passLepPlusIsoTrkSelection(bool isData);
+bool passLepPlusIsoTrkSelectionWHMet(bool isData);
 bool passLepPlusIsoTrkSelection_noEMu(bool isData, bool isMu);
 bool passLepPlusSSPionTrkSelection(bool isData);
 
@@ -116,6 +117,7 @@ double getChi2(LorentzVector& jets_b, LorentzVector& jets_j1, LorentzVector& jet
 int getRegionNumber(float mstep, float mlsp);
 double TopPtWeight(double topPt);
 
+float getBtagSF(float pt, float eta, int id);
 
 static const float BTAG_MED = 0.679;
 static const float PDG_TOP_MASS = 173.5;
