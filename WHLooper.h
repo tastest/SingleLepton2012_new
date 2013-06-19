@@ -32,6 +32,8 @@ class WHLooper {
 
   void fillHists1DWrapper(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "");
   void fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
+  void fillHists2D(std::map<std::string, TH2F*>& h_2d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
+  void fillFlavorHists1D(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
   void fillJetAccHists(std::map<std::string, TH1F*>& h_1d, const float evtweight = 1., const std::string& dir = "", const std::string& suffix = "");
 
   float getCSVCut(const csvpoint csv = WHLooper::CSVM);
@@ -56,6 +58,8 @@ class WHLooper {
   float CUT_MET_;
   float CUT_MT_PRESEL_;
   float CUT_MT_;
+  float CUT_MT_CR13_LOW_;
+  float CUT_MT_CR13_HIGH_;
   float CUT_MT2BL_;
 
   // internal vars to store
@@ -70,6 +74,7 @@ class WHLooper {
   int njets_;
   int njetsalleta_;
   int nbjets_;
+  int nbjetst_;
   int nbjetsl_;
   float met_;
   float metphi_;
@@ -82,6 +87,9 @@ class WHLooper {
   float sumet_;
   float sumet_soft_;
   float ht_;
+  float wpt_;
+  float lepmetdphi_;
+  float bbwdphi_;
   // for ttbar samples
   float genmt2bl_;
 

@@ -10,12 +10,25 @@ ifeq ($(shell root-config --platform),macosx)
 	LINKERFLAGS = -dynamiclib -undefined dynamic_lookup -Wl,-x -O -Xlinker -bind_at_load -flat_namespace $(shell root-config --libs) -lEG -lGenVector -lMathMore
 endif
 
-SOURCES = WHLooper.cc ../Core/PartonCombinatorics.cc ../Plotting/PlotUtilities.cc ../Core/MT2Utility.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/stopUtils.cc ../Core/STOPT.cc
+SOURCES = WHLooper.cc ../../Tools/BTagReshaping/BTagReshaping.cc ../../Tools/BTagReshaping/btag_payload_light.cc ../../Tools/BTagReshaping/btag_payload_b.cc ../Plotting/PlotUtilities.cc ../Core/PartonCombinatorics.cc ../Core/MT2Utility.cc ../Core/mt2w_bisect.cc ../Core/mt2bl_bisect.cc ../Core/MT2.cc ../Core/stopUtils.cc ../Core/STOPT.cc
 OBJECTS = $(SOURCES:.cc=.o) LinkDef_out.o
 LIB = libWHLooper.so
 
+CORESOURCES = ../../CORE/CMS2.cc ../../CORE/utilities.cc ../../CORE/ssSelections.cc ../../CORE/electronSelections.cc ../../CORE/electronSelectionsParameters.cc ../../CORE/MITConversionUtilities.cc ../../CORE/muonSelections.cc ../../CORE/eventSelections.cc ../../CORE/trackSelections.cc ../../CORE/metSelections.cc ../../CORE/jetSelections.cc ../../CORE/photonSelections.cc ../../CORE/triggerUtils.cc ../../CORE/triggerSuperModel.cc ../../CORE/mcSelections.cc ../../CORE/susySelections.cc ../../CORE/mcSUSYkfactor.cc ../../CORE/SimpleFakeRate.cc ../../Tools/goodrun.cc ../../Tools/vtxreweight.cc ../../Tools/msugraCrossSection.cc  ../../CORE/jetsmear/JetSmearer.cc ../../CORE/jetsmear/JetResolution.cc ../../CORE/jetsmear/SigInputObj.cc ../../CORE/jetSmearingTools.cc ../../CORE/QuarkGluonTagger/QGLikelihoodCalculator.cc ../../CORE/QuarkGluonTagger/QuarkGluonTagger.cc 
+
+COREOBJECTS = $(CORESOURCES:.cc=.o) 
+CORELIB = libWHLooperCORE.so
+
+LIBS = $(LIB) $(CORELIB)
+
+libs:	$(LIBS)
+
 $(LIB):	$(OBJECTS) 
 	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) -o $@ 
+
+$(CORELIB):	$(COREOBJECTS) 
+	echo "Linking $(CORELIB)"; \
+	$(LINKER) $(LINKERFLAGS) -shared $(COREOBJECTS) -o $@
 
 LinkDef_out.cxx: LinkDef.h WHLooper.h ../Plotting/PlotUtilities.h ../Core/stopUtils.h 
 	rootcint -f $@ -c $(INCLUDE) WHLooper.h ../Plotting/PlotUtilities.h ../Core/stopUtils.h $<
@@ -46,6 +59,8 @@ clean:
 	rm -f */*.d \
 	rm -f */*.o \
 	rm -f *.so \
+	rm -f ../Core/*.d \
+	rm -f ../Core/*.o \
 	rm -f LinkDef_out* 
 
 -include $(SOURCES:.cc=.d)
