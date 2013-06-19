@@ -1,10 +1,16 @@
 {
 
-  //----------------------------------------
+  //-------------------------------------------------
   // PUT THE PATH TO THE MINIBABIES HERE
-  //----------------------------------------
+  //-------------------------------------------------
 
-  char* path = "/tas/cms2/stop/output_V00-02-21_2012_4jskim/Minibabies_V00-03-03/";
+  char* path = "/tas/cms2/stop/output_V00-02-21_2012_4jskim/Minibabies_V00-03-03/Skim_4jets_MET100_MT120";
+
+  //-------------------------------------------------
+  // ADD THE CUTS: NJETS >= 5 AND JET1 PT > 200 GeV
+  //-------------------------------------------------
+  
+  bool doISRCuts = false;
 
   cout << endl;
   cout << "Loading babies at       : " << path << endl;
@@ -17,6 +23,7 @@
   TChain *ttsl  = new TChain("t");
   TChain *rare  = new TChain("t");
   TChain *wjets = new TChain("t");
+  TChain *sig   = new TChain("t");
 
   // dilepton ttbar
   ttdl->	Add(Form("%s/ttdl_powheg.root",path));
@@ -36,6 +43,10 @@
 
   // W+jets
   wjets->	Add(Form("%s/w1to4jets.root",path));
+
+  // signal
+  sig->Add("/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/minibabies_V00-03-12/Skim_4jets_MET100_MT120/merged_T2tt_mStop-100to200_mLSP-1to100_LeptonFilt.root");
+  sig->Add("/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/minibabies_V00-03-12/Skim_4jets_MET100_MT120/merged_T2tt_mStop-225to350_mLSP-25to250_lepFilter.root");
 
   //----------------------------------------
   // define the selection
@@ -63,6 +74,12 @@
   TCut met250("t1metphicorr > 250");
   TCut met300("t1metphicorr > 300");
 
+  TCut point200("mg==200 && ml==25");  
+  TCut point250("mg==250 && ml==75");
+  TCut point300("mg==300 && ml==125");
+
+  TCut isr("mini_njets>=5 && pfjets[0].pt()>200.0");
+
   TCut presel;
 
   presel += rho;
@@ -79,11 +96,16 @@
   TCut lowdm  = presel + met150 + dphi + chi2;
   TCut highdm = presel + met150 + dphi + chi2 + mt2w;
 
+  if( doISRCuts ){
+    lowdm  += isr;
+    highdm += isr;
+  }
+
   TCut weight("mini_weight * mini_sltrigeff");
 
-  cout << "Using low  deltaM selection : " << lowdm.GetTitle()  << endl;
-  cout << "Using high deltaM selection : " << highdm.GetTitle() << endl;
-  cout << "Using weight                : " << weight.GetTitle() << endl;
+  cout << endl << "Using low  deltaM selection : " << lowdm.GetTitle()  << endl;
+  cout << endl << "Using high deltaM selection : " << highdm.GetTitle() << endl;
+  cout << endl << "Using weight                : " << weight.GetTitle() << endl;
 
   //----------------------------------------
   // get the yields
@@ -93,6 +115,9 @@
   TH1F* httsl  = new TH1F("httsl" ,"",1,0,1);
   TH1F* hwjets = new TH1F("hwjets","",1,0,1);
   TH1F* hrare  = new TH1F("hrare" ,"",1,0,1);
+  TH1F* hsig200  = new TH1F("hsig200" ,"",1,0,1);
+  TH1F* hsig250  = new TH1F("hsig250" ,"",1,0,1);
+  TH1F* hsig300  = new TH1F("hsig300" ,"",1,0,1);
 
   // low deltaM
   ttdl->Draw ("0.5>>httdl"   ,lowdm*weight);
@@ -100,14 +125,21 @@
   wjets->Draw("0.5>>hwjets"  ,lowdm*weight);
   rare->Draw ("0.5>>hrare"   ,lowdm*weight);
 
+  sig->Draw ("0.5>>hsig200"   ,(lowdm+point200)*weight);
+  sig->Draw ("0.5>>hsig250"   ,(lowdm+point250)*weight);
+  sig->Draw ("0.5>>hsig300"   ,(lowdm+point300)*weight);
+
   float tot = httdl->Integral() + httsl->Integral() + hwjets->Integral() + hrare->Integral();
 
   cout << "Low deltaM yields" << endl;
-  cout << "ttdl   : " << Form("%.1f",httdl->Integral())  << endl;
-  cout << "ttsl   : " << Form("%.1f",httsl->Integral())  << endl;
-  cout << "wjets  : " << Form("%.1f",hwjets->Integral()) << endl;
-  cout << "rare   : " << Form("%.1f",hrare->Integral())  << endl;
-  cout << "total  : " << Form("%.1f",tot)                << endl;
+  cout << "ttdl        : " << Form("%.1f",httdl->Integral())  << endl;
+  cout << "ttsl        : " << Form("%.1f",httsl->Integral())  << endl;
+  cout << "wjets       : " << Form("%.1f",hwjets->Integral()) << endl;
+  cout << "rare        : " << Form("%.1f",hrare->Integral())  << endl;
+  cout << "total       : " << Form("%.1f",tot)                << endl;
+  cout << "sig 200/25  : " << Form("%.1f",hsig200->Integral()) << endl;
+  cout << "sig 250/75  : " << Form("%.1f",hsig250->Integral()) << endl;
+  cout << "sig 300/125 : " << Form("%.1f",hsig300->Integral()) << endl;
 
   // high deltaM
   ttdl->Draw ("0.5>>httdl"   ,highdm*weight);
@@ -115,15 +147,24 @@
   wjets->Draw("0.5>>hwjets"  ,highdm*weight);
   rare->Draw ("0.5>>hrare"   ,highdm*weight);
 
+  sig->Draw ("0.5>>hsig200"   ,(highdm+point200)*weight);
+  sig->Draw ("0.5>>hsig250"   ,(highdm+point250)*weight);
+  sig->Draw ("0.5>>hsig300"   ,(highdm+point300)*weight);
+
   tot = httdl->Integral() + httsl->Integral() + hwjets->Integral() + hrare->Integral();
 
   cout << endl;
   cout << "High deltaM yields" << endl;
-  cout << "ttdl   : " << Form("%.1f",httdl->Integral())  << endl;
-  cout << "ttsl   : " << Form("%.1f",httsl->Integral())  << endl;
-  cout << "wjets  : " << Form("%.1f",hwjets->Integral()) << endl;
-  cout << "rare   : " << Form("%.1f",hrare->Integral())  << endl;
-  cout << "total  : " << Form("%.1f",tot)                << endl;
+  cout << "ttdl        : " << Form("%.1f",httdl->Integral())  << endl;
+  cout << "ttsl        : " << Form("%.1f",httsl->Integral())  << endl;
+  cout << "wjets       : " << Form("%.1f",hwjets->Integral()) << endl;
+  cout << "rare        : " << Form("%.1f",hrare->Integral())  << endl;
+  cout << "total       : " << Form("%.1f",tot)                << endl;
+
+  cout << "sig 200/25  : " << Form("%.1f",hsig200->Integral()) << endl;
+  cout << "sig 250/75  : " << Form("%.1f",hsig250->Integral()) << endl;
+  cout << "sig 300/125 : " << Form("%.1f",hsig300->Integral()) << endl;
+
 
 
 }
