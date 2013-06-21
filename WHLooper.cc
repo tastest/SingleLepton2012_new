@@ -41,7 +41,7 @@ const bool doWJetsOverlapRemoval = false;
 const bool doISRReweight = false;
 const bool doTopPtWeight = true;
 const bool doJetSmearing = false;
-const bool doWbbMtReweight = false;
+const bool doWbbMtReweight = true;
 
 const bool doFlavorPlots = true;
 const bool doNM1Plots = true;
@@ -51,30 +51,31 @@ const bool doJetAccPlots = false;
 
 // regions to do
 const bool blindSignal = true;
-const bool doInclusive = true;
+const bool doInclusive = false;
+const bool doInclusiveMTTail = false;
 const bool doSignal = false;
-const bool doSignalMassLast = false;
+const bool doSignalMassLast = true;
 const bool doSignalMETLast = true;
 const bool doSignalSMWH = false;
 const bool doCR1 = false; // high m(bb)
-const bool doCR1METLast = false; // high m(bb), met cut last
+const bool doCR1METLast = true; // high m(bb), met cut last
 const bool doCR2 = false; // lep + track
 const bool doCR3 = false; // dilep
-const bool doCR23 = false; // dilep + (lep+track)
+const bool doCR23 = true; // dilep + (lep+track)
 const bool doCR4 = false; // dilep, high m(bb)
 const bool doCR5 = false; // bveto
-const bool doCR5METLast = false; // bveto
+const bool doCR5METLast = true; // bveto
 const bool doCR6 = false; // 1 btag -- not used
 const bool doCR6METLast = false; // 1 btag -- not used
 const bool doCR7 = false; // high m(bb), 3 jets
 const bool doCR8 = false; // low m(bb)
-const bool doCR8METLast = false; // low m(bb)
+const bool doCR8METLast = true; // low m(bb)
 const bool doCR9 = false; // high m(bb), 150-200
 const bool doCR10 = false; // high m(bb), 200-250
 const bool doCR11 = false; // bveto, high m(bb)
 const bool doCR12 = false; // high m(bb), 4+ jets
 const bool doCR13 = false; // mt bulk
-const bool doCR14 = false; // inverted mbb region
+const bool doCR14 = true; // inverted mbb region
 const bool doStopSel = false;
 
 std::set<DorkyEventIdentifier> already_seen; 
@@ -265,7 +266,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   cout << "[WHLooper::loop] setting up histos" << endl;
 
   // inclusive region hists
-  std::map<std::string, TH1F*> h_1d_inc_presel, h_1d_inc_2j, h_1d_inc_1b, h_1d_inc_2b, h_1d_inc_2j_mt;
+  std::map<std::string, TH1F*> h_1d_inc_presel, h_1d_inc_2j, h_1d_inc_1b, h_1d_inc_2b, h_1d_inc_2j_mt, h_1d_inc_2j_mt_met100, h_1d_inc_2j_mt_met150, h_1d_inc_2j_mt_metcut;
 
   // signal region hists
   std::map<std::string, TH1F*> h_1d_sig_presel, h_1d_sig_final;
@@ -279,7 +280,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // signal region nm1 hists
   std::map<std::string, TH1F*> h_1d_sig_bbmasslast_met_nm1, h_1d_sig_bbmasslast_mt_nm1, h_1d_sig_bbmasslast_mt2bl_nm1,h_1d_sig_bbmasslast_bbmass_nm1;
   // signal region nm1 hists
-  std::map<std::string, TH1F*> h_1d_sig_bbmasslast_mtpeak, h_1d_sig_bbmasslast_mtcut, h_1d_sig_bbmasslast_metcut, h_1d_sig_bbmasslast_met100, h_1d_sig_bbmasslast_met150;
+  std::map<std::string, TH1F*> h_1d_sig_bbmasslast_mtpeak, h_1d_sig_bbmasslast_mtcut, h_1d_sig_bbmasslast_mtcut_met100, h_1d_sig_bbmasslast_metcut, h_1d_sig_bbmasslast_met100, h_1d_sig_bbmasslast_met150;
 
   // signal region hists
   std::map<std::string, TH1F*> h_1d_sig_metlast_presel, h_1d_sig_metlast_final;
@@ -401,7 +402,12 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doInclusive) {
     outfile_->mkdir("inc_presel");
     outfile_->mkdir("inc_2j");
-    outfile_->mkdir("inc_2j_mt");
+    if (doInclusiveMTTail) {
+      outfile_->mkdir("inc_2j_mt");
+      outfile_->mkdir("inc_2j_mt_met100");
+      outfile_->mkdir("inc_2j_mt_met150");
+      outfile_->mkdir("inc_2j_mt_metcut");
+    }
     outfile_->mkdir("inc_1b");
     outfile_->mkdir("inc_2b");
   }
@@ -424,6 +430,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("sig_bbmasslast_mt2bl_nm1");
       outfile_->mkdir("sig_bbmasslast_mtpeak");
       outfile_->mkdir("sig_bbmasslast_mtcut");
+      outfile_->mkdir("sig_bbmasslast_mtcut_met100");
       outfile_->mkdir("sig_bbmasslast_metcut");
       outfile_->mkdir("sig_bbmasslast_mt_nm1");
       outfile_->mkdir("sig_bbmasslast_met_nm1");
@@ -1075,7 +1082,11 @@ void WHLooper::loop(TChain *chain, TString name) {
       // weight for MT tail in Wbb sample to account for missing off-shell W contribution
       if (doWbbMtReweight && isWjets_ && !isWNjets_) {
 	// weight up events with reco MT > 100 by 10%
-	if (mt_ > 100.) {
+	if (mt_ > 100. && met_ > 100.) {
+	  evtweight1l *= 1.3;
+	  evtweight2l *= 1.3;
+	}
+	else if (mt_ > 100. && met_ > 50.) {
 	  evtweight1l *= 1.1;
 	  evtweight2l *= 1.1;
 	}
@@ -1124,8 +1135,22 @@ void WHLooper::loop(TChain *chain, TString name) {
 	  fillHists1DWrapper(h_1d_inc_2j,evtweight1l,"inc_2j");
 	}
 
-	if ( (njetsalleta_ == 2) && (mt_ > CUT_MT_) ) {
-	  fillHists1DWrapper(h_1d_inc_2j_mt,evtweight1l,"inc_2j_mt");
+	if (doInclusiveMTTail) {
+	  if ( (njetsalleta_ == 2) && (mt_ > CUT_MT_) ) {
+	    fillHists1DWrapper(h_1d_inc_2j_mt,evtweight1l,"inc_2j_mt");
+	  }
+
+	  if ( (njetsalleta_ == 2) && (mt_ > CUT_MT_) && (met_ > 100.) ) {
+	    fillHists1DWrapper(h_1d_inc_2j_mt_met100,evtweight1l,"inc_2j_mt_met100");
+	  }
+
+	  if ( (njetsalleta_ == 2) && (mt_ > CUT_MT_) && (met_ > 150.) ) {
+	    fillHists1DWrapper(h_1d_inc_2j_mt_met150,evtweight1l,"inc_2j_mt_met150");
+	  }
+
+	  if ( (njetsalleta_ == 2) && (mt_ > CUT_MT_) && (met_ > CUT_MET_) ) {
+	    fillHists1DWrapper(h_1d_inc_2j_mt_metcut,evtweight1l,"inc_2j_mt_metcut");
+	  }
 	}
 
 	bool fail = false;
@@ -1144,14 +1169,14 @@ void WHLooper::loop(TChain *chain, TString name) {
       // *** presel for signal region:
       //   == 1 lepton, iso track veto
       //   >= 2 bjets
-      //   100 < m(bb) < 140
+      //   100 < m(bb) < 150
       //   met > 50
 
       // *** signal region:
       //   == 1 lepton, iso track veto
       //   == 2 jets, all eta
       //   == 2 bjets
-      //   100 < m(bb) < 140
+      //   100 < m(bb) < 150
       //   met > 175 (cut at 50 for presel)
       //   mt > 100
       //   mt2bl > 200
@@ -1233,6 +1258,9 @@ void WHLooper::loop(TChain *chain, TString name) {
 	// plots for bbmass after each of the major cuts done separately
 	if (!fail && (mt_ > CUT_MT_) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_bbmasslast_mtcut,evtweight1l,"sig_bbmasslast_mtcut");
+	  if (!fail && (met_ > 100.) ) {
+	    if (doNM1Plots) fillHists1DWrapper(h_1d_sig_bbmasslast_mtcut_met100,evtweight1l,"sig_bbmasslast_mtcut_met100");
+	  }
 	}
 
 	if (!fail && (met_ > CUT_MET_) ) {
@@ -1271,11 +1299,11 @@ void WHLooper::loop(TChain *chain, TString name) {
       } // signal region sel (bbmass last)
 
       // -------------------------------------------
-      // *** signal region, but applying m(bb) cut last
+      // *** signal region, but applying met cut last
       //  - presel:
       //   == 1 lepton, iso track veto
       //   >= 2 bjets
-      //   100 < m(bb) < 140
+      //   100 < m(bb) < 150
       //   met > 50
 
       if ( doSignalMETLast
@@ -2452,7 +2480,12 @@ void WHLooper::loop(TChain *chain, TString name) {
   if (doInclusive) {
     savePlotsDir(h_1d_inc_presel,outfile_,"inc_presel");
     savePlotsDir(h_1d_inc_2j,outfile_,"inc_2j");
-    savePlotsDir(h_1d_inc_2j_mt,outfile_,"inc_2j_mt");
+    if (doInclusiveMTTail) {
+      savePlotsDir(h_1d_inc_2j_mt,outfile_,"inc_2j_mt");
+      savePlotsDir(h_1d_inc_2j_mt_met100,outfile_,"inc_2j_mt_met100");
+      savePlotsDir(h_1d_inc_2j_mt_met150,outfile_,"inc_2j_mt_met150");
+      savePlotsDir(h_1d_inc_2j_mt_metcut,outfile_,"inc_2j_mt_metcut");
+    }
     savePlotsDir(h_1d_inc_1b,outfile_,"inc_1b");
     savePlotsDir(h_1d_inc_2b,outfile_,"inc_2b");
   }
@@ -2475,6 +2508,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_sig_bbmasslast_mt2bl_nm1,outfile_,"sig_bbmasslast_mt2bl_nm1");
       savePlotsDir(h_1d_sig_bbmasslast_mtpeak,outfile_,"sig_bbmasslast_mtpeak");
       savePlotsDir(h_1d_sig_bbmasslast_mtcut,outfile_,"sig_bbmasslast_mtcut");
+      savePlotsDir(h_1d_sig_bbmasslast_mtcut_met100,outfile_,"sig_bbmasslast_mtcut_met100");
       savePlotsDir(h_1d_sig_bbmasslast_metcut,outfile_,"sig_bbmasslast_metcut");
       savePlotsDir(h_1d_sig_bbmasslast_mt_nm1,outfile_,"sig_bbmasslast_mt_nm1");
       savePlotsDir(h_1d_sig_bbmasslast_met_nm1,outfile_,"sig_bbmasslast_met_nm1");
