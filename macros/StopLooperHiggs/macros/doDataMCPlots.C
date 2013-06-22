@@ -195,11 +195,27 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
 
   const int mccolor[]={kAzure+1,2,kGreen+1,6,4,kOrange,8,kAzure-9, kGreen+1, kViolet,kGreen+1, 15,12,13,27};
 
-  const int NSAMPLE = 1;
-  char * selection[NSAMPLE] = {"_2l2b"};    
-  const char* samplename[NSAMPLE] = {"2l + 2b"};
+  // const int NSAMPLE = 4;
+  // char * selection[NSAMPLE] = {"_topptwgt_1l2b", "_topptwgt_1l2b_hinj", "_topptwgt_mtpeak_1l3b", "_topptwgt_mtpeak_1l4b"};    
+  // const char* samplename[NSAMPLE] = {"1l + 2b", "1l + 2b + #geq6j", "1l + 3b + M_{T} peak", "1l + 4b + M_{T} peak"};
+  // const int NSAMPLE = 3;
+  // char * selection[NSAMPLE] = {"_topptwgt_1l2b", "_topptwgt_1l3b", "_topptwgt_1l4b"};    
+  // const char* samplename[NSAMPLE] = {"1l + 2b", "1l + 3b", "1l + 4b"};
+  // const int NSAMPLE = 4;
+  // char * selection[NSAMPLE] = {"_1l2b", "_1l2b_4j", "_1l2b_5j", "_1l2b_6j"};    
+  // const char* samplename[NSAMPLE] = {"1l + 2b", "1l + 2b + 4j", "1l + 2b + 5j", "1l + 2b + 6j"};
+  const int NSAMPLE = 3;
+  char * selection[NSAMPLE] = {"_1l2b", "_mtpeak_1l3b", "_mtpeak_1l4b"};    
+  const char* samplename[NSAMPLE] = {"1l + 2b", "1l + 3b", "1l + 4b"};
 
-  TFile *dt_sl = TFile::Open("SIGoutput/data_dl_histos.root");
+  // const int NSAMPLE = 4;
+  // char * selection[NSAMPLE] = {"_1l2b", "_1l2b_hinj", "_1l3b", "_1l4b"};    
+  // const char* samplename[NSAMPLE] = {"1l + 2b", "1l + 2b + #geq6j", "1l + 3b", "1l + 4b"};
+  // const int NSAMPLE = 3;
+  // char * selection[NSAMPLE] = {"_2l2b", "_2l3b", "_2l4b"};    
+  // const char* samplename[NSAMPLE] = {"2l + 2b","2l + 3b","2l + 4b"};
+
+  TFile *dt_sl = TFile::Open("SIGoutput/data_sl_histos.root");
   
   TFile *mc_sl[MCID];   
   for (int j=0;j<MCID;++j) {
@@ -215,7 +231,7 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
 
   for (int isr=0; isr<NSAMPLE; ++isr) {
     
-    const int N1DHISTS = 7;
+    const int N1DHISTS = 9;
     
     TH1F *h_dt1d[N1DHISTS];
     TH1F *h_mc1d[N1DHISTS][MCID];
@@ -230,7 +246,9 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
       "mbb_count",
       "dphi_metlep", 
       "bpt1",
-      "bpt2"};
+      "bpt2", 
+      "mt", 
+      "mt_count"};
     
     // Histogram names
     const char* hist1dname[N1DHISTS] ={
@@ -240,7 +258,9 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
       "h_sig_mbb_count",
       "h_sig_dphi_metlep", 
       "h_sig_bpt1", 
-      "h_sig_bpt2"};
+      "h_sig_bpt2", 
+      "h_sig_mt", 
+      "h_sig_mt_count"};
     
     // List of Log scale plots:
     vector<int> logScale;
@@ -251,6 +271,8 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
     logScale.push_back(4);
     logScale.push_back(5);
     logScale.push_back(6);
+    logScale.push_back(7);
+    logScale.push_back(8);
     logScale.push_back(29);
     
     // End MC Samples definition and open files ///////////////////////////////
@@ -258,7 +280,7 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
     // Open and book histograms ///////////////////////////////////////////////
     
     // List of rebin factors:
-    int rebinFactor[N1DHISTS] = {3,2,2,1,1,5,5};
+    int rebinFactor[N1DHISTS] = {3,2,2,1,1,5,5,2,1};
     if (isr>4) 
       rebinFactor[1] = 6;
     
@@ -270,7 +292,9 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
       "M_{bb} Range", 
       "#Delta #phi(ME_{T}, lep) [rad]", 
       "Lead b p_{T} [GeV]", 
-      "Sub-Lead b p_{T} [GeV]"}; 
+      "Sub-Lead b p_{T} [GeV]", 
+      "M_{T} [GeV]", 
+      "M_{T} Range"}; 
     
       const char* ytitle1d[N1DHISTS]= {
 	//    "",
@@ -284,7 +308,9 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
 	// "GeV", 
 	"rad", 
 	"GeV", 
-	"GeV"};
+	"GeV", 
+	"GeV", 
+	""};
 
       // Book histograms
       for (int i=0;i<N1DHISTS;++i) {
@@ -382,6 +408,11 @@ void doDataMCPlots(const char* ttbar_tag = "_lmgtau") {
 	  h_dt1d[i]->GetXaxis()->SetBinLabel(3,"Out High");	
 	  h_dt1d[i]->GetXaxis()->SetTitle("M_{bb} Region");
 	  h_dt1d[i]->GetYaxis()->SetTitle("Entries");
+	} else if (i==8){
+	  h_dt1d[i]->GetXaxis()->SetBinLabel(1,"Peak");	
+	  h_dt1d[i]->GetXaxis()->SetBinLabel(2,"Tail");	
+	  h_dt1d[i]->GetXaxis()->SetTitle("M_{T} Region");
+	  h_dt1d[i]->GetYaxis()->SetTitle("Entries");	  
 	} else {
 	  h_dt1d[i]->GetXaxis()->SetTitle(Form("%s",
 					       xtitle1d[i]));

@@ -65,14 +65,14 @@ double error_poisson_down(double data) {
 }
 
 //settings go here
-bool do1l = true;
-
 const int NSAMPLE = 3;
-string selection[NSAMPLE] = {Form("_%il2b", do1l?1:2), Form("_%il3b", do1l?1:2), Form("_%il4b", do1l?1:2)};    
-string samplename[NSAMPLE] = {Form("%il + 2b", do1l?1:2), Form("%il + 3b", do1l?1:2), Form("%il + 4b", do1l?1:2)};
-bool addhighmbb[NSAMPLE] = {false, false, true};
-string histotag = "";
-TFile *f_dt;
+char * selection[NSAMPLE] = {"_2l2b", "_2l3b", "_2l4b"};    
+const char* samplename[NSAMPLE] = {"2l + 2b", "2l + 3b", "2l + 4b"};
+bool addhighmbb[NSAMPLE] = {false, false, false};
+char * histotag = "";
+
+TFile *dt_dl;
+TFile *dt_sl;
 
 void plotComparison( TH1F* h_dt , TH1F* h_mc , TH1F *h_extra, char* label, bool dolog, bool drawbkg);
 void runSimplePred(char* ttbar_tag = "", bool issyst = false);
@@ -88,24 +88,15 @@ float erarepred[NSAMPLE];
 float pred[NSAMPLE];
 float epred[NSAMPLE];
 
-float xs_unc_rare = 1.;
+float xs_unc_rare = 0.;
 
 bool doprintout = true;
 
-void doSimplePred(bool doaltttbar = false) {
+void doSimplePredHighMbb(bool doaltttbar = false) {
 
-  cout<<"-------------------------------"<<endl;
-  if (do1l) cout<<"1-LEPTON BACKGROUND PREDICTIONS"<<endl;
-  else cout<<"2-LEPTON BACKGROUND PREDICTIONS"<<endl;
-  cout<<"-------------------------------"<<endl;
+  dt_dl = TFile::Open("SIGoutput/data_dl_histos.root");
+  dt_sl = TFile::Open("SIGoutput/data_sl_histos.root");
   
-  f_dt = TFile::Open(Form("SIGoutput/data_%s_histos.root", do1l ? "sl" : "dl"));
-
-  if (do1l) {
-    for (int isr=0; isr<NSAMPLE; ++isr) 
-      addhighmbb[isr] = false;
-  }
-
   for (int isr=0; isr<NSAMPLE; ++isr) {
     ttpred[isr] = -999.;
     ettpred[isr] = -999.;
@@ -116,201 +107,6 @@ void doSimplePred(bool doaltttbar = false) {
   }
 
   runSimplePred("_lmgtau", false);
-
-  //cout<<"----- SYSTEMATICS -----"<<endl;
-
-    // printf("Prediction \t ");
-    // for (int isr=1; isr<NSAMPLE; ++isr) 
-    //   printf("\t & $%.1f \\pm %.1f$ %s",
-    // 	     pred[isr],epred[isr], 
-    // 	     isr==NSAMPLE-1 ? " \\\\ \n":"");
-    // cout<<"\\hline"<<endl;
-    // cout<<endl;
-
-  float pred_default[NSAMPLE];
-  std::copy(&pred[0], &pred[NSAMPLE], pred_default);
-  float epred_default[NSAMPLE]; 
-  std::copy(&epred[0], &epred[NSAMPLE], epred_default);
-
-  //this is the statistical uncertainty
-  float aunc_stat[NSAMPLE]; 
-  float runc_stat[NSAMPLE]; 
-  std::copy(&epred_default[0], &epred_default[NSAMPLE], aunc_stat);
-  for (int isr=1; isr<NSAMPLE; ++isr) {
-    runc_stat[isr] = aunc_stat[isr]/pred_default[isr]*100.;
-  }
-
-  doprintout = false;
-
-  //cout<<"---------------------- Normalization of rare -----------------------"<<endl;
-  xs_unc_rare = 1.5;
-
-  runSimplePred("_lmgtau", false);
-
-  float pred_xsrare[NSAMPLE];
-  std::copy(&pred[0], &pred[NSAMPLE], pred_xsrare);
-  float epred_xsrare[NSAMPLE]; 
-  std::copy(&epred[0], &epred[NSAMPLE], epred_xsrare);
-
-  float aunc_xsrare[NSAMPLE];
-  float runc_xsrare[NSAMPLE];
-  for (int isr=1; isr<NSAMPLE; ++isr) {
-    aunc_xsrare[isr] = fabs(pred_xsrare[isr]-pred_default[isr]);
-    //subtractSqr(epred_xsrare[isr], epred_default[isr]);
-    runc_xsrare[isr] = aunc_xsrare[isr]/pred_default[isr]*100.;
-    epred_default[isr] = addSqr(epred_default[isr], aunc_xsrare[isr]);
-  }
-
-  // printf("Rare Syst \t ");
-  // for (int isr=1; isr<NSAMPLE; ++isr) 
-  //   printf("\t & $%.1f \\pm %.1f$ %s",
-  // 	   pred[isr],epred[isr], 
-  // 	   isr==NSAMPLE-1 ? " \\\\ \n":"");
-  // cout<<"\\hline"<<endl;
-  // cout<<endl;
-
-  xs_unc_rare = 1.;
-
-
-  //cout<<"---------------------- Alternative tt MC -----------------------"<<endl;
-
-  runSimplePred("_lpowheg", true);
-
-  float pred_ttmc[NSAMPLE];
-  std::copy(&pred[0], &pred[NSAMPLE], pred_ttmc);
-  float epred_ttmc[NSAMPLE]; 
-  std::copy(&epred[0], &epred[NSAMPLE], epred_ttmc);
-
-  float aunc_ttmc[NSAMPLE];
-  float runc_ttmc[NSAMPLE];
-  for (int isr=1; isr<NSAMPLE; ++isr) {
-    aunc_ttmc[isr] = fabs(pred_ttmc[isr]-pred_default[isr]);
-    //    aunc_ttmc[isr] = addSqr(aunc_ttmc[isr], epred_ttmc[isr]);
-    runc_ttmc[isr] = aunc_ttmc[isr]/pred_default[isr]*100.;
-    //add this uncertainty
-    epred_default[isr] = addSqr(epred_default[isr], aunc_ttmc[isr]);
-  }
-
-  cout<<endl;
-  printf("Alternative MC \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.2f \\pm %.2f$ %s",
-  	   pred[isr],epred[isr], 
-  	   isr==NSAMPLE-1 ? " \\\\ \n":"");
-  cout<<"\\hline"<<endl;
-  cout<<endl;
-  
-  //  cout<<"---------------------- Alternative control region range -----------------------"<<endl;
-  histotag = "_alt";
-  runSimplePred("_lmgtau");
-
-  float pred_altrange[NSAMPLE];
-  std::copy(&pred[0], &pred[NSAMPLE], pred_altrange);
-  float epred_altrange[NSAMPLE]; 
-  std::copy(&epred[0], &epred[NSAMPLE], epred_altrange);
-
-  float aunc_altrange[NSAMPLE];
-  float runc_altrange[NSAMPLE];
-  for (int isr=1; isr<NSAMPLE; ++isr) {
-    aunc_altrange[isr] = fabs(pred_altrange[isr]-pred_default[isr]);
-    runc_altrange[isr] = aunc_altrange[isr]/pred_default[isr]*100.;
-    //add this uncertainty
-    epred_default[isr] = addSqr(epred_default[isr], aunc_altrange[isr]);
-  }
-
-  // printf("Alternative control region range \t ");
-  // for (int isr=1; isr<NSAMPLE; ++isr) 
-  //   printf("\t & $%.1f \\pm %.1f$ %s",
-  //  	   pred[isr],epred[isr], 
-  //  	   isr==NSAMPLE-1 ? " \\\\ \n":"");
-  // cout<<"\\hline"<<endl;
-  // cout<<endl;
-  
-  //  cout<<"---------------------- Top pt weight -----------------------"<<endl;
-  histotag = "_topptwgt";
-  runSimplePred("_lmgtau");
-
-  float pred_toppt[NSAMPLE];
-  std::copy(&pred[0], &pred[NSAMPLE], pred_toppt);
-  float epred_toppt[NSAMPLE]; 
-  std::copy(&epred[0], &epred[NSAMPLE], epred_toppt);
-
-  float aunc_toppt[NSAMPLE];
-  float runc_toppt[NSAMPLE];
-  for (int isr=1; isr<NSAMPLE; ++isr) {
-    aunc_toppt[isr] = fabs(pred_toppt[isr]-pred_default[isr]);
-    runc_toppt[isr] = aunc_toppt[isr]/pred_default[isr]*100.;
-    //add this uncertainty
-    epred_default[isr] = addSqr(epred_default[isr], aunc_toppt[isr]);
-  }
-
-  // printf("Top pT weight \t ");
-  // for (int isr=1; isr<NSAMPLE; ++isr) 
-  //   printf("\t & $%.1f \\pm %.1f$ %s",
-  //  	   pred[isr],epred[isr], 
-  //  	   isr==NSAMPLE-1 ? " \\\\ \n":"");
-  // cout<<"\\hline"<<endl;
-  // cout<<endl;
-
-  histotag = "";
-
-  // cout<<endl;
-  // cout<<endl;
-  // cout<<endl;
-
-  //Absolute systematic uncertainties
-
-  printf("Stat. \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", aunc_stat[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("Alt. tt MC \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f \\pm %.1f$ %s", aunc_ttmc[isr], epred_ttmc[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("Alt. CR Range \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", aunc_altrange[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("Top pT Modeling \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", aunc_toppt[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("rare bkg. Norm \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", aunc_xsrare[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  cout<<"\\hline"<<endl;
-  printf("Total \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", epred_default[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  cout<<"\\hline"<<endl;
-  cout<<endl;
-
-  cout<<endl;
-  cout<<endl;
-  cout<<endl;
-
-  //Relative systematic uncertainties
-  printf("Stat. \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", runc_stat[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("Alt. tt MC \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f \\pm %.1f$ %s", runc_ttmc[isr], epred_ttmc[isr]/pred_default[isr]*100., isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("Alt. CR Range \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", runc_altrange[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("Top pT Modeling \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", runc_toppt[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  printf("rare bkg. Norm \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", runc_xsrare[isr], isr==NSAMPLE-1 ? " \\\\ \n":"");
-  cout<<"\\hline"<<endl;
-  printf("Total \t ");
-  for (int isr=1; isr<NSAMPLE; ++isr) 
-    printf("\t & $%.1f$ %s", 
-	   (epred_default[isr]/pred_default[isr])*100., 
-	   isr==NSAMPLE-1 ? " \\\\ \n":"");
-  cout<<"\\hline"<<endl;
-  cout<<endl;
-
 
 }
 
@@ -342,22 +138,21 @@ void runSimplePred(char* ttbar_tag, bool issyst){
 
   // bins for regions
   float i_ctr = 1;
-  float i_sig = 2;
+  float i_sig = 3;
 
   //Store raw information
   //Open single lepton files
-  TFile *f_mc[MCID];
+  TFile *mc_dl[MCID];
   for (int j=0;j<MCID;++j) {
     if (j<1)
-      f_mc[j] = TFile::Open(Form("SIGoutput/%s%s_histos.root",
+      mc_dl[j] = TFile::Open(Form("SIGoutput/%s%s_histos.root",
 				  mcsample[j], ttbar_tag));
     else 
-      f_mc[j] = TFile::Open(Form("SIGoutput/%s_histos.root",
+      mc_dl[j] = TFile::Open(Form("SIGoutput/%s_histos.root",
 				  mcsample[j]));
   }
 
   char * histoname = "h_sig_mbb_count";
-  if (do1l) histoname = "h_sig_mt_count";
 
   //indices are for samples
   TH1F *h_dt[NSAMPLE];
@@ -368,14 +163,14 @@ void runSimplePred(char* ttbar_tag, bool issyst){
   for (int isr=0; isr<NSAMPLE; ++isr) {
 
     //data
-    h_dt[isr] = (TH1F*)f_dt->Get(Form("%s%s%s",histoname,histotag.c_str(),selection[isr].c_str()));
+    h_dt[isr]= (TH1F*)dt_dl->Get(Form("%s%s%s",histoname,histotag,selection[isr]));
     if (doverbose) 
-      cout<<"Data "<<Form("%s%s%s",histoname,histotag.c_str(),selection[isr].c_str())
+      cout<<"Data "<<Form("%s%s%s",histoname,histotag,selection[isr])
 	  <<" "<<h_dt[isr]<<endl;
-    h_dt[isr]->SetName(Form("h_dt%s",selection[isr].c_str()));
+    h_dt[isr]->SetName(Form("h_dt%s",selection[isr]));
     if (issyst)	zeroHistError(h_dt[isr]);
     h_dt_cor[isr] = (TH1F*)h_dt[isr]->Clone();
-    h_dt_cor[isr]->SetName(Form("h_dt_corr%s",selection[isr].c_str()));
+    h_dt_cor[isr]->SetName(Form("h_dt_corr%s",selection[isr]));
 
     if (addhighmbb[isr]) {
       float binval  =  h_dt[isr]->GetBinContent(1) + h_dt[isr]->GetBinContent(3);
@@ -388,24 +183,24 @@ void runSimplePred(char* ttbar_tag, bool issyst){
 
     //mc
     for (int j=0;j<MCID;++j) {
-      h_mc[j][isr] = (TH1F*)f_mc[j]->Get(Form("%s%s%s",histoname,histotag.c_str(),selection[isr].c_str()));
+      h_mc[j][isr] = (TH1F*)mc_dl[j]->Get(Form("%s%s%s",histoname,histotag,selection[isr]));
       if (doverbose) 
 	cout<<"MC "<<mcsample[j]<<" "
-	    <<Form("%s%s%s",histoname,histotag.c_str(),selection[isr].c_str())
+	    <<Form("%s%s%s",histoname,histotag,selection[isr])
 	    <<" "<<h_mc[j][isr]<<endl;
       if (h_mc[j][isr]==0) {
-      h_mc[j][isr] = (TH1F*)f_mc[0]->Get(Form("%s%s%s",histoname,histotag.c_str(),selection[isr].c_str()));
-	h_mc[j][isr]->SetName(Form("h_mc_%s%s", mcsample[j],selection[isr].c_str()));
+	h_mc[j][isr] = (TH1F*)mc_dl[0]->Get(Form("%s%s%s",histoname,histotag,selection[isr]));
+	h_mc[j][isr]->SetName(Form("h_mc_%s%s", mcsample[j],selection[isr]));
 	zeroHist(h_mc[j][isr]);
       }
 	
       if (doverbose) 
 	cout<<"MC "<<mcsample[j]<<" "
-	    <<Form("%s%s%s",histoname,histotag.c_str(),selection[isr].c_str())
+	    <<Form("%s%s%s",histoname,histotag,selection[isr])
 	    <<" "<<h_mc[j][isr]<<endl;
-      h_mc[j][isr]->SetName(Form("h_mc_%s%s", mcsample[j],selection[isr].c_str()));
+      h_mc[j][isr]->SetName(Form("h_mc_%s%s", mcsample[j],selection[isr]));
 	
-      if (issyst && j!=TTBAR)
+      if (issyst && j>1)
 	zeroHistError(h_mc[j][isr]);
 
       if (addhighmbb[isr]) {
@@ -417,20 +212,18 @@ void runSimplePred(char* ttbar_tag, bool issyst){
 	h_mc[j][isr]->SetBinError(3, 0.);
       } 
       
-      if (j!=TTBAR) {
-	h_mc[j][isr]->Scale(xs_unc_rare);
-	h_dt_cor[isr]->Add(h_mc[j][isr], -1.);
-      }
-
       if (j==0) {
 	h_mc_tot[isr] = (TH1F*)h_mc[j][isr]->Clone();
-	h_mc_tot[isr]->SetName(Form("h_mc_tot%s",selection[isr].c_str()));
+	h_mc_tot[isr]->SetName(Form("h_mc_tot%s",selection[isr]));
       } else 
 	h_mc_tot[isr]->Add(h_mc[j][isr]);
 	
+      if (j!=TTBAR) 
+	h_dt_cor[isr]->Add(h_mc[j][isr], -1.);
+
       if (doverbose) {
 	cout<<"-------------------------------------------------"<<endl;
-	printf("%s MC Yields for selection %s \n", mcsample[j], selection[isr].c_str());
+	printf("%s MC Yields for selection %s \n", mcsample[j], selection[isr]);
 	printf("Control: %.2f pm %.2f (%.1f %%) \n", 
 	       h_mc[j][isr]->GetBinContent(i_ctr), 
 	       h_mc[j][isr]->GetBinError(i_ctr), 
@@ -447,19 +240,18 @@ void runSimplePred(char* ttbar_tag, bool issyst){
   }
 
 
-  string printtag = do1l ? "{{\\rm M}_{\\rm T}}" : "{{\\rm M}_{{\\rm b}\\bar{{\\rm b}}}}";
-
   //Calculate the SFs
   if (doprintout) {
     cout<<"-------------------------------------------------"<<endl;
     cout<<"\\hline"<<endl;  
+    printf("\\multicolumn{%i}{c}{$M_{b\\bar{b}} \\le 100$~GeV} \\\\\n", NSAMPLE+1);
     cout<<"\\hline"<<endl;  
     cout<<"Sample  ";
     for (int isr=0; isr<NSAMPLE; ++isr) 
-      printf("& %s ", samplename[isr].c_str());
+      printf("& %s ", samplename[isr]);
     printf(" \\\\\n");
     cout<<"\\hline"<<endl;
-    printf(Form("Data$\_{\\rm %s}$", do1l ? "peak": "out"));
+    cout<<"Data$\_{\\rm out}$  ";
     for (int isr=0; isr<NSAMPLE; ++isr) {
       printf("& $%.2f \\pm %.2f$ ",
 	     h_dt_cor[isr]->GetBinContent(i_ctr), 
@@ -467,7 +259,7 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     }
     printf(" \\\\\n");
     cout<<"\\hline"<<endl;
-    printf(Form("MC$\_{\\rm %s}$", do1l ? "peak": "out"));
+    cout<<"MC$\_{\\rm out}$  ";
     for (int isr=0; isr<NSAMPLE; ++isr) {
       printf("& $%.2f \\pm %.2f$ ",
 	     h_mc[TTBAR][isr]->GetBinContent(i_ctr), 
@@ -478,10 +270,10 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     cout<<"\\hline"<<endl;
     
     TH1F *h_sfout[NSAMPLE];
-    printf(Form("SF$\_{\\rm %s}$", do1l ? "peak": "out"));
+    cout<<"SF$\_{\\rm out}$ ";
     for (int isr=0; isr<NSAMPLE; ++isr) {
       h_sfout[isr] = (TH1F*)h_dt_cor[isr]->Clone();
-      h_sfout[isr]->SetName(Form("h_sfout%s",selection[isr].c_str()));
+      h_sfout[isr]->SetName(Form("h_sfout%s",selection[isr]));
       h_sfout[isr]->Divide(h_mc[TTBAR][isr]);
       printf("& $%.2f \\pm %.2f$ ",
 	     h_sfout[isr]->GetBinContent(i_ctr), 
@@ -496,14 +288,14 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     cout<<endl;
     
     cout<<"\\hline"<<endl;
-    printf(Form("MC$\_{\\rm %s}$", do1l ? "tail": "in"));
+    cout<<"MC$\_{\\rm in}$  ";
     for (int isr=0; isr<NSAMPLE; ++isr) {
       printf("& $%.2f \\pm %.2f$ ",
 	     h_mc[TTBAR][isr]->GetBinContent(i_sig), 
 	     h_mc[TTBAR][isr]->GetBinError(i_sig));
     }
     printf(" \\\\\n");
-    printf(Form("MC$\_{\\rm %s}$", do1l ? "peak": "out"));
+    cout<<"MC$\_{\\rm out}$  ";
     for (int isr=0; isr<NSAMPLE; ++isr) {
       printf("& $%.2f \\pm %.2f$ ",
 	     h_mc[TTBAR][isr]->GetBinContent(i_ctr), 
@@ -515,7 +307,7 @@ void runSimplePred(char* ttbar_tag, bool issyst){
 
   float rmbb[NSAMPLE];
   float ermbb[NSAMPLE];
-  if (doprintout) printf(Form("${\\rm R}_%s^{\\rm MC}$  ", printtag.c_str()));
+  if (doprintout) cout<<"${\\rm R}_{{\\rm M}_{{\\rm b}\\bar{{\\rm b}}}}^{\\rm MC}$  ";
   for (int isr=0; isr<NSAMPLE; ++isr) {
     rmbb[isr] = h_mc[TTBAR][isr]->GetBinContent(i_sig)/h_mc[TTBAR][isr]->GetBinContent(i_ctr);
     ermbb[isr] = addSqr( (h_mc[TTBAR][isr]->GetBinError(i_sig)/h_mc[TTBAR][isr]->GetBinContent(i_sig)), 
@@ -527,11 +319,10 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     cout<<"\\hline"<<endl;
     cout<<"\\hline"<<endl;
 
-    printf(Form("Data$\_{\\rm %s}$ & $%.2f \\pm %.2f$ & - & - \\\\\n", 
-		do1l ? "tail" : "in",
-		h_dt_cor[0]->GetBinContent(i_sig), 
-		h_dt_cor[0]->GetBinError(i_sig)));
-    printf(Form("Data$\_{\\rm %s}$", do1l ? "peak": "out"));
+    printf("Data$\_{\\rm in}$ & $%.2f \\pm %.2f$ & - & - \\\\\n",
+	   h_dt_cor[0]->GetBinContent(i_sig), 
+	   h_dt_cor[0]->GetBinError(i_sig));
+    cout<<"Data$\_{\\rm out}$  ";
     for (int isr=0; isr<NSAMPLE; ++isr) {
       printf("& $%.2f \\pm %.2f$ ",
 	     h_dt_cor[isr]->GetBinContent(i_ctr), 
@@ -539,7 +330,7 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     }
     printf(" \\\\\n");
     cout<<"\\hline"<<endl;
-    printf(Form("${\\rm R}_%s^{\\rm Data}$  ", printtag.c_str()));
+    cout<<"${\\rm R}_{{\\rm M}_{{\\rm b}\\bar{{\\rm b}}}}^{\\rm Data}$  ";
   }
   float rmbb_dt = h_dt_cor[0]->GetBinContent(i_sig)/h_dt_cor[0]->GetBinContent(i_ctr);
   float ermbb_dt = addSqr( (h_dt_cor[0]->GetBinError(i_sig)/h_dt_cor[0]->GetBinContent(i_sig)), 
@@ -550,7 +341,7 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     cout<<"\\hline"<<endl;
     cout<<"\\hline"<<endl;
     
-    printf(Form("SF(${\\rm R}_%s$)  ", printtag.c_str()));
+    cout<<"SF(${\\rm R}_{{\\rm M}_{{\\rm b}\\bar{{\\rm b}}}}$)  ";
   }
   float sf_rmbb = rmbb_dt/rmbb[0];
   float esf_rmbb = addSqr( (ermbb_dt/rmbb_dt), (ermbb[0]/rmbb[0]) )*sf_rmbb; 
@@ -560,37 +351,58 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     cout<<"\\hline"<<endl;
     cout<<"\\hline"<<endl;
     
-    printf(Form("Top pred. = Data$\_{\\rm %s}$ * ${\\rm R}\_%s^{\\rm MC}$ * SF(${\\rm R}\_%s$, 2b) & -  ", 
-		do1l ? "peak" : "out", printtag.c_str(), printtag.c_str()));
+    cout<<"Top pred. = Data$\_{\\rm out}$ * ${\\rm R}\_{{\\rm M}\_{{\\rm b}\\bar{{\\rm b}}}}^{\\rm MC}$ * SF(${\\rm R}\_{{\\rm M}\_{{\\rm b}\\bar{{\\rm b}}}}$, 2b) ";
   }
-  for (int isr=1; isr<NSAMPLE; ++isr) {
-    ttpred[isr]  = h_dt_cor[isr]->GetBinContent(i_ctr)*rmbb[isr]*sf_rmbb;
-    ettpred[isr] = sqrt( pow( (h_dt_cor[isr]->GetBinError(i_ctr)/h_dt_cor[isr]->GetBinContent(i_ctr)), 2) + 
-			 pow( (ermbb[isr]/rmbb[isr]), 2) + pow( (esf_rmbb/sf_rmbb),2) ) * ttpred[isr];
+  for (int isr=0; isr<NSAMPLE; ++isr) {
+    if (isr==0) {
+      ttpred[isr]  = h_dt_cor[isr]->GetBinContent(i_ctr)*rmbb[isr];
+      ettpred[isr] = sqrt( pow( (h_dt_cor[isr]->GetBinError(i_ctr)/h_dt_cor[isr]->GetBinContent(i_ctr)), 2) + 
+			   pow( (ermbb[isr]/rmbb[isr]), 2) ) * ttpred[isr];
+    } else {
+      ttpred[isr]  = h_dt_cor[isr]->GetBinContent(i_ctr)*rmbb[isr]*sf_rmbb;
+      ettpred[isr] = sqrt( pow( (h_dt_cor[isr]->GetBinError(i_ctr)/h_dt_cor[isr]->GetBinContent(i_ctr)), 2) + 
+			   pow( (ermbb[isr]/rmbb[isr]), 2) + pow( (esf_rmbb/sf_rmbb),2) ) * ttpred[isr];
+    }
     if (doprintout) printf("& $%.2f \\pm %.2f$ ",ttpred[isr], ettpred[isr]);    
   }
   if (doprintout) {
     printf(" \\\\\n");
-    cout<<"Rare & - ";
+    cout<<"Rare ";
   }
-  for (int isr=1; isr<NSAMPLE; ++isr) {
+  for (int isr=0; isr<NSAMPLE; ++isr) {
     rarepred[isr]  = h_mc[RARE][isr]->GetBinContent(i_sig);
-    erarepred[isr] = h_mc[RARE][isr]->GetBinError(i_sig);//addSqr( h_mc[RARE][isr]->GetBinError(i_sig), (xs_unc_rare*rarepred[isr]) );
+    erarepred[isr] = addSqr( h_mc[RARE][isr]->GetBinError(i_sig), (xs_unc_rare*rarepred[isr]) );
     if (doprintout) printf("& $%.2f \\pm %.2f$ ",rarepred[isr], erarepred[isr]);    
   }
   if (doprintout) {
     printf(" \\\\\n");
     
     cout<<"\\hline"<<endl;
-    cout<<"Total Pred. & -  ";
+    cout<<"Total Pred. ";
   }
-  for (int isr=1; isr<NSAMPLE; ++isr) {
+  for (int isr=0; isr<NSAMPLE; ++isr) {
     pred[isr] = ttpred[isr] + rarepred[isr];
     epred[isr] = addSqr( ettpred[isr], erarepred[isr]);
     if (doprintout) printf("& $%.2f \\pm %.2f$ ",pred[isr], epred[isr]);    
   }
   if (doprintout) {
+    printf(" \\\\\n");
+    cout<<"\\hline"<<endl;
+    cout<<"Data ";
+    for (int isr=0; isr<NSAMPLE; ++isr) {
+      if (doprintout) printf("& $%.0f$ ",h_dt[isr]->GetBinContent(3));    
+    }
     printf(" \\\\\n"); 
+    cout<<"\\hline"<<endl;
+    cout<<"Data/Pred ";
+    for (int isr=0; isr<NSAMPLE; ++isr) {
+      float closure = h_dt[isr]->GetBinContent(3)/pred[isr];
+      float eclosure = h_dt[isr]->GetBinContent(3)>0. ? 
+	addSqr(h_dt[isr]->GetBinError(3)/h_dt[isr]->GetBinContent(3), epred[isr]/pred[isr]) * closure : 0.;
+      if (doprintout) printf("& $%.2f \\pm %.2f$ ",closure, eclosure);    
+    }
+    printf(" \\\\\n"); 
+
     cout<<endl;
     cout<<endl;
     cout<<endl;
