@@ -99,6 +99,10 @@ class StopTreeLooper {
 
 	float pfcalo_metratio;
 	float pfcalo_metdphi;
+	
+	//flags to blind signal region
+	bool issigmbb;
+	bool issigmt;
 
 
 };

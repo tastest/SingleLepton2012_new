@@ -74,6 +74,8 @@ StopTreeLooper::StopTreeLooper()
   mt2wmin = -9999.;
   pfcalo_metratio = -9999.;
   pfcalo_metdphi  = -9999.;
+  issigmbb = false;
+  issigmt = false;
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -147,6 +149,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
   int nevt_check = 0;
 
   bool isData = name.Contains("data") ? true : false;
+  bool isttbar = (name.Contains("ttsl") || name.Contains("ttdl") ||
+		  name.Contains("ttall") || name.Contains("tt_")) ? true : false;
+
+  cout<<"[StopTreeLooper::loop] Running on sample "<<name.Data()<<" is ttbar "<<isttbar<<endl;
 
   //Define jet multiplicity requirement
   min_njets = 4;
@@ -156,7 +162,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
   //Define peak region 
   min_mtpeak = 50.; 
-  max_mtpeak = 80.; 
+  max_mtpeak = 100.; 
   printf("[StopTreeLooper::loop] MT PEAK definition %.0f - %.0f GeV \n", min_mtpeak, max_mtpeak);
   min_mbb = 100.; 
   max_mbb = 150.; 
@@ -361,6 +367,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       float trigweight = isData ? 1. : getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
       float trigweight_dl = isData ? 1. : getdltrigweight(stopt.id1(), stopt.id2());
 
+      //top pt weight for systematics studies
+      float topptweight = isttbar ? sqrt( TopPtWeight_v2(stopt.t().Pt()) * TopPtWeight_v2(stopt.tbar().Pt()) ) : 1.;
+      
       //----------------------------------------------------------------------------
       // calculate mbb
       //----------------------------------------------------------------------------      
@@ -401,10 +410,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       else flav_tag_dl = "_mysterydl";
       string basic_flav_tag_dl = flav_tag_dl;
       if ( abs(stopt.id1()) != abs(stopt.id2()) ) basic_flav_tag_dl = "_mueg";
+      string njets_tag = Form("_%ij", n_jets<7 ? n_jets : 6);
 
       //
       // SIGNAL REGIONS - single lepton + 3 or >=4 b-tags
       //
+
+      issigmt = (isData && t1metphicorrmt > 120.) ? true : false; 
 
       if ( dataset_1l && passSingleLeptonSelection(isData) 
 	   && stopt.ngoodlep()==1
@@ -412,8 +424,15 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	   //	   && t1metphicorrmt> 120. 
 	   && n_bjets>=4 )
 	{
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l4b", flav_tag_sl, 120. );
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l4b", "", 120. );
+	  if ( !issigmt ) {
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l4b", flav_tag_sl, 120. );
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l4b", "", 120. );
+	    if (n_jets>=6) makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l4b_hinj", "", 120. );
+	    makeSIGPlots( evtweight*trigweight*topptweight, h_1d_sig, "_topptwgt_1l4b", "", 120. );
+	  }
+	  //distributions in MT peak region --> here don't have to worry about signal contamination
+	  if ( t1metphicorrmt > min_mtpeak && t1metphicorrmt < max_mtpeak ) 
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_mtpeak_1l4b", "", 120. );
 	}
 
       if ( dataset_1l && passSingleLeptonSelection(isData) 
@@ -424,41 +443,61 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	   && n_bjets==3 
 	   && n_ljets>0 )  
 	{
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l3b", flav_tag_sl, 150. );
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l3b", "", 150. );
+	  if ( !issigmt ) {
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l3b", flav_tag_sl, 150. );
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l3b", "", 150. );
+	    if (n_jets>=7) makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l3b_hinj", "", 150. );
+	    makeSIGPlots( evtweight*trigweight*topptweight, h_1d_sig, "_topptwgt_1l3b", "", 150. );
+	  }
+	  //distributions in MT peak region --> here don't have to worry about signal contamination
+	  if ( t1metphicorrmt > min_mtpeak && t1metphicorrmt < max_mtpeak ) 
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_mtpeak_1l3b", "", 150. );
 	}
 
       if ( dataset_1l && passSingleLeptonSelection(isData) 
 	   && stopt.ngoodlep()==1
 	   && passisotrk 
-	   && n_jets>=5 
 	   //	   && t1metphicorrmt> 150.  
-	   && n_bjets==2 )
+	   && n_bjets==2  
+	   && n_ljets>0 )
 	{
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l2b", flav_tag_sl, 150. );
-	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l2b", "", 150. );
+	  if (n_jets>=5) {
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l2b", flav_tag_sl, 150. );
+	    makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l2b", "", 150. );
+	    if (n_jets>=7) makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l2b_hinj", "", 150. );
+	    makeSIGPlots( evtweight*trigweight*topptweight, h_1d_sig, "_topptwgt_1l2b", "", 150. );
+	  }
+	  //studies of jet dependence
+	  makeSIGPlots( evtweight*trigweight, h_1d_sig, "_1l2b"+njets_tag, "", 150. );
 	}
 
       //
       // SIGNAL REGIONS - dilepton + 3 or >=4 b-tags
       //
 
+      //blind signal regions
+      issigmbb = (isData && mbb > min_mbb && mbb < max_mbb) ? true : false;
+
       if ( dataset_2l && passDileptonSelection(isData) 
 	   //	   && mbb > min_mbb && mbb < max_mbb 
 	   && n_jets>=4 
-	   && n_bjets>=4 )
+	   && n_bjets>=4 
+	   && !issigmbb )
 	{
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l4b", flav_tag_dl, -1. );
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l4b", "", -1. );
+	  makeSIGPlots( evtweight*trigweight_dl*topptweight, h_1d_sig, "_topptwgt_2l4b", "", -1. );
 	}
 
       if ( dataset_2l && passDileptonSelection(isData) 
 	   //	   && mbb > min_mbb && mbb < max_mbb
 	   && n_jets>=5 
-	   && n_bjets==3 )
+	   && n_bjets==3 
+	   && !issigmbb )
 	{
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l3b", flav_tag_dl, -1. );
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l3b", "", -1. );
+	  makeSIGPlots( evtweight*trigweight_dl*topptweight, h_1d_sig, "_topptwgt_2l3b", "", -1. );
 	}
 
       if ( dataset_2l && passDileptonSelection(isData) 
@@ -468,6 +507,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	{
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l2b", flav_tag_dl, -1. );
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l2b", "", -1. );
+	  //jet dependent distributions for systematics studies
+	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l2b"+njets_tag, "", -1. );
+	  makeSIGPlots( evtweight*trigweight_dl*topptweight, h_1d_sig, "_topptwgt_2l2b", "", -1. );
 	}
 
     } // end event loop
@@ -525,7 +567,7 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
     plot1D("h_sig_bpt1"+tag_selection+flav_tag, jets.at(0).pt(), evtweight, h_1d, 50, 30., 400.);
   if (jets.size()>1) 
     plot1D("h_sig_bpt2"+tag_selection+flav_tag, jets.at(1).pt(), evtweight, h_1d, 50, 30., 400.);
-
+  
   //mbb distribution
   float mbb_count = -1.;
   if ( mbb <= min_mbb ) mbb_count = 0.5;
@@ -536,6 +578,14 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   float mbbplot = mbb<h_xmin ? h_xmin+0.001 : mbb;
   plot1D("h_sig_mbb"+tag_selection+flav_tag, min(mbbplot, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_mbb_count"+tag_selection+flav_tag, mbb_count, evtweight, h_1d, 3, 0, 3);
+
+  //alternative Mbb sideband region for systematic uncertainty
+  float mbb_count_alt = -1.;
+  if ( mbb <=80. ) mbb_count_alt = 0.5;
+  else if ( mbb > min_mbb && mbb < max_mbb ) mbb_count_alt = 1.5;
+  else if ( mbb >= max_mbb ) mbb_count_alt = 2.5;
+  else mbb_count_alt = -1.;
+  plot1D("h_sig_mbb_count_alt"+tag_selection+flav_tag, mbb_count_alt, evtweight, h_1d, 3, 0, 3);
   
   //MT
   float mt_count = -1.;
@@ -543,7 +593,7 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
        && t1metphicorrmt < max_mtpeak )    mt_count = 0.5;
   else if ( t1metphicorrmt > mtcut ) mt_count = 1.5;
   if (mtcut<0.) mt_count = 1.5; 
- 
+
   //binning for mT plots
   nbins = 30;
   h_xmin = 0.;
@@ -551,8 +601,23 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   x_ovflw = h_xmax-0.001;
   plot1D("h_sig_mt"      +tag_selection+flav_tag, min(t1metphicorrmt, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
   plot1D("h_sig_mt_count"+tag_selection+flav_tag, mt_count, evtweight, h_1d, 2, 0, 2);
-  
+
+  //alternative MT peak region for systematic uncertainty
+  float mt_count_alt = -1.;
+  if ( t1metphicorrmt < 80. )        mt_count_alt = 0.5;
+  else if ( t1metphicorrmt > mtcut ) mt_count_alt = 1.5;
+  if (mtcut<0.) mt_count_alt = 1.5; 
+  plot1D("h_sig_mt_count_alt"+tag_selection+flav_tag, mt_count_alt, evtweight, h_1d, 2, 0, 2);
+
+  //  //distributions in MT peak region
+  // if ( t1metphicorrmt > min_mtpeak 
+  //      && t1metphicorrmt < max_mtpeak ) {
+  //   plot1D("h_sig_mtpeak_mbb"+tag_selection+flav_tag, min(mbbplot, x_ovflw), evtweight, h_1d, nbins, h_xmin, h_xmax);
+  //   plot1D("h_sig_mtpeak_mbb_count"+tag_selection+flav_tag, mbb_count, evtweight, h_1d, 3, 0, 3);
+  // }
+
   plot1D("h_sig_njets"+tag_selection+flav_tag, min(n_jets,7),  evtweight, h_1d, 7,0,7);
   plot1D("h_sig_nbjets"+tag_selection+flav_tag, min(n_bjets,5), evtweight, h_1d, 5, 0, 5);
+
 
 }
