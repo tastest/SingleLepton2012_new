@@ -1947,6 +1947,16 @@ double TopPtWeight(double topPt){
 }
 
 //--------------------------------------------------------------------
+//updated version of top pt reweighting function from June 2013
+//see slide 12 of presentation: https://indico.cern.ch/getFile.py/access?contribId=2&resId=0&materialId=slides&confId=252018
+
+double TopPtWeight_v2(double topPt){
+  if( topPt<0 ) return 1.;
+  double result = exp(0.156 - 0.00137 * topPt);
+  return result;
+}
+
+//--------------------------------------------------------------------
 
 // btag POG recommended SFs from Moriond 2013 recommendations, located here:
 //  https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#Recommendation_for_b_c_tagging_a
