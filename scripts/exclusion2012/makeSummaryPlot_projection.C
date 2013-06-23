@@ -1,4 +1,4 @@
-#include "Utils/SMS_utils.C"
+//#include "Utils/SMS_utils.C"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -115,7 +115,7 @@ void makeSummaryPlot_projection( bool doBDT = true , bool print = false){
   c_opt->SetLineStyle(7);
   c_opt2->SetLineStyle(7);
 
-  TH2F* hdummy = new TH2F("hdummy","",100,0,800,100,0,650);
+  TH2F* hdummy = new TH2F("hdummy","",100,150,1000,100,0,650);
   hdummy->Reset();
 
   gPad->SetTopMargin(0.1);
@@ -129,7 +129,7 @@ void makeSummaryPlot_projection( bool doBDT = true , bool print = false){
   hdummy->GetXaxis()->SetTitle("m_{ #tilde{t}}  [GeV]");
   hdummy->GetZaxis()->SetTitle("95% CL UL on #sigma#timesBF [pb]");
   hdummy->GetZaxis()->SetTitleOffset(0.8);
-  hdummy->GetXaxis()->SetRangeUser(xaxismin,800);
+  hdummy->GetXaxis()->SetRangeUser(xaxismin,1000);
   hdummy->GetYaxis()->SetRangeUser(0,650);
   hdummy->SetMinimum(0.001);
   hdummy->SetMaximum(100);
@@ -141,13 +141,13 @@ void makeSummaryPlot_projection( bool doBDT = true , bool print = false){
   //-------------------------------
 
   c_nom->Draw("CONT3SAMEC");
-  c_nom2->Draw("CONT3SAMEC");
+  //c_nom2->Draw("CONT3SAMEC");
 
   c_opt->Draw("CONT3SAMEC");
   c_opt2->Draw("CONT3SAMEC");
 
   c_pess->Draw("CONT3SAMEC");
-  c_pess2->Draw("CONT3SAMEC");
+  //c_pess2->Draw("CONT3SAMEC");
 
   //---------------------------------
   // print labels
@@ -174,7 +174,7 @@ void makeSummaryPlot_projection( bool doBDT = true , bool print = false){
   TLegend *leg = new TLegend(0.48,0.75,0.93,0.88);
   //leg->SetTextSize(0.04);
   leg->AddEntry(c_nom       ,"20 fb^{-1} 8 TeV data "   ,"l");
-  leg->AddEntry(c_pess      ,"300 fb^{-1} 14 TeV data (pessimistic)"   ,"l");
+  leg->AddEntry(c_pess      ,"300 fb^{-1} 14 TeV data (conservative)" ,"l");
   leg->AddEntry(c_opt       ,"300 fb^{-1} 14 TeV data (optimistic)"   ,"l");
   leg->SetBorderSize(0);
   leg->SetFillColor(0);
@@ -194,14 +194,14 @@ void makeSummaryPlot_projection( bool doBDT = true , bool print = false){
   line->DrawLine( 173.5 ,      0 , 475+12.5+173.5 , 475+12.5);
   line->DrawLine(   150 , 150-81 ,  475+12.5+81.0 , 475+12.5);
 
-  t->SetTextAngle(35);
+  t->SetTextAngle(44);
 
   // t->SetTextColor(4);
   // t->DrawLatex(0.43,0.55,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
 
   t->SetTextColor(1);
-  t->DrawLatex(0.57,0.55,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{t}");
-  t->DrawLatex(0.47,0.55,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+  t->DrawLatex(0.46,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{t}");
+  t->DrawLatex(0.38,0.53,"m_{#tilde{t}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
 
   if( print ){
     can1->Print("plots/makeSummaryPlot_projection.pdf");
