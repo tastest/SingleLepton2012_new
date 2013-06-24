@@ -34,7 +34,7 @@ void doAll() {
   char* path_T2bw_fine   = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_fine";
   char* path_T2bw_coarse = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse";
   char* path_T2bw_mad    = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad";
-  
+  char* path_T2tt_lepFilter = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad";
 
   const int NSAMPLES = 1;
   char* sampletag[NSAMPLES] = {
@@ -54,6 +54,9 @@ void doAll() {
 
     //"T2ttPoint_650_1"
 
+    //"merged_T2tt_mStop-225to350_mLSP-25to250_lepFilter",
+    "merged_T2tt_mStop-100to200_mLSP-1to100_LeptonFilt",
+
     //--------------------
     // T2bw madgraph
     //--------------------
@@ -63,7 +66,7 @@ void doAll() {
     //"merged_T2bw_mStop_500to800_mLSP_0to700_x050"
 
     // x=0.25
-    "merged_T2bw_mStop-100to475_mLSP-0to375_x025",
+    //"merged_T2bw_mStop-100to475_mLSP-0to375_x025",
     //"merged_T2bw_mStop-500to800_mLSP-0to700_x025"
 
     // x=0.75
@@ -141,22 +144,27 @@ void doAll() {
 
     if( TString(sampletag[i]).Contains("T2") ){
 
-      if( TString(sampletag[i]).Contains("T2tt") ){
+      if( TString(sampletag[i]).Contains("T2tt") && TString(sampletag[i]).Contains("Filt") ){
+	ch[i]->Add(Form("%s/%s*root",path_T2tt_lepFilter,sampletag[i]));
+	cout << "Added " << Form("%s/%s*root",path_T2tt_lepFilter,sampletag[i]) << endl;	
+      }
+
+      else if( TString(sampletag[i]).Contains("T2tt") ){
 	ch[i]->Add(Form("%s/%s*root",path_T2tt,sampletag[i]));
 	cout << "Added " << Form("%s/%s*root",path_T2tt,sampletag[i]) << endl;	
       }
 
-      if( TString(sampletag[i]).Contains("T2bw_fine") ){
+      else if( TString(sampletag[i]).Contains("T2bw_fine") ){
 	ch[i]->Add(Form("%s/%s*root",path_T2bw_fine,sampletag[i]));
 	cout << "Added " << Form("%s/%s*root",path_T2bw_fine,sampletag[i]) << endl;	
       }
 
-      if( TString(sampletag[i]).Contains("T2bw_coarse") ){
+      else if( TString(sampletag[i]).Contains("T2bw_coarse") ){
 	ch[i]->Add(Form("%s/%s.root",path_T2bw_coarse,sampletag[i]));
 	cout << "Added " << Form("%s/%s.root",path_T2bw_coarse,sampletag[i]) << endl;	
       }
 
-      if( TString(sampletag[i]).Contains("T2bw") && (TString(sampletag[i]).Contains("x025")||TString(sampletag[i]).Contains("x050")||TString(sampletag[i]).Contains("x075")) ){
+      else if( TString(sampletag[i]).Contains("T2bw") && (TString(sampletag[i]).Contains("x025")||TString(sampletag[i]).Contains("x050")||TString(sampletag[i]).Contains("x075")) ){
 	ch[i]->Add(Form("%s/%s*root",path_T2bw_mad,sampletag[i]));
 	cout << "Added " << Form("%s/%s*root",path_T2bw_mad,sampletag[i]) << endl;	
       }

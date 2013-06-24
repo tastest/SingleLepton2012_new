@@ -150,13 +150,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         char* h_nsig_filename             = "";
         char* h_nsig_filename_masslessLSP = "";
 
-        if( name.Contains("T2tt") ){
+        if( name.Contains("T2tt") && name.Contains("Filt") ){
+	  h_nsig_filename             = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad/myMassDB_lepFilter_rescaled.root";
+	  h_nsig_filename_masslessLSP = h_nsig_filename;
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massive LSP)  " << h_nsig_filename << endl;
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massless LSP) " << h_nsig_filename_masslessLSP << endl;
+	}
+
+        else if( name.Contains("T2tt") ){
 	  h_nsig_filename             = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/myMassDB_T2tt_massiveLSP.root";
 	  h_nsig_filename_masslessLSP = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad/myMassDB_T2tt_masslessLSP.root";
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massive LSP)  " << h_nsig_filename << endl;
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massless LSP) " << h_nsig_filename_masslessLSP << endl;
 	}
-        if( name.Contains("T2bw") ){
+
+        else if( name.Contains("T2bw") ){
 
 	  if( name.Contains("fine") ){
 	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-23/T2bw_pythia_fine/myMassDB_T2bw_fine.root";
@@ -1113,7 +1121,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         rootdir->cd();
 
 //        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
-        outFile_   = new TFile(Form("output_V00-03-11/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-12/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
