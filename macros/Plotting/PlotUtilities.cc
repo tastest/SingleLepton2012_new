@@ -235,6 +235,27 @@ void plot1D(string title, float xval, double weight, std::map<string, TH1F*> &al
   
 }
 
+TH1F* getHist1D(string title, std::map<string, TH1F*> &allhistos, 
+	    int numbinsx, float xmin, float xmax)  
+{
+
+  TH1F* currentHisto = 0;
+
+  std::map<string, TH1F*>::iterator iter= allhistos.find(title);
+  if(iter == allhistos.end()) //no histo for this yet, so make a new one
+    {
+      currentHisto= new TH1F(title.c_str(), title.c_str(), numbinsx, xmin, xmax);
+      currentHisto->Sumw2();
+      allhistos.insert(std::pair<string, TH1F*> (title,currentHisto) );
+    }
+  else // exists already, so just fill it
+    {
+      currentHisto = (*iter).second;
+    }
+  
+  return currentHisto;
+}
+
 void savePlots(std::map<string, TH1F*> &h_1d, char* outfilename){
   TFile outfile(outfilename,"RECREATE") ;
 
@@ -259,6 +280,80 @@ void savePlots2(std::map<string, TH2F*> &h_1d, char* outfilename){
   for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
     it1d->second->Write();
     delete it1d->second;
+  }
+
+  outfile.Write();
+  outfile.Close();
+}
+
+
+void savePlotsDir(std::map<string, TH1F*> &h_1d, TFile* outfile, char* dirname){
+
+  printf("[StopTreeLooper::loop] Saving 1d histograms to dir: %s\n", dirname);
+
+  TDirectory* dir = 0;
+
+  // base dir: just cd to output file
+  if (strcmp(dirname,"") == 0) {
+    outfile->cd();
+  } else {
+    // first check for directory, create if it doesn't exist
+    dir = (TDirectory*)outfile->Get(dirname);
+    if (dir == 0) {
+      dir = outfile->mkdir(dirname);
+    } 
+    dir->cd();
+  }
+
+  std::map<std::string, TH1F*>::iterator it1d;
+  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
+    it1d->second->Write();
+    delete it1d->second;
+  }
+
+}
+
+void savePlots2Dir(std::map<string, TH2F*> &h_2d, TFile* outfile, char* dirname){
+
+  printf("[StopTreeLooper::loop] Saving 2d histograms to dir: %s\n", dirname);
+
+  TDirectory* dir = 0;
+
+  // base dir: just cd to output file
+  if (strcmp(dirname,"") == 0) {
+    outfile->cd();
+  } else {
+    // first check for directory, create if it doesn't exist
+    dir = (TDirectory*)outfile->Get(dirname);
+    if (dir == 0) {
+      dir = outfile->mkdir(dirname);
+    } 
+    dir->cd();
+  }
+
+  std::map<std::string, TH2F*>::iterator it2d;
+  for(it2d=h_2d.begin(); it2d!=h_2d.end(); it2d++) {
+    it2d->second->Write();
+    delete it2d->second;
+  }
+
+}
+
+void savePlots12(std::map<string, TH1F*> &h_1d, std::map<string, TH2F*> &h_2d, char* outfilename){
+  TFile outfile(outfilename,"RECREATE") ;
+
+  printf("[StopTreeLooper::loop] Saving histograms to %s\n", outfilename);
+
+  std::map<std::string, TH1F*>::iterator it1d;
+  for(it1d=h_1d.begin(); it1d!=h_1d.end(); it1d++) {
+    it1d->second->Write();
+    delete it1d->second;
+  }
+
+  std::map<std::string, TH2F*>::iterator it2d;
+  for(it2d=h_2d.begin(); it2d!=h_2d.end(); it2d++) {
+    it2d->second->Write();
+    delete it2d->second;
   }
 
   outfile.Write();
