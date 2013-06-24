@@ -3248,6 +3248,26 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	weight_ = 1.;
       }
 
+      else if(TString(prefix).Contains("HHWWbb")) {
+
+	mG_ = cms2.sparm_values().at(0);
+        mL_ = -999; //cms2.sparm_values().at(1);
+
+	if     ( mG_ == 150 ) xsecsusy_ = 2.141;
+	else if( mG_ == 200 ) xsecsusy_ = 0.6975;
+	else if( mG_ == 250 ) xsecsusy_ = 0.271;
+	else{
+	  cout << "ERROR! unrecognized mu value " << mG_ << endl;
+	}
+
+	// filter efficiency: require HH->WWbb with >=1 lepton
+	// HH->WWbb filter efficiency = 2 X 0.577 X 0.215 = 0.248
+	// >=1 lepton efficiency      = 1 - ( 1 - ( 3 X 0.108 )^2 ) = 0.543
+	// total filter efficiency = 0.248 X 0.543 = 0.135
+
+	weight_ = lumi * xsecsusy_ * (1000.0/100000.0) * 0.135;
+      }
+
       else if(strcmp(prefix,"LMscan") == 0){
 
 	m0_  = -999; //sparm_m0();

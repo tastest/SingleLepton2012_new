@@ -41,7 +41,7 @@ void doAll(bool skipFWLite = true)
   // choose version, output will be written to output/[version]
   //---------------------------------------------------------------
   
-  const char* version    = "V00-01-01";
+  const char* version    = "V00-02-29";
   const char* jsonfile   = "jsons/Cert_198050-207279_8TeV_19p47ifb_Collisions12_JSON_goodruns.txt";
   const bool  useMCSkims = true;
 
@@ -105,8 +105,9 @@ void doAll(bool skipFWLite = true)
   bool runT2tt     = 0; 
   bool runT2tt_few = 0;
   bool runT2bw     = 0;
-  bool runT2bw_few = 1;
+  bool runT2bw_few = 0;
   bool runtttest   = 0;
+  bool runHHWWbb   = 1;
 
   bool rundata2012a      = 0;
   bool rundata2012b      = 0;
@@ -193,6 +194,16 @@ void doAll(bool skipFWLite = true)
     pickSkimIfExists(chtopall,"/tmp/merged_ntuple_157.root");
     //    pickSkimIfExists(chtopall,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-13/merged*.root");
 
+  }
+
+  //----------------------------------------
+  // HH->WWbb
+  //----------------------------------------
+
+  TChain* chHHWWbb = new TChain("Events");
+
+  if (runHHWWbb) {
+    pickSkimIfExists(chHHWWbb,"/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/SMS-TChihhwwbb_mNeutralino-150to250_mLSP-0_8TeV-Pythia6Z/V05-03-28/merged_ntuple*root");
   }
 
   //----------------------------------------
@@ -631,6 +642,12 @@ void doAll(bool skipFWLite = true)
     cout << "Processing ttbar all.. " << endl;
     looper->ScanChain(chtopall,"ttall", kttall, prettall, lumi);
     cout << "Done processing ttbar all.. " << endl;
+  }
+  //--------------------------------------------------------------------
+  if (runHHWWbb) {
+    cout << "Processing HH->WWbb.. " << endl;
+    looper->ScanChain(chHHWWbb,"HHWWbb", 1, 1, lumi);
+    cout << "Done processing HH->WWbb.. " << endl;
   }
   //--------------------------------------------------------------------
   if (runtttest) {
