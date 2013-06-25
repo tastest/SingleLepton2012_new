@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTDIR=V24_cr5invmass
+OUTDIR=V24_cr14nomt
 
 declare -a Samples=(ttsl ttdl tsl tdl wjets wbb others data)
 

@@ -1,0 +1,26 @@
+#### Using this code:
+
+# Check out this directory into SingleLepton2012/macros:
+cvs co -d WHLooper UserCode/olivito/SingleLepton2012/macros/WHLooper
+
+# Make sure you have the latest versions of macros/Core, macros/Plotting, and Tools/BTagReshaping
+
+# compile
+make
+
+# To run, the script doAll.C has most of the options, including input directory and which babies are picked up for each background.  
+# The script do.sh lauches jobs in parallel to run each background.  
+# The output appears in WHLooper/output/OUTDIR, where OUTDIR is specified in do.sh.
+# Once things are set up, to run, just do:
+mkdir output
+. do.sh
+
+# Running takes a while (~40min for the longest sample, ttbar1l), because I make a ton of histograms.  
+# To speed up a little bit, regions can be turned on and off in WHLooper near the top with the "doCRX" flags.
+# There are a lot of regions defined, basically anything I've ever looked at... The main important ones are:
+const bool doSignalMassLast = true;
+const bool doSignalMETLast = true;
+const bool doCR23 = true; // dilep + (lep+track)
+const bool doCR5METLast = true; // bveto
+const bool doCR14 = true; // inverted mbb region
+
