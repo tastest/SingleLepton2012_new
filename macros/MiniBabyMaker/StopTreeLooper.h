@@ -51,6 +51,7 @@ class StopTreeLooper {
 
         void setOutFileName(string filename); 
         void doWHNtuple(); 
+	void disableMVA();
         void loop(TChain *chain, TString name);
 
 	//	MT2struct Best_MT2Calculator_Ricardo(list<Candidate>, StopTree*, bool);
@@ -178,6 +179,12 @@ class StopTreeLooper {
 	Float_t xsecsusy_;
 	Float_t isrweight_;
 
+	Int_t   nnonbjets_;
+	Float_t jjmaxpt_mass_;
+	Float_t jjmaxpt_pt_;
+	Float_t jjw_mass_;
+	Float_t jjw_pt_;
+
 	Float_t rand_;
 	vector<float> bdt_;
 	vector<float> bdtup_;
@@ -201,6 +208,7 @@ class StopTreeLooper {
 
 	//jet information
 	vector<LorentzVector> jets;
+	vector<LorentzVector> nonbjets;
 	vector<LorentzVector> jets_up;
 	vector<LorentzVector> jets_down;
 	vector<LorentzVector> bjets;
@@ -216,7 +224,8 @@ class StopTreeLooper {
 	float metupphi;
 	float metdownphi;
 
-    static const bool __apply_mva = true; 
+	//static const bool __apply_mva = true; 
+	bool __apply_mva; 
     static const bool __mini_branches = true;
     static const bool __add_babies = true; 
 
