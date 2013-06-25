@@ -66,6 +66,8 @@ StopTreeLooper::StopTreeLooper()
     MET_CUT = 50.0;
 
     m_minibabylabel_ = "";
+
+    __apply_mva = true;
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -76,6 +78,7 @@ void StopTreeLooper::setOutFileName(string filename)
 {
     m_outfilename_ = filename;
     jets.clear();
+    nonbjets.clear();
     jets_up.clear();
     jets_down.clear();
     bjets.clear();
@@ -102,6 +105,10 @@ void StopTreeLooper::doWHNtuple()
     MET_CUT = 50.0;
 
     m_minibabylabel_ = "_whmet";
+}
+
+void StopTreeLooper::disableMVA(){
+  __apply_mva = false;
 }
 
 void StopTreeLooper::loop(TChain *chain, TString name)
@@ -568,6 +575,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	      //      << " weight " << evtweight << endl;
             }
 
+	    if( name.Contains("HHWWbb") ){
+	      weight_ = stopt.weight() * 19.5;
+	    }
+
 	    //	    nvtxweight_ = stopt.nvtxweight();
 	    nvtxweight_ = puweight;
 
@@ -666,6 +677,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             // jet selection
             jets.clear();
+	    nonbjets.clear();
             jets_up.clear();
             jets_down.clear();
             bjets.clear();
@@ -685,6 +697,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             nb_downBCShape_ = 0;
             nb_upLShape_ = 0;
             nb_downLShape_ = 0;
+	    nnonbjets_ = 0;
 
             // kinematic variables
             htssl_ = 0.;
@@ -808,6 +821,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 		}
 	      }
 
+	      else{
+		nnonbjets_++;
+		nonbjets.push_back(stopt.pfjets().at(i));
+	      }
+
 	      // bjet pt and dR(b,lep) with btagging up
 	      if ( (fabs(stopt.pfjets().at(i).eta()) <= BJET_ETA) && (csv_upBCShape > 0.679) ) {
 		nb_bup++;
@@ -924,6 +942,30 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 bbwdphi_ = fabs(TVector2::Phi_mpi_pi(bb.phi() - w.Phi()));
             }
 
+	    // for HH->WWbb analysis
+	    if( nnonbjets_ >= 2 ){
+	      LorentzVector dijet = nonbjets.at(0) + nonbjets.at(1);
+
+	      jjmaxpt_mass_ = dijet.M();
+	      jjmaxpt_pt_   = dijet.pt();
+
+	      float mindm = 99999;
+
+	      for( unsigned int i = 0 ; i < nonbjets.size() ; i++ ){
+		for( unsigned int j = i+1 ; j < nonbjets.size() ; j++ ){
+
+		  LorentzVector this_dijet = nonbjets.at(i) + nonbjets.at(j);
+		  
+		  if( fabs( this_dijet.M() - 81.0 ) < mindm ){
+		    mindm     = fabs( this_dijet.M() - 81.0 );
+		    jjw_mass_ = this_dijet.M();
+		    jjw_pt_   = this_dijet.pt();
+		  }
+
+		}
+	      }
+
+	    }
 
             //------------------------------------------ 
             // datasets bit
@@ -1121,7 +1163,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         rootdir->cd();
 
 //        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
-        outFile_   = new TFile(Form("output_V00-03-12/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-13/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
@@ -1238,6 +1280,12 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             outTree_->Branch("mini_t2ttLM"    , &t2ttLM_    ,  "mini_t2ttLM/F"    );
             outTree_->Branch("mini_t2ttHM"    , &t2ttHM_    ,  "mini_t2ttHM/F"    );
+
+            outTree_->Branch("mini_nnonbjets"    , &nnonbjets_    ,  "mini_t2ttHM/I"        );
+            outTree_->Branch("mini_jjmaxpt_mass" , &jjmaxpt_mass_ ,  "mini_jjmaxpt_mass/F"  );
+            outTree_->Branch("mini_jjmaxpt_pt"   , &jjmaxpt_pt_   ,  "mini_jjmaxpt_pt/F"    );
+            outTree_->Branch("mini_jjw_mass"     , &jjw_mass_     ,  "mini_jjw_mass/F"      );
+            outTree_->Branch("mini_jjw_pt"       , &jjw_pt_       ,  "mini_jjw_pt/F"        );
         }
 
         if (__apply_mva){
