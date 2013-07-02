@@ -9,7 +9,6 @@
 #include "../Plotting/PlotUtilities.h"
 #include "../../Tools/BTagReshaping/BTagReshaping.h"
 
-
 #include "TROOT.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -68,6 +67,7 @@ StopTreeLooper::StopTreeLooper()
     m_minibabylabel_ = "";
 
     __apply_mva = true;
+    __disableBranches = false;
 }
 
 StopTreeLooper::~StopTreeLooper()
@@ -105,6 +105,19 @@ void StopTreeLooper::doWHNtuple()
     MET_CUT = 50.0;
 
     m_minibabylabel_ = "_whmet";
+}
+
+void StopTreeLooper::pruneBabies(){
+  cout << "Removing many branches of the baby" << endl;
+  __disableBranches = true;
+}
+void StopTreeLooper::setNjetsCut(int n){
+  cout << "Switch to: njets >= " << n << endl;
+  NJETS_CUT = n;
+}
+void StopTreeLooper::setMetCut(float metcut){
+  cout << "Switch to: MET > " << metcut << endl;
+  MET_CUT = metcut;
 }
 
 void StopTreeLooper::disableMVA(){
@@ -484,6 +497,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    float puweight = vtxweight_n( stopt.ntruepu(), h_pu_wgt, isData );
 
+	    puweight_ = 1.0;
+	    if( !name.Contains("T2") && !isData ) puweight_ = puweight;
+
             weight_ = isData ? 1. : 
                 ( stopt.weight() * 19.5 * puweight * stopt.mgcor() );
 
@@ -728,6 +744,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 					 stopt.pfjets_csv().at(i),
 					 stopt.pfjets_mcflavorAlgo().at(i) ); 
 
+	      pfjets_csvreshape_.push_back( csv_nominal );
+
 	      //float csv_upBCShape=(isData || name.Contains("T2")) ? stopt.pfjets_csv().at(i)
 	      float csv_upBCShape=(isData) ? stopt.pfjets_csv().at(i)
 		: upBCShape->reshape( stopt.pfjets().at(i).eta(),
@@ -757,7 +775,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 					 stopt.pfjets_mcflavorAlgo().at(i) );
 
 	      // jets with up and down variations
-	      float unc     = stopt.pfjets_uncertainty().at(i);
+	      //float unc     = stopt.pfjets_uncertainty().at(i);
+	      float unc = 0.0;
+
 	      float pt_up   = stopt.pfjets().at(i).pt() * ( 1 + unc );
 	      float pt_down = stopt.pfjets().at(i).pt() * ( 1 - unc );
 	      float eta     = fabs(stopt.pfjets().at(i).eta());
@@ -1163,7 +1183,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         rootdir->cd();
 
 //        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
-        outFile_   = new TFile(Form("output_V00-03-13/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-14/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
@@ -1197,6 +1217,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_met"       , &met_       ,  "mini_met/F"	 );
             outTree_->Branch("mini_metup"     , &metup_     ,  "mini_metup/F"	 );
             outTree_->Branch("mini_metdown"   , &metdown_   ,  "mini_metdown/F"	 );
+
+            outTree_->Branch("mini_puweight"  , &puweight_  ,  "mini_puweight/F" );
 
             outTree_->Branch("mini_sig"       , &sig_       ,  "mini_sig/I"	 );
             outTree_->Branch("mini_cr1"       , &cr1_       ,  "mini_cr1/I"	 );
@@ -1286,6 +1308,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_jjmaxpt_pt"   , &jjmaxpt_pt_   ,  "mini_jjmaxpt_pt/F"    );
             outTree_->Branch("mini_jjw_mass"     , &jjw_mass_     ,  "mini_jjw_mass/F"      );
             outTree_->Branch("mini_jjw_pt"       , &jjw_pt_       ,  "mini_jjw_pt/F"        );
+
+	    outTree_->Branch("pfjets_csvreshape" , "std::vector<float>" , &pfjets_csvreshape_      );
         }
 
         if (__apply_mva){
@@ -1295,6 +1319,97 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  outTree_->Branch("mini_bdtbup"    , "std::vector<float>" , &bdtbup_   );
 	  outTree_->Branch("mini_bdtbdown"  , "std::vector<float>" , &bdtbdown_ );
 	}
+
+
+	if( __disableBranches ){
+
+	  cout << "Removing all branches and only storing the needed ones" << endl;
+
+	  outTree_->SetBranchStatus("*",0); 
+	  outTree_->SetBranchStatus("pfjets.fCoordinates*",1); 
+	  outTree_->SetBranchStatus("pfjets_csv",1); 
+	  outTree_->SetBranchStatus("pfjets_csvreshape",1); 
+	  outTree_->SetBranchStatus("pfjets_sigma",1); 
+	  outTree_->SetBranchStatus("pfjets_mva5xPUid",1); 
+	  outTree_->SetBranchStatus("pfjets_mcflavorAlgo",1); 
+	  outTree_->SetBranchStatus("pfjets_mcflavorPhys",1); 
+	  outTree_->SetBranchStatus("pfjets_corr",1); 
+	  outTree_->SetBranchStatus("mini_puweight",1); 
+	  outTree_->SetBranchStatus("isdata",1); 
+	  outTree_->SetBranchStatus("ngoodlep",1); 
+	  outTree_->SetBranchStatus("ngoodel",1); 
+	  outTree_->SetBranchStatus("ngoodmu",1); 
+
+	  if( TString(prefix).Contains("data") ){
+	    outTree_->SetBranchStatus("genps_*",1); 
+	    outTree_->SetBranchStatus("genmet",1); 
+	    outTree_->SetBranchStatus("genmetphi",1); 
+	  }
+
+	  outTree_->SetBranchStatus("run",1);
+	  outTree_->SetBranchStatus("lumi",1);
+	  outTree_->SetBranchStatus("event",1);
+	  outTree_->SetBranchStatus("dataset",1);
+	  outTree_->SetBranchStatus("mini_dltrigeff",1);
+	  outTree_->SetBranchStatus("mini_mt2b",1);
+	  outTree_->SetBranchStatus("mini_mt2bl",1);
+	  outTree_->SetBranchStatus("nels",1);
+	  outTree_->SetBranchStatus("nmus",1);
+	  outTree_->SetBranchStatus("ntaus",1);
+	  outTree_->SetBranchStatus("nleps",1);
+	  outTree_->SetBranchStatus("pfmet",1);
+	  outTree_->SetBranchStatus("pfmetphi",1); 
+	  outTree_->SetBranchStatus("calomet",1);
+	  outTree_->SetBranchStatus("calometphi",1); 
+	  outTree_->SetBranchStatus("nvtx",1); 
+	  outTree_->SetBranchStatus("mm",1);
+	  outTree_->SetBranchStatus("mmtk",1);
+	  outTree_->SetBranchStatus("me",1);
+	  outTree_->SetBranchStatus("em",1);
+	  outTree_->SetBranchStatus("ee",1);
+	  outTree_->SetBranchStatus("isomu24",1);
+	  outTree_->SetBranchStatus("ele27wp80",1);
+	  outTree_->SetBranchStatus("lep1",1);
+	  outTree_->SetBranchStatus("pflep1",1);
+	  outTree_->SetBranchStatus("isopf1",1);
+	  outTree_->SetBranchStatus("eoverpin",1);
+	  outTree_->SetBranchStatus("leptype",1);
+	  outTree_->SetBranchStatus("lep2",1);
+	  outTree_->SetBranchStatus("id1",1);
+	  outTree_->SetBranchStatus("id2",1);
+	  outTree_->SetBranchStatus("ngoodlep",1);
+	  outTree_->SetBranchStatus("rhovor",1);
+	  outTree_->SetBranchStatus("mini_met*",1);
+	  outTree_->SetBranchStatus("mini_mt*",1);
+	  outTree_->SetBranchStatus("mini_njets*",1);
+	  outTree_->SetBranchStatus("mini_nb",1);
+	  outTree_->SetBranchStatus("mini_passisotrk",1);
+	  outTree_->SetBranchStatus("mini_passtauveto",1);
+	  outTree_->SetBranchStatus("mini_dphimjmin",1);
+	  outTree_->SetBranchStatus("mini_chi2",1);
+	  outTree_->SetBranchStatus("mini_mt2w",1);
+	  outTree_->SetBranchStatus("mini_pt_b",1);
+	  outTree_->SetBranchStatus("mini_htratiom",1);
+	  outTree_->SetBranchStatus("mini_dRleptB1",1);
+	  outTree_->SetBranchStatus("mini_bdt",1);
+	  outTree_->SetBranchStatus("mini_weight",1);
+	  outTree_->SetBranchStatus("mini_sltrigeff",1);
+	  outTree_->SetBranchStatus("mini_mstop",1);
+	  outTree_->SetBranchStatus("mini_mlsp",1);
+	  outTree_->SetBranchStatus("mini_x",1);
+	  outTree_->SetBranchStatus("mini_xsecsusy",1);
+	  outTree_->SetBranchStatus("mini_nsigevents",1);
+	  outTree_->SetBranchStatus("mini_weightleft",1);
+	  outTree_->SetBranchStatus("mini_weightright",1);
+	  outTree_->SetBranchStatus("mini_t2bwweight_ss",1);
+	  outTree_->SetBranchStatus("mini_t2bwweight_ll",1);
+	  outTree_->SetBranchStatus("mini_t2bwweight_lr",1);
+	  outTree_->SetBranchStatus("mini_t2bwweight_rl",1);
+	  outTree_->SetBranchStatus("mini_t2bwweight_rr",1);
+	  outTree_->SetBranchStatus("mini_isrweight",1);
+
+	}
+
 
     }
 
@@ -1400,6 +1515,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         t2ttLM_ =-1;
         t2ttLM_ =-1;
 
+	pfjets_csvreshape_.clear();
         bdt_.clear();
 	bdtup_.clear();
 	bdtdown_.clear();

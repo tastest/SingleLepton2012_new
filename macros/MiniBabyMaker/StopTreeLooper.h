@@ -51,6 +51,9 @@ class StopTreeLooper {
 
         void setOutFileName(string filename); 
         void doWHNtuple(); 
+        void pruneBabies(); // remove many branches
+	void setNjetsCut(int n);
+	void setMetCut(float metcut);
 	void disableMVA();
         void loop(TChain *chain, TString name);
 
@@ -75,6 +78,8 @@ class StopTreeLooper {
 	// cut and count selections
 	Float_t t2ttLM_;
 	Float_t t2ttHM_;
+
+	Float_t puweight_;
 
 	// kinematic variables
 	Float_t mt_;
@@ -186,6 +191,7 @@ class StopTreeLooper {
 	Float_t jjw_pt_;
 
 	Float_t rand_;
+	vector<float> pfjets_csvreshape_;
 	vector<float> bdt_;
 	vector<float> bdtup_;
 	vector<float> bdtdown_;
@@ -226,6 +232,7 @@ class StopTreeLooper {
 
 	//static const bool __apply_mva = true; 
 	bool __apply_mva; 
+	bool __disableBranches; 
     static const bool __mini_branches = true;
     static const bool __add_babies = true; 
 
