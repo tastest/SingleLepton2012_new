@@ -21,14 +21,14 @@ void doAll_commonBabies( char* filename = "ttV" ) {
   StopTreeLooper *looper = new StopTreeLooper();
 
   looper->pruneBabies();
-  looper->setNjetsCut(0);
+  looper->setNjetsCut(2);
   looper->setMetCut(0.0);
 
   //------------------------------ 
   // samples to run over
   //------------------------------ 
  
-  char* path                = "/nfs-7/userdata/stop/output_V00-02-24_2012_2jskim"; 
+  char* path                = "/nfs-7/userdata/stop/output_V00-02-21_2012_2jskim"; 
   char* path_T2tt           = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-24/T2tt_mad";
   char* path_T2tt_lepFilter = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2tt_mad";
   char* path_T2bw_mad       = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad";
