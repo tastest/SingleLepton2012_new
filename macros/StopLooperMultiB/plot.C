@@ -188,12 +188,14 @@ void drawMT(bool doLog, int rebin) {
   plotPreliminary(lumiLeg, 0.65 ,0.80);
 
   if(data) plotLeg("data - ttbar 2l - rare - ttH",1.,data,0.45,0.65,"pe");
-  if(tt_1l) plotLeg("ttbar 1l",1., tt_1l, 0.45,0.6,"f");
+  if(tt_1l) plotLeg("#tilde{t}#tilde{#bar{t}} 1l",1., tt_1l, 0.45,0.6,"f");
   //  if(tt_2l) plotLeg("ttbar 2l",1., tt_2l, 0.7,0.55,"f");
   //  if(hrare) plotLeg("rare",1., hrare, 0.7,0.5,"f");
   //  if(ttH) plotLeg("ttH",1., ttH, 0.7,0.45,"f");
 
   cout << " done 1 " << endl;
+
+  if(histoName->Contains("discr")) return;
 
   c1->cd();
   TPad *respad = new TPad("respad","respad",0,0.8,1,1);
@@ -201,8 +203,7 @@ void drawMT(bool doLog, int rebin) {
   respad->cd();
 
   TH1 * hdata=data->Clone();
-  TH1 * hMC=tt_1l->Clone();
-
+  TH1 * hMC=tt_2l->Clone();
   
   //  hdata->Rebin(rebin);
   //  hMC->Rebin(rebin);
@@ -246,15 +247,15 @@ void getPrediction(TH1 * data) {
   
   cout << "histoName " << histo << endl;
 
-  if(histo.Contains("h_cr1_mt_3bM") || histo.Contains("h_cr1_mt_4bM")) {
+  if(histo.Contains("h_cr1_mt_3bM") || histo.Contains("h_cr1_mt_4bM") || histo.Contains("cr1_mt_12bM")) {
 
     double errorLow = 0.;
     double errorHigh120 = 0.;
     double errorHigh150 = 0.;
     
-    double integralBulk = (data->IntegralAndError(data->FindBin(50),data->FindBin(100),errorLow));
-    double integralHigh120 = (data->IntegralAndError(data->FindBin(120),data->FindBin(9999),errorHigh120));
-    double integralHigh150 = (data->IntegralAndError(data->FindBin(150),data->FindBin(9999),errorHigh150));
+    double integralBulk = (data->IntegralAndError(data->FindBin(50.01),data->FindBin(100.01),errorLow));
+    double integralHigh120 = (data->IntegralAndError(data->FindBin(120.01),data->FindBin(9999),errorHigh120));
+    double integralHigh150 = (data->IntegralAndError(data->FindBin(150.01),data->FindBin(9999),errorHigh150));
 
     /*
     cout << " bulk : " << integralBulk << endl;
@@ -266,51 +267,64 @@ void getPrediction(TH1 * data) {
     double errorRatio120 = ratio120*sqrt(pow(errorLow/integralBulk,2) + pow(errorHigh120/integralHigh120,2));
     double errorRatio150 = ratio150*sqrt(pow(errorLow/integralBulk,2) + pow(errorHigh150/integralHigh150,2));
 
-    if(histo.Contains("h_cr1_mt_4bM")) cout << "@@@@@@ mt120: " << round_fn(ratio120,3) << " +- " <<  round_fn(errorRatio120,3) << endl;
-    if(histo.Contains("h_cr1_mt_3bM")) cout << "@@@@@@ mt150: " << round_fn(ratio150,3) << " +- " <<  round_fn(errorRatio150,3) << endl;
+    cout << "+ + + + correction factor MT " << endl;
+
+    /*
+    if(histo.Contains("h_cr1_mt_4bM")) cout << "@@@@ mt120: " << round_fn(ratio120,3) << " +- " <<  round_fn(errorRatio120,3) << endl;
+    if(histo.Contains("h_cr1_mt_3bM")) cout << "@@@@ mt150: " << round_fn(ratio150,3) << " +- " <<  round_fn(errorRatio150,3) << endl;
+    */
+
+    cout << "@@@@ mt120: " << round_fn(ratio120,3) << " +- " <<  round_fn(errorRatio120,3) << endl;
+    cout << "@@@@ mt150: " << round_fn(ratio150,3) << " +- " <<  round_fn(errorRatio150,3) << endl;
+
+
 
   }
 
-  //  if(histo.Contains("cr3_2b_Massbb") || histo.Contains("cr3tau_2b_Massbb") || histo.Contains("cr2_3bT_Massbb") || histo.Contains("cr2_4bM_Massbb") || histo.Contains("h_cr4_massHbb_3bM") || histo.Contains("h_cr4_massHbb_4bM") || histo.Contains("cr1_massHbb_3bT")  || histo.Contains("cr1_massHbb_4bM") || histo.Contains("cr1_massHbb_3bM") || histo.Contains("cr1_massHbb_2bM") || histo.Contains("cr4_massHbb_eq2bM")) { 
-    //    double integralLowMass = (data->Integral(data->FindBin(-20),data->FindBin(80)));
-    //    double integralWindow = (data->Integral(data->FindBin(80),data->FindBin(200)));
     
-  if(histo.Contains("h_cr4_massHbb_3bM") || histo.Contains("h_cr4_massHbb_4bM") || histo.Contains("cr1_massHbb_4bM") || histo.Contains("cr1_massHbb_3bM") || histo.Contains("cr1_massHbb_eq2bM") || histo.Contains("cr1_massHbb_2bM") || histo.Contains("cr4_massHbb_eq2bM") || histo.Contains("h_cr1_mt_4bM") || histo.Contains("h_cr1_mt_3bM")) {
+  if(histo.Contains("h_cr4_massHbb_3bM") || histo.Contains("h_cr4_massHbb_4bM") || histo.Contains("cr1_massHbb_4bM") || histo.Contains("cr1_massHbb_3bM") || histo.Contains("cr1_massHbb_2bM") || histo.Contains("cr1_massHbb_2bM") || histo.Contains("cr4_massHbb_2bM") || histo.Contains("cr4_massHbb")/*|| histo.Contains("h_cr1_mt_4bM") || histo.Contains("h_cr1_mt_3bM")*/) {
 
     double errorLow = 0.;
     double errorWindow = 0.;
     double errorHigh= 0.;
     
-    double integralLowMass = (data->IntegralAndError(data->FindBin(-20),data->FindBin(100),errorLow));
-    double integralWindow = (data->IntegralAndError(data->FindBin(100),data->FindBin(150),errorWindow));
-    double integralHighMass = (data->IntegralAndError(data->FindBin(150),data->FindBin(9999),errorHigh));
+    double integralLowMass = (data->IntegralAndError(0,data->FindBin(99.99),errorLow));
+    double integralWindow = (data->IntegralAndError(data->FindBin(100.01),data->FindBin(149.99),errorWindow));
+    double integralHighMass = (data->IntegralAndError(data->FindBin(150.01),data->FindBin(9999),errorHigh));
 
+    if(DODEBUG) {
+      cout<<"low mass "<<integralLowMass<<endl;
+      cout<<"bin "<<data->FindBin(99.99)<<" center "<<data->GetBinCenter(data->FindBin(99.99))<<endl;
+      cout<<"bin "<<data->FindBin(100.01)<<" center "<<data->GetBinCenter(data->FindBin(100.01))<<endl;
+      cout<<"window "<<integralWindow<<endl;
+      cout<<"bin "<<data->FindBin(149.99)<<" center "<<data->GetBinCenter(data->FindBin(149.99))<<endl;
+      cout<<"bin "<<data->FindBin(150.01)<<" center "<<data->GetBinCenter(data->FindBin(150.01))<<endl;
+      cout<<"high mass "<<integralHighMass<<endl;
+    }
 
-    //	IntegralAndError(Int_t binx1, Int_t binx2, Double_t& err, Option_t* option = "") const
-
-    //    cout << " integral Total " << data->Integral()  << endl;
+    // cout << " integral Total " << data->Integral()  << endl;
     // cout << " integral low mass " << integralLowMass  << " error " << errorLow << endl;
     // cout << " integral mass window " << integralWindow << " error " << errorWindow << endl;
 
     double ratio =  integralWindow/integralLowMass;
     double errorRatio = ratio*sqrt(pow(errorLow/integralLowMass,2) + pow(errorWindow/integralWindow,2));
 
-    if(histo.Contains("h_cr4_massHbb_4bM")) {
+    if(histo.Contains("cr4_massHbb_4bM") || histo.Contains("cr1_massHbb_4bM")) {
 
       ratio =  integralWindow/(integralLowMass+integralHighMass);
       errorRatio = ratio*sqrt(pow(errorLow/integralLowMass,2) + pow(errorHigh/integralHighMass,2) + pow(errorWindow/integralWindow,2));
 
     }
 
-
     cout << "+ + + + correction factor R IN/OUTLow " << round_fn(ratio,3)  << " +- " << round_fn(errorRatio,3) <<  endl;
     if(DODEBUG)    cout << "                    IN " << round_fn(integralWindow,3) << " OUT low " << round_fn(integralLowMass,3) << " OUT high " << round_fn(integralHighMass,3) << endl;
+    if(DODEBUG)    cout << "                    INTEGRAL " <<  data->Integral()<< endl;
 
   }
 
   //  if(histo.Contains("cr2_njets_3bT_lowMassbb") || histo.Contains("cr2_njets_4bM_lowMassbb") || histo.Contains("cr2_ntaujetstau_3bT_lowMassbb") || histo.Contains("cr2_ntaujetstau_4bM_lowMassbb") || histo.Contains("cr1_njets_3bT") || histo.Contains("cr1_njets_4bM") || histo.Contains("cr4_njets_3bT_lowMassbb") || histo.Contains("cr4_njets_4bM_lowMassbb") || histo.Contains("cr4_njets_3bM_lowMassbb")) { 
 
-  if(histo.Contains("cr4_njets_4bM_lowMassbb") || histo.Contains("cr4_njets_3bM_lowMassbb") || histo.Contains("cr1_njets_4bM") || histo.Contains("cr1_njets_3bM")) {
+  if(histo.Contains("cr4_njets_4bM_lowMassbb") || histo.Contains("cr4_njets_3bM_lowMassbb") || histo.Contains("cr1_njets_4bM") || histo.Contains("cr1_njets_3bM") || histo.Contains("cr4_massHbb_2bM_ge4") || histo.Contains("cr4_massHbb_3bM_eq4")) {
     
     double error=0;
     double integral = (data->IntegralAndError(0,data->GetNbinsX(),error));
@@ -324,23 +338,27 @@ void getPrediction(TH1 * data) {
 
 void doTwoSearch() {
 
- 
-  cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
-  cout << "&&&&&&&&&&&& SF &&&&&&&&&&&&&"<< endl;
-  Draw("cr4_massHbb_eq2bM",4,1,true);
-  Draw("cr1_massHbb_eq2bM",1,1,true);
-  Draw("cr1_massHbb_3bM",1,1,true);
-  Draw("cr1_massHbb_4bM",1,1,true);
-
   cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
   cout << "&&&&&&&&&&&& NORMALINAION data sideband &&&&&&&&&&&&&"<< endl;
-  Draw("cr4_njets_4bM_lowMassbb",4,1,false);
   Draw("cr4_njets_3bM_lowMassbb",4,1,false);
+  c1->SaveAs("NOTE/njets2l3b.pdf");
+  Draw("cr4_njets_4bM_lowMassbb",4,1,false);
+  c1->SaveAs("NOTE/njets2l4b.pdf");
 
   cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
   cout << "&&&&&&&&&&&& correction R from MC &&&&&&&&&&&&&"<< endl;
   Draw("h_cr4_massHbb_3bM",4,1,false);
   Draw("h_cr4_massHbb_4bM",4,1,false);
+
+  cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
+  cout << "&&&&&&&&&&&& SF &&&&&&&&&&&&&"<< endl;
+  // those below are control region
+  Draw("cr4_massHbb_2bM_ge4",4,1,true);
+  Draw("cr4_massHbb_3bM_eq4",4,1,true); // this is with 4 jets and is outside the signal region
+
+  Draw("cr1_massHbb_2bM",1,1,true); // this is with 4 jets
+  Draw("cr1_massHbb_3bM",1,1,true);  // this is with 5 jets
+  Draw("cr1_massHbb_4bM",1,1,true); // this is with 4 jets
 
 
   //  Draw("h_cr4_massHbb_3bM",4,1,false); /// this is to solve the problem of the canvas
@@ -351,10 +369,11 @@ void doTwoSearch() {
 void doOneSearch() {
 
   cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
-  cout << "&&&&&&&&&&&& NORMALINAION data sideband &&&&&&&&&&&&&"<< endl;
+  cout << "&&&&&&&&&&&& NORMALIZATION data sideband &&&&&&&&&&&&&"<< endl;
+  Draw("cr1_njets_3bM",1,1,false);
+  c1->SaveAs("NOTE/njets1l3b.pdf");
   Draw("cr1_njets_4bM",1,1,false);
-  Draw("cr1_njets_3bM",1,1,false);
-  Draw("cr1_njets_3bM",1,1,false);
+  c1->SaveAs("NOTE/njets1l4b.pdf");
 
   cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
   cout << "&&&&&&&&&&&& correction R from MC &&&&&&&&&&&&&"<< endl;
@@ -362,12 +381,11 @@ void doOneSearch() {
   Draw("h_cr1_mt_4bM",1,1,false);
 
   cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
-  cout << "&&&&&&&&&&&& SF &&&&&&&&&&&&&"<< endl;
-  Draw("cr4_massHbb_eq2bM",4,1,true);
-  Draw("cr1_massHbb_2bM",1,1,true);
-  Draw("cr1_massHbb_3bM",1,1,true);
-  Draw("cr1_massHbb_4bM",1,1,true);
+  cout << "&&&&&&&&&&&& SF MT &&&&&&&&&&&&&"<< endl;
 
+  Draw("cr1_mt_12bM",1,1,true);
+  Draw("cr1_mt_12bM_gt5",1,1,true);
+  Draw("cr1_mt_12bM_gt6",1,1,true);
 
 }
 
@@ -425,8 +443,9 @@ void Draw(const char * histoName, int CR, int rebin, bool doLog)
 
   TH1 *data= getHisto(fileName,dirName,histoName,1,1,rebin);
 
-  TH1 *tt_2l = getHisto("ttdl_lmgtau_histos.root",dirName,histoName,kAzure+10,1,rebin);
-  TH1 *tt_1l = getHisto("ttsl_lmgtau_histos.root",dirName,histoName,kOrange+10,1,rebin);
+  TH1 *tt_2l = getHisto("ttdl_lmgtau_histos.root",dirName,histoName,kAzure+1,1,rebin);
+  //  TH1 *tt_1l = getHisto("ttsl_lmgtau_histos.root",dirName,histoName,kOrange+10,1,rebin);
+  TH1 *tt_1l = getHisto("ttsl_lmgtau_histos.root",dirName,histoName,kRed,1,rebin);
   //  TH1 *tt_2l = getHisto("ttdl_powheg_histos.root",dirName,histoName,kAzure+10,1,rebin);
   //  TH1 *tt_1l = getHisto("ttsl_powheg_histos.root",dirName,histoName,kOrange+10,1,rebin);
 
@@ -438,9 +457,9 @@ void Draw(const char * histoName, int CR, int rebin, bool doLog)
   TH1 *hrare1= getHisto("rareTop_1l.root",dirName,histoName,kGreen+1,1,rebin);
   TH1 *hrare2= getHisto("rareNoTop.root",dirName,histoName,kGreen+1,1,rebin);
   TH1 *ttH=getHisto("ttH_histos.root",dirName,histoName,kGreen+2,1,rebin);
-  if(hrare1) hrare->Add(hrare1);
-  if(hrare2) hrare->Add(hrare2);
-  if(ttH) hrare->Add(ttH);
+  if(hrare1 && hrare) hrare->Add(hrare1);
+  if(hrare2 && hrare) hrare->Add(hrare2);
+  //  if(ttH) hrare->Add(ttH);
 
   if(histo.Contains("h_cr4_massHbb")) {
     cout << "want to calculate R " << histoName << endl;
@@ -458,53 +477,68 @@ void Draw(const char * histoName, int CR, int rebin, bool doLog)
   if(histo.Contains("h_cr4_massHbb")) return;
   if(histo.Contains("h_cr1_mt")) return;
 
-  TH1 * hdataSubRare=data->Clone();
-  TH1 * hrareNeg=hrare->Clone();
-  //  TH1 * httHNeg=ttH->Clone();
-  hrareNeg->Scale(-1);  
-  //  httHNeg->Scale(-1);  
-  hdataSubRare->Add(hrareNeg);
-  //  hdataSubRare->Add(httHNeg);
-  if(histo.Contains("cr1_njets")) tt_2l->Scale(-1);
-  if(histo.Contains("cr1_njets")) hdataSubRare->Add(tt_2l);
+  if(!histo.Contains("discr")) {
+    TH1 * hdataSubRare=data->Clone();
+    TH1 * hrareNeg=hrare->Clone();
+    TH1 * httHNeg=ttH->Clone();
+    if(hrareNeg) hrareNeg->Scale(-1);  
+    if(httHNeg) httHNeg->Scale(-1);  
+    if(hrareNeg) hdataSubRare->Add(hrareNeg);
+    if(httHNeg) hdataSubRare->Add(httHNeg);
+    if(histo.Contains("cr1_")) tt_2l->Scale(-1);
+    if(histo.Contains("cr1_")) hdataSubRare->Add(tt_2l);
 
-  if(histo.Contains("cr4_massHbb_eq2b")) {
-  
-    cout << "=================="<< endl;
-    cout << "want to calcualte SF " << histoName << endl;
+    if(histo.Contains("cr4_")) tt_1l->Scale(-1);
+    if(histo.Contains("cr4_")) hdataSubRare->Add(tt_1l);
     
-    if(DODEBUG) cout << " --> data " << endl;
-    if(DODEBUG && data) getPrediction(data);
+    if(histo.Contains("cr4")) {
+      
+      cout << "=================="<< endl;
+      cout << "want to calcualte SF " << histoName << endl;
+      
+      if(DODEBUG) cout << " --> data " << endl;
+      if(DODEBUG && data) getPrediction(data);
+      
+      cout << " --> data - rare - tt1l" << endl;
+      if(hdataSubRare) getPrediction(hdataSubRare);
+      
+      cout << " --> ttbar dilepton " << endl;
+      if(tt_2l) getPrediction(tt_2l);
+      //    cout << " --> rare " << endl;
+      //    if(hrare) getPrediction(hrare);      
 
-    cout << " --> data rare subtracted" << endl;
-    if(hdataSubRare) getPrediction(hdataSubRare);
+    } else {
+      
+      cout << " --> data - rare - tt2l" << endl;
+      //  tt_1l->Scale(1.25);
+      if(hdataSubRare) getPrediction(hdataSubRare);
+      
+      if(DODEBUG) cout << " --> data " << endl;
+      if(DODEBUG && data) getPrediction(data);
 
-    cout << " --> ttbar dilepton " << endl;
-    if(tt_2l) getPrediction(tt_2l);
-    //    cout << " --> rare " << endl;
-    //    if(hrare) getPrediction(hrare);
- 
-  } else {
+      /*
+      if(histo.Contains("cr1"))  cout << " --> ttbar single-lepton " << endl;
+      if(histo.Contains("cr1") && tt_1l) getPrediction(tt_1l);
+      
+      if(histo.Contains("cr4")) cout << " --> ttbar dilepton " << endl;
+      if(histo.Contains("cr4") && tt_2l) getPrediction(tt_2l);
+      */
 
-    //  tt_1l->Scale(1.25);
-    cout << " --> data - rare " << endl;
-    if(hdataSubRare) getPrediction(hdataSubRare);
+      cout << " --> ttbar single-lepton " << endl;
+      getPrediction(tt_1l);
+      
 
-    if(DODEBUG) cout << " --> data " << endl;
-    if(DODEBUG && data) getPrediction(data);
+      if(DODEBUG) cout << " --> ttbar dilepton " << endl;
+      if(DODEBUG && tt_2l) getPrediction(tt_2l);
 
-    if(histo.Contains("cr4")) cout << " --> ttbar dilepton " << endl;
-    if(histo.Contains("cr4") && tt_2l) getPrediction(tt_2l);
 
-    if(histo.Contains("cr1"))  cout << " --> ttbar single-lepton " << endl;
-    if(histo.Contains("cr1") && tt_1l) getPrediction(tt_1l);
+      if(DODEBUG) cout << " --> rare " << endl;
+      if(DODEBUG && hrare) getPrediction(hrare);
 
-    if(DODEBUG) cout << " --> rare " << endl;
-    if(DODEBUG && hrare) getPrediction(hrare);
-
-    if(DODEBUG) cout << " --> tth " << endl;
-    if(DODEBUG && ttH) getPrediction(ttH);
-
+      if(DODEBUG) cout << " --> tth " << endl;
+      if(DODEBUG && ttH) getPrediction(ttH);
+    
+    }
   }
 
   cout << "DONE "<< endl;
@@ -533,8 +567,12 @@ void Draw(const char * histoName, int CR, int rebin, bool doLog)
   if(data) data->SetMaximum(1.5*data->GetMaximum());
   //  if(data) data->GetXaxis()->SetTitle(data->GetName());
   if(data) data->GetXaxis()->SetTitle(data->GetName());
-  if(data && histo.Contains("massHbb")) data->GetXaxis()->SetTitle("m(bb)");
+  if(data) data->GetYaxis()->SetTitle("Events");
+  if(data && histo.Contains("massHbb")) data->GetXaxis()->SetTitle("m(bb) [GeV]");
   if(data && histo.Contains("njets")) data->GetXaxis()->SetTitle("Jet Multiplicity");
+
+  if(data && histo.Contains("discr_bjets")) data->GetXaxis()->SetTitle("CSV");
+  if(data && histo.Contains("discr_bjets")) data->GetXaxis()->SetRangeUser(0.6,1.);
 
   //  if(histoName->Contains("iso")) data->SetMinimum(0.01);
 
@@ -546,19 +584,21 @@ void Draw(const char * histoName, int CR, int rebin, bool doLog)
   plotPreliminary(lumiLeg, 0.6 ,0.80);
 
   if(data) plotLeg("data",1.,data,0.65,0.65,"pe");
-  if(tt_1l) plotLeg("ttbar 1l",1., tt_1l, 0.65,0.6,"f");
-  if(tt_2l) plotLeg("ttbar 2l",1., tt_2l, 0.65,0.55,"f");
+  if(tt_1l) plotLeg("t#bar{t} 1 l",1., tt_1l, 0.65,0.6,"f");
+  if(tt_2l) plotLeg("t#bar{t} 2 l",1., tt_2l, 0.65,0.55,"f");
   if(hrare) plotLeg("rare",1., hrare, 0.65,0.5,"f");
-  if(ttH) plotLeg("ttH",1., ttH, 0.65,0.45,"f");
-
-  
+  if(ttH) plotLeg("t#bar{t}H",1., ttH, 0.65,0.45,"f");
+ 
   TLatex latexLabel1;
 
   latexLabel1.SetTextSize(0.04);
   latexLabel1.SetNDC();
-  if(histo.Contains("2bM")) latexLabel1.DrawLatex(0.25, 0.7, "= 2 b");
-  if(histo.Contains("3bM")) latexLabel1.DrawLatex(0.25, 0.7, "= 3 b");
-  if(histo.Contains("4bM")) latexLabel1.DrawLatex(0.25, 0.7, ">= 4 b");
+  if(histo.Contains("2bM") && histo.Contains("cr4")) latexLabel1.DrawLatex(0.25, 0.7, "2l = 2 b");
+  if(histo.Contains("3bM") && histo.Contains("cr4")) latexLabel1.DrawLatex(0.25, 0.7, "2l = 3 b");
+  if(histo.Contains("4bM") && histo.Contains("cr4")) latexLabel1.DrawLatex(0.25, 0.7, "2l >= 4 b");
+  if(histo.Contains("2bM") && histo.Contains("cr1")) latexLabel1.DrawLatex(0.25, 0.7, "1l = 2 b");
+  if(histo.Contains("3bM") && histo.Contains("cr1")) latexLabel1.DrawLatex(0.25, 0.7, "1l = 3 b");
+  if(histo.Contains("4bM") && histo.Contains("cr1")) latexLabel1.DrawLatex(0.25, 0.7, "1l >= 4 b");
 
   cout << " done 1 " << endl;
 
@@ -578,16 +618,23 @@ void Draw(const char * histoName, int CR, int rebin, bool doLog)
 
   hdata->GetYaxis()->SetRangeUser(0.5,1.5);
   //  hdata->GetYaxis()->SetRangeUser(0.,2.);
+  //  tdrStyle->SetTitleSize(0.05, "XYZ");
+  //  respad->SetLeftMargin(0.02);
+
+  hdata->GetXaxis()->SetTitleSize(0.1);
+  hdata->GetYaxis()->SetTitleSize(0.2);
+  hdata->GetYaxis()->SetTitleOffset(0.4);
+  hdata->GetXaxis()->SetTitleOffset(0.5);
+
   hdata->GetYaxis()->SetTitle("data/MC");
-  //  hdata->GetYaxis()->SetTitleSize(0.8);
   hdata->GetYaxis()->SetLabelSize(0.1);
   hdata->GetXaxis()->SetLabelSize(0.1);
 
   //  if(histoName->Contains("pttrk")) hdata->Rebin(5);
   //  if(histoName->Contains("pttrk")) hMC->Rebin(5);
   
-
   hdata->Divide(hMC);
+  if(hdata && histo.Contains("discr_bjets")) hdata->GetXaxis()->SetRangeUser(0.6,1.);
   hdata->Draw();
 
   //  TLine *line = new TLine(0,1,11,1);
@@ -653,7 +700,8 @@ void dumpTables(int type) {
   TH1 *DYj = getHisto("DY1to4Jtot_histos.root",dirName,histoName,kOrange+10,1,rebin);
   TH1 *Wj = getHisto("w1to4jets_histos.root",dirName,histoName,kOrange+10,1,rebin);
 
-  TH1 *TTH = getHisto("baby_TTH_00-02-03_histos.root",dirName,histoName,kOrange+10,1,rebin);
+  //  TH1 *TTH = getHisto("baby_TTH_00-02-03_histos.root",dirName,histoName,kOrange+10,1,rebin);
+  TH1 *TTH = getHisto("ttH_histos.root",dirName,histoName,kOrange+10,1,rebin);
 
   int totBKG=0;
 
@@ -741,8 +789,15 @@ void plot() {
 
   c2.Print("PlotSearch.ps(");
 
-  doTwoSearch();
+  Draw("cr1_discr_bjets_3bM_eq4",1,2,false);
+  c1->SaveAs("NOTE/discr_1l_3b_j4.pdf");
+  Draw("cr1_discr_bjets_4bM_gt6",1,2,false);
+  c1->SaveAs("NOTE/discr_1l_4b_j6.pdf");
+  Draw("cr4_discr_bjets_3bM_eq4",4,2,false);
+  c1->SaveAs("NOTE/discr_2l_3b_j4.pdf");
+
   doOneSearch();
+  //  doTwoSearch();
 
   c2.Print("PlotSearch.ps)");
 
