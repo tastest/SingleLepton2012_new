@@ -92,6 +92,7 @@ class WHLooper {
   float bbwdphi_;
   // for ttbar samples
   float genmt2bl_;
+  bool tobtecveto_;
 
   // for CR3 (with two leptons)
   LorentzVector lep_;
@@ -108,7 +109,10 @@ class WHLooper {
   bool isWNjets_;
   bool isWNjets_nobb_;
   bool isWNjets_onlybb_;
+  bool isWino_;
   bool isTChiwh_;
+  bool isTChihhwwbb_;
+  bool isScan_;
   bool isttmg_;
   bool isttsl_;
   bool isttdl_;
