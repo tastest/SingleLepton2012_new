@@ -58,7 +58,7 @@ fi
 #
 
 echo "
-Grid_Resource=gt2 osg-gw-4.t2.ucsd.edu:2119/jobmanager-condor
+Grid_Resource=gt2 osg-gw-6.t2.ucsd.edu:2119/jobmanager-condor
 universe=${UNIVERSE}
 when_to_transfer_output = ON_EXIT
 #the actual executable to run is not transfered by its name.
