@@ -1971,39 +1971,40 @@ double TopPtWeight_v2(double topPt){
 // !!! for CVSM only!
 float getBtagSF(float pt, float eta, int id, bool fastsim){
 
-  float sf = 1.;
-
   // same SF for b and c
-  if ((abs(id) == 4) || (abs(id) == 5)) sf = 0.963;
+  if ((abs(id) == 4) || (abs(id) == 5)) {
+    float sf = 0.963;
 
-  // fastsim correction for b
-  if ((abs(id) == 5) && fastsim) {
-    const int nbins = 14;
-    const float ptmin[] = {30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500};
-    const float ptmax[] = {40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 670};
-    const float CFb[] = {0.982194,0.980998,0.992014,0.994472,0.996825,0.999822,1.00105,1.00023,0.991994,0.979123,0.947207,0.928006,0.874260,0.839610};
+    // fastsim correction for b
+    if ((abs(id) == 5) && fastsim) {
+      const int nbins = 14;
+      const float ptmin[] = {30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500};
+      const float ptmax[] = {40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 670};
+      const float CFb[] = {0.982194,0.980998,0.992014,0.994472,0.996825,0.999822,1.00105,1.00023,0.991994,0.979123,0.947207,0.928006,0.874260,0.839610};
 
-    for (int i = 0; i < nbins; ++i) {
-      if ((pt > ptmin[i]) && (pt <= ptmax[i])) {
-	sf *= CFb[i];
-	break;
-      }
-    } // loop over bins
-    // overflow bin: use highest SF bin
-    if (pt >= ptmax[nbins-1]) sf *= CFb[nbins-1];
-  } 
+      for (int i = 0; i < nbins; ++i) {
+        if ((pt > ptmin[i]) && (pt <= ptmax[i])) {
+      	sf *= CFb[i];
+      	break;
+        }
+      } // loop over bins
+      // overflow bin: use highest SF bin
+      if (pt >= ptmax[nbins-1]) sf *= CFb[nbins-1];
+    } 
+    return sf;
+  }
 
   // otherwise use functional forms for light
   if( fabs(eta) < 0.8 )
-    sf = ((1.06238+(0.00198635*pt))+(-4.89082e-06*(pt*pt)))+(3.29312e-09*(pt*(pt*pt)));
+    return ((1.06238+(0.00198635*pt))+(-4.89082e-06*(pt*pt)))+(3.29312e-09*(pt*(pt*pt)));
 
   if( fabs(eta) >= 0.8 && fabs(eta) < 1.6 )
-    sf = ((1.08048+(0.00110831*pt))+(-2.96189e-06*(pt*pt)))+(2.16266e-09*(pt*(pt*pt)));
+    return ((1.08048+(0.00110831*pt))+(-2.96189e-06*(pt*pt)))+(2.16266e-09*(pt*(pt*pt)));
 
   if( fabs(eta) >= 1.6 && fabs(eta) < 2.4 )
-    sf = ((1.09145+(0.000687171*pt))+(-2.45054e-06*(pt*pt)))+(1.7844e-09*(pt*(pt*pt)));
+    return ((1.09145+(0.000687171*pt))+(-2.45054e-06*(pt*pt)))+(1.7844e-09*(pt*(pt*pt)));
 
-  return sf;
-  //  std::cout << __FILE__ << " " << __LINE__ << ":getBtagSF: invalid eta: " << eta << ", or invalid id: " << id << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << ":getBtagSF: invalid eta: " << eta << ", or invalid id: " << id << std::endl;
+  return 1.;
 }
 
