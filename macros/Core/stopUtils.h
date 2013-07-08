@@ -118,7 +118,7 @@ int getRegionNumber(float mstep, float mlsp);
 double TopPtWeight(double topPt);
 double TopPtWeight_v2(double topPt);
 
-float getBtagSF(float pt, float eta, int id);
+float getBtagSF(float pt, float eta, int id, bool fastsim = false);
 
 static const float BTAG_MED = 0.679;
 static const float PDG_TOP_MASS = 173.5;
