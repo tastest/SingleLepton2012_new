@@ -67,9 +67,9 @@ const bool doSignal = true;
 const bool doSignalMassLast = true;
 const bool doSignalMETLast = true;
 const bool doCR5METLast = true; // bveto
-const bool doCR5InvMass = false; // bveto, inverted m(bb)
-const bool doCR5MassLast = false; // bveto, mass last
-const bool doCR14 = false; // inverted mbb region
+const bool doCR5InvMass = true; // bveto, inverted m(bb)
+const bool doCR5MassLast = true; // bveto, mass last
+const bool doCR14 = true; // inverted mbb region
 
 // regions to do: need for CR results/plots
 const bool doCR1METLast = false; // high m(bb), met cut last
@@ -198,6 +198,12 @@ void WHLooper::loop(TChain *chain, TString name) {
     isWNjets_onlybb_ = false;
   }
 
+  if (name.Contains("whbb")) {
+    isWHbb_ = true;
+  } else {
+    isWHbb_ = false;
+  }
+
   if (name.Contains("Wino")) {
     isWino_ = true;
   } else {
@@ -318,12 +324,12 @@ void WHLooper::loop(TChain *chain, TString name) {
   // signal region nm1 hists
   std::map<std::string, TH1F*> h_1d_sig_bbmasslast_met_nm1, h_1d_sig_bbmasslast_mt_nm1, h_1d_sig_bbmasslast_mt2bl_nm1,h_1d_sig_bbmasslast_bbmass_nm1;
   // signal region nm1 hists
-  std::map<std::string, TH1F*> h_1d_sig_bbmasslast_mtpeak, h_1d_sig_bbmasslast_mtcut, h_1d_sig_bbmasslast_mtcut_met100, h_1d_sig_bbmasslast_metcut, h_1d_sig_bbmasslast_met100, h_1d_sig_bbmasslast_met150, h_1d_sig_bbmasslast_nomt_met50, h_1d_sig_bbmasslast_nomt_met75, h_1d_sig_bbmasslast_nomt_met100, h_1d_sig_bbmasslast_nomt_met125, h_1d_sig_bbmasslast_nomt_met150, h_1d_sig_bbmasslast_nomt_met137, h_1d_sig_bbmasslast_nomt_met162, h_1d_sig_bbmasslast_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_sig_bbmasslast_mtpeak, h_1d_sig_bbmasslast_mtcut, h_1d_sig_bbmasslast_mtcut_met100, h_1d_sig_bbmasslast_metcut, h_1d_sig_bbmasslast_met100, h_1d_sig_bbmasslast_met125, h_1d_sig_bbmasslast_met150, h_1d_sig_bbmasslast_nomt_met50, h_1d_sig_bbmasslast_nomt_met75, h_1d_sig_bbmasslast_nomt_met100, h_1d_sig_bbmasslast_nomt_met125, h_1d_sig_bbmasslast_nomt_met150, h_1d_sig_bbmasslast_nomt_met137, h_1d_sig_bbmasslast_nomt_met162, h_1d_sig_bbmasslast_nomt_met175;
 
   // signal region hists
   std::map<std::string, TH1F*> h_1d_sig_metlast_presel, h_1d_sig_metlast_final;
   // signal region nm1 hists
-  std::map<std::string, TH1F*> h_1d_sig_metlast_met_nm1, h_1d_sig_metlast_mtfirst, h_1d_sig_metlast_mt_nm1, h_1d_sig_metlast_mt2bl_nm1, h_1d_sig_metlast_met100, h_1d_sig_metlast_met150, h_1d_sig_metlast_nomt_met100, h_1d_sig_metlast_nomt_met150, h_1d_sig_metlast_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_sig_metlast_met_nm1, h_1d_sig_metlast_mtfirst, h_1d_sig_metlast_mt_nm1, h_1d_sig_metlast_mt2bl_nm1, h_1d_sig_metlast_met100, h_1d_sig_metlast_met125, h_1d_sig_metlast_met150, h_1d_sig_metlast_nomt_met100, h_1d_sig_metlast_nomt_met150, h_1d_sig_metlast_nomt_met175;
   // 2d hists for correlations
   std::map<std::string, TH2F*> h_2d_sig_metlast_mt2bl_nm1;
 
@@ -359,7 +365,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr1, met last hists
   std::map<std::string, TH1F*> h_1d_cr1_metlast_presel, h_1d_cr1_metlast_final;
   // cr1, met last nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr1_metlast_mt_nm1, h_1d_cr1_metlast_mtfirst, h_1d_cr1_metlast_mt2bl_nm1, h_1d_cr1_metlast_met_nm1, h_1d_cr1_metlast_met100, h_1d_cr1_metlast_met150;
+  std::map<std::string, TH1F*> h_1d_cr1_metlast_mt_nm1, h_1d_cr1_metlast_mtfirst, h_1d_cr1_metlast_mt2bl_nm1, h_1d_cr1_metlast_met_nm1, h_1d_cr1_metlast_met100, h_1d_cr1_metlast_met125, h_1d_cr1_metlast_met150;
 
   // cr2 hists
   std::map<std::string, TH1F*> h_1d_cr2_presel, h_1d_cr2_final;
@@ -374,7 +380,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr23 hists
   std::map<std::string, TH1F*> h_1d_cr23_presel, h_1d_cr23_final;
   // cr23 nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr23_bbmass_nm1, h_1d_cr23_met_nm1, h_1d_cr23_mt_nm1, h_1d_cr23_mt2blfirst, h_1d_cr23_metcut, h_1d_cr23_met100, h_1d_cr23_met150, h_1d_cr23_mt2bl_nm1;
+  std::map<std::string, TH1F*> h_1d_cr23_bbmass_nm1, h_1d_cr23_met_nm1, h_1d_cr23_mt_nm1, h_1d_cr23_mt2blfirst, h_1d_cr23_metcut, h_1d_cr23_met100, h_1d_cr23_met125, h_1d_cr23_met150, h_1d_cr23_mt2bl_nm1;
 
   // cr4 hists
   std::map<std::string, TH1F*> h_1d_cr4_presel, h_1d_cr4_final;
@@ -389,29 +395,29 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr5, met last hists
   std::map<std::string, TH1F*> h_1d_cr5_metlast_presel, h_1d_cr5_metlast_final;
   // cr5, met last nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr5_metlast_bbmass_nm1, h_1d_cr5_metlast_mtfirst, h_1d_cr5_metlast_mt_nm1, h_1d_cr5_metlast_mt2bl_nm1, h_1d_cr5_metlast_met_nm1, h_1d_cr5_metlast_met100, h_1d_cr5_metlast_met150, h_1d_cr5_metlast_nomt_met100, h_1d_cr5_metlast_nomt_met150, h_1d_cr5_metlast_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_cr5_metlast_bbmass_nm1, h_1d_cr5_metlast_mtfirst, h_1d_cr5_metlast_mt_nm1, h_1d_cr5_metlast_mt2bl_nm1, h_1d_cr5_metlast_met_nm1, h_1d_cr5_metlast_met100, h_1d_cr5_metlast_met125, h_1d_cr5_metlast_met150, h_1d_cr5_metlast_nomt_met100, h_1d_cr5_metlast_nomt_met150, h_1d_cr5_metlast_nomt_met175;
 
   // cr5, inv mass hists
   std::map<std::string, TH1F*> h_1d_cr5_invmass_presel, h_1d_cr5_invmass_final;
   // cr5, inv mass nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr5_invmass_bbmass_nm1, h_1d_cr5_invmass_mtfirst, h_1d_cr5_invmass_mt_nm1, h_1d_cr5_invmass_mt2bl_nm1, h_1d_cr5_invmass_met_nm1, h_1d_cr5_invmass_met100, h_1d_cr5_invmass_met150, h_1d_cr5_invmass_nomt_met100, h_1d_cr5_invmass_nomt_met150, h_1d_cr5_invmass_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_cr5_invmass_bbmass_nm1, h_1d_cr5_invmass_mtfirst, h_1d_cr5_invmass_mt_nm1, h_1d_cr5_invmass_mt2bl_nm1, h_1d_cr5_invmass_met_nm1, h_1d_cr5_invmass_met100, h_1d_cr5_invmass_met125, h_1d_cr5_invmass_met150, h_1d_cr5_invmass_nomt_met100, h_1d_cr5_invmass_nomt_met150, h_1d_cr5_invmass_nomt_met175;
 
   // cr5, high mass met last hists
   std::map<std::string, TH1F*> h_1d_cr5_highmass_presel, h_1d_cr5_highmass_final;
   // cr5, high mass met last nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr5_highmass_mtfirst, h_1d_cr5_highmass_mt_nm1, h_1d_cr5_highmass_mt2bl_nm1, h_1d_cr5_highmass_met_nm1, h_1d_cr5_highmass_met100, h_1d_cr5_highmass_met150;
+  std::map<std::string, TH1F*> h_1d_cr5_highmass_mtfirst, h_1d_cr5_highmass_mt_nm1, h_1d_cr5_highmass_mt2bl_nm1, h_1d_cr5_highmass_met_nm1, h_1d_cr5_highmass_met100, h_1d_cr5_highmass_met125, h_1d_cr5_highmass_met150;
 
   // cr5, low mass met last hists
   std::map<std::string, TH1F*> h_1d_cr5_lowmass_presel, h_1d_cr5_lowmass_final;
   // cr5, low mass met last nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr5_lowmass_mtfirst, h_1d_cr5_lowmass_mt_nm1, h_1d_cr5_lowmass_mt2bl_nm1, h_1d_cr5_lowmass_met_nm1, h_1d_cr5_lowmass_met100, h_1d_cr5_lowmass_met150;
+  std::map<std::string, TH1F*> h_1d_cr5_lowmass_mtfirst, h_1d_cr5_lowmass_mt_nm1, h_1d_cr5_lowmass_mt2bl_nm1, h_1d_cr5_lowmass_met_nm1, h_1d_cr5_lowmass_met100, h_1d_cr5_lowmass_met125, h_1d_cr5_lowmass_met150;
 
   // cr5 mass last region hists
   std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_presel, h_1d_cr5_bbmasslast_final;
   // cr5 mass last region nm1 hists
   std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_met_nm1, h_1d_cr5_bbmasslast_mt_nm1, h_1d_cr5_bbmasslast_mt2bl_nm1,h_1d_cr5_bbmasslast_bbmass_nm1;
   // cr5 mass last region nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_mtpeak, h_1d_cr5_bbmasslast_mtcut, h_1d_cr5_bbmasslast_mtcut_met100, h_1d_cr5_bbmasslast_metcut, h_1d_cr5_bbmasslast_met100, h_1d_cr5_bbmasslast_met150, h_1d_cr5_bbmasslast_nomt_met50, h_1d_cr5_bbmasslast_nomt_met75, h_1d_cr5_bbmasslast_nomt_met100, h_1d_cr5_bbmasslast_nomt_met125, h_1d_cr5_bbmasslast_nomt_met150, h_1d_cr5_bbmasslast_nomt_met137, h_1d_cr5_bbmasslast_nomt_met162, h_1d_cr5_bbmasslast_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_mtpeak, h_1d_cr5_bbmasslast_mtcut, h_1d_cr5_bbmasslast_mtcut_met100, h_1d_cr5_bbmasslast_metcut, h_1d_cr5_bbmasslast_met100, h_1d_cr5_bbmasslast_met125, h_1d_cr5_bbmasslast_met150, h_1d_cr5_bbmasslast_nomt_met50, h_1d_cr5_bbmasslast_nomt_met75, h_1d_cr5_bbmasslast_nomt_met100, h_1d_cr5_bbmasslast_nomt_met125, h_1d_cr5_bbmasslast_nomt_met150, h_1d_cr5_bbmasslast_nomt_met137, h_1d_cr5_bbmasslast_nomt_met162, h_1d_cr5_bbmasslast_nomt_met175;
 
   // cr6 hists
   std::map<std::string, TH1F*> h_1d_cr6_presel, h_1d_cr6_final;
@@ -436,7 +442,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr8, met last hists
   std::map<std::string, TH1F*> h_1d_cr8_metlast_presel, h_1d_cr8_metlast_final;
   // cr8, met last nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr8_metlast_mt_nm1, h_1d_cr8_metlast_mtfirst, h_1d_cr8_metlast_mt2bl_nm1, h_1d_cr8_metlast_met_nm1, h_1d_cr8_metlast_met100, h_1d_cr8_metlast_met150;
+  std::map<std::string, TH1F*> h_1d_cr8_metlast_mt_nm1, h_1d_cr8_metlast_mtfirst, h_1d_cr8_metlast_mt2bl_nm1, h_1d_cr8_metlast_met_nm1, h_1d_cr8_metlast_met100, h_1d_cr8_metlast_met125, h_1d_cr8_metlast_met150;
 
   // cr9 hists
   std::map<std::string, TH1F*> h_1d_cr9_presel, h_1d_cr9_final;
@@ -468,7 +474,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr14 hists
   std::map<std::string, TH1F*> h_1d_cr14_presel, h_1d_cr14_final;
   // cr14 nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr14_mt_nm1, h_1d_cr14_mtfirst, h_1d_cr14_mt2bl_nm1, h_1d_cr14_met_nm1, h_1d_cr14_met100, h_1d_cr14_met150, h_1d_cr14_nomt_met100, h_1d_cr14_nomt_met150, h_1d_cr14_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_cr14_mt_nm1, h_1d_cr14_mtfirst, h_1d_cr14_mt2bl_nm1, h_1d_cr14_met_nm1, h_1d_cr14_met100, h_1d_cr14_met125, h_1d_cr14_met150, h_1d_cr14_nomt_met100, h_1d_cr14_nomt_met150, h_1d_cr14_nomt_met175;
 
   // stop region hists
   std::map<std::string, TH1F*> h_1d_stop_presel, h_1d_stop_comp;
@@ -520,6 +526,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       }
       outfile_->mkdir("sig_bbmasslast_met_nm1");
       outfile_->mkdir("sig_bbmasslast_met100");
+      outfile_->mkdir("sig_bbmasslast_met125");
       outfile_->mkdir("sig_bbmasslast_met150");
       outfile_->mkdir("sig_bbmasslast_bbmass_nm1");
     }
@@ -539,6 +546,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("sig_metlast_mt_nm1");
       outfile_->mkdir("sig_metlast_met_nm1");
       outfile_->mkdir("sig_metlast_met100");
+      outfile_->mkdir("sig_metlast_met125");
       outfile_->mkdir("sig_metlast_met150");
     }
     outfile_->mkdir("sig_metlast_final");
@@ -613,6 +621,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr1_metlast_mt_nm1");
       outfile_->mkdir("cr1_metlast_met_nm1");
       outfile_->mkdir("cr1_metlast_met100");
+      outfile_->mkdir("cr1_metlast_met125");
       outfile_->mkdir("cr1_metlast_met150");
     }
     outfile_->mkdir("cr1_metlast_final");
@@ -654,6 +663,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr23_metcut");
       outfile_->mkdir("cr23_met_nm1");
       outfile_->mkdir("cr23_met100");
+      outfile_->mkdir("cr23_met125");
       outfile_->mkdir("cr23_met150");
     }
     outfile_->mkdir("cr23_final");
@@ -695,6 +705,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr5_metlast_mt_nm1");
       outfile_->mkdir("cr5_metlast_met_nm1");
       outfile_->mkdir("cr5_metlast_met100");
+      outfile_->mkdir("cr5_metlast_met125");
       outfile_->mkdir("cr5_metlast_met150");
     }
     outfile_->mkdir("cr5_metlast_final");
@@ -714,6 +725,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr5_invmass_mt_nm1");
       outfile_->mkdir("cr5_invmass_met_nm1");
       outfile_->mkdir("cr5_invmass_met100");
+      outfile_->mkdir("cr5_invmass_met125");
       outfile_->mkdir("cr5_invmass_met150");
     }
     outfile_->mkdir("cr5_invmass_final");
@@ -727,6 +739,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr5_highmass_mt_nm1");
       outfile_->mkdir("cr5_highmass_met_nm1");
       outfile_->mkdir("cr5_highmass_met100");
+      outfile_->mkdir("cr5_highmass_met125");
       outfile_->mkdir("cr5_highmass_met150");
     }
     outfile_->mkdir("cr5_highmass_final");
@@ -740,6 +753,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr5_lowmass_mt_nm1");
       outfile_->mkdir("cr5_lowmass_met_nm1");
       outfile_->mkdir("cr5_lowmass_met100");
+      outfile_->mkdir("cr5_lowmass_met125");
       outfile_->mkdir("cr5_lowmass_met150");
     }
     outfile_->mkdir("cr5_lowmass_final");
@@ -766,6 +780,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       }
       outfile_->mkdir("cr5_bbmasslast_met_nm1");
       outfile_->mkdir("cr5_bbmasslast_met100");
+      outfile_->mkdir("cr5_bbmasslast_met125");
       outfile_->mkdir("cr5_bbmasslast_met150");
       outfile_->mkdir("cr5_bbmasslast_bbmass_nm1");
     }
@@ -823,6 +838,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr8_metlast_mt_nm1");
       outfile_->mkdir("cr8_metlast_met_nm1");
       outfile_->mkdir("cr8_metlast_met100");
+      outfile_->mkdir("cr8_metlast_met125");
       outfile_->mkdir("cr8_metlast_met150");
     }
     outfile_->mkdir("cr8_metlast_final");
@@ -896,6 +912,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr14_mt_nm1");
       outfile_->mkdir("cr14_met_nm1");
       outfile_->mkdir("cr14_met100");
+      outfile_->mkdir("cr14_met125");
       outfile_->mkdir("cr14_met150");
     }
     outfile_->mkdir("cr14_final");
@@ -1076,12 +1093,14 @@ void WHLooper::loop(TChain *chain, TString name) {
 	// all xsecs except 130 from Ben's twiki
 	// 130 xsec from electrohiggs twiki
 	float xsecweight = 1.;
-	if (name.Contains("Wino_130")) xsecweight = 3.9 * (10000./237517.) * weight_lumi_br_nevents; // 237517 events 
+	if (name.Contains("Wino_130")) xsecweight = 4.1 * (10000./237517.) * weight_lumi_br_nevents; // 237517 events 
 	else if (name.Contains("Wino_150")) xsecweight = 2.4 * (10000./292245.) * weight_lumi_br_nevents; // 292245 events
+	else if (name.Contains("Wino_175")) xsecweight = 1.3 * (10000./16432.) * weight_lumi_br_nevents; // 16432 events
 	else if (name.Contains("Wino_200")) xsecweight = 0.79 * (10000./16004.) * weight_lumi_br_nevents; // 16004 events
 	else if (name.Contains("Wino_250")) xsecweight = 0.32 * (10000./7598.) * weight_lumi_br_nevents; // 7598 events
 	else if (name.Contains("Wino_300")) xsecweight = 0.15 * (10000./7307.) * weight_lumi_br_nevents; // 7307 events
 	else if (name.Contains("Wino_350")) xsecweight = 0.074 * (10000./7059.) * weight_lumi_br_nevents; // 7059 events
+	//	else if (name.Contains("Wino_400")) xsecweight = 0.039 * (10000./xx.) * weight_lumi_br_nevents; // xx events
 	evtweight = xsecweight * lumi;
       }
 
@@ -1099,6 +1118,9 @@ void WHLooper::loop(TChain *chain, TString name) {
 	topptweight *= 1.01;
 	evtweight *= topptweight;
       }
+
+      // correction for W->lnu BR in SM WH->lnubb sample
+      if (isWHbb_) evtweight *= 0.33;
 
       // trigger effs
       float sltrigeff = isData ? 1. : 
@@ -1230,7 +1252,7 @@ void WHLooper::loop(TChain *chain, TString name) {
 	  }
 	  // apply SF if requested
 	  if (doBtagSFs && !isData && !isTChiwh_) {
-	    float sf = getBtagSF(thisjet.pt(),thisjet.eta(),stopt.pfjets_mcflavorAlgo().at(i));
+	    float sf = getBtagSF(thisjet.pt(),thisjet.eta(),stopt.pfjets_mcflavorAlgo().at(i),isTChiwh_ || isWino_);
 	    evtweight1l *= sf;
 	    evtweight2l *= sf;
 	  }
@@ -1579,6 +1601,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 125.) ) {
+	  fillHists1DWrapper(h_1d_sig_bbmasslast_met125,evtweight1l,"sig_bbmasslast_met125");
+	}
+	else fail = true;
+
 	if (!fail && (met_ > 150.) ) {
 	  fillHists1DWrapper(h_1d_sig_bbmasslast_met150,evtweight1l,"sig_bbmasslast_met150");
 	}
@@ -1652,6 +1679,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	if (!fail && (met_ > 100.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_metlast_met100,evtweight1l,"sig_metlast_met100");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_metlast_met125,evtweight1l,"sig_metlast_met125");
 	}
 	else fail = true;
 
@@ -1969,6 +2001,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_metlast_met125,evtweight1l,"cr1_metlast_met125");
+	}
+	else fail = true;
+
 	if (!fail && (met_ > 150.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr1_metlast_met150,evtweight1l,"cr1_metlast_met150");
 	}
@@ -2179,6 +2216,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr23_met125,evtweight1l,"cr23_met125");
+	}
+	else fail = true;
+
 	if (!fail && (met_ > 150.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr23_met150,evtweight1l,"cr23_met150");
 	}
@@ -2377,6 +2419,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_metlast_met125,evtweight1l,"cr5_metlast_met125");
+	}
+	else fail = true;
+
 	if (!fail && (met_ > 150.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_metlast_met150,evtweight1l,"cr5_metlast_met150");
 	}
@@ -2448,6 +2495,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_invmass_met125,evtweight1l,"cr5_invmass_met125");
+	}
+	else fail = true;
+
 	if (!fail && (met_ > 150.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_invmass_met150,evtweight1l,"cr5_invmass_met150");
 	}
@@ -2495,6 +2547,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	if (!fail && (met_ > 100.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_highmass_met100,evtweight1l,"cr5_highmass_met100");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_highmass_met125,evtweight1l,"cr5_highmass_met125");
 	}
 	else fail = true;
 
@@ -2546,6 +2603,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	if (!fail && (met_ > 100.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_lowmass_met100,evtweight1l,"cr5_lowmass_met100");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr5_lowmass_met125,evtweight1l,"cr5_lowmass_met125");
 	}
 	else fail = true;
 
@@ -2646,6 +2708,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	if (!fail && (met_ > 100.) ) {
 	  fillHists1DWrapper(h_1d_cr5_bbmasslast_met100,evtweight1l,"cr5_bbmasslast_met100");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > 125.) ) {
+	  fillHists1DWrapper(h_1d_cr5_bbmasslast_met125,evtweight1l,"cr5_bbmasslast_met125");
 	}
 	else fail = true;
 
@@ -2874,6 +2941,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 
 	if (!fail && (met_ > 100.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr8_metlast_met100,evtweight1l,"cr8_metlast_met100");
+	}
+	else fail = true;
+
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr8_metlast_met125,evtweight1l,"cr8_metlast_met125");
 	}
 	else fail = true;
 
@@ -3225,6 +3297,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 125.) ) {
+	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr14_met125,evtweight1l,"cr14_met125");
+	}
+	else fail = true;
+
 	if (!fail && (met_ > 150.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_cr14_met150,evtweight1l,"cr14_met150");
 	}
@@ -3353,6 +3430,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       }
       savePlotsDir(h_1d_sig_bbmasslast_met_nm1,outfile_,"sig_bbmasslast_met_nm1");
       savePlotsDir(h_1d_sig_bbmasslast_met100,outfile_,"sig_bbmasslast_met100");
+      savePlotsDir(h_1d_sig_bbmasslast_met125,outfile_,"sig_bbmasslast_met125");
       savePlotsDir(h_1d_sig_bbmasslast_met150,outfile_,"sig_bbmasslast_met150");
       savePlotsDir(h_1d_sig_bbmasslast_bbmass_nm1,outfile_,"sig_bbmasslast_bbmass_nm1");
     }
@@ -3373,6 +3451,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_sig_metlast_mt_nm1,outfile_,"sig_metlast_mt_nm1");
       savePlotsDir(h_1d_sig_metlast_met_nm1,outfile_,"sig_metlast_met_nm1");
       savePlotsDir(h_1d_sig_metlast_met100,outfile_,"sig_metlast_met100");
+      savePlotsDir(h_1d_sig_metlast_met125,outfile_,"sig_metlast_met125");
       savePlotsDir(h_1d_sig_metlast_met150,outfile_,"sig_metlast_met150");
     }
     savePlotsDir(h_1d_sig_metlast_final,outfile_,"sig_metlast_final");
@@ -3447,6 +3526,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr1_metlast_mt_nm1,outfile_,"cr1_metlast_mt_nm1");
       savePlotsDir(h_1d_cr1_metlast_met_nm1,outfile_,"cr1_metlast_met_nm1");
       savePlotsDir(h_1d_cr1_metlast_met100,outfile_,"cr1_metlast_met100");
+      savePlotsDir(h_1d_cr1_metlast_met125,outfile_,"cr1_metlast_met125");
       savePlotsDir(h_1d_cr1_metlast_met150,outfile_,"cr1_metlast_met150");
     }
     savePlotsDir(h_1d_cr1_metlast_final,outfile_,"cr1_metlast_final");
@@ -3488,6 +3568,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr23_metcut,outfile_,"cr23_metcut");
       savePlotsDir(h_1d_cr23_met_nm1,outfile_,"cr23_met_nm1");
       savePlotsDir(h_1d_cr23_met100,outfile_,"cr23_met100");
+      savePlotsDir(h_1d_cr23_met125,outfile_,"cr23_met125");
       savePlotsDir(h_1d_cr23_met150,outfile_,"cr23_met150");
     }
     savePlotsDir(h_1d_cr23_final,outfile_,"cr23_final");
@@ -3528,6 +3609,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr5_metlast_mt_nm1,outfile_,"cr5_metlast_mt_nm1");
       savePlotsDir(h_1d_cr5_metlast_met_nm1,outfile_,"cr5_metlast_met_nm1");
       savePlotsDir(h_1d_cr5_metlast_met100,outfile_,"cr5_metlast_met100");
+      savePlotsDir(h_1d_cr5_metlast_met125,outfile_,"cr5_metlast_met125");
       savePlotsDir(h_1d_cr5_metlast_met150,outfile_,"cr5_metlast_met150");
     }
     savePlotsDir(h_1d_cr5_metlast_final,outfile_,"cr5_metlast_final");
@@ -3546,6 +3628,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr5_invmass_mt_nm1,outfile_,"cr5_invmass_mt_nm1");
       savePlotsDir(h_1d_cr5_invmass_met_nm1,outfile_,"cr5_invmass_met_nm1");
       savePlotsDir(h_1d_cr5_invmass_met100,outfile_,"cr5_invmass_met100");
+      savePlotsDir(h_1d_cr5_invmass_met125,outfile_,"cr5_invmass_met125");
       savePlotsDir(h_1d_cr5_invmass_met150,outfile_,"cr5_invmass_met150");
     }
     savePlotsDir(h_1d_cr5_invmass_final,outfile_,"cr5_invmass_final");
@@ -3559,6 +3642,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr5_highmass_mt_nm1,outfile_,"cr5_highmass_mt_nm1");
       savePlotsDir(h_1d_cr5_highmass_met_nm1,outfile_,"cr5_highmass_met_nm1");
       savePlotsDir(h_1d_cr5_highmass_met100,outfile_,"cr5_highmass_met100");
+      savePlotsDir(h_1d_cr5_highmass_met125,outfile_,"cr5_highmass_met125");
       savePlotsDir(h_1d_cr5_highmass_met150,outfile_,"cr5_highmass_met150");
     }
     savePlotsDir(h_1d_cr5_highmass_final,outfile_,"cr5_highmass_final");
@@ -3572,6 +3656,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr5_lowmass_mt_nm1,outfile_,"cr5_lowmass_mt_nm1");
       savePlotsDir(h_1d_cr5_lowmass_met_nm1,outfile_,"cr5_lowmass_met_nm1");
       savePlotsDir(h_1d_cr5_lowmass_met100,outfile_,"cr5_lowmass_met100");
+      savePlotsDir(h_1d_cr5_lowmass_met125,outfile_,"cr5_lowmass_met125");
       savePlotsDir(h_1d_cr5_lowmass_met150,outfile_,"cr5_lowmass_met150");
     }
     savePlotsDir(h_1d_cr5_lowmass_final,outfile_,"cr5_lowmass_final");
@@ -3598,6 +3683,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       }
       savePlotsDir(h_1d_cr5_bbmasslast_met_nm1,outfile_,"cr5_bbmasslast_met_nm1");
       savePlotsDir(h_1d_cr5_bbmasslast_met100,outfile_,"cr5_bbmasslast_met100");
+      savePlotsDir(h_1d_cr5_bbmasslast_met125,outfile_,"cr5_bbmasslast_met125");
       savePlotsDir(h_1d_cr5_bbmasslast_met150,outfile_,"cr5_bbmasslast_met150");
       savePlotsDir(h_1d_cr5_bbmasslast_bbmass_nm1,outfile_,"cr5_bbmasslast_bbmass_nm1");
     }
@@ -3654,6 +3740,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr8_metlast_mt_nm1,outfile_,"cr8_metlast_mt_nm1");
       savePlotsDir(h_1d_cr8_metlast_met_nm1,outfile_,"cr8_metlast_met_nm1");
       savePlotsDir(h_1d_cr8_metlast_met100,outfile_,"cr8_metlast_met100");
+      savePlotsDir(h_1d_cr8_metlast_met125,outfile_,"cr8_metlast_met125");
       savePlotsDir(h_1d_cr8_metlast_met150,outfile_,"cr8_metlast_met150");
     }
     savePlotsDir(h_1d_cr8_metlast_final,outfile_,"cr8_metlast_final");
@@ -3726,6 +3813,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr14_mt_nm1,outfile_,"cr14_mt_nm1");
       savePlotsDir(h_1d_cr14_met_nm1,outfile_,"cr14_met_nm1");
       savePlotsDir(h_1d_cr14_met100,outfile_,"cr14_met100");
+      savePlotsDir(h_1d_cr14_met125,outfile_,"cr14_met125");
       savePlotsDir(h_1d_cr14_met150,outfile_,"cr14_met150");
     }
     savePlotsDir(h_1d_cr14_final,outfile_,"cr14_final");
