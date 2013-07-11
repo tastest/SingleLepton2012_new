@@ -1340,6 +1340,15 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTau_leadPtcand_;
 	TBranch *pfTau_leadPtcand_branch;
 	bool pfTau_leadPtcand_isLoaded;
+	int	pfTauSS_leadPtcandID_;
+	TBranch *pfTauSS_leadPtcandID_branch;
+	bool pfTauSS_leadPtcandID_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauSS_;
+	TBranch *pfTauSS_branch;
+	bool pfTauSS_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauSS_leadPtcand_;
+	TBranch *pfTauSS_leadPtcand_branch;
+	bool pfTauSS_leadPtcand_isLoaded;
 	int	pfTauLoose_leadPtcandID_;
 	TBranch *pfTauLoose_leadPtcandID_branch;
 	bool pfTauLoose_leadPtcandID_isLoaded;
@@ -1349,6 +1358,24 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauLoose_leadPtcand_;
 	TBranch *pfTauLoose_leadPtcand_branch;
 	bool pfTauLoose_leadPtcand_isLoaded;
+	int	pfTauTight_leadPtcandID_;
+	TBranch *pfTauTight_leadPtcandID_branch;
+	bool pfTauTight_leadPtcandID_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauTight_;
+	TBranch *pfTauTight_branch;
+	bool pfTauTight_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauTight_leadPtcand_;
+	TBranch *pfTauTight_leadPtcand_branch;
+	bool pfTauTight_leadPtcand_isLoaded;
+	int	pfTauTightSS_leadPtcandID_;
+	TBranch *pfTauTightSS_leadPtcandID_branch;
+	bool pfTauTightSS_leadPtcandID_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauTightSS_;
+	TBranch *pfTauTightSS_branch;
+	bool pfTauTightSS_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTauTightSS_leadPtcand_;
+	TBranch *pfTauTightSS_leadPtcand_branch;
+	bool pfTauTightSS_leadPtcand_isLoaded;
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfcandOS10_;
 	TBranch *pfcandOS10_branch;
 	bool pfcandOS10_isLoaded;
@@ -1403,6 +1430,18 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *neutralino_tbar_;
 	TBranch *neutralino_tbar_branch;
 	bool neutralino_tbar_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *genc1_;
+	TBranch *genc1_branch;
+	bool genc1_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *genn2_;
+	TBranch *genn2_branch;
+	bool genn2_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *neutralino_c1_;
+	TBranch *neutralino_c1_branch;
+	bool neutralino_c1_isLoaded;
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *neutralino_n2_;
+	TBranch *neutralino_n2_branch;
+	bool neutralino_n2_isLoaded;
 	int	lep_t_id_;
 	TBranch *lep_t_id_branch;
 	bool lep_t_id_isLoaded;
@@ -1427,6 +1466,9 @@ protected:
 	vector<float> *pfjets_chEfrac_;
 	TBranch *pfjets_chEfrac_branch;
 	bool pfjets_chEfrac_isLoaded;
+	vector<float> *pfjets_muofrac_;
+	TBranch *pfjets_muofrac_branch;
+	bool pfjets_muofrac_isLoaded;
 	vector<float> *pfjets_chm_;
 	TBranch *pfjets_chm_branch;
 	bool pfjets_chm_isLoaded;
@@ -1682,6 +1724,16 @@ void Init(TTree *tree) {
 		pfTau_leadPtcand_branch = tree->GetBranch("pfTau_leadPtcand");
 		if (pfTau_leadPtcand_branch) {pfTau_leadPtcand_branch->SetAddress(&pfTau_leadPtcand_);}
 	}
+	pfTauSS_branch = 0;
+	if (tree->GetBranch("pfTauSS") != 0) {
+		pfTauSS_branch = tree->GetBranch("pfTauSS");
+		if (pfTauSS_branch) {pfTauSS_branch->SetAddress(&pfTauSS_);}
+	}
+	pfTauSS_leadPtcand_branch = 0;
+	if (tree->GetBranch("pfTauSS_leadPtcand") != 0) {
+		pfTauSS_leadPtcand_branch = tree->GetBranch("pfTauSS_leadPtcand");
+		if (pfTauSS_leadPtcand_branch) {pfTauSS_leadPtcand_branch->SetAddress(&pfTauSS_leadPtcand_);}
+	}
 	pfTauLoose_branch = 0;
 	if (tree->GetBranch("pfTauLoose") != 0) {
 		pfTauLoose_branch = tree->GetBranch("pfTauLoose");
@@ -1691,6 +1743,26 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfTauLoose_leadPtcand") != 0) {
 		pfTauLoose_leadPtcand_branch = tree->GetBranch("pfTauLoose_leadPtcand");
 		if (pfTauLoose_leadPtcand_branch) {pfTauLoose_leadPtcand_branch->SetAddress(&pfTauLoose_leadPtcand_);}
+	}
+	pfTauTight_branch = 0;
+	if (tree->GetBranch("pfTauTight") != 0) {
+		pfTauTight_branch = tree->GetBranch("pfTauTight");
+		if (pfTauTight_branch) {pfTauTight_branch->SetAddress(&pfTauTight_);}
+	}
+	pfTauTight_leadPtcand_branch = 0;
+	if (tree->GetBranch("pfTauTight_leadPtcand") != 0) {
+		pfTauTight_leadPtcand_branch = tree->GetBranch("pfTauTight_leadPtcand");
+		if (pfTauTight_leadPtcand_branch) {pfTauTight_leadPtcand_branch->SetAddress(&pfTauTight_leadPtcand_);}
+	}
+	pfTauTightSS_branch = 0;
+	if (tree->GetBranch("pfTauTightSS") != 0) {
+		pfTauTightSS_branch = tree->GetBranch("pfTauTightSS");
+		if (pfTauTightSS_branch) {pfTauTightSS_branch->SetAddress(&pfTauTightSS_);}
+	}
+	pfTauTightSS_leadPtcand_branch = 0;
+	if (tree->GetBranch("pfTauTightSS_leadPtcand") != 0) {
+		pfTauTightSS_leadPtcand_branch = tree->GetBranch("pfTauTightSS_leadPtcand");
+		if (pfTauTightSS_leadPtcand_branch) {pfTauTightSS_leadPtcand_branch->SetAddress(&pfTauTightSS_leadPtcand_);}
 	}
 	pfcandOS10_branch = 0;
 	if (tree->GetBranch("pfcandOS10") != 0) {
@@ -1781,6 +1853,26 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("neutralino_tbar") != 0) {
 		neutralino_tbar_branch = tree->GetBranch("neutralino_tbar");
 		if (neutralino_tbar_branch) {neutralino_tbar_branch->SetAddress(&neutralino_tbar_);}
+	}
+	genc1_branch = 0;
+	if (tree->GetBranch("genc1") != 0) {
+		genc1_branch = tree->GetBranch("genc1");
+		if (genc1_branch) {genc1_branch->SetAddress(&genc1_);}
+	}
+	genn2_branch = 0;
+	if (tree->GetBranch("genn2") != 0) {
+		genn2_branch = tree->GetBranch("genn2");
+		if (genn2_branch) {genn2_branch->SetAddress(&genn2_);}
+	}
+	neutralino_c1_branch = 0;
+	if (tree->GetBranch("neutralino_c1") != 0) {
+		neutralino_c1_branch = tree->GetBranch("neutralino_c1");
+		if (neutralino_c1_branch) {neutralino_c1_branch->SetAddress(&neutralino_c1_);}
+	}
+	neutralino_n2_branch = 0;
+	if (tree->GetBranch("neutralino_n2") != 0) {
+		neutralino_n2_branch = tree->GetBranch("neutralino_n2");
+		if (neutralino_n2_branch) {neutralino_n2_branch->SetAddress(&neutralino_n2_);}
 	}
 	pfjets_branch = 0;
 	if (tree->GetBranch("pfjets") != 0) {
@@ -3878,10 +3970,25 @@ void Init(TTree *tree) {
 		pfTau_leadPtcandID_branch = tree->GetBranch("pfTau_leadPtcandID");
 		if (pfTau_leadPtcandID_branch) {pfTau_leadPtcandID_branch->SetAddress(&pfTau_leadPtcandID_);}
 	}
+	pfTauSS_leadPtcandID_branch = 0;
+	if (tree->GetBranch("pfTauSS_leadPtcandID") != 0) {
+		pfTauSS_leadPtcandID_branch = tree->GetBranch("pfTauSS_leadPtcandID");
+		if (pfTauSS_leadPtcandID_branch) {pfTauSS_leadPtcandID_branch->SetAddress(&pfTauSS_leadPtcandID_);}
+	}
 	pfTauLoose_leadPtcandID_branch = 0;
 	if (tree->GetBranch("pfTauLoose_leadPtcandID") != 0) {
 		pfTauLoose_leadPtcandID_branch = tree->GetBranch("pfTauLoose_leadPtcandID");
 		if (pfTauLoose_leadPtcandID_branch) {pfTauLoose_leadPtcandID_branch->SetAddress(&pfTauLoose_leadPtcandID_);}
+	}
+	pfTauTight_leadPtcandID_branch = 0;
+	if (tree->GetBranch("pfTauTight_leadPtcandID") != 0) {
+		pfTauTight_leadPtcandID_branch = tree->GetBranch("pfTauTight_leadPtcandID");
+		if (pfTauTight_leadPtcandID_branch) {pfTauTight_leadPtcandID_branch->SetAddress(&pfTauTight_leadPtcandID_);}
+	}
+	pfTauTightSS_leadPtcandID_branch = 0;
+	if (tree->GetBranch("pfTauTightSS_leadPtcandID") != 0) {
+		pfTauTightSS_leadPtcandID_branch = tree->GetBranch("pfTauTightSS_leadPtcandID");
+		if (pfTauTightSS_leadPtcandID_branch) {pfTauTightSS_leadPtcandID_branch->SetAddress(&pfTauTightSS_leadPtcandID_);}
 	}
 	lep_t_id_branch = 0;
 	if (tree->GetBranch("lep_t_id") != 0) {
@@ -3902,6 +4009,11 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("pfjets_chEfrac") != 0) {
 		pfjets_chEfrac_branch = tree->GetBranch("pfjets_chEfrac");
 		if (pfjets_chEfrac_branch) {pfjets_chEfrac_branch->SetAddress(&pfjets_chEfrac_);}
+	}
+	pfjets_muofrac_branch = 0;
+	if (tree->GetBranch("pfjets_muofrac") != 0) {
+		pfjets_muofrac_branch = tree->GetBranch("pfjets_muofrac");
+		if (pfjets_muofrac_branch) {pfjets_muofrac_branch->SetAddress(&pfjets_muofrac_);}
 	}
 	pfjets_chm_branch = 0;
 	if (tree->GetBranch("pfjets_chm") != 0) {
@@ -4515,9 +4627,18 @@ void GetEntry(unsigned int idx)
 		pfTau_leadPtcandID_isLoaded = false;
 		pfTau_isLoaded = false;
 		pfTau_leadPtcand_isLoaded = false;
+		pfTauSS_leadPtcandID_isLoaded = false;
+		pfTauSS_isLoaded = false;
+		pfTauSS_leadPtcand_isLoaded = false;
 		pfTauLoose_leadPtcandID_isLoaded = false;
 		pfTauLoose_isLoaded = false;
 		pfTauLoose_leadPtcand_isLoaded = false;
+		pfTauTight_leadPtcandID_isLoaded = false;
+		pfTauTight_isLoaded = false;
+		pfTauTight_leadPtcand_isLoaded = false;
+		pfTauTightSS_leadPtcandID_isLoaded = false;
+		pfTauTightSS_isLoaded = false;
+		pfTauTightSS_leadPtcand_isLoaded = false;
 		pfcandOS10_isLoaded = false;
 		pfcandOS10looseZ_isLoaded = false;
 		pfcand5looseZ_isLoaded = false;
@@ -4536,6 +4657,10 @@ void GetEntry(unsigned int idx)
 		stop_tbar_isLoaded = false;
 		neutralino_t_isLoaded = false;
 		neutralino_tbar_isLoaded = false;
+		genc1_isLoaded = false;
+		genn2_isLoaded = false;
+		neutralino_c1_isLoaded = false;
+		neutralino_n2_isLoaded = false;
 		lep_t_id_isLoaded = false;
 		lep_tbar_id_isLoaded = false;
 		pfjets_isLoaded = false;
@@ -4544,6 +4669,7 @@ void GetEntry(unsigned int idx)
 		pfjets_faillepolap_isLoaded = false;
 		pfjets_csv_isLoaded = false;
 		pfjets_chEfrac_isLoaded = false;
+		pfjets_muofrac_isLoaded = false;
 		pfjets_chm_isLoaded = false;
 		pfjets_neu_isLoaded = false;
 		pfjets_l1corr_isLoaded = false;
@@ -5026,9 +5152,18 @@ void LoadAllBranches()
 	if (pfTau_leadPtcandID_branch != 0) pfTau_leadPtcandID();
 	if (pfTau_branch != 0) pfTau();
 	if (pfTau_leadPtcand_branch != 0) pfTau_leadPtcand();
+	if (pfTauSS_leadPtcandID_branch != 0) pfTauSS_leadPtcandID();
+	if (pfTauSS_branch != 0) pfTauSS();
+	if (pfTauSS_leadPtcand_branch != 0) pfTauSS_leadPtcand();
 	if (pfTauLoose_leadPtcandID_branch != 0) pfTauLoose_leadPtcandID();
 	if (pfTauLoose_branch != 0) pfTauLoose();
 	if (pfTauLoose_leadPtcand_branch != 0) pfTauLoose_leadPtcand();
+	if (pfTauTight_leadPtcandID_branch != 0) pfTauTight_leadPtcandID();
+	if (pfTauTight_branch != 0) pfTauTight();
+	if (pfTauTight_leadPtcand_branch != 0) pfTauTight_leadPtcand();
+	if (pfTauTightSS_leadPtcandID_branch != 0) pfTauTightSS_leadPtcandID();
+	if (pfTauTightSS_branch != 0) pfTauTightSS();
+	if (pfTauTightSS_leadPtcand_branch != 0) pfTauTightSS_leadPtcand();
 	if (pfcandOS10_branch != 0) pfcandOS10();
 	if (pfcandOS10looseZ_branch != 0) pfcandOS10looseZ();
 	if (pfcand5looseZ_branch != 0) pfcand5looseZ();
@@ -5047,6 +5182,10 @@ void LoadAllBranches()
 	if (stop_tbar_branch != 0) stop_tbar();
 	if (neutralino_t_branch != 0) neutralino_t();
 	if (neutralino_tbar_branch != 0) neutralino_tbar();
+	if (genc1_branch != 0) genc1();
+	if (genn2_branch != 0) genn2();
+	if (neutralino_c1_branch != 0) neutralino_c1();
+	if (neutralino_n2_branch != 0) neutralino_n2();
 	if (lep_t_id_branch != 0) lep_t_id();
 	if (lep_tbar_id_branch != 0) lep_tbar_id();
 	if (pfjets_branch != 0) pfjets();
@@ -5055,6 +5194,7 @@ void LoadAllBranches()
 	if (pfjets_faillepolap_branch != 0) pfjets_faillepolap();
 	if (pfjets_csv_branch != 0) pfjets_csv();
 	if (pfjets_chEfrac_branch != 0) pfjets_chEfrac();
+	if (pfjets_muofrac_branch != 0) pfjets_muofrac();
 	if (pfjets_chm_branch != 0) pfjets_chm();
 	if (pfjets_neu_branch != 0) pfjets_neu();
 	if (pfjets_l1corr_branch != 0) pfjets_l1corr();
@@ -10826,6 +10966,45 @@ void LoadAllBranches()
 		}
 		return *pfTau_leadPtcand_;
 	}
+	int &pfTauSS_leadPtcandID()
+	{
+		if (not pfTauSS_leadPtcandID_isLoaded) {
+			if (pfTauSS_leadPtcandID_branch != 0) {
+				pfTauSS_leadPtcandID_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauSS_leadPtcandID_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauSS_leadPtcandID_isLoaded = true;
+		}
+		return pfTauSS_leadPtcandID_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS()
+	{
+		if (not pfTauSS_isLoaded) {
+			if (pfTauSS_branch != 0) {
+				pfTauSS_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauSS_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauSS_isLoaded = true;
+		}
+		return *pfTauSS_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS_leadPtcand()
+	{
+		if (not pfTauSS_leadPtcand_isLoaded) {
+			if (pfTauSS_leadPtcand_branch != 0) {
+				pfTauSS_leadPtcand_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauSS_leadPtcand_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauSS_leadPtcand_isLoaded = true;
+		}
+		return *pfTauSS_leadPtcand_;
+	}
 	int &pfTauLoose_leadPtcandID()
 	{
 		if (not pfTauLoose_leadPtcandID_isLoaded) {
@@ -10864,6 +11043,84 @@ void LoadAllBranches()
 			pfTauLoose_leadPtcand_isLoaded = true;
 		}
 		return *pfTauLoose_leadPtcand_;
+	}
+	int &pfTauTight_leadPtcandID()
+	{
+		if (not pfTauTight_leadPtcandID_isLoaded) {
+			if (pfTauTight_leadPtcandID_branch != 0) {
+				pfTauTight_leadPtcandID_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauTight_leadPtcandID_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauTight_leadPtcandID_isLoaded = true;
+		}
+		return pfTauTight_leadPtcandID_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTight()
+	{
+		if (not pfTauTight_isLoaded) {
+			if (pfTauTight_branch != 0) {
+				pfTauTight_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauTight_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauTight_isLoaded = true;
+		}
+		return *pfTauTight_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTight_leadPtcand()
+	{
+		if (not pfTauTight_leadPtcand_isLoaded) {
+			if (pfTauTight_leadPtcand_branch != 0) {
+				pfTauTight_leadPtcand_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauTight_leadPtcand_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauTight_leadPtcand_isLoaded = true;
+		}
+		return *pfTauTight_leadPtcand_;
+	}
+	int &pfTauTightSS_leadPtcandID()
+	{
+		if (not pfTauTightSS_leadPtcandID_isLoaded) {
+			if (pfTauTightSS_leadPtcandID_branch != 0) {
+				pfTauTightSS_leadPtcandID_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauTightSS_leadPtcandID_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauTightSS_leadPtcandID_isLoaded = true;
+		}
+		return pfTauTightSS_leadPtcandID_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTightSS()
+	{
+		if (not pfTauTightSS_isLoaded) {
+			if (pfTauTightSS_branch != 0) {
+				pfTauTightSS_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauTightSS_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauTightSS_isLoaded = true;
+		}
+		return *pfTauTightSS_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTightSS_leadPtcand()
+	{
+		if (not pfTauTightSS_leadPtcand_isLoaded) {
+			if (pfTauTightSS_leadPtcand_branch != 0) {
+				pfTauTightSS_leadPtcand_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTauTightSS_leadPtcand_branch does not exist!\n");
+				exit(1);
+			}
+			pfTauTightSS_leadPtcand_isLoaded = true;
+		}
+		return *pfTauTightSS_leadPtcand_;
 	}
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10()
 	{
@@ -11099,6 +11356,58 @@ void LoadAllBranches()
 		}
 		return *neutralino_tbar_;
 	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &genc1()
+	{
+		if (not genc1_isLoaded) {
+			if (genc1_branch != 0) {
+				genc1_branch->GetEntry(index);
+			} else { 
+				printf("branch genc1_branch does not exist!\n");
+				exit(1);
+			}
+			genc1_isLoaded = true;
+		}
+		return *genc1_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &genn2()
+	{
+		if (not genn2_isLoaded) {
+			if (genn2_branch != 0) {
+				genn2_branch->GetEntry(index);
+			} else { 
+				printf("branch genn2_branch does not exist!\n");
+				exit(1);
+			}
+			genn2_isLoaded = true;
+		}
+		return *genn2_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_c1()
+	{
+		if (not neutralino_c1_isLoaded) {
+			if (neutralino_c1_branch != 0) {
+				neutralino_c1_branch->GetEntry(index);
+			} else { 
+				printf("branch neutralino_c1_branch does not exist!\n");
+				exit(1);
+			}
+			neutralino_c1_isLoaded = true;
+		}
+		return *neutralino_c1_;
+	}
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_n2()
+	{
+		if (not neutralino_n2_isLoaded) {
+			if (neutralino_n2_branch != 0) {
+				neutralino_n2_branch->GetEntry(index);
+			} else { 
+				printf("branch neutralino_n2_branch does not exist!\n");
+				exit(1);
+			}
+			neutralino_n2_isLoaded = true;
+		}
+		return *neutralino_n2_;
+	}
 	int &lep_t_id()
 	{
 		if (not lep_t_id_isLoaded) {
@@ -11202,6 +11511,19 @@ void LoadAllBranches()
 			pfjets_chEfrac_isLoaded = true;
 		}
 		return *pfjets_chEfrac_;
+	}
+	vector<float> &pfjets_muofrac()
+	{
+		if (not pfjets_muofrac_isLoaded) {
+			if (pfjets_muofrac_branch != 0) {
+				pfjets_muofrac_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_muofrac_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_muofrac_isLoaded = true;
+		}
+		return *pfjets_muofrac_;
 	}
 	vector<float> &pfjets_chm()
 	{
@@ -12140,9 +12462,18 @@ namespace Stop {
 	int &pfTau_leadPtcandID();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand();
+	int &pfTauSS_leadPtcandID();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS_leadPtcand();
 	int &pfTauLoose_leadPtcandID();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauLoose_leadPtcand();
+	int &pfTauTight_leadPtcandID();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTight();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTight_leadPtcand();
+	int &pfTauTightSS_leadPtcandID();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTightSS();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauTightSS_leadPtcand();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcandOS10looseZ();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfcand5looseZ();
@@ -12161,6 +12492,10 @@ namespace Stop {
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_tbar();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_t();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_tbar();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &genc1();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &genn2();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_c1();
+	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &neutralino_n2();
 	int &lep_t_id();
 	int &lep_tbar_id();
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets();
@@ -12169,6 +12504,7 @@ namespace Stop {
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &pfjets_faillepolap();
 	vector<float> &pfjets_csv();
 	vector<float> &pfjets_chEfrac();
+	vector<float> &pfjets_muofrac();
 	vector<float> &pfjets_chm();
 	vector<float> &pfjets_neu();
 	vector<float> &pfjets_l1corr();
