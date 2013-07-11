@@ -28,19 +28,7 @@ class StopTreeLooper {
 
 	//plotting
 	void makeSIGPlots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag, float mtcut ); 
-	void makeCR1Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag, float mtcut ); 
-	void makeCR2Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag_dl, float mtcut );
-	void makeCR4Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag_dl, float mtcut );
-	void makeCR5Plots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag_dl, float mtcut );
-	void makeNJPlots( float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag ); 
-	void makeZPlots(  float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			   string tag_selection, string flav_tag );
+			  string tag_selection, string flav_tag, float mtcut, bool is40 ); 
 
     private:
 
@@ -68,7 +56,8 @@ class StopTreeLooper {
 	float pt_b;
 	float dRleptB1;
 	//mbb
-	float mbb;
+	float mbb40;
+	float mbb30;
 	//maria variables
 	float htssl;
 	float htosl;
@@ -84,9 +73,11 @@ class StopTreeLooper {
 	float max_mbb; 
 	//jets information
 	int n_jets;
-	int n_bjets;
+	int n_bjets40;
+	int n_bjets30;
 	int n_ljets;
-	vector<LorentzVector> jets;
+	vector<LorentzVector> bjets40;
+	vector<LorentzVector> bjets30;
 	vector<float> btag;
 	vector<float> sigma_jets;
 	vector<int> mc;
@@ -101,7 +92,8 @@ class StopTreeLooper {
 	float pfcalo_metdphi;
 	
 	//flags to blind signal region
-	bool issigmbb;
+	bool issigmbb30;
+	bool issigmbb40;
 	bool issigmt;
 
 
