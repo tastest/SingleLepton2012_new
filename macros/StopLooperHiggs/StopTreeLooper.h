@@ -28,7 +28,12 @@ class StopTreeLooper {
 
 	//plotting
 	void makeSIGPlots(float evtweight, std::map<std::string, TH1F*> &h_1d, 
-			  string tag_selection, string flav_tag, float mtcut, bool is40 ); 
+			  string tag_selection, string flav_tag, float mtcut ); 
+	void makeMinSIGPlots( float evtweight, std::map<std::string, TH1F*> &h_1d, 
+			      string tag_selection, string flav_tag, 
+			      float mtcut, float mbbval );
+	//calculate mbb
+	float getMbb(vector<LorentzVector> &bjets);
 
     private:
 
@@ -57,7 +62,7 @@ class StopTreeLooper {
 	float dRleptB1;
 	//mbb
 	float mbb40;
-	float mbb30;
+	float mbb;
 	//maria variables
 	float htssl;
 	float htosl;
@@ -81,6 +86,35 @@ class StopTreeLooper {
 	vector<float> btag;
 	vector<float> sigma_jets;
 	vector<int> mc;
+	//systematics
+	int n_bjets40_upBCShape;
+	int n_bjets30_upBCShape;
+	int n_ljets_upBCShape;
+	vector<LorentzVector> bjets40_upBCShape;
+	vector<LorentzVector> bjets30_upBCShape;
+	int n_bjets40_downBCShape;
+	int n_bjets30_downBCShape;
+	int n_ljets_downBCShape;
+	vector<LorentzVector> bjets40_downBCShape;
+	vector<LorentzVector> bjets30_downBCShape;
+	int n_bjets40_upLShape;
+	int n_bjets30_upLShape;
+	int n_ljets_upLShape;
+	vector<LorentzVector> bjets40_upLShape;
+	vector<LorentzVector> bjets30_upLShape;
+	int n_bjets40_downLShape;
+	int n_bjets30_downLShape;
+	int n_ljets_downLShape;
+	vector<LorentzVector> bjets40_downLShape;
+	vector<LorentzVector> bjets30_downLShape;
+	float mbb40_upBCShape;
+	float mbb_upBCShape;
+	float mbb40_downBCShape;
+	float mbb_downBCShape;
+	float mbb40_upLShape;
+	float mbb_upLShape;
+	float mbb40_downLShape;
+	float mbb_downLShape;
 
 	float chi2min;
 	float chi2minprob;
@@ -92,9 +126,10 @@ class StopTreeLooper {
 	float pfcalo_metdphi;
 	
 	//flags to blind signal region
-	bool issigmbb30;
+	bool issigmbb;
 	bool issigmbb40;
-	bool issigmt;
+	bool issigmt120;
+	bool issigmt150;
 
 
 };
