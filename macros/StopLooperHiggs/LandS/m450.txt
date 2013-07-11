@@ -1,0 +1,31 @@
+# Counting experiment with multiple channels
+imax 4  number of channels
+jmax *  number of backgrounds ('*' = automatic)
+kmax *  number of nuisance parameters (sources of systematical uncertainties)
+------------
+# four channels, each with it's number of observed events
+bin          1l3b 1l4b 2l3b 2l4b
+observation   12   24   9   8
+------------
+# now we list the expected events for signal and all backgrounds in those bins
+# the second 'process' line must have a positive number for backgrounds, and 0 for signal
+# for the signal, we normalize the yields to an hypothetical cross section of 1/pb
+# so that we get an absolute limit in cross section in units of pb.
+# then we list the independent sources of uncertainties, and give their effect (syst. error)
+# on each process and bin
+bin           1l3b    1l3b    1l4b    1l4b    2l3b    2l3b    2l4b    2l4b
+process    stop    bkg     stop    bkg    stop   bkg    stop    bkg
+process       0        1         0        1       0       1        0        1  
+rate         23.24  11.79  115.58  24.42  31.46 8.55  49.81  8.08
+------------
+sigUnc   lnN   1.10     -      1.10      -      1.10     -      1.10      -   
+stat1l3b lnN   -      1.093     -         -       -          -        -         -   
+stat1l4b lnN   -          -        -      1.087   -          -        -         -    
+stat2l3b lnN   -          -        -         -       -       1.208    -         -    
+stat2l4b lnN   -          -        -         -       -          -        -      1.273
+sfmbb    lnN   -          -        -         -       -       1.1       -       1.2   
+sfmt     lnN   -      1.078        -         1.042       -       -       -       -   
+rarebkg  lnN   -       1.036    -      1.008    -      1.014    -     1.056    
+
+
+
