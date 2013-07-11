@@ -146,6 +146,23 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   else if (infile.Contains("WH_WToLNu_HToBB"))   	             sample = Form("whbb_%s",            outfileid.Data());
   else if (infile.Contains("SMS-T2tt"))                              sample = Form("T2tt_%s",            outfileid.Data());
   else if (infile.Contains("SMS-T2bw"))                              sample = Form("T2bw_%s",            outfileid.Data());
+  else if (infile.Contains("TChiwh_125_1"))                          sample = Form("TChiwh_125_1_%s",    outfileid.Data());
+  else if (infile.Contains("TChiwh_150_1"))                          sample = Form("TChiwh_150_1_%s",    outfileid.Data());
+  else if (infile.Contains("TChiwh_200_1"))                          sample = Form("TChiwh_200_1_%s",    outfileid.Data());
+  else if (infile.Contains("TChiwh_250_1"))                          sample = Form("TChiwh_250_1_%s",    outfileid.Data());
+  else if (infile.Contains("TChiwh_250_25"))                         sample = Form("TChiwh_250_25_%s",   outfileid.Data());
+  else if (infile.Contains("TChiwh_250_50"))                         sample = Form("TChiwh_250_50_%s",   outfileid.Data());
+  else if (infile.Contains("TChiwh_300_1"))                          sample = Form("TChiwh_300_1_%s",    outfileid.Data());
+  else if (infile.Contains("TChiwh_350_1"))                          sample = Form("TChiwh_350_1_%s",    outfileid.Data());
+  else if (infile.Contains("TChiwh_400_1"))                          sample = Form("TChiwh_400_1_%s",    outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino130_bino1"))            sample = Form("Wino_130_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino150_bino1"))            sample = Form("Wino_150_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino175_bino1"))            sample = Form("Wino_175_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino200_bino1"))            sample = Form("Wino_200_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino250_bino1"))            sample = Form("Wino_250_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino300_bino1"))            sample = Form("Wino_300_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino350_bino1"))            sample = Form("Wino_350_1_%s",      outfileid.Data());
+  else if (infile.Contains("WinoNLSP_chargino400_bino1"))            sample = Form("Wino_400_1_%s",      outfileid.Data());
   //Data
   //single muon
   else if (infile.Contains("SingleMu_Run2012A-recover-06Aug2012-v1_AOD"))       sample =  Form("SingleMu2012A_recover06Aug2012v1V532_%s",     outfileid.Data());

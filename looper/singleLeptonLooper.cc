@@ -1325,6 +1325,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       stop_tbar_ = 0;   
       neutralino_t_ = 0;   
       neutralino_tbar_ = 0;  
+      genc1_	= 0;   
+      genn2_ = 0;   
+      neutralino_c1_ = 0;   
+      neutralino_n2_ = 0;  
 
       npartons_    =  0;
       nwzpartons_  = -9;
@@ -1422,6 +1426,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  }
 	  if ( genps_id_mother().at(igen) == -1000006 && ( abs(id) == 1000022 ) ) {
 	    neutralino_tbar_ = &(genps_p4().at(igen));
+	  }
+	  
+	  //store c1/n2 for WH
+	  if ( abs(id) == 1000024)
+	    genc1_ = &(genps_p4().at(igen));   
+	  else if ( abs(id) == 1000023 )
+	    genn2_ = &(genps_p4().at(igen));   
+
+	  //store neutralinos for WH
+	  if ( abs(genps_id_mother().at(igen)) == 1000024  && ( abs(id) == 1000022 ) ) {
+	    neutralino_c1_ = &(genps_p4().at(igen));
+	  }
+	  if ( abs(genps_id_mother().at(igen)) == 1000023 && ( abs(id) == 1000022 ) ) {
+	    neutralino_n2_ = &(genps_p4().at(igen));
 	  }
 	  
 	  //store daughter lepton
@@ -4231,6 +4249,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("stop_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &stop_tbar_ );
   outTree->Branch("neutralino_t"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_t_    );
   outTree->Branch("neutralino_tbar" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_tbar_ );
+  outTree->Branch("genc1"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &genc1_   	);
+  outTree->Branch("genn2" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &genn2_ );
+  outTree->Branch("neutralino_c1"    , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_c1_    );
+  outTree->Branch("neutralino_n2" , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &neutralino_n2_ );
   outTree->Branch("lep_t_id",            &lep_t_id_,            "lep_t_id/I");  
   outTree->Branch("lep_tbar_id",         &lep_tbar_id_,         "lep_tbar_id/I");  
 
