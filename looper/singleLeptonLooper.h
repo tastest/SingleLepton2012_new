@@ -427,6 +427,7 @@ class singleLeptonLooper
         LorentzVector*  pfTau_;
         LorentzVector*  pfTau_leadPtcand_;
         Int_t pfTau_leadPtcandID_;
+	Int_t pfTau_decayModeFinder_;
 
         LorentzVector*  pfTauSS_;
         LorentzVector*  pfTauSS_leadPtcand_;
@@ -592,6 +593,7 @@ class singleLeptonLooper
 	Int_t   eebadsc_;
 	Int_t   hbhenew_;
         Int_t   hbhe_;
+	Int_t   ecallasernew_;
 
 	Int_t   jetid_;
 	Int_t   jetid30_;

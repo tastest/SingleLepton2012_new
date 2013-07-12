@@ -369,6 +369,8 @@ void singleLeptonLooper::InitBaby(){
   pfTau_leadPtcand_  = 0;
   pfTau_leadPtcandID_ = -1;
 
+  pfTau_decayModeFinder_=-99999.;
+
   pfTauSS_       = 0;
   pfTauSS_leadPtcand_  = 0;
   pfTauSS_leadPtcandID_ = -1;
@@ -2399,6 +2401,9 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  int leadingPtCand_index=(taus_pf_pfcandIndicies().at(indexTauMax)).at(0);
 	  pfTau_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
 	  pfTau_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
+	  pfTau_decayModeFinder_= taus_pf_byDecayModeFinding().at(indexTauMax);
+
+	  //	cout << "decayMode " << pfTau_decayModeFinder_ << endl;
 
 	}
       }
@@ -3412,6 +3417,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       eebadsc_   = 1;
       if( isData ) eebadsc_ = filt_eeBadSc();
       hbhenew_   = passHBHEFilter();
+      ecallasernew_   = passECALLaserFilter();
 
       //for SCs above 20 GeV, store the max. ECAL laser correction and the eta/pT of this SC
       if( !TString(prefix).Contains("T2") ) {
@@ -3729,6 +3735,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("csc"       ,  &csc_       ,  "csc/I");  
   outTree->Branch("hbhe"      ,  &hbhe_      ,  "hbhe/I");  
   outTree->Branch("hbhenew"   ,  &hbhenew_   ,  "hbhenew/I");  
+  outTree->Branch("ecallasernew" ,  &ecallasernew_ ,  "ecallasermew/I");  
   outTree->Branch("hcallaser" ,  &hcallaser_ ,  "hcallaser/I");  
   outTree->Branch("ecaltp"    ,  &ecaltp_    ,  "ecaltp/I");  
   outTree->Branch("trkfail"   ,  &trkfail_   ,  "trkfail/I");  
@@ -4212,6 +4219,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfTau_leadPtcandID",        &pfTau_leadPtcandID_,        "pfTau_leadPtcandID/I");
   outTree->Branch("pfTau"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_	);
   outTree->Branch("pfTau_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_leadPtcand_	);
+
+  outTree->Branch("pfTau_decayModeFinder",        &pfTau_decayModeFinder_,        "pfTau_decayModeFinder/I");
 
   outTree->Branch("pfTauSS_leadPtcandID",        &pfTauSS_leadPtcandID_,        "pfTauSS_leadPtcandID/I");
   outTree->Branch("pfTauSS"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauSS_	);
