@@ -72,8 +72,12 @@ class StopTreeLooper {
 	Int_t cr4_;
 	Int_t cr5_;   
 
+        // WH analysis selections
 	Int_t whsig_;
-	Int_t whcr1_;   
+	Int_t whcrbbmass_;   
+	Int_t whcr2l_;   
+	Int_t whcrbveto_;   
+	Int_t tobtecveto_;   
 
 	// cut and count selections
 	Float_t t2ttLM_;
@@ -100,6 +104,8 @@ class StopTreeLooper {
 	Float_t mt2wdown_;
 	Float_t mt2wbup_;
 	Float_t mt2wbdown_;
+	Float_t mt2blup_;
+	Float_t mt2bldown_;
 
 	Float_t mini_weightleft_;
 	Float_t mini_weightright_;
@@ -136,6 +142,8 @@ class StopTreeLooper {
 	Float_t sltrigeff_;
 	Float_t dltrigeff_;
 	Int_t   nsigevents_;
+	Float_t btagsf_;
+	Float_t topptweight_;
 
 	// jet counting
 	Int_t nb_;
@@ -146,8 +154,10 @@ class StopTreeLooper {
 	Int_t njets_;
 	Int_t njets_up_;
 	Int_t njets_down_;
+	Int_t njets_fwd_;
 
 	// lepton variables
+	Int_t pass1l_;
 	Int_t passisotrk_;
 	Int_t passtauveto_;
 	Int_t nlep_;
@@ -176,9 +186,11 @@ class StopTreeLooper {
 	Float_t bbpt_;
 	Float_t wpt_;
 	Float_t bbwdphi_;
+	Float_t lepmetdphi_;
 
 	// susy variables
 	Float_t mstop_;
+	Float_t mchargino_;
 	Float_t mlsp_;
 	Float_t x_;
 	Float_t xsecsusy_;
@@ -208,6 +220,9 @@ class StopTreeLooper {
 	int NJETS_CUT;
 
     float MET_CUT;
+
+	bool DO_WHMET;
+	bool DO_CSV_RESHAPING;
 
 	string m_outfilename_;
     string m_minibabylabel_;
