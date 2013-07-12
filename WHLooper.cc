@@ -34,24 +34,25 @@
 using namespace Stop;
 
 // selections
-const bool blindSignal = true;
+const bool blindSignal = false;
 const bool doTrkVeto = true;
 const bool doTauVeto = true;
 const bool doLep2Veto = true;
 const bool doTobTecVeto = true;
-const int pileupMVAWP = 0; // 0 = tight, 1 = medium
+const int  pileupMVAWP = 0; // 0 = tight, 1 = medium
 const bool doWJetsOverlapRemoval = false; // obsolete, done automatically
 const bool doLowGenMtCut = false;
 
 // weightings to apply
 const bool doCSVReshaping = false;
 const bool doBtagSFs = true; // should only do one of reshaping and SFs at a time
-const bool doISRReweight = false;
+const bool doISRReweight = true;
 const bool doTopPtWeight = true; // obsolete variable, automatically applied
 const bool doJetSmearing = false;
 const bool doWbbMtReweight = true;
 const bool doTopPtReweight2 = true;
 const bool doLepPlusBSFs = true;
+const int  doJESVar = 0; // 0 for nominal, 1 for down, 2 for up
 
 // plotting options
 const bool doFlavorPlots = true;
@@ -1059,12 +1060,13 @@ void WHLooper::loop(TChain *chain, TString name) {
       if (isttmg_) {
 	evtweight /= stopt.mgcor();
 	// apply ISR weight to ttbar, if requested
-	if (doISRReweight) {
-	  if (stopt.ptttbar() > 250.) evtweight *= 0.8;
-	  else if (stopt.ptttbar() > 150.) evtweight *= 0.9;
-	  else if (stopt.ptttbar() > 120.) evtweight *= 0.95;
-	}
+	// if (doISRReweight) {
+	//   if (stopt.ptttbar() > 250.) evtweight *= 0.8;
+	//   else if (stopt.ptttbar() > 150.) evtweight *= 0.9;
+	//   else if (stopt.ptttbar() > 120.) evtweight *= 0.95;
+	// }
       }
+
       // cross section weights for TChiwh samples:
       //  xsec (pb) * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.58 / nevents (10000)
       float weight_lumi_br_nevents = 1.914E-02;
@@ -1090,18 +1092,38 @@ void WHLooper::loop(TChain *chain, TString name) {
       } else if (isTChihhwwbb_) {
 	evtweight = stopt.weight() * lumi;
       } else if (isWino_) {
-	// all xsecs except 130 from Ben's twiki
-	// 130 xsec from electrohiggs twiki
+
+	// Higgs mass 126..
+	//  xsec (pb) * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.56 / nevents (10000)
+	weight_lumi_br_nevents = 1.848E-02;
+
+	// all xsecs from Ben's twiki
 	float xsecweight = 1.;
-	if (name.Contains("Wino_130")) xsecweight = 4.1 * (10000./237517.) * weight_lumi_br_nevents; // 237517 events 
-	else if (name.Contains("Wino_150")) xsecweight = 2.4 * (10000./292245.) * weight_lumi_br_nevents; // 292245 events
-	else if (name.Contains("Wino_175")) xsecweight = 1.3 * (10000./16432.) * weight_lumi_br_nevents; // 16432 events
-	else if (name.Contains("Wino_200")) xsecweight = 0.79 * (10000./16004.) * weight_lumi_br_nevents; // 16004 events
-	else if (name.Contains("Wino_250")) xsecweight = 0.32 * (10000./7598.) * weight_lumi_br_nevents; // 7598 events
-	else if (name.Contains("Wino_300")) xsecweight = 0.15 * (10000./7307.) * weight_lumi_br_nevents; // 7307 events
-	else if (name.Contains("Wino_350")) xsecweight = 0.074 * (10000./7059.) * weight_lumi_br_nevents; // 7059 events
-	//	else if (name.Contains("Wino_400")) xsecweight = 0.039 * (10000./xx.) * weight_lumi_br_nevents; // xx events
+	if (name.Contains("Wino_130")) xsecweight = 4.1 * (10000./237517.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_150")) xsecweight = 2.4   * (10000./292245.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_175")) xsecweight = 1.3   * (10000./122175.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_200")) xsecweight = 0.79  * (10000./82387.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_225")) xsecweight = 0.49  * (10000./62656.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_250")) xsecweight = 0.32  * (10000./30585.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_275")) xsecweight = 0.21  * (10000./30053.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_300")) xsecweight = 0.15  * (10000./22197.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_325")) xsecweight = 0.10  * (10000./21889.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_350")) xsecweight = 0.074 * (10000./14311.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_375")) xsecweight = 0.054 * (10000./14130.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_400")) xsecweight = 0.039 * (10000./13872.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_425")) xsecweight = 0.030 * (10000./6925.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_450")) xsecweight = 0.022 * (10000./6934.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_475")) xsecweight = 0.017 * (10000./6851.) * weight_lumi_br_nevents; 
+	else if (name.Contains("Wino_500")) xsecweight = 0.013 * (10000./6797.) * weight_lumi_br_nevents; 
 	evtweight = xsecweight * lumi;
+
+	// ISR reweight for signal
+	if (doISRReweight) {
+	  float initstate_pt = (stopt.genc1() + stopt.genn2()).pt();
+	  if (initstate_pt > 250.) evtweight *= 0.8;
+	  else if (initstate_pt > 150.) evtweight *= 0.9;
+	  else if (initstate_pt > 120.) evtweight *= 0.95;
+	}
       }
 
 
@@ -1190,6 +1212,9 @@ void WHLooper::loop(TChain *chain, TString name) {
 	// if (doJetSmearing && !isData) thisjet = smearJet(stopt.pfjets().at(i), jetSmearer, true);
 	// else thisjet = stopt.pfjets().at(i);	
 	thisjet = stopt.pfjets().at(i);	
+	float unc = stopt.pfjets_uncertainty().at(i);
+	if (doJESVar == 1) thisjet = (1-unc)*stopt.pfjets().at(i);
+	else if (doJESVar == 2) thisjet = (1+unc)*stopt.pfjets().at(i);
 
 	jets_smearcorrs_.push_back(thisjet.pt()/stopt.pfjets().at(i).pt());
 
@@ -1681,6 +1706,8 @@ void WHLooper::loop(TChain *chain, TString name) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_metlast_met100,evtweight1l,"sig_metlast_met100");
 	}
 	else fail = true;
+
+	//	if (!fail) dumpEventInfo("signal region event");
 
 	if (!fail && (met_ > 125.) ) {
 	  if (doNM1Plots) fillHists1DWrapper(h_1d_sig_metlast_met125,evtweight1l,"sig_metlast_met125");
@@ -4330,6 +4357,11 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
 
   if (isTChihhwwbb_) {
     plot1D("h_mg"+suffix,       stopt.mg(),       evtweight, h_1d, 500, 0., 500.);
+  }
+
+  if (isWino_) {
+    float initstate_pt = (stopt.genc1() + stopt.genn2()).pt();
+    plot1D("h_initstatept"+suffix,       initstate_pt,       evtweight, h_1d, 1000, 0., 1000.);
   }
 
   if (doJetAccPlots && (njetsalleta_ == 2)) fillJetAccHists(h_1d,evtweight,dir,suffix);
