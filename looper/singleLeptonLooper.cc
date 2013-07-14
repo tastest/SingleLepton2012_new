@@ -363,6 +363,7 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetoL10_       = 0;
   pfcandOS10_       = 0;
   pfcandOS10looseZ_       = 0;
+  pfcandOS10looseZStopClassic_       = 0;
   pfcand5looseZ_        = 0;
   pfcand5looseZStopClassic_        = 0;
 
@@ -400,6 +401,7 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetoLid10_      =-1;
   pfcandidOS10_      =-1;
   pfcandidOS10looseZ_      =-1;
+  pfcandidOS10looseZStopClassic_      =-1;
   pfcandid5looseZ_       =-1; 
   pfcandid5looseZStopClassic_       =-1; 
 
@@ -411,8 +413,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetoLiso10_    = 9999.;     
   pfcandisoOS10_    = 9999.;     
   pfcandisoOS10looseZ_    = 9999.;     
+  pfcandisoOS10looseZStopClassic_    = 9999.;     
   pfcandiso5looseZ_     = 9999.;     
-
   pfcandiso5looseZStopClassic_     = 9999.;     
 
   pfcandpt5_      = 9999.;
@@ -421,7 +423,7 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetopt10_     = 9999.;
   pfcandvetoLpt10_     = 9999.;
   pfcandptOS10_     = 9999.;
-  pfcandptOS10looseZ_     = 9999.;
+  pfcandptOS10looseZStopClassic_     = 9999.;
   pfcandpt5looseZ_      = 9999.;
   pfcandpt5looseZStopClassic_      = 9999.;
 
@@ -432,8 +434,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandvetoLdz10_     = 9999.;
   pfcanddzOS10_     = 9999.;
   pfcanddzOS10looseZ_     = 9999.;
+  pfcanddzOS10looseZStopClassic_     = 9999.;
   pfcanddz5looseZ_      = 9999.;
-
   pfcanddz5looseZStopClassic_      = 9999.;
 
   pfcandmindrj5_  = 9999.;
@@ -2107,6 +2109,15 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcandOS10looseZ_ = &pfcands_p4().at(ipf);
 	  pfcandidOS10looseZ_ =  pfcands_particleId().at(ipf);
 	}
+
+	if(pfcands_p4().at(ipf).pt()>=10 && iso < pfcandisoOS10_ && !isLeadLepton && charge>0){
+	  pfcandisoOS10looseZStopClassic_ = iso;
+	  pfcanddzOS10looseZStopClassic_ = mindz;
+	  pfcandptOS10looseZStopClassic_ = pfcands_p4().at(ipf).pt();
+	  pfcandOS10looseZStopClassic_ = &pfcands_p4().at(ipf);
+	  pfcandidOS10looseZStopClassic_ =  pfcands_particleId().at(ipf);
+	}
+
 
 	//tighten dz cut
 	if( fabs(mindz) > dz_cut ) continue;
@@ -4140,6 +4151,11 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcandiso5looseZStopClassic",       &pfcandiso5looseZStopClassic_,       "pfcandiso5looseZStopClassic/F");  
   outTree->Branch("pfcandpt5looseZStopClassic",        &pfcandpt5looseZStopClassic_,        "pfcandpt5looseZStopClassic/F");  
   outTree->Branch("pfcanddz5looseZStopClassic",        &pfcanddz5looseZStopClassic_,        "pfcanddz5looseZStopClassic/F");  
+
+  outTree->Branch("pfcandidOS10looseZStopClassic",       &pfcandidOS10looseZStopClassic_,       "pfcandidOS10looseZStopClassic/I");
+  outTree->Branch("pfcandisoOS10looseZStopClassic",      &pfcandisoOS10looseZStopClassic_,      "pfcandisoOS10looseZStopClassic/F");  
+  outTree->Branch("pfcandptOS10looseZStopClassic",       &pfcandptOS10looseZStopClassic_,       "pfcandptOS10looseZStopClassic/F");  
+  outTree->Branch("pfcanddzOS10looseZStopClassic",       &pfcanddzOS10looseZStopClassic_,       "pfcanddzOS10looseZStopClassic/F");  
 
   outTree->Branch("pfcanddirid10",       &pfcanddirid10_,       "pfcanddirid10/I");
   outTree->Branch("pfcanddiriso10",      &pfcanddiriso10_,      "pfcanddiriso10/F");  
