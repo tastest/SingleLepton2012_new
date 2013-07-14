@@ -370,6 +370,7 @@ void singleLeptonLooper::InitBaby(){
   pfTau_leadPtcandID_ = -1;
 
   pfTau_decayModeFinder_=-99999.;
+  pfTau_discriminator_=-99999.;
 
   pfTauSS_       = 0;
   pfTauSS_leadPtcand_  = 0;
@@ -501,6 +502,9 @@ void singleLeptonLooper::InitBaby(){
   eSCPresh_ = -9999;  
   ecalveto1_ = -9999;
   hcalveto1_ = -9999;
+
+  eleThreeCharge_ = -9999;
+  eleThreeCharge2_ = -9999;
 
   iso2_   = -9999;
   isont2_ = -9999;
@@ -2402,7 +2406,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfTau_leadPtcand_= &(pfcands_p4().at(leadingPtCand_index));
 	  pfTau_leadPtcandID_= pfcands_particleId().at(leadingPtCand_index);
 	  pfTau_decayModeFinder_= taus_pf_byDecayModeFinding().at(indexTauMax);
-
+	  pfTau_discriminator_ = taus_pf_byIsolationMVA2raw().at(indexTauMax);
 	  //	cout << "decayMode " << pfTau_decayModeFinder_ << endl;
 
 	}
@@ -4227,6 +4231,7 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfTau_leadPtcand"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTau_leadPtcand_	);
 
   outTree->Branch("pfTau_decayModeFinder",        &pfTau_decayModeFinder_,        "pfTau_decayModeFinder/I");
+  outTree->Branch("pfTau_discriminator_",        &pfTau_discriminator_,        "pfTau_discriminator/F");
 
   outTree->Branch("pfTauSS_leadPtcandID",        &pfTauSS_leadPtcandID_,        "pfTauSS_leadPtcandID/I");
   outTree->Branch("pfTauSS"  , "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", &pfTauSS_	);
