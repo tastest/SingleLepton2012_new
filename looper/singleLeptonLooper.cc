@@ -8,6 +8,7 @@
 #include "../Tools/vtxreweight.h"
 #include "../Tools/msugraCrossSection.h"
 #include "BtagFuncs.h"
+#include "../Tools/pfjetMVAtools.h"
 
 //#include "stopUtils.h"
 
@@ -588,6 +589,10 @@ void singleLeptonLooper::InitBaby(){
   // pfjets_beta_0p2_.clear();
   // pfjets_beta2_0p2_.clear();
   pfjets_mvaBeta_.clear();
+  //old buggy version in CMS2 ntuple due to jet index mis-matches
+  pfjets_mvaPUid_ob_.clear();
+  pfjets_mva5xPUid_ob_.clear();
+  pfjets_mvaBeta_ob_.clear();
 
   genps_pdgId_.clear();
   genps_firstMother_.clear();
@@ -2571,6 +2576,32 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       LorentzVector mht15_p4;
       vector<int> mht15_pfcandIndices;
+      
+      //retrieve the correct PU MVA value for jets
+      vector <float> full5xmvavalue_corr;
+      if (getGoodMVAs(full5xmvavalue_corr, "full5xmvavalue")) {
+	if (full5xmvavalue_corr.size()!=pfjets_p4().size())
+	  cout<<"ERROR::FIX FAILED FOR PU MVA VALUES: good mva vector size: "<<full5xmvavalue_corr.size()
+	      <<" pfjets size: "<<pfjets_p4().size()
+	      <<" old mva vector size: "<<pfjets_full5xmvavalue().size()
+	      <<endl;
+      }
+      vector <float> full53xmvavalue_corr;
+      if (getGoodMVAs(full53xmvavalue_corr, "full53xmvavalue")) {
+	if (full53xmvavalue_corr.size()!=pfjets_p4().size())
+	  cout<<"ERROR::FIX FAILED FOR PU MVA VALUES: good mva vector size: "<<full53xmvavalue_corr.size()
+	      <<" pfjets size: "<<pfjets_p4().size()
+	      <<" old mva vector size: "<<pfjets_full53xmvavalue().size()
+	      <<endl;
+      }
+      vector <float> full53xmva_beta_corr;
+      if (getGoodMVAs(full53xmva_beta_corr, "full53xmva_beta")) {
+	if (full53xmva_beta_corr.size()!=pfjets_p4().size())
+	  cout<<"ERROR::FIX FAILED FOR PU MVA VALUES: good mva vector size: "<<full53xmva_beta_corr.size()
+	      <<" pfjets size: "<<pfjets_p4().size()
+	      <<" old mva vector size: "<<pfjets_full53xmva_beta().size()
+	      <<endl;
+      }
 
       for (unsigned int ijet = 0 ; ijet < pfjets_p4().size() ; ijet++) {
 	
@@ -2708,7 +2739,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	// calculate MHT quantities: vector sum of jets above some threshold
 	//  apply pileup MVA ID on jets first
-	if ( (fabs( vjet.eta() ) < 4.7) && (passMVAJetId(vjet.pt(), vjet.eta(), pfjets_full5xmvavalue().at(ijet), 0)) ) {
+	//	if ( (fabs( vjet.eta() ) < 4.7) && (passMVAJetId(vjet.pt(), vjet.eta(), pfjets_full5xmvavalue().at(ijet), 0)) ) {
+	if ( (fabs( vjet.eta() ) < 4.7) && (passMVAJetId(vjet.pt(), vjet.eta(), full5xmvavalue_corr.at(ijet), 0)) ) {
 	  vector<int>::const_iterator pfcandIndices_begin = pfjets_pfcandIndicies().at(ijet).begin();
 	  vector<int>::const_iterator pfcandIndices_end = pfjets_pfcandIndicies().at(ijet).end();
 	  if ( vjet.pt() > 15. ) {
@@ -3038,10 +3070,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // pfjets_beta2_0p15_.push_back( pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.15) );
         // pfjets_beta_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 1, 0.2 ) );
         // pfjets_beta2_0p2_.push_back(  pfjet_beta( vipfjets_p4.at(i).p4ind, 2, 0.2 ) );	
-	pfjets_mvaPUid_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
-	pfjets_mva5xPUid_.push_back(pfjets_full5xmvavalue().at(vipfjets_p4.at(i).p4ind));
-	pfjets_mvaBeta_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
-
+	pfjets_mvaPUid_ob_.push_back(pfjets_full53xmvavalue().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mva5xPUid_ob_.push_back(pfjets_full5xmvavalue().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaBeta_ob_.push_back(pfjets_full53xmva_beta().at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaPUid_.push_back(full5xmvavalue_corr.at(vipfjets_p4.at(i).p4ind));
+	pfjets_mva5xPUid_.push_back(full5xmvavalue_corr.at(vipfjets_p4.at(i).p4ind));
+	pfjets_mvaBeta_.push_back(full53xmva_beta_corr.at(vipfjets_p4.at(i).p4ind));
       }
       l1cors_all.clear();
 
@@ -4355,6 +4389,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   // outTree->Branch("pfjets_beta2_0p15","std::vector<float>", &pfjets_beta2_0p15_);
   // outTree->Branch("pfjets_beta_0p2",  "std::vector<float>", &pfjets_beta_0p2_  );
   // outTree->Branch("pfjets_beta2_0p2", "std::vector<float>", &pfjets_beta2_0p2_ );
+  outTree->Branch("pfjets_mvaPUid_ob",      "std::vector<float>", &pfjets_mvaPUid_ob_ );
+  outTree->Branch("pfjets_mva5xPUid_ob",      "std::vector<float>", &pfjets_mva5xPUid_ob_ );
+  outTree->Branch("pfjets_mvaBeta_ob",      "std::vector<float>", &pfjets_mvaBeta_ob_ );
   outTree->Branch("pfjets_mvaPUid",      "std::vector<float>", &pfjets_mvaPUid_ );
   outTree->Branch("pfjets_mva5xPUid",      "std::vector<float>", &pfjets_mva5xPUid_ );
   outTree->Branch("pfjets_mvaBeta",      "std::vector<float>", &pfjets_mvaBeta_ );

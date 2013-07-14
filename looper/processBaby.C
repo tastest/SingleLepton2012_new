@@ -34,7 +34,7 @@ void pickSkimIfExists( TChain *ch, const std::string& base, const std::string& s
   return;
 }
 
-void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7C-v1/V05-03-25_slim/merged_ntuple_450.root" )
+void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7C-v1/V05-03-25/merged_ntuple_450.root" )
 {
 
   //---------------------------------------------------------------

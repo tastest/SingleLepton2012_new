@@ -534,6 +534,10 @@ class singleLeptonLooper
 	std::vector<float> pfjets_mvaPUid_;
 	std::vector<float> pfjets_mva5xPUid_;
 	std::vector<float> pfjets_mvaBeta_;
+	//old buggy version in CMS2 ntuple due to jet index mis-matches
+	std::vector<float> pfjets_mvaPUid_ob_;
+	std::vector<float> pfjets_mva5xPUid_ob_;
+	std::vector<float> pfjets_mvaBeta_ob_;
 
         VofP4 genjets_;
         VofP4 genqgs_;
