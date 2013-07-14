@@ -364,6 +364,7 @@ void singleLeptonLooper::InitBaby(){
   pfcandOS10_       = 0;
   pfcandOS10looseZ_       = 0;
   pfcand5looseZ_        = 0;
+  pfcand5looseZStopClassic_        = 0;
 
   pfTau_       = 0;
   pfTau_leadPtcand_  = 0;
@@ -400,6 +401,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandidOS10_      =-1;
   pfcandidOS10looseZ_      =-1;
   pfcandid5looseZ_       =-1; 
+  pfcandid5looseZStopClassic_       =-1; 
+
 
   pfcandiso5_     = 9999.;     
   pfcandiso10_    = 9999.;     
@@ -410,6 +413,8 @@ void singleLeptonLooper::InitBaby(){
   pfcandisoOS10looseZ_    = 9999.;     
   pfcandiso5looseZ_     = 9999.;     
 
+  pfcandiso5looseZStopClassic_     = 9999.;     
+
   pfcandpt5_      = 9999.;
   pfcandpt10_     = 9999.;
   pfcanddirpt10_     = 9999.;
@@ -418,6 +423,7 @@ void singleLeptonLooper::InitBaby(){
   pfcandptOS10_     = 9999.;
   pfcandptOS10looseZ_     = 9999.;
   pfcandpt5looseZ_      = 9999.;
+  pfcandpt5looseZStopClassic_      = 9999.;
 
   pfcanddz5_      = 9999.;
   pfcanddz10_     = 9999.;
@@ -427,6 +433,8 @@ void singleLeptonLooper::InitBaby(){
   pfcanddzOS10_     = 9999.;
   pfcanddzOS10looseZ_     = 9999.;
   pfcanddz5looseZ_      = 9999.;
+
+  pfcanddz5looseZStopClassic_      = 9999.;
 
   pfcandmindrj5_  = 9999.;
   pfcandmindrj10_ = 9999.;
@@ -2081,6 +2089,16 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	  pfcand5looseZ_ = &pfcands_p4().at(ipf);
           pfcandid5looseZ_ =  pfcands_particleId().at(ipf);
 	}
+
+	if( pfcands_p4().at(ipf).pt()>=5 && iso < pfcandiso5_ && !isLeadLepton){
+	  pfcandiso5looseZStopClassic_ = iso;
+	  pfcanddz5looseZStopClassic_ = mindz;
+	  pfcandpt5looseZStopClassic_ = pfcands_p4().at(ipf).pt();
+	  pfcand5looseZStopClassic_ = &pfcands_p4().at(ipf);
+          pfcandid5looseZStopClassic_ =  pfcands_particleId().at(ipf);
+	}
+
+
 
 	if( pfcands_p4().at(ipf).pt()>=10 && iso < pfcandisoOS10looseZ_ && !isLeadLepton && charge>0){
 	  pfcandisoOS10looseZ_ = iso;
@@ -4117,6 +4135,11 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("pfcandisoOS10looseZ",      &pfcandisoOS10looseZ_,      "pfcandisoOS10looseZ/F");  
   outTree->Branch("pfcandptOS10looseZ",       &pfcandptOS10looseZ_,       "pfcandptOS10looseZ/F");  
   outTree->Branch("pfcanddzOS10looseZ",       &pfcanddzOS10looseZ_,       "pfcanddzOS10looseZ/F");  
+
+  outTree->Branch("pfcandid5looseZStopClassic",        &pfcandid5looseZStopClassic_,        "pfcandid5looseZStopClassic/I");
+  outTree->Branch("pfcandiso5looseZStopClassic",       &pfcandiso5looseZStopClassic_,       "pfcandiso5looseZStopClassic/F");  
+  outTree->Branch("pfcandpt5looseZStopClassic",        &pfcandpt5looseZStopClassic_,        "pfcandpt5looseZStopClassic/F");  
+  outTree->Branch("pfcanddz5looseZStopClassic",        &pfcanddz5looseZStopClassic_,        "pfcanddz5looseZStopClassic/F");  
 
   outTree->Branch("pfcanddirid10",       &pfcanddirid10_,       "pfcanddirid10/I");
   outTree->Branch("pfcanddiriso10",      &pfcanddiriso10_,      "pfcanddiriso10/F");  

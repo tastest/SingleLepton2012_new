@@ -211,6 +211,8 @@ class singleLeptonLooper
         Int_t pfcandidOS10looseZ_;  
         Int_t pfcandid5looseZ_;     
 
+        Int_t pfcandid5looseZStopClassic_;     
+
         Float_t pfcandiso5_;     
         Float_t pfcandiso10_;     
         Float_t pfcanddiriso10_;     
@@ -219,6 +221,8 @@ class singleLeptonLooper
         Float_t pfcandisoOS10_;     
         Float_t pfcandisoOS10looseZ_;     
         Float_t pfcandiso5looseZ_;     
+
+        Float_t pfcandiso5looseZStopClassic_;     
 
         Float_t pfcandpt5_;
         Float_t pfcandpt10_;
@@ -229,6 +233,8 @@ class singleLeptonLooper
         Float_t pfcandptOS10looseZ_;
         Float_t pfcandpt5looseZ_;
 
+	Float_t pfcandpt5looseZStopClassic_;
+
         Float_t pfcanddz5_;
         Float_t pfcanddz10_;
         Float_t pfcanddirdz10_;
@@ -237,6 +243,7 @@ class singleLeptonLooper
         Float_t pfcanddzOS10_;
         Float_t pfcanddzOS10looseZ_;
         Float_t pfcanddz5looseZ_;
+        Float_t pfcanddz5looseZStopClassic_;
 
         Float_t pfcandmindrj5_;
         Float_t pfcandmindrj10_;
@@ -419,6 +426,7 @@ class singleLeptonLooper
         LorentzVector*  pfcandOS10_;
         LorentzVector*  pfcandOS10looseZ_;
         LorentzVector*  pfcand5looseZ_;
+        LorentzVector*  pfcand5looseZStopClassic_;
 
         LorentzVector*  pfTau15_;
         LorentzVector*  pfTau15_leadPtcand_;
