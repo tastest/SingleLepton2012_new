@@ -738,6 +738,8 @@ class singleLeptonLooper
 	Float_t d0vtx_;
 	Float_t dzvtx_;
 	Float_t expinnerlayers_;
+	Int_t   eleThreeCharge_;
+	Int_t   eleThreeCharge2_;
 	Float_t fbrem_;
 	Float_t pfisoch_;
 	Float_t pfisoem_;

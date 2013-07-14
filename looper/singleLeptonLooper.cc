@@ -3490,6 +3490,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	      ((fabs(scs_eta()[els_scindex()[index1]])>1.4442)&&(lep1_scslasercormax_>3.0)))
 	    lep1_badecallaser_ = 1;
 	}
+	eleThreeCharge_=samesign::passThreeChargeRequirement(index1);
+
       }
       else if( leptype_ == 1 ){
 	iso1_   = muonIsoValue( index1 , true  ); //truncated 
@@ -3530,6 +3532,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	      ((fabs(scs_eta()[els_scindex()[index2]])>1.4442)&&(lep2_scslasercormax_>3.0)))
 	    lep2_badecallaser_ = 1;
 	}
+	eleThreeCharge2_=samesign::passThreeChargeRequirement(index2);
       }
       else if(abs(id2_) == 13) {
 	iso2_   = muonIsoValue( index2 , true  ); //truncated 
@@ -3992,6 +3995,9 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("eSCPresh", & eSCPresh_, "eSCPresh/F");
   outTree->Branch("lep1_scslasercormean", &lep1_scslasercormean_, "lep1_scslasercormean/F");
   outTree->Branch("lep1_scslasercormax", &lep1_scslasercormax_, "lep1_scslasercormax/F");
+
+  outTree->Branch("eleThreeCharge", &eleThreeCharge_, "eleThreeCharge/I");
+  outTree->Branch("eleThreeCharge2", &eleThreeCharge2_, "eleThreeCharge2/I");
 
   outTree->Branch("eoverpin2",         &eoverpin2_,         "eoverpin2/F");
   outTree->Branch("eoverpout2",        &eoverpout2_,        "eoverpout2/F");
