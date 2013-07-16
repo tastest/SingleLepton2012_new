@@ -514,6 +514,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             weight_ = isData ? 1. : 
                 ( stopt.weight() * 19.5 * puweight * stopt.mgcor() );
 
+            whweight_ = isData ? 1. : 
+                ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
+
 	    nsigevents_ = -1;
 
 	    x_ = stopt.x();
@@ -616,8 +619,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    if (name.Contains("ttbar_")) {
 	      topptweight_ = TopPtWeight(stopt.ptt());
+	      topptweight2_ = sqrt( TopPtWeight_v2(stopt.t().Pt()) * TopPtWeight_v2(stopt.tbar().Pt()) );
 	    } else {
 	      topptweight_ = 1.0;
+	      topptweight2_ = 1.0;
 	    }
 
             //------------------------------------------ 
@@ -1325,12 +1330,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_mt2bldown" , &mt2bldown_ ,  "mini_mt2bldown/F"  );
 
             outTree_->Branch("mini_weight"    , &weight_    ,  "mini_weight/F"	 );
+            outTree_->Branch("mini_whweight"  , &whweight_  ,  "mini_whweight/F"	 );
             outTree_->Branch("mini_nvtxweight", &nvtxweight_,  "mini_nvtxweight/F"	 );
             outTree_->Branch("mini_sltrigeff" , &sltrigeff_ ,  "mini_sltrigeff/F" );
             outTree_->Branch("mini_dltrigeff" , &dltrigeff_ ,  "mini_dltrigeff/F" );
             outTree_->Branch("mini_nsigevents", &nsigevents_,  "mini_nsigevents/I" );
             outTree_->Branch("mini_btagsf"    , &btagsf_    ,  "mini_btagsf/F"    );
             outTree_->Branch("mini_topptweight", &topptweight_,  "mini_topptweight/F");
+            outTree_->Branch("mini_topptweight2", &topptweight2_,  "mini_topptweight2/F");
 
             outTree_->Branch("mini_nb"        , &nb_        ,   "mini_nb/I"	         );
             outTree_->Branch("mini_nbupBC"    , &nb_upBCShape_  ,  "mini_nbupBC/I"	);
@@ -1505,6 +1512,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  outTree_->SetBranchStatus("mini_isrweight",1);
 
 	  if (DO_WHMET) {
+	    outTree_->SetBranchStatus("mini_whweight",1);
+	    outTree_->SetBranchStatus("mini_btagsf",1);
+	    outTree_->SetBranchStatus("mini_topptweight2",1);
+
 	    outTree_->SetBranchStatus("mini_pass1l",1);
 	    outTree_->SetBranchStatus("mini_pt_J1",1);
 
@@ -1575,11 +1586,13 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
         // weights
         weight_     = -1.0;
+        whweight_     = -1.0;
         nvtxweight_ = -1.0;
         sltrigeff_  = -1.0;
         dltrigeff_  = -1.0;
         btagsf_     = -1.0;
         topptweight_= -1.0;
+        topptweight2_= -1.0;
 
         // jet counting
         nb_         = -1;

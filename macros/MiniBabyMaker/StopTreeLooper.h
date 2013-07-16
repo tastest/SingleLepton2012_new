@@ -138,12 +138,14 @@ class StopTreeLooper {
 
 	// weights
 	Float_t weight_;
+	Float_t whweight_;
 	Float_t nvtxweight_;
 	Float_t sltrigeff_;
 	Float_t dltrigeff_;
 	Int_t   nsigevents_;
 	Float_t btagsf_;
 	Float_t topptweight_;
+	Float_t topptweight2_;
 
 	// jet counting
 	Int_t nb_;
