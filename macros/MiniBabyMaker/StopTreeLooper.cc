@@ -1040,6 +1040,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    }
 
+	    // silly cut on MT > 0. for WH+MET analysis
+	    // -- applied in WHLooper for all preselection results, so will apply here too..
+	    if (DO_WHMET && !(mt_ > 0.)) continue;
+
             //------------------------------------------ 
             // datasets bit
             //------------------------------------------ 
@@ -1502,16 +1506,21 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  outTree_->SetBranchStatus("mini_x",1);
 	  outTree_->SetBranchStatus("mini_xsecsusy",1);
 	  outTree_->SetBranchStatus("mini_nsigevents",1);
-	  outTree_->SetBranchStatus("mini_weightleft",1);
-	  outTree_->SetBranchStatus("mini_weightright",1);
-	  outTree_->SetBranchStatus("mini_t2bwweight_ss",1);
-	  outTree_->SetBranchStatus("mini_t2bwweight_ll",1);
-	  outTree_->SetBranchStatus("mini_t2bwweight_lr",1);
-	  outTree_->SetBranchStatus("mini_t2bwweight_rl",1);
-	  outTree_->SetBranchStatus("mini_t2bwweight_rr",1);
 	  outTree_->SetBranchStatus("mini_isrweight",1);
 
-	  if (DO_WHMET) {
+	  // specific for stop analysis
+	  if (!DO_WHMET) {
+	    outTree_->SetBranchStatus("mini_weightleft",1);
+	    outTree_->SetBranchStatus("mini_weightright",1);
+	    outTree_->SetBranchStatus("mini_t2bwweight_ss",1);
+	    outTree_->SetBranchStatus("mini_t2bwweight_ll",1);
+	    outTree_->SetBranchStatus("mini_t2bwweight_lr",1);
+	    outTree_->SetBranchStatus("mini_t2bwweight_rl",1);
+	    outTree_->SetBranchStatus("mini_t2bwweight_rr",1);
+	  }
+
+	  // branches for WH+MET analysis
+	  else {
 	    outTree_->SetBranchStatus("mini_whweight",1);
 	    outTree_->SetBranchStatus("mini_btagsf",1);
 	    outTree_->SetBranchStatus("mini_topptweight2",1);
@@ -1525,13 +1534,14 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    outTree_->SetBranchStatus("mini_whcrbveto",1);
 
 	    outTree_->SetBranchStatus("mini_bbmass",1);
-	    outTree_->SetBranchStatus("mini_mt2bl",1);
 	    outTree_->SetBranchStatus("mini_njets_fwd",1);
-
+	    outTree_->SetBranchStatus("mini_bbpt",1);
+	    outTree_->SetBranchStatus("mini_wpt",1);
+	    outTree_->SetBranchStatus("mini_bbwdphi",1);
+	    outTree_->SetBranchStatus("mini_lepmetdphi",1);
 	  }
 
 	}
-
 
     }
 
