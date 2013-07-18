@@ -146,6 +146,8 @@ class StopTreeLooper {
 	Float_t btagsf_;
 	Float_t topptweight_;
 	Float_t topptweight2_;
+	Float_t wbbmtcor_;
+	Float_t whtailsf_;
 
 	// jet counting
 	Int_t nb_;

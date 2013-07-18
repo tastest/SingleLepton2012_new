@@ -502,6 +502,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             initBaby(); // set all branches to -1
 
+	    // WH+MET: gen level cut for W+light sample
+	    if (name.Contains("w1to4jets") && (stopt.nbs() == 2)) continue;
+
             //------------------------------------------ 
             // event weight
             //------------------------------------------ 
@@ -516,6 +519,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
             whweight_ = isData ? 1. : 
                 ( stopt.weight() * 19.5 * stopt.nvtxweight() * stopt.mgcor() );
+
+	    // correct for W->lnu branching fraction in SM WH->lnubb
+	    if (name.Contains("whbb")) {
+	      whweight_ *= 0.33;
+	    }
 
 	    nsigevents_ = -1;
 
@@ -617,9 +625,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             dltrigeff_ = isData ? 1. : 
                 getdltrigweight(stopt.id1(), stopt.id2());
 
-	    if (name.Contains("ttbar_")) {
+	    if (name.Contains("ttbar_") || name.Contains("ttsl_") || name.Contains("ttdl_")) {
 	      topptweight_ = TopPtWeight(stopt.ptt());
-	      topptweight2_ = sqrt( TopPtWeight_v2(stopt.t().Pt()) * TopPtWeight_v2(stopt.tbar().Pt()) );
+	      // extra factor of 1.01 to preserve total normalization
+	      topptweight2_ = 1.01 * sqrt( TopPtWeight_v2(stopt.t().Pt()) * TopPtWeight_v2(stopt.tbar().Pt()) );
 	    } else {
 	      topptweight_ = 1.0;
 	      topptweight2_ = 1.0;
@@ -1040,6 +1049,37 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    }
 
+	    // WH+MET: tail weights for single lep top and W+bb
+	    if (name.Contains("ttsl_") || name.Contains("tW_lepsl")) {
+	      // single lepton top: corrections of:
+	      // - for MT2bl > 200: 0.8
+	      // - for MT2bl > 200 && MT > 100: 1.4
+	      wbbmtcor_ = 1.;
+	      whtailsf_ = 1.;
+	      if (mt2bl_ > 200.) {
+		whtailsf_ *= 0.8;
+		if (mt_ > 100.) whtailsf_ *= 1.4;
+	      }
+	    } else if (name.Contains("wbbjets")) {
+	      // W+bb: corrections of:
+	      // - missing off shell W's: for MT > 100: 1.1 for MET <= 100, 1.4 for MET > 100 
+	      // - for MT2bl > 200: 0.8
+	      // - for MT2bl > 200 && MT > 100: 1.1
+	      wbbmtcor_ = 1.;
+	      whtailsf_ = 1.;
+	      if (mt_ > 100.) {
+		if (met_ > 100.) wbbmtcor_ = 1.4;
+		else wbbmtcor_ = 1.1;
+	      }
+	      if (mt2bl_ > 200.) {
+		whtailsf_ *= 0.8;
+		if (mt_ > 100.) whtailsf_ *= 1.1;
+	      }
+	    } else {
+	      wbbmtcor_ = 1.;
+	      whtailsf_ = 1.;
+	    }
+
 	    // silly cut on MT > 0. for WH+MET analysis
 	    // -- applied in WHLooper for all preselection results, so will apply here too..
 	    if (DO_WHMET && !(mt_ > 0.)) continue;
@@ -1342,6 +1382,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_btagsf"    , &btagsf_    ,  "mini_btagsf/F"    );
             outTree_->Branch("mini_topptweight", &topptweight_,  "mini_topptweight/F");
             outTree_->Branch("mini_topptweight2", &topptweight2_,  "mini_topptweight2/F");
+            outTree_->Branch("mini_wbbmtcor"    , &wbbmtcor_    ,  "mini_wbbmtcor/F"    );
+            outTree_->Branch("mini_whtailsf"    , &whtailsf_    ,  "mini_whtailsf/F"    );
 
             outTree_->Branch("mini_nb"        , &nb_        ,   "mini_nb/I"	         );
             outTree_->Branch("mini_nbupBC"    , &nb_upBCShape_  ,  "mini_nbupBC/I"	);
@@ -1524,6 +1566,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    outTree_->SetBranchStatus("mini_whweight",1);
 	    outTree_->SetBranchStatus("mini_btagsf",1);
 	    outTree_->SetBranchStatus("mini_topptweight2",1);
+	    outTree_->SetBranchStatus("mini_dltrigeff",1);
+	    outTree_->SetBranchStatus("mini_wbbmtcor",1);
+	    outTree_->SetBranchStatus("mini_whtailsf",1);
 
 	    outTree_->SetBranchStatus("mini_pass1l",1);
 	    outTree_->SetBranchStatus("mini_pt_J1",1);
@@ -1603,6 +1648,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         btagsf_     = -1.0;
         topptweight_= -1.0;
         topptweight2_= -1.0;
+        wbbmtcor_= -1.0;
+        whtailsf_= -1.0;
 
         // jet counting
         nb_         = -1;
