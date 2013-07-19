@@ -561,6 +561,10 @@ class singleLeptonLooper
 	Int_t ee_;
 	Int_t isomu24_;
 	Int_t ele27wp80_;
+
+	Int_t Mu_TriCentralPFJet30_;
+	Int_t Mu_TriCentralPFNoPUJet30_30_20_;
+	Int_t Mu_TriCentralPFNoPUJet30_;      
 	
  	LorentzVector*  nonisoel_;   
  	LorentzVector*  nonisomu_;   

@@ -966,7 +966,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     cms2.Init(tree);
       
     unsigned int nEntries = tree->GetEntries();
-
+    nEntries=10000;
     for(unsigned int z = 0; z < nEntries; ++z) {
       ++nEventsTotal;
 
@@ -3633,6 +3633,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       me_        = passUnprescaledHLTTriggerPattern("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
       em_        = passUnprescaledHLTTriggerPattern("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
       ee_        = passUnprescaledHLTTriggerPattern("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v") ? 1 : 0;
+
+      mmtk_      = passUnprescaledHLTTriggerPattern("HLT_Mu17_TkMu8_v")                                   ? 1 : 0;
+
+      Mu_TriCentralPFJet30_           = passUnprescaledHLTTriggerPattern("HLT_IsoMu17_eta2p1_TriCentralPFJet30_v")           ? 1 : 0;
+      Mu_TriCentralPFNoPUJet30_30_20_ = passUnprescaledHLTTriggerPattern("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20_v") ? 1 : 0;
+      Mu_TriCentralPFNoPUJet30_       = passUnprescaledHLTTriggerPattern("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_v")       ? 1 : 0;
    
       char* isomutrigname = (evt_run()<193806 || !isData) ? 
 	(char*) "HLT_IsoMu24_eta2p1_v" : (char*) "HLT_IsoMu24_v";
@@ -3924,6 +3930,10 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   outTree->Branch("em"             ,  &em_              ,    "em/I"          );
   outTree->Branch("mu"             ,  &mu_              ,    "mu/I"          );
   outTree->Branch("ee"             ,  &ee_              ,    "ee/I"          );
+
+  outTree->Branch("Mu_TriCentralPFJet30"             ,  &Mu_TriCentralPFJet30_              ,    "Mu_TriCentralPFJet30/I"              );
+  outTree->Branch("Mu_TriCentralPFNoPUJet30_30_20"   ,  &Mu_TriCentralPFNoPUJet30_30_20_    ,    "Mu_TriCentralPFNoPUJet30_30_20/I"    );
+  outTree->Branch("Mu_TriCentralPFNoPUJet30"         ,  &Mu_TriCentralPFNoPUJet30_          ,    "Mu_TriCentralPFNoPUJet30/I"          );
 
   // pfjets L1FastL2L3Res
   outTree->Branch("npfjets30",        &npfjets30_,        "npfjets30/I");
