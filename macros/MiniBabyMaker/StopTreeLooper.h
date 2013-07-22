@@ -145,7 +145,6 @@ class StopTreeLooper {
 	Int_t   nsigevents_;
 	Float_t btagsf_;
 	Float_t topptweight_;
-	Float_t topptweight2_;
 	Float_t wbbmtcor_;
 	Float_t whtailsf_;
 

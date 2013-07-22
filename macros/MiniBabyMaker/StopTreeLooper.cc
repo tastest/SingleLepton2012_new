@@ -656,12 +656,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
                 getdltrigweight(stopt.id1(), stopt.id2());
 
 	    if (name.Contains("ttbar_") || name.Contains("ttsl_") || name.Contains("ttdl_")) {
-	      topptweight_ = TopPtWeight(stopt.ptt());
 	      // extra factor of 1.01 to preserve total normalization
-	      topptweight2_ = 1.01 * sqrt( TopPtWeight_v2(stopt.t().Pt()) * TopPtWeight_v2(stopt.tbar().Pt()) );
+	      topptweight_ = 1.01 * sqrt( TopPtWeight_v2(stopt.t().Pt()) * TopPtWeight_v2(stopt.tbar().Pt()) );
 	    } else {
 	      topptweight_ = 1.0;
-	      topptweight2_ = 1.0;
 	    }
 
             //------------------------------------------ 
@@ -1345,7 +1343,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         rootdir->cd();
 
 //        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
-        outFile_   = new TFile(Form("output_V00-03-14/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-15/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
@@ -1415,7 +1413,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             outTree_->Branch("mini_nsigevents", &nsigevents_,  "mini_nsigevents/I" );
             outTree_->Branch("mini_btagsf"    , &btagsf_    ,  "mini_btagsf/F"    );
             outTree_->Branch("mini_topptweight", &topptweight_,  "mini_topptweight/F");
-            outTree_->Branch("mini_topptweight2", &topptweight2_,  "mini_topptweight2/F");
             outTree_->Branch("mini_wbbmtcor"    , &wbbmtcor_    ,  "mini_wbbmtcor/F"    );
             outTree_->Branch("mini_whtailsf"    , &whtailsf_    ,  "mini_whtailsf/F"    );
 
@@ -1599,7 +1596,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  else {
 	    outTree_->SetBranchStatus("mini_whweight",1);
 	    outTree_->SetBranchStatus("mini_btagsf",1);
-	    outTree_->SetBranchStatus("mini_topptweight2",1);
+	    outTree_->SetBranchStatus("mini_topptweight",1);
 	    outTree_->SetBranchStatus("mini_dltrigeff",1);
 	    outTree_->SetBranchStatus("mini_wbbmtcor",1);
 	    outTree_->SetBranchStatus("mini_whtailsf",1);
@@ -1683,7 +1680,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         dltrigeff_  = -1.0;
         btagsf_     = -1.0;
         topptweight_= -1.0;
-        topptweight2_= -1.0;
         wbbmtcor_= -1.0;
         whtailsf_= -1.0;
 
