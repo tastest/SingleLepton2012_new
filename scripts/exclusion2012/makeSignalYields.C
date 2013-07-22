@@ -7,29 +7,31 @@
   float lumi    = 19500.0;
 
   // T2tt cut-based
-  TFile* f = TFile::Open("rootfiles/T2tt_histos.root");
-  int n = 8;
+  // TFile* f = TFile::Open("rootfiles/T2tt_histos.root");
+  // int n = 8;
 
   // T2tt cut-based
-  //TFile* f = TFile::Open("rootfiles/T2tt_BDT_histos.root");
-  //int n = 6;
+  TFile* f = TFile::Open("rootfiles/T2tt_BDT_histos.root");
+  int n = 6;
 
   // T2bw cut-based
   //TFile* f = TFile::Open("rootfiles/T2bw_MG_x50_histos.root");
   //TFile* f = TFile::Open("rootfiles/T2bw_MG_x50T2BW_SS_histos.root");
-  //int n = 8;
+  //TFile* f = TFile::Open("rootfiles/T2bw_MG_x75T2BW_SS_histos.root");
+  // TFile* f = TFile::Open("rootfiles/T2bw_MG_x25T2BW_SS_histos.root");
+  // int n = 8;
+
+  // // T2bw x=0.75 BDT
+  // TFile* f = TFile::Open("rootfiles/T2bw_MG_x75T2BW_SS_BDT_histos.root");
+  // int n = 4;
   
   // T2bw x=0.5 BDT
-  //TFile* f = TFile::Open("rootfiles/T2bw_MG_x50T2BW_SS_BDT_histos.root");
-  //int n = 5;
+  // TFile* f = TFile::Open("rootfiles/T2bw_MG_x50T2BW_SS_BDT_histos.root");
+  // int n = 5;
 
   // // T2bw x=0.5 BDT
-  //TFile* f = TFile::Open("rootfiles/T2bw_MG_x75T2BW_SS_BDT_histos.root");
-  // int n = 4;
-
-  // T2bw x=0.5 BDT
-  //TFile* f = TFile::Open("rootfiles/T2bw_MG_x25T2BW_SS_BDT_histos.root");
-  //int n = 3;
+  // TFile* f = TFile::Open("rootfiles/T2bw_MG_x25T2BW_SS_BDT_histos.root");
+  // int n = 3;
 
 
 
@@ -80,7 +82,7 @@
 
   cout << endl;
 
-  cout << endl << "650/100" << endl;
+  cout << endl << "600/100" << endl;
 
   for( int i = 0 ; i < n ; i++ ){
     int bin600 = h[i]->FindBin(600,100);
