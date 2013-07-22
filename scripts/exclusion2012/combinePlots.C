@@ -239,7 +239,7 @@ void smoothHist(TH2F* h){
 // main function
 //------------------------------------ 
 
-void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* pol = "" , bool print = false){
+void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* pol = "" , bool print = false , bool doFixups = true){
 
   //----------------------------------------------
   // input parameters
@@ -591,8 +591,6 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
   //-------------------------------
   // various fix-ups
   //-------------------------------
-
-  bool doFixups = true;
 
   if( doFixups ){
 
