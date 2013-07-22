@@ -420,7 +420,6 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     TH1F* h_pu_wgt = (TH1F*)pu_file->Get("puWeights");
     h_pu_wgt->SetName("h_pu_wgt");
 
-
     //------------------------------
     // file loop
     //------------------------------
@@ -433,6 +432,9 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     //  int i_permille_old = 0;
 
     bool isData = name.Contains("data") ? true : false;
+    bool isfastsim = false;
+    if (name.Contains("T2tt") || name.Contains("T2bw") || name.Contains("Wino")) isfastsim = true;
+
 
     cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
 
@@ -503,7 +505,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             initBaby(); // set all branches to -1
 
 	    // WH+MET: gen level cut for W+light sample
-	    if (name.Contains("w1to4jets") && (stopt.nbs() == 2)) continue;
+	    if (DO_WHMET && name.Contains("w1to4jets") && (stopt.nbs() == 2)) continue;
 
             //------------------------------------------ 
             // event weight
@@ -616,6 +618,34 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    if( name.Contains("HHWWbb") ){
 	      weight_ = stopt.weight() * 19.5;
 	    }
+
+	    // temporary fix for WH+MET signal samples
+	    //  until final madgraph samples with Sparm values arrive
+            if( name.Contains("Wino") ) {
+
+	      if (name.Contains("Wino_130")) { mchargino_ = 130; xsecsusy_ = 4.1; nsigevents_ = 237517; } 
+	      else if (name.Contains("Wino_150")) { mchargino_ = 150; xsecsusy_ = 2.4   ; nsigevents_ = 292245; } 
+	      else if (name.Contains("Wino_175")) { mchargino_ = 175; xsecsusy_ = 1.3   ; nsigevents_ = 122175; } 
+	      else if (name.Contains("Wino_200")) { mchargino_ = 200; xsecsusy_ = 0.79  ; nsigevents_ = 82387; } 
+	      else if (name.Contains("Wino_225")) { mchargino_ = 225; xsecsusy_ = 0.49  ; nsigevents_ = 62656; } 
+	      else if (name.Contains("Wino_250")) { mchargino_ = 250; xsecsusy_ = 0.32  ; nsigevents_ = 30585; } 
+	      else if (name.Contains("Wino_275")) { mchargino_ = 275; xsecsusy_ = 0.21  ; nsigevents_ = 30053; } 
+	      else if (name.Contains("Wino_300")) { mchargino_ = 300; xsecsusy_ = 0.15  ; nsigevents_ = 22197; } 
+	      else if (name.Contains("Wino_325")) { mchargino_ = 325; xsecsusy_ = 0.10  ; nsigevents_ = 21889; } 
+	      else if (name.Contains("Wino_350")) { mchargino_ = 350; xsecsusy_ = 0.074 ; nsigevents_ = 14311; } 
+	      else if (name.Contains("Wino_375")) { mchargino_ = 375; xsecsusy_ = 0.054 ; nsigevents_ = 14130; } 
+	      else if (name.Contains("Wino_400")) { mchargino_ = 400; xsecsusy_ = 0.039 ; nsigevents_ = 13872; } 
+	      else if (name.Contains("Wino_425")) { mchargino_ = 425; xsecsusy_ = 0.030 ; nsigevents_ = 6925; } 
+	      else if (name.Contains("Wino_450")) { mchargino_ = 450; xsecsusy_ = 0.022 ; nsigevents_ = 6934; } 
+	      else if (name.Contains("Wino_475")) { mchargino_ = 475; xsecsusy_ = 0.017 ; nsigevents_ = 6851; } 
+	      else if (name.Contains("Wino_500")) { mchargino_ = 500; xsecsusy_ = 0.013 ; nsigevents_ = 6797; } 
+
+	      mlsp_ = 1;
+
+	      //  xsec (pb) * 19.5 fb-1 * 1000 (pb to fb) * br(w->lv) 0.33 * br(h->bb) 0.56 / nevents
+	      whweight_ = xsecsusy_ * 19.5 * 1000. * 0.33 * 0.56 / float(nsigevents_);
+
+            }
 
 	    //	    nvtxweight_ = stopt.nvtxweight();
 	    nvtxweight_ = puweight;
@@ -882,7 +912,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 				      stopt.pfjets().at(i).phi() , 
 				      stopt.lep1().eta(), stopt.lep1().phi());
 		}
-		btagsf_ *= getBtagSF(stopt.pfjets().at(i).pt(),stopt.pfjets().at(i).eta(),stopt.pfjets_mcflavorAlgo().at(i));
+		btagsf_ *= getBtagSF(stopt.pfjets().at(i).pt(),stopt.pfjets().at(i).eta(),stopt.pfjets_mcflavorAlgo().at(i),isfastsim);
 	      }
 
 	      else{
@@ -1197,12 +1227,15 @@ void StopTreeLooper::loop(TChain *chain, TString name)
             // t2ttLM_     = pass_T2tt_LM(isData,name);
             // t2ttHM_     = pass_T2tt_HM(isData,name);
 
-	    // susy vars
-	    mstop_       = stopt.mg();                   // stop mass
-	    mlsp_        = stopt.ml();                   // LSP mass
-	    // I moved this line higher up
-	    //x_           = stopt.x();                    // chargino mass parameter x
-	    xsecsusy_    = stopt.xsecsusy();
+	    // TEMPORARY FIX FOR WH+MET: fill these variables above
+	    if (!DO_WHMET) {
+	      // susy vars
+	      mstop_       = stopt.mg();                   // stop mass
+	      mlsp_        = stopt.ml();                   // LSP mass
+	      // I moved this line higher up
+	      //x_           = stopt.x();                    // chargino mass parameter x
+	      xsecsusy_    = stopt.xsecsusy();
+	    }
 
             // number of analysis selected leptons
             nlep_       = stopt.ngoodlep();              
@@ -1221,6 +1254,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    if     ( name.Contains("T2") ) isrboost = (stopt.stop_t() + stopt.stop_tbar()).pt();
 	    else if( name.Contains("ttsl") || name.Contains("ttdl") || name.Contains("ttall") || name.Contains("tt_") ) isrboost = (stopt.ttbar()).pt();
+	    else if( name.Contains("Wino") ) isrboost = (stopt.genc1() + stopt.genn2()).pt();
 
 	    isrweight_ = 1.0;
 	    if( isrboost > 120.0 && isrboost < 150.0 ) isrweight_ = 0.95;
@@ -1584,6 +1618,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    outTree_->SetBranchStatus("mini_wpt",1);
 	    outTree_->SetBranchStatus("mini_bbwdphi",1);
 	    outTree_->SetBranchStatus("mini_lepmetdphi",1);
+
+	    outTree_->SetBranchStatus("mini_mchargino",1);
 	  }
 
 	}
