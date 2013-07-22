@@ -27,7 +27,7 @@ class StopTreeLooper {
 	void studyIsoTrack(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
 	void studyIsoTaus(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData);
 	void studyGenJet(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d,std::map<std::string, TH2F*> &h_2d, bool isData);
-	void classify3B(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData, bool doLRM);
+	void classify3B(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH2F*> &h_2d, bool isData, bool doLRM, bool doTAU);
 	void studyAcceptance(float evtweight, string tag_selection, std::map<std::string, TH1F*> &h_1d);
 
 	void fillSignalYieldTable(float evtweight, string tag_selection , std::map<std::string, TH1F*> &h_1d, std::map<std::string, TH1F*> &h_1d_qg, std::map<std::string, TH2F*> &h_2d_qg, bool isData);
