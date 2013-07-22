@@ -153,8 +153,8 @@ void plotPolarization( bool doBDT = true , bool print = false){
   c_left->Draw("CONT3SAMEC");
 
   c_nom_smallDM->Draw("CONT3SAMEC");
-  c_right_smallDM->Draw("CONT3SAMEC");
-  c_left_smallDM->Draw("CONT3SAMEC");
+  //c_right_smallDM->Draw("CONT3SAMEC");
+  //c_left_smallDM->Draw("CONT3SAMEC");
 
   //---------------------------------
   // print labels
