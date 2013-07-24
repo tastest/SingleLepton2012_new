@@ -195,6 +195,41 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file (massless LSP) " << h_nsig_filename_masslessLSP << endl;
 	}
 
+        else if( name.Contains("T2bw") && name.Contains("_mLSP-1_x") ){
+
+	  if( name.Contains("merged_T2bw_mStop-100to475_mLSP-1_x-025" ) ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/myMassDB_mStop-100to475_mLSP-1_x-025.root";
+	  }
+
+	  else if( name.Contains("merged_T2bw_mStop-500to800_mLSP-1_x-025" ) ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/myMassDB_mStop-500to800_mLSP-1_x-025.root";
+	  }
+
+	  else if( name.Contains("merged_T2bw_mStop-100to475_mLSP-1_x-050" ) ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/myMassDB_mStop-100to475_mLSP-1_x-050.root";
+	  }
+
+	  else if( name.Contains("merged_T2bw_mStop-500to800_mLSP-1_x-050" ) ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/myMassDB_mStop-500to800_mLSP-1_x-050.root";
+	  }
+
+	  else if( name.Contains("merged_T2bw_mStop-100to475_mLSP-1_x-075" ) ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/myMassDB_mStop-100to475_mLSP-1_x-075.root";
+	  }
+
+	  else if( name.Contains("merged_T2bw_mStop-500to800_mLSP-1_x-075" ) ){
+	    h_nsig_filename = "/nfs-7/userdata/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/myMassDB_mStop-500to800_mLSP-1_x-075.root";
+	  }
+
+	  else{
+	    cout << "Can't find mass histo for sample " << name << ", QUITTING!!!" << endl;
+	    exit(0);
+	  }
+
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file  " << h_nsig_filename << endl;
+	}
+
+
         else if( name.Contains("T2bw") ){
 
 	  if( name.Contains("fine") ){
@@ -1343,7 +1378,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
         rootdir->cd();
 
 //        outFile_   = new TFile(Form("output/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
-        outFile_   = new TFile(Form("output_V00-03-15/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
+        outFile_   = new TFile(Form("output_V00-03-16/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
 	//        outFile_   = new TFile(Form("/nfs-7/userdata/stop/output_V00-02-21_2012_4jskim/Minibabies/%s%s.root", prefix, m_minibabylabel_.c_str()), "RECREATE");
         outFile_->cd();
 
