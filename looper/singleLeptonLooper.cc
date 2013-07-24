@@ -663,6 +663,16 @@ float singleLeptonLooper::stopPairCrossSection( float stopmass ){
 
 //--------------------------------------------------------------------
 
+float singleLeptonLooper::c1n2CrossSection( float c1mass ){
+
+  int   bin  = c1n2_xsec_hist->FindBin(c1mass);
+  float xsec = c1n2_xsec_hist->GetBinContent(bin);
+  return xsec;
+
+}
+
+//--------------------------------------------------------------------
+
 bool passSingleMuTrigger2011_pt30( bool isData , int lepType ) {
   
   //----------------------------
@@ -868,6 +878,24 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   stop_xsec_hist        = (TH1D*) stop_xsec_file->Get("h_stop_xsec");
   
   if( stop_xsec_hist == 0 ){
+    cout << "Error, could not retrieve stop cross section hist, quitting" << endl;
+    exit(0);
+  }
+
+  //------------------------------------------------
+  // set c1n2 cross section file
+  //------------------------------------------------
+
+  c1n2_xsec_file = TFile::Open("c1n2_xsec.root");
+  
+  if( !c1n2_xsec_file->IsOpen() ){
+    cout << "Error, could not open stop cross section TFile, quitting" << endl;
+    exit(0);
+  }
+  
+  c1n2_xsec_hist        = (TH1F*) c1n2_xsec_file->Get("h_c1n2_xsec");
+  
+  if( c1n2_xsec_hist == 0 ){
     cout << "Error, could not retrieve stop cross section hist, quitting" << endl;
     exit(0);
   }
@@ -3336,6 +3364,18 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
         // need to put some reasonable numbers here..
 	// currently applying xsecs downstream
 	weight_ = 1.;
+      }
+
+      else if(TString(prefix).Contains("TChiWH")) {
+	  for (int i=0; i<(int)sparm_values().size(); ++i) {
+	    if (sparm_names().at(i).Contains("mchargino")) mG_ = sparm_values().at(i);
+	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
+	  }
+
+        xsecsusy_  = mG_ > 0. ? c1n2CrossSection(mG_) : -999;
+	// note: number of events needs to be included in weight (later)
+        weight_ = xsecsusy_ > 0. ? lumi * xsecsusy_ * 1000. : -999.;
+
       }
 
       else if(TString(prefix).Contains("HHWWbb")) {

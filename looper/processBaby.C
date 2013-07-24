@@ -146,6 +146,7 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   else if (infile.Contains("WH_WToLNu_HToBB"))   	             sample = Form("whbb_%s",            outfileid.Data());
   else if (infile.Contains("SMS-T2tt"))                              sample = Form("T2tt_%s",            outfileid.Data());
   else if (infile.Contains("SMS-T2bw"))                              sample = Form("T2bw_%s",            outfileid.Data());
+  else if (infile.Contains("SMS-TChiWH"))                            sample = Form("TChiWH_%s",          outfileid.Data());
   else if (infile.Contains("TChiwh_125_1"))                          sample = Form("TChiwh_125_1_%s",    outfileid.Data());
   else if (infile.Contains("TChiwh_150_1"))                          sample = Form("TChiwh_150_1_%s",    outfileid.Data());
   else if (infile.Contains("TChiwh_200_1"))                          sample = Form("TChiwh_200_1_%s",    outfileid.Data());

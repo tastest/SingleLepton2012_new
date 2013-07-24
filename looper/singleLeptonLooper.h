@@ -112,6 +112,7 @@ class singleLeptonLooper
         // Baby ntuple methods
         void makeTree (char *prefix,bool doFakeApp, FREnum frmode );
 	float stopPairCrossSection( float stopmass );
+	float c1n2CrossSection( float c1mass );
         void closeTree ();
 	//	float trackIso( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 , bool dovtxcut = false , float pt_thresh = 0.0);
 	std::vector<float> trackIsoPtRanges( int thisPf , float coneR = 0.3 , float dz_thresh = 0.05 );
@@ -122,6 +123,8 @@ class singleLeptonLooper
 	bool initialized;
 	TH1D*   stop_xsec_hist;
 	TFile*  stop_xsec_file;
+	TH1F*   c1n2_xsec_hist;
+	TFile*  c1n2_xsec_file;
 	//3D Vertex weight
 	//	double Weight3D[50][50][50];
 
