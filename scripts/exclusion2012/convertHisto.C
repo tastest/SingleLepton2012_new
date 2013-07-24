@@ -21,19 +21,23 @@
   // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75.root";
   // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-08/Skim_4jets_MET100_MT120/myMassDB_mStop_x75_25GeVbins.root";
 
-  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75.root";
-  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75_25GeVbins.root";
+  // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75.root";
+  // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75_25GeVbins.root";
 
   // char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse.root";
   // char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_pythiaCoarse/minibaby_V00-03-09/Skim_4jets_MET100_MT120/myMassDB_T2bw_coarse_25GeVbins.root";
+
+  char* filename_in  = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/minibaby_V00-03-16/Skim_4jets_MET100_MT120/myMassDB_x-025_mLSP1.root";
+  char* filename_out = "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/LSP1/minibaby_V00-03-16/Skim_4jets_MET100_MT120/myMassDB_x-025_mLSP1_25GeVbins.root";
+  char* histname     = "masses25";
 
   cout << "Reading in  " << filename_in  << endl;
   cout << "Writing out " << filename_out << endl;
 
   TFile* fin = TFile::Open(filename_in);
 
-  TH2F*  hin    = (TH2F*) fin->Get("masses75");
-  TH2F*  hout   = new TH2F("masses75","masses75",41,-12.5,1012.5,41,-12.5,1012.5); 
+  TH2F*  hin    = (TH2F*) fin->Get(histname);
+  TH2F*  hout   = new TH2F(histname,histname,41,-12.5,1012.5,41,-12.5,1012.5); 
 
   /*
   TH2F*  hin25  = (TH2F*) fin->Get("masses25");
