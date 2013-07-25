@@ -119,24 +119,24 @@ void SMS(char* sample = "T2tt" , int x = 1, bool doBDT = false , char* pol = "" 
     if( x==25 ){
       xchar          = (char*) "_x25";
       denomhistoname = (char*) "masses25";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x025*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x25_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/Combined_T2bw_MLSP1/merged*025*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/Combined_T2bw_MLSP1/myMassDB_x025.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.25";
     }
 
     else if( x==50 ){
       xchar          = (char*) "_x50";
       denomhistoname = (char*) "masses";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x050*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x50_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/Combined_T2bw_MLSP1/merged*050*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/Combined_T2bw_MLSP1/myMassDB_x050.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.50";
     }
 
     else if( x==75 ){
       xchar          = (char*) "_x75";
       denomhistoname = (char*) "masses75";
-      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/merged*x075*root";
-      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/minibaby_V00-03-11/Skim_4jets_MET100_MT120/myMassDB_mStop_combined_x75_25GeVbins.root";
+      filename       = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/Combined_T2bw_MLSP1/merged*075*root";
+      denomname      = (char*) "/tas/cms2/stop/cms2V05-03-26_stoplooperV00-02-25/T2bw_mad/Combined_T2bw_MLSP1/myMassDB_x075.root";
       label          = (char*) "pp #rightarrow #tilde{t}#tilde{t}, #tilde{t} #rightarrow b+#tilde{#chi}_{1}^{#pm}, x=0.75";
     }
     
@@ -1486,7 +1486,6 @@ void doAll(){
   // SMS("T2bw_MG",25,false,"T2BW_SS",true);
   // SMS("T2bw_MG",50,false,"T2BW_SS",true);
   // SMS("T2bw_MG",75,false,"T2BW_SS",true);
-
 
 }
 
