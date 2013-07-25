@@ -758,8 +758,10 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     //for the single lepton SRs, scale the dilepton background
     //for the dilepton SRs, have no yields for single lepton ttbar, so this doesn't matter
     if (isr<4) {
-      ettsmpred[isr] = addSqr( (ettsmpred[isr]/ttsmpred[isr]), (esf_ttsm[isr+4]/sf_ttsm[isr+4]) );
-      ttsmpred[isr] *= sf_ttsm[isr+4];
+      ttsmpred[isr]  = h_mc[isample][isr]->GetBinContent(i_sig) * sf_ttsm[isr+4];
+      ettsmpred[isr] = 
+	addSqr( (h_mc[isample][isr]->GetBinError(i_sig)/h_mc[isample][isr]->GetBinContent(i_sig)), 
+		(esf_ttsm[isr+4]/sf_ttsm[isr+4]) ) * ttsmpred[isr];
     } 
     if (doprintout) printf("& $%.2f \\pm %.2f$ ",ttsmpred[isr], ettsmpred[isr]);    
   }
