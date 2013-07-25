@@ -56,6 +56,8 @@ StopTreeLooper::StopTreeLooper()
   pt_b = -9999.;
   mbb = -9999.;
   mbb40 = -9999.;
+  n_mbb = -9999;
+  n_mbb40 = -9999;
   dRleptB1 = -9999.;
   htssl = -9999.;
   htosl = -9999.;
@@ -489,8 +491,10 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       // calculate mbb
       //----------------------------------------------------------------------------      
 
-      mbb = getMbb(bjets30);
-      mbb40 = getMbb(bjets40);
+      n_mbb = 0;
+      n_mbb40 = 0;
+      mbb = getMbbWithCount(bjets30, n_mbb);
+      mbb40 = getMbbWithCount(bjets40, n_mbb40);
       //systematics
       mbb_upBCShape = getMbb(bjets30_upBCShape);
       mbb40_upBCShape = getMbb(bjets40_upBCShape);
@@ -532,8 +536,8 @@ void StopTreeLooper::loop(TChain *chain, TString name)
       //
 
       //blind signal regions
-      issigmbb = (isData && mbb > min_mbb && mbb < max_mbb) ? true : false;
-      issigmbb40 = (isData && mbb40 > min_mbb && mbb40 < max_mbb) ? true : false;
+      issigmbb = (isData && ( ( n_mbb==1 && mbb >= min_mbb && mbb < max_mbb ) || n_mbb>1 ) ) ? true : false;
+      issigmbb40 = (isData && ( ( n_mbb40==1 && mbb40 >= min_mbb && mbb40 < max_mbb ) || n_mbb40>1 ) ) ? true : false;
 
       if ( dataset_2l && passDileptonSelection(isData) 
 	   && n_jets>=4 
@@ -549,7 +553,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	   && n_jets>=5 
 	   && n_bjets40==3 
 	   && n_bjets30==3 
-	   && !issigmbb40 )
+	   && !issigmbb )
 	{
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l3b", flav_tag_dl, -1. );
 	  makeSIGPlots( evtweight*trigweight_dl, h_1d_sig, "_2l3b", "", -1. );
@@ -772,10 +776,12 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   x_ovflw = h_xmax-0.001;
 
   //mbb distribution
+  //new definition first bin is CR, second is SR and third is bad pairs
   float mbb_count = -1.;
-  if ( mbb < min_mbb ) mbb_count = 0.5;
-  else if ( mbb >= min_mbb && mbb < max_mbb ) mbb_count = 1.5;
-  else if ( mbb >= max_mbb ) mbb_count = 2.5;
+  if ( n_mbb==1 && ( mbb < min_mbb || mbb >= max_mbb ) ) mbb_count = 0.5;
+  else if ( n_mbb==1 && ( mbb >= min_mbb && mbb < max_mbb ) ) mbb_count = 1.5;
+  else if ( n_mbb>1 ) mbb_count = 1.5;
+  else if ( n_mbb==0 ) mbb_count = 2.5;
   else mbb_count = -1.;
 
   float mbbplot = mbb<h_xmin ? h_xmin+0.001 : mbb;
@@ -783,12 +789,8 @@ void StopTreeLooper::makeSIGPlots( float evtweight, std::map<std::string, TH1F*>
   plot1D("h_sig_mbb_count"+tag_selection+flav_tag, mbb_count, evtweight, h_1d, 3, 0, 3);
 
   //alternative Mbb sideband region for systematic uncertainty
-  float mbb_count_alt = -1.;
-  if ( mbb >= 25. && mbb < 100. ) mbb_count_alt = 0.5;
-  else if ( mbb >= min_mbb && mbb < max_mbb ) mbb_count_alt = 1.5;
-  else if ( mbb >= max_mbb ) mbb_count_alt = 2.5;
-  else mbb_count_alt = -1.;
-  plot1D("h_sig_mbb_count_alt"+tag_selection+flav_tag, mbb_count_alt, evtweight, h_1d, 3, 0, 3);
+  //using same distribution, not including combinations failing kinematic requirements
+  plot1D("h_sig_mbb_count_alt"+tag_selection+flav_tag, mbb_count, evtweight, h_1d, 3, 0, 3);
   
   //MT
   float mt_count = -1.;
@@ -874,3 +876,52 @@ float StopTreeLooper::getMbb( vector<LorentzVector> &bjets )
     }
   return mbbval;
 }
+
+
+// updated version that keeps track of the number of pairs
+float StopTreeLooper::getMbbWithCount( vector<LorentzVector> &bjets , int &npairs ) 
+{
+  vector<float> mbb;
+  vector<int> i_mbb;
+  vector<int> j_mbb;
+  npairs = 0;
+  for (int i=0; i<(int)bjets.size(); ++i) 
+    for (int j=i+1; j<(int)bjets.size(); ++j) {
+      float dR_bbpair = dRbetweenVectors( bjets.at(i), bjets.at(j) );
+      if ( dR_bbpair > 2./3.*TMath::Pi() ) continue;
+      LorentzVector bbpair = bjets.at(i) + bjets.at(j);
+      if ( bbpair.M()/bbpair.pt()/dR_bbpair > 0.65 ) continue;
+      if ( fabs(bjets.at(i).Rapidity()-bjets.at(j).Rapidity()) > 1.2 ) continue;
+      //store all pairs
+      mbb.push_back(bbpair.M());
+      i_mbb.push_back(i);
+      j_mbb.push_back(j);
+    }
+
+  float mbbval = -9999.;
+  int i_mbbval = -9;
+  int j_mbbval = -9;
+  //find the pair closest to 125
+  for (int k=0; k<(int)mbb.size(); ++k) {
+    if ( (mbbval<0.) || ( fabs(mbbval-125.) > fabs(mbb.at(k)-125.) ) ) {
+      mbbval = mbb.at(k);
+      i_mbbval = i_mbb.at(k);
+      j_mbbval = j_mbb.at(k);
+    }
+  } 
+  if (mbbval>0.) npairs++;
+ 
+  //now count additional pairs
+  for (int k=0; k<(int)mbb.size(); ++k) {
+    //do not use jets in existing pairing
+    if ( i_mbb.at(k)==i_mbbval || 
+	 j_mbb.at(k)==i_mbbval ||
+	 i_mbb.at(k)==j_mbbval || 
+	 j_mbb.at(k)==j_mbbval ) continue;
+    npairs++;
+  } 
+  if (npairs>2) npairs = 2;
+
+  return mbbval;
+}
+

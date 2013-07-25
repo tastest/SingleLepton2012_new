@@ -282,7 +282,7 @@ void doPredAll(bool doaltttbar = false) {
   cout<<endl;
   
   //  cout<<"---------------------- Alternative control region range -----------------------"<<endl;
-  //histotag = "_alt";
+  histotag = "_alt";
   addhighmbb[4] = false;
   addhighmbb[5] = false;
   addhighmbb[6] = false;
@@ -304,6 +304,7 @@ void doPredAll(bool doaltttbar = false) {
     //epred_default[isr] = addSqr(epred_default[isr], aunc_altrange[isr]);
   }
 
+  histotag = "";
   addhighmbb[4] = true;
   addhighmbb[5] = true;
   addhighmbb[6] = true;

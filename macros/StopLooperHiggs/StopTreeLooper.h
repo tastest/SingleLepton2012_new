@@ -34,6 +34,7 @@ class StopTreeLooper {
 			      float mtcut, float mbbval );
 	//calculate mbb
 	float getMbb(vector<LorentzVector> &bjets);
+	float getMbbWithCount(vector<LorentzVector> &bjets , int &n_mbb);
 
     private:
 
@@ -61,8 +62,11 @@ class StopTreeLooper {
 	float pt_b;
 	float dRleptB1;
 	//mbb
+	//mbb
 	float mbb40;
 	float mbb;
+	int n_mbb40;
+	int n_mbb;
 	//maria variables
 	float htssl;
 	float htosl;
