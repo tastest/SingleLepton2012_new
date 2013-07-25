@@ -68,7 +68,8 @@ double error_poisson_down(double data) {
 //odd entries are for bkg estimate
 const int NSAMPLE = 8;
 string selection[NSAMPLE] = 
-  { "_1l1or2b_mt150_g5j", "_1l3b", "_1l1or2b_mt120_g4j", "_1l4b", "_2l2b", "_2l3b", "_2l2b", "_2l4b" }; 
+  { "_1l1or2b_mt150_g5j", "_1l3b", "_1l1or2b_mt120_g4j", "_1l4b", 
+    "_2l2b", "_2l3b", "_2l2b", "_2l4b" }; 
 string samplename[NSAMPLE] = 
   { "1l + 1 or 2 b (#geq 5j, M_{T}>150 GeV)", 
     "1l + 3 b (#geq 5j, M_{T}>150 GeV)", 
@@ -281,8 +282,12 @@ void doPredAll(bool doaltttbar = false) {
   cout<<endl;
   
   //  cout<<"---------------------- Alternative control region range -----------------------"<<endl;
-  histotag = "_alt";
-  //  addhighmbb[5] = true;
+  //histotag = "_alt";
+  addhighmbb[4] = false;
+  addhighmbb[5] = false;
+  addhighmbb[6] = false;
+  addhighmbb[7] = false;
+
   runSimplePred("_lmgtau");
 
   float pred_altrange[NSAMPLE];
@@ -299,7 +304,10 @@ void doPredAll(bool doaltttbar = false) {
     //epred_default[isr] = addSqr(epred_default[isr], aunc_altrange[isr]);
   }
 
-  //  addhighmbb[5] = false;
+  addhighmbb[4] = true;
+  addhighmbb[5] = true;
+  addhighmbb[6] = true;
+  addhighmbb[7] = true;
 
   // printf("Alternative control region range \t ");
   // for (int isr=2; isr<NSAMPLE; ++isr) 
@@ -438,7 +446,8 @@ void doPredAll(bool doaltttbar = false) {
     pred_total += pred[isr];
     epred_total = addSqr(epred_total, epred[isr]);
   }
-  printf("TOTAL: \t & $%.2f \\pm %.2f (%.1f)$ \\\\ \n", pred_total, epred_total, epred_total/pred_total*100.);
+  printf("TOTAL: \t & $%.2f \\pm %.2f (%.1f)$ \\\\ \n", 
+	 pred_total, epred_total, epred_total/pred_total*100.);
 
 }
 
@@ -749,8 +758,8 @@ void runSimplePred(char* ttbar_tag, bool issyst){
     //for the single lepton SRs, scale the dilepton background
     //for the dilepton SRs, have no yields for single lepton ttbar, so this doesn't matter
     if (isr<4) {
-      ttsmpred[isr] *= sf_ttsm[isr];
-      ettsmpred[isr] = addSqr( (ettsmpred[isr]/ttsmpred[isr]), (esf_ttsm[isr]/sf_ttsm[isr]) );
+      ettsmpred[isr] = addSqr( (ettsmpred[isr]/ttsmpred[isr]), (esf_ttsm[isr+4]/sf_ttsm[isr+4]) );
+      ttsmpred[isr] *= sf_ttsm[isr+4];
     } 
     if (doprintout) printf("& $%.2f \\pm %.2f$ ",ttsmpred[isr], ettsmpred[isr]);    
   }
