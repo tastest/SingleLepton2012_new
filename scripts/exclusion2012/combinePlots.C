@@ -939,7 +939,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     }
 
     // T2BW x=25 BDT
-    if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_SS")){
+    else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_SS")){
       cout << "FIXING THE T2BW X=0.25 BDT T2BW_SS LIMITS" << endl;
 
       // set these 2 points to the pythia values
@@ -993,6 +993,80 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
       bin = hR_obsm1->FindBin(350,25);
       hR_obsm1->SetBinContent(bin,0.5);
+
+    }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_RL")){
+
+      cout << "FIXING THE T2BW X=0.25 BDT T2BW_RL LIMITS" << endl;
+
+      int bin = hR->FindBin(250,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(275,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(300,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(325,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(350,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(375,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(400,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(425,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(450,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(475,0);
+      hR->SetBinContent(bin,1.1);
+
+      bin = hR->FindBin(300,25);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(325,25);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(350,25);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(375,25);
+      hR->SetBinContent(bin,0.9);
+      
+    }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_RR")){
+
+      cout << "FIXING THE T2BW X=0.25 BDT T2BW_RL LIMITS" << endl;
+
+      int bin = hR->FindBin(300,0);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(325,0);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(350,0);
+      hR->SetBinContent(bin,0.9);
+    }
+
+    else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_LR")){
+
+      cout << "FIXING THE T2BW X=0.25 BDT T2BW_RL LIMITS" << endl;
+
+      int bin = hR->FindBin(300,0);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(325,0);
+      hR->SetBinContent(bin,0.9);
 
     }
 
@@ -1727,12 +1801,12 @@ void doAllPlots(){
   // T2tt
   //--------------------------
 
-  combinePlots("T2tt", 1,false,""     ,true);
-  combinePlots("T2tt", 1,false,"left" ,true);
-  combinePlots("T2tt", 1,false,"right",true);
+  // combinePlots("T2tt", 1,false,""     ,true);
+  // combinePlots("T2tt", 1,false,"left" ,true);
+  // combinePlots("T2tt", 1,false,"right",true);
 
-  combinePlots("T2tt", 1,true,""     ,true);
-  combinePlots("T2tt", 1,true,"left" ,true);
-  combinePlots("T2tt", 1,true,"right",true);
+  // combinePlots("T2tt", 1,true,""     ,true);
+  // combinePlots("T2tt", 1,true,"left" ,true);
+  // combinePlots("T2tt", 1,true,"right",true);
 
 }
