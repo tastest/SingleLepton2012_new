@@ -303,7 +303,8 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     }
 
     else if( x==50 ){
-      xaxismin        = 200.0;
+      //xaxismin        = 200.0;
+      xaxismin        = 225.0; //UPDATED
       xchar           = (char*) "_x50";
       nSR             = 8;
       if( doBDT ) nSR = 5;
@@ -594,6 +595,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
   if( doFixups ){
 
+    // T2BW x=25 CUT-BASED
     if( TString(sample).Contains("T2bw_MG") && x==25 && !doBDT ){
       cout << "FIXING THE T2BW X=0.25 CUT-BASED LIMITS" << endl;
 
@@ -610,27 +612,27 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       hxsec_best->SetBinContent(bin,0.04);
     }
 
-
+    // T2BW x=25 BDT
     else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT ){
       cout << "FIXING THE T2BW X=0.25 BDT LIMITS" << endl;
 
       int bin = hxsec_best->FindBin(325,0);
-      hxsec_best_exp->SetBinContent(bin,1.3);
+      // hxsec_best_exp->SetBinContent(bin,1.3);
 
-      bin = hxsec_best->FindBin(300,0);
-      hxsec_best_exp->SetBinContent(bin,2.1);
+      // bin = hxsec_best->FindBin(300,0);
+      // hxsec_best_exp->SetBinContent(bin,2.1);
 
-      bin = hxsec_best->FindBin(350,0);
-      hxsec_best_exp->SetBinContent(bin,0.9);
+      // bin = hxsec_best->FindBin(350,0);
+      // hxsec_best_exp->SetBinContent(bin,0.9);
 
-      bin = hxsec_best->FindBin(375,0);
-      hxsec_best_exp->SetBinContent(bin,0.6);
+      // bin = hxsec_best->FindBin(375,0);
+      // hxsec_best_exp->SetBinContent(bin,0.6);
+
+      //bin = hxsec_best->FindBin(475,0);
+      //hxsec_best_exp->SetBinContent(bin,0.2);
 
       bin = hxsec_best->FindBin(450,75);
       hxsec_best_expp1->SetBinContent(bin,0.15);
-
-      bin = hxsec_best->FindBin(475,0);
-      hxsec_best_exp->SetBinContent(bin,0.2);
 
       bin = hxsec_best->FindBin(325,75);
       hxsec_best_expp1->SetBinContent(bin,1.0);
@@ -652,17 +654,17 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
       // hxsec_best->SetBinContent(bin,0.5*(val0+val50));
     }
 
-
+    // T2BW x=50 BDT
     else if( TString(sample).Contains("T2bw_MG") && x==50 && doBDT ){
       cout << "FIXING THE T2BW X=0.5 BDT LIMITS" << endl;
 
       int bin = hxsec_best->FindBin(200,0);
-      hxsec_best_exp->SetBinContent(bin,18);
-      hxsec_best->SetBinContent(bin,18);
+      // // // hxsec_best_exp->SetBinContent(bin,18);
+      // // // hxsec_best->SetBinContent(bin,18);
 
       bin = hxsec_best->FindBin(200,25);
-      hxsec_best_exp->SetBinContent(bin,18);
-      hxsec_best->SetBinContent(bin,18);
+      // // // hxsec_best_exp->SetBinContent(bin,18);
+      // // // hxsec_best->SetBinContent(bin,18);
 
       int bin150= hxsec_best->FindBin(150,0);
       int bin175= hxsec_best->FindBin(175,0);
@@ -924,8 +926,9 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
   if( doFixups ){
 
+    // T2BW x=25 CUT-BASED
     if( TString(sample).Contains("T2bw_MG") && x==25 && !doBDT && TString(pol).Contains("T2BW_SS")){
-      cout << "FIXING THE T2BW X=0.5 CUT-BASED T2BW_SS LIMITS" << endl;
+      cout << "FIXING THE T2BW X=0.25 CUT-BASED T2BW_SS LIMITS" << endl;
 
       // set these 2 points to the pythia values
       int bin = hR->FindBin(575,175);
@@ -933,6 +936,64 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
       bin = hR->FindBin(550,25);
       hR_obsp1->SetBinContent(bin,1.1);
+    }
+
+    // T2BW x=25 BDT
+    if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_SS")){
+      cout << "FIXING THE T2BW X=0.25 BDT T2BW_SS LIMITS" << endl;
+
+      // set these 2 points to the pythia values
+      int bin = hR->FindBin(325,0);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR->FindBin(350,0);
+      hR->SetBinContent(bin,0.9);
+
+      bin = hR_exp->FindBin(225,0);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin = hR_exp->FindBin(250,0);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin = hR_exp->FindBin(275,0);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin = hR_exp->FindBin(450,0);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin = hR_exp->FindBin(475,0);
+      hR_exp->SetBinContent(bin,1.1);
+
+      bin = hR_exp->FindBin(300,25);
+      hR_exp->SetBinContent(bin,0.9);
+
+      bin = hR_exp->FindBin(325,25);
+      hR_exp->SetBinContent(bin,0.9);
+
+      bin = hR_exp->FindBin(350,25);
+      hR_exp->SetBinContent(bin,0.9);
+
+      bin = hR_exp->FindBin(375,25);
+      hR_exp->SetBinContent(bin,0.9);
+
+      bin = hR_exp->FindBin(400,25);
+      hR_exp->SetBinContent(bin,0.9);
+
+      bin = hR_obsm1->FindBin(425,0);
+      hR_obsm1->SetBinContent(bin,1.1);
+
+      bin = hR_obsm1->FindBin(450,0);
+      hR_obsm1->SetBinContent(bin,1.1);
+
+      bin = hR_obsm1->FindBin(475,0);
+      hR_obsm1->SetBinContent(bin,1.1);
+
+      bin = hR_obsm1->FindBin(325,25);
+      hR_obsm1->SetBinContent(bin,0.5);
+
+      bin = hR_obsm1->FindBin(350,25);
+      hR_obsm1->SetBinContent(bin,0.5);
+
     }
 
     // else if( TString(sample).Contains("T2bw_MG") && x==25 && doBDT && TString(pol).Contains("T2BW_SS")){
@@ -948,6 +1009,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     //   // hR_obsp1->SetBinContent(bin,1.1);
     // }
 
+    // T2TT BDT TOP-RIGHT
     else if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("right")){
       cout << "FIXING T2TT BDT RIGHT LIMITS" << endl;
 
@@ -963,6 +1025,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
     }
 
+    // T2TT BDT TOP-LEFT
     else if( TString(sample).Contains("T2tt") && doBDT && TString(pol).Contains("left")){
       cout << "FIXING T2TT BDT LEFT LIMITS" << endl;
 
@@ -971,6 +1034,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
     }
 
+    // T2TT CUT-BASED
     else if( TString(sample).Contains("T2tt") && !doBDT ){
       cout << "FIXING T2TT CUT-BASED NOMINAL LIMITS" << endl;
 
@@ -982,6 +1046,7 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
 
     }
 
+    // T2BW X=50 CUT-BASED
     else if( TString(sample).Contains("T2bw_MG") && x==50 && !doBDT && TString(pol).Contains("T2BW_SS")){
       cout << "FIXING THE T2BW X=0.5 CUT-BASED LIMITS" << endl;
 
@@ -1488,9 +1553,13 @@ void combinePlots(char* sample = "T2tt" , int x = 1, bool doBDT = true, char* po
     }
     else if( x==50 ){
       //line->DrawLine(162   , 0 , 300+12.5+162   , 300+12.5);
-      line->DrawLine(200   , 200-162 , 300+12.5+162   , 300+12.5);
+      // line->DrawLine(200   , 200-162 , 300+12.5+162   , 300+12.5);
+      // t->SetTextAngle(50);
+      // t->DrawLatex(0.31,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+
+      line->DrawLine(225   , 225-162 , 300+12.5+162   , 300+12.5);
       t->SetTextAngle(50);
-      t->DrawLatex(0.31,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+      t->DrawLatex(0.29,0.5,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
     }
     else if( x==75 ){
       line->DrawLine(120   , 12 , 300+12.5+108   , 300+12.5);
