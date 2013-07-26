@@ -57,7 +57,8 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
   label       = "pp #rightarrow #tilde{t} #tilde{t}*, #tilde{t} #rightarrow b #tilde{#chi}_{1}^{+}";
 
   if(x==25) xaxismin = 200.0;
-  if(x==50) xaxismin = 200.0;
+  //if(x==50) xaxismin = 200.0;
+  if(x==50) xaxismin = 225.0;
   if(x==75) xaxismin = 125.0;
 
   yaxismax    = 250.0;
@@ -116,6 +117,7 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
     //   c_pol[i]->SetBinContent(182,0.99);
     // }
   }
+
 
   if( x==50 ){
     cout << "x=0.5 limits for chiR WL" << endl;
@@ -252,9 +254,12 @@ void plotPolarization_T2bw( bool doBDT = true , int x = 50 , bool print = false)
     t->DrawLatex(0.35,0.21,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
   }
   else if( x==50 ){
-    line->DrawLine(200   , 200-162 , 250+12.5+162   , 250+12.5);
+    //line->DrawLine(200   , 200-162 , 250+12.5+162   , 250+12.5);
+    //t->SetTextAngle(44);
+    //t->DrawLatex(0.31,0.46,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    line->DrawLine(225   , 225-162 , 250+12.5+162   , 250+12.5);
     t->SetTextAngle(44);
-    t->DrawLatex(0.31,0.46,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+    t->DrawLatex(0.29,0.46,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
   }
   else if( x==75 ){
     line->DrawLine(125   , 125-108 , 250+12.5+108   , 250+12.5);
