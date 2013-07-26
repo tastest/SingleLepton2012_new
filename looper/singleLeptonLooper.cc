@@ -3372,7 +3372,8 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
 	  }
 
-        xsecsusy_  = mG_ > 0. ? c1n2CrossSection(mG_) : -999;
+	// factor in braching ratios here: br(w->lv) 0.33 * br(h->bb) 0.56
+        xsecsusy_  = mG_ > 0. ? c1n2CrossSection(mG_) * 0.33 * 0.56 : -999;
 	// note: number of events needs to be included in weight (later)
         weight_ = xsecsusy_ > 0. ? lumi * xsecsusy_ * 1000. : -999.;
 
