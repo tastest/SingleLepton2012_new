@@ -54,7 +54,7 @@ void makeSummaryPlot_T2bw( bool doBDT = true , bool print = false){
 
   if( TString(sample).Contains("T2tt") ){
     label       = "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow t #tilde{#chi}_{1}^{0}";
-    xaxismin    = 150.0;
+    xaxismin    = 225.0;
     yaxismax    = 250.0;
   }
 
@@ -67,8 +67,11 @@ void makeSummaryPlot_T2bw( bool doBDT = true , bool print = false){
   // set up filenames and print them out
   //----------------------------------------------
 
-  char* filename_T2tt  = Form("rootfiles/T2tt_combinePlots%s_nmin20.root"     ,BDTchar);
-  char* filename_T2bw  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s_nmin20.root",x,BDTchar);
+  //char* filename_T2tt  = Form("rootfiles/T2tt_combinePlots%s_nmin20.root"     ,BDTchar);
+  //char* filename_T2bw  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s_nmin20.root",x,BDTchar);
+
+  char* filename_T2tt  = Form("rootfiles/T2tt_combinePlots%s.root"     ,BDTchar);
+  char* filename_T2bw  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s.root",x,BDTchar);
 
   char* outfilename    = Form("rootfiles/makeSummaryPlot_x%s.root",BDTchar);
 
@@ -199,23 +202,25 @@ void makeSummaryPlot_T2bw( bool doBDT = true , bool print = false){
   leg->Draw();
 
   t->SetTextSize(0.04);
-  t->DrawLatex(0.18,0.94,"CMS Preliminary                                  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
+  //t->DrawLatex(0.18,0.94,"CMS Preliminary                                  #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
+  t->DrawLatex(0.18,0.94,"CMS                                                            #sqrt{s} = 8 TeV, #scale[0.6]{#int}Ldt = 19.5 fb^{-1}");
 
   TLine *line = new TLine();
   line->SetLineWidth(2);
   line->SetLineStyle(2);
 
   line->SetLineColor(1);
-  line->DrawLine(162.0,0,300+12.5+162.0,300+12.5);
+  //line->DrawLine(162.0,0,300+12.5+162.0,300+12.5);
+  line->DrawLine(225,225-162,300+12.5+162.0,300+12.5);
 
   // line->SetLineColor(2);
   // line->DrawLine(173.5,0,300+12.5+173.5,300+12.5);
   // line->DrawLine(   150,150-81,300+12.5+81.0,300+12.5);
 
-  t->SetTextAngle(46);
+  t->SetTextAngle(43);
 
   t->SetTextColor(1);
-  t->DrawLatex(0.43,0.55,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
+  t->DrawLatex(0.36,0.55,"m_{#tilde{#chi}_{1}^{#pm}} - m_{#tilde{#chi}_{1}^{0}} = m_{W}");
 
   t->SetTextAngle(0);
   t->SetTextSize(0.05);
@@ -227,6 +232,7 @@ void makeSummaryPlot_T2bw( bool doBDT = true , bool print = false){
 
   if( print ){
     can1->Print(Form("plots/makeSummaryPlot%s_T2bw.pdf",BDTchar));
+    can1->Print(Form("plots/makeSummaryPlot%s_T2bw.png",BDTchar));
   }
 
   // TFile* f = TFile::Open("electronic/topneutralino_polarization.root","RECREATE");

@@ -67,8 +67,11 @@ void makeSummaryPlot( bool doBDT = true , bool print = false){
   // set up filenames and print them out
   //----------------------------------------------
 
-  char* filename_T2tt  = Form("rootfiles/T2tt_combinePlots%s_nmin20.root"     ,BDTchar);
-  char* filename_T2bw  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s_nmin20.root",x,BDTchar);
+  //char* filename_T2tt  = Form("rootfiles/T2tt_combinePlots%s_nmin20.root"     ,BDTchar);
+  //char* filename_T2bw  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s_nmin20.root",x,BDTchar);
+
+  char* filename_T2tt  = Form("rootfiles/T2tt_combinePlots%s.root"     ,BDTchar);
+  char* filename_T2bw  = Form("rootfiles/T2bw_MG_x%i_combinePlotsT2BW_SS%s.root",x,BDTchar);
 
   char* outfilename    = Form("rootfiles/makeSummaryPlot_x%s.root",BDTchar);
 
