@@ -8,7 +8,7 @@ source /home/users/olivito/SingleLepton2012_batch/setupbatch.sh
 
 1) copy files to run looper into job_input directory
 for example, from the looper directory
-> cp -r BtagFuncs.h processBaby.C jetCorrections jetSmearData QGTaggerConfig jsons data vtxreweight* stop_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
+> cp -r BtagFuncs.h processBaby.C jetCorrections jetSmearData QGTaggerConfig jsons data vtxreweight* stop_xsec.root c1n2_xsec.root goodModelNames_tanbeta10.txt *.so batchsubmit/job_input/
 
 *** note that after copying the latest source files into the job_input subdir, you must run one of the writeConfig scripts below to recreate the input tarball which is used for the batch jobs!
 
