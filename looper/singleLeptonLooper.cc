@@ -994,7 +994,6 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     cms2.Init(tree);
       
     unsigned int nEntries = tree->GetEntries();
-    nEntries=10000;
     for(unsigned int z = 0; z < nEntries; ++z) {
       ++nEventsTotal;
 
@@ -3784,9 +3783,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
   
   already_seen.clear();
 
-  if (nEventsChain != nEventsTotal)
-    std::cout << "ERROR: number of events from files is not equal to total number of events" << std::endl;
-
+  if (nEventsChain != nEventsTotal) 
+    std::cout << "ERROR: number of events from files (" << nEventsChain 
+	      << ") is not equal to total number of processed events (" << nEventsTotal << ")" << std::endl;
+  
   stop_xsec_file->Close();
 
   //delete d_llsol; //REPLACETOPMASS
