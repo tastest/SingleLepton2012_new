@@ -165,6 +165,9 @@ void processBaby( TString outfileid = "tt_test", TString infile = "/hadoop/cms/s
   else if (infile.Contains("WinoNLSP_chargino350_bino1"))            sample = Form("Wino_350_1_%s",      outfileid.Data());
   else if (infile.Contains("WinoNLSP_chargino400_bino1"))            sample = Form("Wino_400_1_%s",      outfileid.Data());
   //Data
+  //single mu-had
+  else if (infile.Contains("MuHad_Run2012A-recover-06Aug2012-v1_AOD"))          sample =  Form("MuHad2012A_recover06Aug2012v1V532_%s",     outfileid.Data());
+  else if (infile.Contains("MuHad_Run2012A-13Jul2012-v1_AOD"))                  sample =  Form("MuHad2012A_13Jul2012v1V532_%s",            outfileid.Data());
   //single muon
   else if (infile.Contains("SingleMu_Run2012A-recover-06Aug2012-v1_AOD"))       sample =  Form("SingleMu2012A_recover06Aug2012v1V532_%s",     outfileid.Data());
   else if (infile.Contains("SingleMu_Run2012A-13Jul2012-v1_AOD"))       	sample =  Form("SingleMu2012A_13Jul2012v1V532_%s",            outfileid.Data());
