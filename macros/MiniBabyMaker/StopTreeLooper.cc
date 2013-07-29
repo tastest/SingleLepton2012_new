@@ -177,7 +177,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
     TH2F *h_nsig, *h_nsig25, *h_nsig75 ;
     TH2F *h_nsig_masslessLSP;
 
-    if( name.Contains("T2") ){
+    if( name.Contains("T2") || name.Contains("TChiWH") ){
         char* h_nsig_filename             = "";
         char* h_nsig_filename_masslessLSP = "";
 
@@ -257,6 +257,11 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	    exit(0);
 	  }
 
+	  cout << "[StopTreeLooper::loop] opening mass TH2 file  " << h_nsig_filename << endl;
+	}
+
+	else if (name.Contains("TChiWH")) {
+	  h_nsig_filename = "/nfs-7/userdata/stop/output_V00-02-36_2012/myMassDB_TChiWH.root";
 	  cout << "[StopTreeLooper::loop] opening mass TH2 file  " << h_nsig_filename << endl;
 	}
 
@@ -468,7 +473,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
     bool isData = name.Contains("data") ? true : false;
     bool isfastsim = false;
-    if (name.Contains("T2tt") || name.Contains("T2bw") || name.Contains("Wino")) isfastsim = true;
+    if (name.Contains("T2tt") || name.Contains("T2bw") || name.Contains("Wino") || name.Contains("TChiWH")) isfastsim = true;
 
 
     cout << "[StopTreeLooper::loop] running over chain with total entries " << nEvents << endl;
@@ -681,6 +686,18 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 	      whweight_ = xsecsusy_ * 19.5 * 1000. * 0.33 * 0.56 / float(nsigevents_);
 
             }
+
+	    if ( name.Contains("TChiWH") ) {
+	      int bin = h_nsig->FindBin(stopt.mg(),stopt.ml());
+	      float nevents = h_nsig->GetBinContent(bin);
+
+	      //NOTE::need to add vtx. reweighting for the signal sample
+	      whweight_  = stopt.xsecsusy() * 1000.0 / nevents * 19.5; 
+	      nsigevents_ = (int) nevents;
+	      mchargino_   = stopt.mg();                   // chargino mass
+	      mlsp_        = stopt.ml();                   // LSP mass
+	      xsecsusy_    = stopt.xsecsusy();
+	    }
 
 	    //	    nvtxweight_ = stopt.nvtxweight();
 	    nvtxweight_ = puweight;
@@ -1287,7 +1304,7 @@ void StopTreeLooper::loop(TChain *chain, TString name)
 
 	    if     ( name.Contains("T2") ) isrboost = (stopt.stop_t() + stopt.stop_tbar()).pt();
 	    else if( name.Contains("ttsl") || name.Contains("ttdl") || name.Contains("ttall") || name.Contains("tt_") ) isrboost = (stopt.ttbar()).pt();
-	    else if( name.Contains("Wino") ) isrboost = (stopt.genc1() + stopt.genn2()).pt();
+	    else if( name.Contains("Wino") || name.Contains("TChiWH") ) isrboost = (stopt.genc1() + stopt.genn2()).pt();
 
 	    isrweight_ = 1.0;
 	    if( isrboost > 120.0 && isrboost < 150.0 ) isrweight_ = 0.95;
