@@ -24,6 +24,7 @@
 #include "TStyle.h"
 #include "TLine.h"
 #include "TMath.h"
+#include "TPaletteAxis.h"
 
 using namespace std;
 
@@ -59,11 +60,12 @@ void convertEff_T2tt(){
 
   TFile* fin = TFile::Open("rootfiles/T2tt_histos.root");
 
-  TFile* fin_combined = TFile::Open("rootfiles/T2tt_combinePlots_nmin20.root");
+  //TFile* fin_combined = TFile::Open("rootfiles/T2tt_combinePlots_nmin20.root");
+  TFile* fin_combined = TFile::Open("rootfiles/T2tt_combinePlots.root");
 
   TH2F* h[8];
 
-  TCanvas *c1 = new TCanvas("c1","c1",1800,800);
+  TCanvas *c1 = new TCanvas("c1","c1",2200,800);
   c1->Divide(4,2);
 
   TFile* fout = TFile::Open("topneutralino_cutbased_efficiencies.root","RECREATE");
@@ -93,7 +95,14 @@ void convertEff_T2tt(){
     gPad->SetLogz(1);
     gPad->SetRightMargin(0.2);
     gPad->SetTopMargin(0.07);
+
+    gPad->Update();
+    TPaletteAxis *palette = (TPaletteAxis*)h[i]->GetListOfFunctions()->FindObject("palette");
+    delete palette;
+
     h[i]->Draw("colz");
+
+    h[i]->GetZaxis()->SetTitle("efficiency #times acceptance");
 
     TLatex *text = new TLatex();
     text->SetNDC();
@@ -127,6 +136,22 @@ void convertEff_T2tt(){
 
   bin = h[0]->FindBin(675,0);
   cout << "675/0 HM300 " << h[7]->GetBinContent(bin) << " " << h[7]->GetBinContent(bin)*19500.0*0.0106123 << endl;
+
+  bin = h[0]->FindBin(250,50);
+
+  cout << endl << "250/50 yields" << endl;
+  for( int i = 0 ; i < 8 ; i++ ){
+    cout << "Region " << i << " " << h[i]->GetBinContent(bin) << " " << h[i]->GetBinContent(bin)*19500.0*5.57596 << endl;
+  }
+
+  bin = h[0]->FindBin(650,50);
+
+  cout << endl << "650/50 yields" << endl;
+  for( int i = 0 ; i < 8 ; i++ ){
+    cout << "Region " << i << " " << h[i]->GetBinContent(bin) << " " << h[i]->GetBinContent(bin)*19500.0*0.0139566 << endl;
+
+  }
+
 
   c1->Print("topneutralino_cutbased_efficiencies.C");
   c1->Print("plots/topneutralino_cutbased_efficiencies.pdf");
