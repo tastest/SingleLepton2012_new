@@ -82,7 +82,7 @@ void convertEff_T2tt(){
 
     blankHist(h[i],300);
 
-    h[i]->GetXaxis()->SetRangeUser(150,800);
+    h[i]->GetXaxis()->SetRangeUser(100,800);
     h[i]->GetYaxis()->SetRangeUser(0,450);
     h[i]->SetMinimum(1e-6);
     h[i]->SetMaximum(1.0);
