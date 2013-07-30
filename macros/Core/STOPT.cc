@@ -8,6 +8,7 @@ namespace Stop {
 	int &csc() { return stopt.csc(); }
 	int &hbhe() { return stopt.hbhe(); }
 	int &hbhenew() { return stopt.hbhenew(); }
+	int &ecallasernew() { return stopt.ecallasernew(); }
 	int &hcallaser() { return stopt.hcallaser(); }
 	int &ecaltp() { return stopt.ecaltp(); }
 	int &trkfail() { return stopt.trkfail(); }
@@ -114,6 +115,9 @@ namespace Stop {
 	int &em() { return stopt.em(); }
 	int &mu() { return stopt.mu(); }
 	int &ee() { return stopt.ee(); }
+	int &Mu_TriCentralPFJet30() { return stopt.Mu_TriCentralPFJet30(); }
+	int &Mu_TriCentralPFNoPUJet30_30_20() { return stopt.Mu_TriCentralPFNoPUJet30_30_20(); }
+	int &Mu_TriCentralPFNoPUJet30() { return stopt.Mu_TriCentralPFNoPUJet30(); }
 	int &npfjets30() { return stopt.npfjets30(); }
 	int &npfjets30lepcorr() { return stopt.npfjets30lepcorr(); }
 	float &knjets() { return stopt.knjets(); }
@@ -235,6 +239,8 @@ namespace Stop {
 	float &eSCPresh() { return stopt.eSCPresh(); }
 	float &lep1_scslasercormean() { return stopt.lep1_scslasercormean(); }
 	float &lep1_scslasercormax() { return stopt.lep1_scslasercormax(); }
+	int &eleThreeCharge() { return stopt.eleThreeCharge(); }
+	int &eleThreeCharge2() { return stopt.eleThreeCharge2(); }
 	float &eoverpin2() { return stopt.eoverpin2(); }
 	float &eoverpout2() { return stopt.eoverpout2(); }
 	float &dEtaIn2() { return stopt.dEtaIn2(); }
@@ -341,6 +347,14 @@ namespace Stop {
 	float &pfcandisoOS10looseZ() { return stopt.pfcandisoOS10looseZ(); }
 	float &pfcandptOS10looseZ() { return stopt.pfcandptOS10looseZ(); }
 	float &pfcanddzOS10looseZ() { return stopt.pfcanddzOS10looseZ(); }
+	int &pfcandid5looseZStopClassic() { return stopt.pfcandid5looseZStopClassic(); }
+	float &pfcandiso5looseZStopClassic() { return stopt.pfcandiso5looseZStopClassic(); }
+	float &pfcandpt5looseZStopClassic() { return stopt.pfcandpt5looseZStopClassic(); }
+	float &pfcanddz5looseZStopClassic() { return stopt.pfcanddz5looseZStopClassic(); }
+	int &pfcandidOS10looseZStopClassic() { return stopt.pfcandidOS10looseZStopClassic(); }
+	float &pfcandisoOS10looseZStopClassic() { return stopt.pfcandisoOS10looseZStopClassic(); }
+	float &pfcandptOS10looseZStopClassic() { return stopt.pfcandptOS10looseZStopClassic(); }
+	float &pfcanddzOS10looseZStopClassic() { return stopt.pfcanddzOS10looseZStopClassic(); }
 	int &pfcanddirid10() { return stopt.pfcanddirid10(); }
 	float &pfcanddiriso10() { return stopt.pfcanddiriso10(); }
 	float &pfcanddirpt10() { return stopt.pfcanddirpt10(); }
@@ -442,6 +456,8 @@ namespace Stop {
 	int &pfTau_leadPtcandID() { return stopt.pfTau_leadPtcandID(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau() { return stopt.pfTau(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand() { return stopt.pfTau_leadPtcand(); }
+	int &pfTau_decayModeFinder() { return stopt.pfTau_decayModeFinder(); }
+	float &pfTau_discriminator_() { return stopt.pfTau_discriminator_(); }
 	int &pfTauSS_leadPtcandID() { return stopt.pfTauSS_leadPtcandID(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS() { return stopt.pfTauSS(); }
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS_leadPtcand() { return stopt.pfTauSS_leadPtcand(); }
@@ -508,6 +524,9 @@ namespace Stop {
 	vector<float> &pfjets_beta_0p2() { return stopt.pfjets_beta_0p2(); }
 	vector<float> &pfjets_beta2_0p1() { return stopt.pfjets_beta2_0p1(); }
 	vector<float> &pfjets_beta2_0p5() { return stopt.pfjets_beta2_0p5(); }
+	vector<float> &pfjets_mvaPUid_ob() { return stopt.pfjets_mvaPUid_ob(); }
+	vector<float> &pfjets_mva5xPUid_ob() { return stopt.pfjets_mva5xPUid_ob(); }
+	vector<float> &pfjets_mvaBeta_ob() { return stopt.pfjets_mvaBeta_ob(); }
 	vector<float> &pfjets_mvaPUid() { return stopt.pfjets_mvaPUid(); }
 	vector<float> &pfjets_mva5xPUid() { return stopt.pfjets_mva5xPUid(); }
 	vector<float> &pfjets_mvaBeta() { return stopt.pfjets_mvaBeta(); }

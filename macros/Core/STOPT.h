@@ -38,6 +38,9 @@ protected:
 	int	hbhenew_;
 	TBranch *hbhenew_branch;
 	bool hbhenew_isLoaded;
+	int	ecallasernew_;
+	TBranch *ecallasernew_branch;
+	bool ecallasernew_isLoaded;
 	int	hcallaser_;
 	TBranch *hcallaser_branch;
 	bool hcallaser_isLoaded;
@@ -356,6 +359,15 @@ protected:
 	int	ee_;
 	TBranch *ee_branch;
 	bool ee_isLoaded;
+	int	Mu_TriCentralPFJet30_;
+	TBranch *Mu_TriCentralPFJet30_branch;
+	bool Mu_TriCentralPFJet30_isLoaded;
+	int	Mu_TriCentralPFNoPUJet30_30_20_;
+	TBranch *Mu_TriCentralPFNoPUJet30_30_20_branch;
+	bool Mu_TriCentralPFNoPUJet30_30_20_isLoaded;
+	int	Mu_TriCentralPFNoPUJet30_;
+	TBranch *Mu_TriCentralPFNoPUJet30_branch;
+	bool Mu_TriCentralPFNoPUJet30_isLoaded;
 	int	npfjets30_;
 	TBranch *npfjets30_branch;
 	bool npfjets30_isLoaded;
@@ -719,6 +731,12 @@ protected:
 	float	lep1_scslasercormax_;
 	TBranch *lep1_scslasercormax_branch;
 	bool lep1_scslasercormax_isLoaded;
+	int	eleThreeCharge_;
+	TBranch *eleThreeCharge_branch;
+	bool eleThreeCharge_isLoaded;
+	int	eleThreeCharge2_;
+	TBranch *eleThreeCharge2_branch;
+	bool eleThreeCharge2_isLoaded;
 	float	eoverpin2_;
 	TBranch *eoverpin2_branch;
 	bool eoverpin2_isLoaded;
@@ -1037,6 +1055,30 @@ protected:
 	float	pfcanddzOS10looseZ_;
 	TBranch *pfcanddzOS10looseZ_branch;
 	bool pfcanddzOS10looseZ_isLoaded;
+	int	pfcandid5looseZStopClassic_;
+	TBranch *pfcandid5looseZStopClassic_branch;
+	bool pfcandid5looseZStopClassic_isLoaded;
+	float	pfcandiso5looseZStopClassic_;
+	TBranch *pfcandiso5looseZStopClassic_branch;
+	bool pfcandiso5looseZStopClassic_isLoaded;
+	float	pfcandpt5looseZStopClassic_;
+	TBranch *pfcandpt5looseZStopClassic_branch;
+	bool pfcandpt5looseZStopClassic_isLoaded;
+	float	pfcanddz5looseZStopClassic_;
+	TBranch *pfcanddz5looseZStopClassic_branch;
+	bool pfcanddz5looseZStopClassic_isLoaded;
+	int	pfcandidOS10looseZStopClassic_;
+	TBranch *pfcandidOS10looseZStopClassic_branch;
+	bool pfcandidOS10looseZStopClassic_isLoaded;
+	float	pfcandisoOS10looseZStopClassic_;
+	TBranch *pfcandisoOS10looseZStopClassic_branch;
+	bool pfcandisoOS10looseZStopClassic_isLoaded;
+	float	pfcandptOS10looseZStopClassic_;
+	TBranch *pfcandptOS10looseZStopClassic_branch;
+	bool pfcandptOS10looseZStopClassic_isLoaded;
+	float	pfcanddzOS10looseZStopClassic_;
+	TBranch *pfcanddzOS10looseZStopClassic_branch;
+	bool pfcanddzOS10looseZStopClassic_isLoaded;
 	int	pfcanddirid10_;
 	TBranch *pfcanddirid10_branch;
 	bool pfcanddirid10_isLoaded;
@@ -1340,6 +1382,12 @@ protected:
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > *pfTau_leadPtcand_;
 	TBranch *pfTau_leadPtcand_branch;
 	bool pfTau_leadPtcand_isLoaded;
+	int	pfTau_decayModeFinder_;
+	TBranch *pfTau_decayModeFinder_branch;
+	bool pfTau_decayModeFinder_isLoaded;
+	float	pfTau_discriminator__;
+	TBranch *pfTau_discriminator__branch;
+	bool pfTau_discriminator__isLoaded;
 	int	pfTauSS_leadPtcandID_;
 	TBranch *pfTauSS_leadPtcandID_branch;
 	bool pfTauSS_leadPtcandID_isLoaded;
@@ -1538,6 +1586,15 @@ protected:
 	vector<float> *pfjets_beta2_0p5_;
 	TBranch *pfjets_beta2_0p5_branch;
 	bool pfjets_beta2_0p5_isLoaded;
+	vector<float> *pfjets_mvaPUid_ob_;
+	TBranch *pfjets_mvaPUid_ob_branch;
+	bool pfjets_mvaPUid_ob_isLoaded;
+	vector<float> *pfjets_mva5xPUid_ob_;
+	TBranch *pfjets_mva5xPUid_ob_branch;
+	bool pfjets_mva5xPUid_ob_isLoaded;
+	vector<float> *pfjets_mvaBeta_ob_;
+	TBranch *pfjets_mvaBeta_ob_branch;
+	bool pfjets_mvaBeta_ob_isLoaded;
 	vector<float> *pfjets_mvaPUid_;
 	TBranch *pfjets_mvaPUid_branch;
 	bool pfjets_mvaPUid_isLoaded;
@@ -1944,6 +2001,11 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("hbhenew") != 0) {
 		hbhenew_branch = tree->GetBranch("hbhenew");
 		if (hbhenew_branch) {hbhenew_branch->SetAddress(&hbhenew_);}
+	}
+	ecallasernew_branch = 0;
+	if (tree->GetBranch("ecallasernew") != 0) {
+		ecallasernew_branch = tree->GetBranch("ecallasernew");
+		if (ecallasernew_branch) {ecallasernew_branch->SetAddress(&ecallasernew_);}
 	}
 	hcallaser_branch = 0;
 	if (tree->GetBranch("hcallaser") != 0) {
@@ -2474,6 +2536,21 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("ee") != 0) {
 		ee_branch = tree->GetBranch("ee");
 		if (ee_branch) {ee_branch->SetAddress(&ee_);}
+	}
+	Mu_TriCentralPFJet30_branch = 0;
+	if (tree->GetBranch("Mu_TriCentralPFJet30") != 0) {
+		Mu_TriCentralPFJet30_branch = tree->GetBranch("Mu_TriCentralPFJet30");
+		if (Mu_TriCentralPFJet30_branch) {Mu_TriCentralPFJet30_branch->SetAddress(&Mu_TriCentralPFJet30_);}
+	}
+	Mu_TriCentralPFNoPUJet30_30_20_branch = 0;
+	if (tree->GetBranch("Mu_TriCentralPFNoPUJet30_30_20") != 0) {
+		Mu_TriCentralPFNoPUJet30_30_20_branch = tree->GetBranch("Mu_TriCentralPFNoPUJet30_30_20");
+		if (Mu_TriCentralPFNoPUJet30_30_20_branch) {Mu_TriCentralPFNoPUJet30_30_20_branch->SetAddress(&Mu_TriCentralPFNoPUJet30_30_20_);}
+	}
+	Mu_TriCentralPFNoPUJet30_branch = 0;
+	if (tree->GetBranch("Mu_TriCentralPFNoPUJet30") != 0) {
+		Mu_TriCentralPFNoPUJet30_branch = tree->GetBranch("Mu_TriCentralPFNoPUJet30");
+		if (Mu_TriCentralPFNoPUJet30_branch) {Mu_TriCentralPFNoPUJet30_branch->SetAddress(&Mu_TriCentralPFNoPUJet30_);}
 	}
 	npfjets30_branch = 0;
 	if (tree->GetBranch("npfjets30") != 0) {
@@ -3080,6 +3157,16 @@ void Init(TTree *tree) {
 		lep1_scslasercormax_branch = tree->GetBranch("lep1_scslasercormax");
 		if (lep1_scslasercormax_branch) {lep1_scslasercormax_branch->SetAddress(&lep1_scslasercormax_);}
 	}
+	eleThreeCharge_branch = 0;
+	if (tree->GetBranch("eleThreeCharge") != 0) {
+		eleThreeCharge_branch = tree->GetBranch("eleThreeCharge");
+		if (eleThreeCharge_branch) {eleThreeCharge_branch->SetAddress(&eleThreeCharge_);}
+	}
+	eleThreeCharge2_branch = 0;
+	if (tree->GetBranch("eleThreeCharge2") != 0) {
+		eleThreeCharge2_branch = tree->GetBranch("eleThreeCharge2");
+		if (eleThreeCharge2_branch) {eleThreeCharge2_branch->SetAddress(&eleThreeCharge2_);}
+	}
 	eoverpin2_branch = 0;
 	if (tree->GetBranch("eoverpin2") != 0) {
 		eoverpin2_branch = tree->GetBranch("eoverpin2");
@@ -3610,6 +3697,46 @@ void Init(TTree *tree) {
 		pfcanddzOS10looseZ_branch = tree->GetBranch("pfcanddzOS10looseZ");
 		if (pfcanddzOS10looseZ_branch) {pfcanddzOS10looseZ_branch->SetAddress(&pfcanddzOS10looseZ_);}
 	}
+	pfcandid5looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcandid5looseZStopClassic") != 0) {
+		pfcandid5looseZStopClassic_branch = tree->GetBranch("pfcandid5looseZStopClassic");
+		if (pfcandid5looseZStopClassic_branch) {pfcandid5looseZStopClassic_branch->SetAddress(&pfcandid5looseZStopClassic_);}
+	}
+	pfcandiso5looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcandiso5looseZStopClassic") != 0) {
+		pfcandiso5looseZStopClassic_branch = tree->GetBranch("pfcandiso5looseZStopClassic");
+		if (pfcandiso5looseZStopClassic_branch) {pfcandiso5looseZStopClassic_branch->SetAddress(&pfcandiso5looseZStopClassic_);}
+	}
+	pfcandpt5looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcandpt5looseZStopClassic") != 0) {
+		pfcandpt5looseZStopClassic_branch = tree->GetBranch("pfcandpt5looseZStopClassic");
+		if (pfcandpt5looseZStopClassic_branch) {pfcandpt5looseZStopClassic_branch->SetAddress(&pfcandpt5looseZStopClassic_);}
+	}
+	pfcanddz5looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcanddz5looseZStopClassic") != 0) {
+		pfcanddz5looseZStopClassic_branch = tree->GetBranch("pfcanddz5looseZStopClassic");
+		if (pfcanddz5looseZStopClassic_branch) {pfcanddz5looseZStopClassic_branch->SetAddress(&pfcanddz5looseZStopClassic_);}
+	}
+	pfcandidOS10looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcandidOS10looseZStopClassic") != 0) {
+		pfcandidOS10looseZStopClassic_branch = tree->GetBranch("pfcandidOS10looseZStopClassic");
+		if (pfcandidOS10looseZStopClassic_branch) {pfcandidOS10looseZStopClassic_branch->SetAddress(&pfcandidOS10looseZStopClassic_);}
+	}
+	pfcandisoOS10looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcandisoOS10looseZStopClassic") != 0) {
+		pfcandisoOS10looseZStopClassic_branch = tree->GetBranch("pfcandisoOS10looseZStopClassic");
+		if (pfcandisoOS10looseZStopClassic_branch) {pfcandisoOS10looseZStopClassic_branch->SetAddress(&pfcandisoOS10looseZStopClassic_);}
+	}
+	pfcandptOS10looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcandptOS10looseZStopClassic") != 0) {
+		pfcandptOS10looseZStopClassic_branch = tree->GetBranch("pfcandptOS10looseZStopClassic");
+		if (pfcandptOS10looseZStopClassic_branch) {pfcandptOS10looseZStopClassic_branch->SetAddress(&pfcandptOS10looseZStopClassic_);}
+	}
+	pfcanddzOS10looseZStopClassic_branch = 0;
+	if (tree->GetBranch("pfcanddzOS10looseZStopClassic") != 0) {
+		pfcanddzOS10looseZStopClassic_branch = tree->GetBranch("pfcanddzOS10looseZStopClassic");
+		if (pfcanddzOS10looseZStopClassic_branch) {pfcanddzOS10looseZStopClassic_branch->SetAddress(&pfcanddzOS10looseZStopClassic_);}
+	}
 	pfcanddirid10_branch = 0;
 	if (tree->GetBranch("pfcanddirid10") != 0) {
 		pfcanddirid10_branch = tree->GetBranch("pfcanddirid10");
@@ -3970,6 +4097,16 @@ void Init(TTree *tree) {
 		pfTau_leadPtcandID_branch = tree->GetBranch("pfTau_leadPtcandID");
 		if (pfTau_leadPtcandID_branch) {pfTau_leadPtcandID_branch->SetAddress(&pfTau_leadPtcandID_);}
 	}
+	pfTau_decayModeFinder_branch = 0;
+	if (tree->GetBranch("pfTau_decayModeFinder") != 0) {
+		pfTau_decayModeFinder_branch = tree->GetBranch("pfTau_decayModeFinder");
+		if (pfTau_decayModeFinder_branch) {pfTau_decayModeFinder_branch->SetAddress(&pfTau_decayModeFinder_);}
+	}
+	pfTau_discriminator__branch = 0;
+	if (tree->GetBranch("pfTau_discriminator_") != 0) {
+		pfTau_discriminator__branch = tree->GetBranch("pfTau_discriminator_");
+		if (pfTau_discriminator__branch) {pfTau_discriminator__branch->SetAddress(&pfTau_discriminator__);}
+	}
 	pfTauSS_leadPtcandID_branch = 0;
 	if (tree->GetBranch("pfTauSS_leadPtcandID") != 0) {
 		pfTauSS_leadPtcandID_branch = tree->GetBranch("pfTauSS_leadPtcandID");
@@ -4130,6 +4267,21 @@ void Init(TTree *tree) {
 		pfjets_beta2_0p5_branch = tree->GetBranch("pfjets_beta2_0p5");
 		if (pfjets_beta2_0p5_branch) {pfjets_beta2_0p5_branch->SetAddress(&pfjets_beta2_0p5_);}
 	}
+	pfjets_mvaPUid_ob_branch = 0;
+	if (tree->GetBranch("pfjets_mvaPUid_ob") != 0) {
+		pfjets_mvaPUid_ob_branch = tree->GetBranch("pfjets_mvaPUid_ob");
+		if (pfjets_mvaPUid_ob_branch) {pfjets_mvaPUid_ob_branch->SetAddress(&pfjets_mvaPUid_ob_);}
+	}
+	pfjets_mva5xPUid_ob_branch = 0;
+	if (tree->GetBranch("pfjets_mva5xPUid_ob") != 0) {
+		pfjets_mva5xPUid_ob_branch = tree->GetBranch("pfjets_mva5xPUid_ob");
+		if (pfjets_mva5xPUid_ob_branch) {pfjets_mva5xPUid_ob_branch->SetAddress(&pfjets_mva5xPUid_ob_);}
+	}
+	pfjets_mvaBeta_ob_branch = 0;
+	if (tree->GetBranch("pfjets_mvaBeta_ob") != 0) {
+		pfjets_mvaBeta_ob_branch = tree->GetBranch("pfjets_mvaBeta_ob");
+		if (pfjets_mvaBeta_ob_branch) {pfjets_mvaBeta_ob_branch->SetAddress(&pfjets_mvaBeta_ob_);}
+	}
 	pfjets_mvaPUid_branch = 0;
 	if (tree->GetBranch("pfjets_mvaPUid") != 0) {
 		pfjets_mvaPUid_branch = tree->GetBranch("pfjets_mvaPUid");
@@ -4193,6 +4345,7 @@ void GetEntry(unsigned int idx)
 		csc_isLoaded = false;
 		hbhe_isLoaded = false;
 		hbhenew_isLoaded = false;
+		ecallasernew_isLoaded = false;
 		hcallaser_isLoaded = false;
 		ecaltp_isLoaded = false;
 		trkfail_isLoaded = false;
@@ -4299,6 +4452,9 @@ void GetEntry(unsigned int idx)
 		em_isLoaded = false;
 		mu_isLoaded = false;
 		ee_isLoaded = false;
+		Mu_TriCentralPFJet30_isLoaded = false;
+		Mu_TriCentralPFNoPUJet30_30_20_isLoaded = false;
+		Mu_TriCentralPFNoPUJet30_isLoaded = false;
 		npfjets30_isLoaded = false;
 		npfjets30lepcorr_isLoaded = false;
 		knjets_isLoaded = false;
@@ -4420,6 +4576,8 @@ void GetEntry(unsigned int idx)
 		eSCPresh_isLoaded = false;
 		lep1_scslasercormean_isLoaded = false;
 		lep1_scslasercormax_isLoaded = false;
+		eleThreeCharge_isLoaded = false;
+		eleThreeCharge2_isLoaded = false;
 		eoverpin2_isLoaded = false;
 		eoverpout2_isLoaded = false;
 		dEtaIn2_isLoaded = false;
@@ -4526,6 +4684,14 @@ void GetEntry(unsigned int idx)
 		pfcandisoOS10looseZ_isLoaded = false;
 		pfcandptOS10looseZ_isLoaded = false;
 		pfcanddzOS10looseZ_isLoaded = false;
+		pfcandid5looseZStopClassic_isLoaded = false;
+		pfcandiso5looseZStopClassic_isLoaded = false;
+		pfcandpt5looseZStopClassic_isLoaded = false;
+		pfcanddz5looseZStopClassic_isLoaded = false;
+		pfcandidOS10looseZStopClassic_isLoaded = false;
+		pfcandisoOS10looseZStopClassic_isLoaded = false;
+		pfcandptOS10looseZStopClassic_isLoaded = false;
+		pfcanddzOS10looseZStopClassic_isLoaded = false;
 		pfcanddirid10_isLoaded = false;
 		pfcanddiriso10_isLoaded = false;
 		pfcanddirpt10_isLoaded = false;
@@ -4627,6 +4793,8 @@ void GetEntry(unsigned int idx)
 		pfTau_leadPtcandID_isLoaded = false;
 		pfTau_isLoaded = false;
 		pfTau_leadPtcand_isLoaded = false;
+		pfTau_decayModeFinder_isLoaded = false;
+		pfTau_discriminator__isLoaded = false;
 		pfTauSS_leadPtcandID_isLoaded = false;
 		pfTauSS_isLoaded = false;
 		pfTauSS_leadPtcand_isLoaded = false;
@@ -4693,6 +4861,9 @@ void GetEntry(unsigned int idx)
 		pfjets_beta_0p2_isLoaded = false;
 		pfjets_beta2_0p1_isLoaded = false;
 		pfjets_beta2_0p5_isLoaded = false;
+		pfjets_mvaPUid_ob_isLoaded = false;
+		pfjets_mva5xPUid_ob_isLoaded = false;
+		pfjets_mvaBeta_ob_isLoaded = false;
 		pfjets_mvaPUid_isLoaded = false;
 		pfjets_mva5xPUid_isLoaded = false;
 		pfjets_mvaBeta_isLoaded = false;
@@ -4718,6 +4889,7 @@ void LoadAllBranches()
 	if (csc_branch != 0) csc();
 	if (hbhe_branch != 0) hbhe();
 	if (hbhenew_branch != 0) hbhenew();
+	if (ecallasernew_branch != 0) ecallasernew();
 	if (hcallaser_branch != 0) hcallaser();
 	if (ecaltp_branch != 0) ecaltp();
 	if (trkfail_branch != 0) trkfail();
@@ -4824,6 +4996,9 @@ void LoadAllBranches()
 	if (em_branch != 0) em();
 	if (mu_branch != 0) mu();
 	if (ee_branch != 0) ee();
+	if (Mu_TriCentralPFJet30_branch != 0) Mu_TriCentralPFJet30();
+	if (Mu_TriCentralPFNoPUJet30_30_20_branch != 0) Mu_TriCentralPFNoPUJet30_30_20();
+	if (Mu_TriCentralPFNoPUJet30_branch != 0) Mu_TriCentralPFNoPUJet30();
 	if (npfjets30_branch != 0) npfjets30();
 	if (npfjets30lepcorr_branch != 0) npfjets30lepcorr();
 	if (knjets_branch != 0) knjets();
@@ -4945,6 +5120,8 @@ void LoadAllBranches()
 	if (eSCPresh_branch != 0) eSCPresh();
 	if (lep1_scslasercormean_branch != 0) lep1_scslasercormean();
 	if (lep1_scslasercormax_branch != 0) lep1_scslasercormax();
+	if (eleThreeCharge_branch != 0) eleThreeCharge();
+	if (eleThreeCharge2_branch != 0) eleThreeCharge2();
 	if (eoverpin2_branch != 0) eoverpin2();
 	if (eoverpout2_branch != 0) eoverpout2();
 	if (dEtaIn2_branch != 0) dEtaIn2();
@@ -5051,6 +5228,14 @@ void LoadAllBranches()
 	if (pfcandisoOS10looseZ_branch != 0) pfcandisoOS10looseZ();
 	if (pfcandptOS10looseZ_branch != 0) pfcandptOS10looseZ();
 	if (pfcanddzOS10looseZ_branch != 0) pfcanddzOS10looseZ();
+	if (pfcandid5looseZStopClassic_branch != 0) pfcandid5looseZStopClassic();
+	if (pfcandiso5looseZStopClassic_branch != 0) pfcandiso5looseZStopClassic();
+	if (pfcandpt5looseZStopClassic_branch != 0) pfcandpt5looseZStopClassic();
+	if (pfcanddz5looseZStopClassic_branch != 0) pfcanddz5looseZStopClassic();
+	if (pfcandidOS10looseZStopClassic_branch != 0) pfcandidOS10looseZStopClassic();
+	if (pfcandisoOS10looseZStopClassic_branch != 0) pfcandisoOS10looseZStopClassic();
+	if (pfcandptOS10looseZStopClassic_branch != 0) pfcandptOS10looseZStopClassic();
+	if (pfcanddzOS10looseZStopClassic_branch != 0) pfcanddzOS10looseZStopClassic();
 	if (pfcanddirid10_branch != 0) pfcanddirid10();
 	if (pfcanddiriso10_branch != 0) pfcanddiriso10();
 	if (pfcanddirpt10_branch != 0) pfcanddirpt10();
@@ -5152,6 +5337,8 @@ void LoadAllBranches()
 	if (pfTau_leadPtcandID_branch != 0) pfTau_leadPtcandID();
 	if (pfTau_branch != 0) pfTau();
 	if (pfTau_leadPtcand_branch != 0) pfTau_leadPtcand();
+	if (pfTau_decayModeFinder_branch != 0) pfTau_decayModeFinder();
+	if (pfTau_discriminator__branch != 0) pfTau_discriminator_();
 	if (pfTauSS_leadPtcandID_branch != 0) pfTauSS_leadPtcandID();
 	if (pfTauSS_branch != 0) pfTauSS();
 	if (pfTauSS_leadPtcand_branch != 0) pfTauSS_leadPtcand();
@@ -5218,6 +5405,9 @@ void LoadAllBranches()
 	if (pfjets_beta_0p2_branch != 0) pfjets_beta_0p2();
 	if (pfjets_beta2_0p1_branch != 0) pfjets_beta2_0p1();
 	if (pfjets_beta2_0p5_branch != 0) pfjets_beta2_0p5();
+	if (pfjets_mvaPUid_ob_branch != 0) pfjets_mvaPUid_ob();
+	if (pfjets_mva5xPUid_ob_branch != 0) pfjets_mva5xPUid_ob();
+	if (pfjets_mvaBeta_ob_branch != 0) pfjets_mvaBeta_ob();
 	if (pfjets_mvaPUid_branch != 0) pfjets_mvaPUid();
 	if (pfjets_mva5xPUid_branch != 0) pfjets_mva5xPUid();
 	if (pfjets_mvaBeta_branch != 0) pfjets_mvaBeta();
@@ -5323,6 +5513,19 @@ void LoadAllBranches()
 			hbhenew_isLoaded = true;
 		}
 		return hbhenew_;
+	}
+	int &ecallasernew()
+	{
+		if (not ecallasernew_isLoaded) {
+			if (ecallasernew_branch != 0) {
+				ecallasernew_branch->GetEntry(index);
+			} else { 
+				printf("branch ecallasernew_branch does not exist!\n");
+				exit(1);
+			}
+			ecallasernew_isLoaded = true;
+		}
+		return ecallasernew_;
 	}
 	int &hcallaser()
 	{
@@ -6701,6 +6904,45 @@ void LoadAllBranches()
 			ee_isLoaded = true;
 		}
 		return ee_;
+	}
+	int &Mu_TriCentralPFJet30()
+	{
+		if (not Mu_TriCentralPFJet30_isLoaded) {
+			if (Mu_TriCentralPFJet30_branch != 0) {
+				Mu_TriCentralPFJet30_branch->GetEntry(index);
+			} else { 
+				printf("branch Mu_TriCentralPFJet30_branch does not exist!\n");
+				exit(1);
+			}
+			Mu_TriCentralPFJet30_isLoaded = true;
+		}
+		return Mu_TriCentralPFJet30_;
+	}
+	int &Mu_TriCentralPFNoPUJet30_30_20()
+	{
+		if (not Mu_TriCentralPFNoPUJet30_30_20_isLoaded) {
+			if (Mu_TriCentralPFNoPUJet30_30_20_branch != 0) {
+				Mu_TriCentralPFNoPUJet30_30_20_branch->GetEntry(index);
+			} else { 
+				printf("branch Mu_TriCentralPFNoPUJet30_30_20_branch does not exist!\n");
+				exit(1);
+			}
+			Mu_TriCentralPFNoPUJet30_30_20_isLoaded = true;
+		}
+		return Mu_TriCentralPFNoPUJet30_30_20_;
+	}
+	int &Mu_TriCentralPFNoPUJet30()
+	{
+		if (not Mu_TriCentralPFNoPUJet30_isLoaded) {
+			if (Mu_TriCentralPFNoPUJet30_branch != 0) {
+				Mu_TriCentralPFNoPUJet30_branch->GetEntry(index);
+			} else { 
+				printf("branch Mu_TriCentralPFNoPUJet30_branch does not exist!\n");
+				exit(1);
+			}
+			Mu_TriCentralPFNoPUJet30_isLoaded = true;
+		}
+		return Mu_TriCentralPFNoPUJet30_;
 	}
 	int &npfjets30()
 	{
@@ -8275,6 +8517,32 @@ void LoadAllBranches()
 		}
 		return lep1_scslasercormax_;
 	}
+	int &eleThreeCharge()
+	{
+		if (not eleThreeCharge_isLoaded) {
+			if (eleThreeCharge_branch != 0) {
+				eleThreeCharge_branch->GetEntry(index);
+			} else { 
+				printf("branch eleThreeCharge_branch does not exist!\n");
+				exit(1);
+			}
+			eleThreeCharge_isLoaded = true;
+		}
+		return eleThreeCharge_;
+	}
+	int &eleThreeCharge2()
+	{
+		if (not eleThreeCharge2_isLoaded) {
+			if (eleThreeCharge2_branch != 0) {
+				eleThreeCharge2_branch->GetEntry(index);
+			} else { 
+				printf("branch eleThreeCharge2_branch does not exist!\n");
+				exit(1);
+			}
+			eleThreeCharge2_isLoaded = true;
+		}
+		return eleThreeCharge2_;
+	}
 	float &eoverpin2()
 	{
 		if (not eoverpin2_isLoaded) {
@@ -9653,6 +9921,110 @@ void LoadAllBranches()
 		}
 		return pfcanddzOS10looseZ_;
 	}
+	int &pfcandid5looseZStopClassic()
+	{
+		if (not pfcandid5looseZStopClassic_isLoaded) {
+			if (pfcandid5looseZStopClassic_branch != 0) {
+				pfcandid5looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandid5looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandid5looseZStopClassic_isLoaded = true;
+		}
+		return pfcandid5looseZStopClassic_;
+	}
+	float &pfcandiso5looseZStopClassic()
+	{
+		if (not pfcandiso5looseZStopClassic_isLoaded) {
+			if (pfcandiso5looseZStopClassic_branch != 0) {
+				pfcandiso5looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandiso5looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandiso5looseZStopClassic_isLoaded = true;
+		}
+		return pfcandiso5looseZStopClassic_;
+	}
+	float &pfcandpt5looseZStopClassic()
+	{
+		if (not pfcandpt5looseZStopClassic_isLoaded) {
+			if (pfcandpt5looseZStopClassic_branch != 0) {
+				pfcandpt5looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandpt5looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandpt5looseZStopClassic_isLoaded = true;
+		}
+		return pfcandpt5looseZStopClassic_;
+	}
+	float &pfcanddz5looseZStopClassic()
+	{
+		if (not pfcanddz5looseZStopClassic_isLoaded) {
+			if (pfcanddz5looseZStopClassic_branch != 0) {
+				pfcanddz5looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddz5looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddz5looseZStopClassic_isLoaded = true;
+		}
+		return pfcanddz5looseZStopClassic_;
+	}
+	int &pfcandidOS10looseZStopClassic()
+	{
+		if (not pfcandidOS10looseZStopClassic_isLoaded) {
+			if (pfcandidOS10looseZStopClassic_branch != 0) {
+				pfcandidOS10looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandidOS10looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandidOS10looseZStopClassic_isLoaded = true;
+		}
+		return pfcandidOS10looseZStopClassic_;
+	}
+	float &pfcandisoOS10looseZStopClassic()
+	{
+		if (not pfcandisoOS10looseZStopClassic_isLoaded) {
+			if (pfcandisoOS10looseZStopClassic_branch != 0) {
+				pfcandisoOS10looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandisoOS10looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandisoOS10looseZStopClassic_isLoaded = true;
+		}
+		return pfcandisoOS10looseZStopClassic_;
+	}
+	float &pfcandptOS10looseZStopClassic()
+	{
+		if (not pfcandptOS10looseZStopClassic_isLoaded) {
+			if (pfcandptOS10looseZStopClassic_branch != 0) {
+				pfcandptOS10looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcandptOS10looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcandptOS10looseZStopClassic_isLoaded = true;
+		}
+		return pfcandptOS10looseZStopClassic_;
+	}
+	float &pfcanddzOS10looseZStopClassic()
+	{
+		if (not pfcanddzOS10looseZStopClassic_isLoaded) {
+			if (pfcanddzOS10looseZStopClassic_branch != 0) {
+				pfcanddzOS10looseZStopClassic_branch->GetEntry(index);
+			} else { 
+				printf("branch pfcanddzOS10looseZStopClassic_branch does not exist!\n");
+				exit(1);
+			}
+			pfcanddzOS10looseZStopClassic_isLoaded = true;
+		}
+		return pfcanddzOS10looseZStopClassic_;
+	}
 	int &pfcanddirid10()
 	{
 		if (not pfcanddirid10_isLoaded) {
@@ -10966,6 +11338,32 @@ void LoadAllBranches()
 		}
 		return *pfTau_leadPtcand_;
 	}
+	int &pfTau_decayModeFinder()
+	{
+		if (not pfTau_decayModeFinder_isLoaded) {
+			if (pfTau_decayModeFinder_branch != 0) {
+				pfTau_decayModeFinder_branch->GetEntry(index);
+			} else { 
+				printf("branch pfTau_decayModeFinder_branch does not exist!\n");
+				exit(1);
+			}
+			pfTau_decayModeFinder_isLoaded = true;
+		}
+		return pfTau_decayModeFinder_;
+	}
+	float &pfTau_discriminator_()
+	{
+		if (not pfTau_discriminator__isLoaded) {
+			if (pfTau_discriminator__branch != 0) {
+				pfTau_discriminator__branch->GetEntry(index);
+			} else { 
+				printf("branch pfTau_discriminator__branch does not exist!\n");
+				exit(1);
+			}
+			pfTau_discriminator__isLoaded = true;
+		}
+		return pfTau_discriminator__;
+	}
 	int &pfTauSS_leadPtcandID()
 	{
 		if (not pfTauSS_leadPtcandID_isLoaded) {
@@ -11824,6 +12222,45 @@ void LoadAllBranches()
 		}
 		return *pfjets_beta2_0p5_;
 	}
+	vector<float> &pfjets_mvaPUid_ob()
+	{
+		if (not pfjets_mvaPUid_ob_isLoaded) {
+			if (pfjets_mvaPUid_ob_branch != 0) {
+				pfjets_mvaPUid_ob_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mvaPUid_ob_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mvaPUid_ob_isLoaded = true;
+		}
+		return *pfjets_mvaPUid_ob_;
+	}
+	vector<float> &pfjets_mva5xPUid_ob()
+	{
+		if (not pfjets_mva5xPUid_ob_isLoaded) {
+			if (pfjets_mva5xPUid_ob_branch != 0) {
+				pfjets_mva5xPUid_ob_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mva5xPUid_ob_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mva5xPUid_ob_isLoaded = true;
+		}
+		return *pfjets_mva5xPUid_ob_;
+	}
+	vector<float> &pfjets_mvaBeta_ob()
+	{
+		if (not pfjets_mvaBeta_ob_isLoaded) {
+			if (pfjets_mvaBeta_ob_branch != 0) {
+				pfjets_mvaBeta_ob_branch->GetEntry(index);
+			} else { 
+				printf("branch pfjets_mvaBeta_ob_branch does not exist!\n");
+				exit(1);
+			}
+			pfjets_mvaBeta_ob_isLoaded = true;
+		}
+		return *pfjets_mvaBeta_ob_;
+	}
 	vector<float> &pfjets_mvaPUid()
 	{
 		if (not pfjets_mvaPUid_isLoaded) {
@@ -12028,6 +12465,7 @@ namespace Stop {
 	int &csc();
 	int &hbhe();
 	int &hbhenew();
+	int &ecallasernew();
 	int &hcallaser();
 	int &ecaltp();
 	int &trkfail();
@@ -12134,6 +12572,9 @@ namespace Stop {
 	int &em();
 	int &mu();
 	int &ee();
+	int &Mu_TriCentralPFJet30();
+	int &Mu_TriCentralPFNoPUJet30_30_20();
+	int &Mu_TriCentralPFNoPUJet30();
 	int &npfjets30();
 	int &npfjets30lepcorr();
 	float &knjets();
@@ -12255,6 +12696,8 @@ namespace Stop {
 	float &eSCPresh();
 	float &lep1_scslasercormean();
 	float &lep1_scslasercormax();
+	int &eleThreeCharge();
+	int &eleThreeCharge2();
 	float &eoverpin2();
 	float &eoverpout2();
 	float &dEtaIn2();
@@ -12361,6 +12804,14 @@ namespace Stop {
 	float &pfcandisoOS10looseZ();
 	float &pfcandptOS10looseZ();
 	float &pfcanddzOS10looseZ();
+	int &pfcandid5looseZStopClassic();
+	float &pfcandiso5looseZStopClassic();
+	float &pfcandpt5looseZStopClassic();
+	float &pfcanddz5looseZStopClassic();
+	int &pfcandidOS10looseZStopClassic();
+	float &pfcandisoOS10looseZStopClassic();
+	float &pfcandptOS10looseZStopClassic();
+	float &pfcanddzOS10looseZStopClassic();
 	int &pfcanddirid10();
 	float &pfcanddiriso10();
 	float &pfcanddirpt10();
@@ -12462,6 +12913,8 @@ namespace Stop {
 	int &pfTau_leadPtcandID();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTau_leadPtcand();
+	int &pfTau_decayModeFinder();
+	float &pfTau_discriminator_();
 	int &pfTauSS_leadPtcandID();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS();
 	ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &pfTauSS_leadPtcand();
@@ -12528,6 +12981,9 @@ namespace Stop {
 	vector<float> &pfjets_beta_0p2();
 	vector<float> &pfjets_beta2_0p1();
 	vector<float> &pfjets_beta2_0p5();
+	vector<float> &pfjets_mvaPUid_ob();
+	vector<float> &pfjets_mva5xPUid_ob();
+	vector<float> &pfjets_mvaBeta_ob();
 	vector<float> &pfjets_mvaPUid();
 	vector<float> &pfjets_mva5xPUid();
 	vector<float> &pfjets_mvaBeta();
