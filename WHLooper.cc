@@ -199,6 +199,18 @@ void WHLooper::loop(TChain *chain, TString name) {
     isWNjets_onlybb_ = false;
   }
 
+  if (name.Contains("wzbb")) {
+    isWZbb_ = true;
+  } else {
+    isWZbb_ = false;
+  }
+
+  if (name.Contains("wzlight")) {
+    isWZlight_ = true;
+  } else {
+    isWZlight_ = false;
+  }
+
   if (name.Contains("whbb")) {
     isWHbb_ = true;
   } else {
@@ -418,7 +430,7 @@ void WHLooper::loop(TChain *chain, TString name) {
   // cr5 mass last region nm1 hists
   std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_met_nm1, h_1d_cr5_bbmasslast_mt_nm1, h_1d_cr5_bbmasslast_mt2bl_nm1,h_1d_cr5_bbmasslast_bbmass_nm1;
   // cr5 mass last region nm1 hists
-  std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_mtpeak, h_1d_cr5_bbmasslast_mtcut, h_1d_cr5_bbmasslast_mtcut_met100, h_1d_cr5_bbmasslast_metcut, h_1d_cr5_bbmasslast_met100, h_1d_cr5_bbmasslast_met125, h_1d_cr5_bbmasslast_met150, h_1d_cr5_bbmasslast_nomt_met50, h_1d_cr5_bbmasslast_nomt_met75, h_1d_cr5_bbmasslast_nomt_met100, h_1d_cr5_bbmasslast_nomt_met125, h_1d_cr5_bbmasslast_nomt_met150, h_1d_cr5_bbmasslast_nomt_met137, h_1d_cr5_bbmasslast_nomt_met162, h_1d_cr5_bbmasslast_nomt_met175;
+  std::map<std::string, TH1F*> h_1d_cr5_bbmasslast_mtpeak, h_1d_cr5_bbmasslast_mtcut, h_1d_cr5_bbmasslast_mtcut_met100, h_1d_cr5_bbmasslast_metcut, h_1d_cr5_bbmasslast_met100, h_1d_cr5_bbmasslast_met125, h_1d_cr5_bbmasslast_met150, h_1d_cr5_bbmasslast_met500, h_1d_cr5_bbmasslast_nomt_met50, h_1d_cr5_bbmasslast_nomt_met75, h_1d_cr5_bbmasslast_nomt_met100, h_1d_cr5_bbmasslast_nomt_met125, h_1d_cr5_bbmasslast_nomt_met150, h_1d_cr5_bbmasslast_nomt_met137, h_1d_cr5_bbmasslast_nomt_met162, h_1d_cr5_bbmasslast_nomt_met175;
 
   // cr6 hists
   std::map<std::string, TH1F*> h_1d_cr6_presel, h_1d_cr6_final;
@@ -783,6 +795,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       outfile_->mkdir("cr5_bbmasslast_met100");
       outfile_->mkdir("cr5_bbmasslast_met125");
       outfile_->mkdir("cr5_bbmasslast_met150");
+      outfile_->mkdir("cr5_bbmasslast_met500");
       outfile_->mkdir("cr5_bbmasslast_bbmass_nm1");
     }
     outfile_->mkdir("cr5_bbmasslast_final");
@@ -965,6 +978,9 @@ void WHLooper::loop(TChain *chain, TString name) {
   ULong64_t nEventsPass = 0;
   //  ULong64_t i_permille_old = 0;
 
+  ULong64_t nPass_EventCuts = 0;
+  ULong64_t nPass_PreselCuts = 0;
+
   bool isData = name.Contains("data") ? true : false;
 
   while (TChainElement *currentFile = (TChainElement*)fileIter.Next()) {
@@ -1030,6 +1046,12 @@ void WHLooper::loop(TChain *chain, TString name) {
       if (doWJetsOverlapRemoval && isWNjets_ && (stopt.nbs() == 2)) continue;
       else if (isWNjets_nobb_ && (stopt.nbs() == 2)) continue;
       else if (isWNjets_onlybb_ && (stopt.nbs() != 2)) continue;
+
+      //---------------------------------------------------------------------------- 
+      // WZ->lnujj sample: keep only bb events (or only light events)
+      //---------------------------------------------------------------------------- 
+      if (isWZbb_ && (stopt.nbs() < 2)) continue;
+      if (isWZlight_ && (stopt.nbs() > 0)) continue;
 
       //---------------------------------------------------------------------------- 
       // ttV samples: split into 1,2 leptons, others
@@ -1168,6 +1190,8 @@ void WHLooper::loop(TChain *chain, TString name) {
       //   to make sure the same vertex is used for btagging, leptons, etc
       if (stopt.indexfirstGoodVertex_()) continue;
 
+      ++nPass_EventCuts;
+
       // low gen mt: for systematic studies
       if (doLowGenMtCut && (isttsl_ || istsl_ || isWjets_) && (stopt.mcmtln() > 110.)) continue;
 
@@ -1212,9 +1236,11 @@ void WHLooper::loop(TChain *chain, TString name) {
 	// if (doJetSmearing && !isData) thisjet = smearJet(stopt.pfjets().at(i), jetSmearer, true);
 	// else thisjet = stopt.pfjets().at(i);	
 	thisjet = stopt.pfjets().at(i);	
-	float unc = stopt.pfjets_uncertainty().at(i);
-	if (doJESVar == 1) thisjet = (1-unc)*stopt.pfjets().at(i);
-	else if (doJESVar == 2) thisjet = (1+unc)*stopt.pfjets().at(i);
+	if (doJESVar != 0) {
+	  float unc = stopt.pfjets_uncertainty().at(i);
+	  if (doJESVar == 1) thisjet = (1-unc)*stopt.pfjets().at(i);
+	  else if (doJESVar == 2) thisjet = (1+unc)*stopt.pfjets().at(i);
+	}
 
 	jets_smearcorrs_.push_back(thisjet.pt()/stopt.pfjets().at(i).pt());
 
@@ -1386,12 +1412,12 @@ void WHLooper::loop(TChain *chain, TString name) {
       }
 
       // scale factors for data/MC disagreements for lep+b backgrounds
-      if (doLepPlusBSFs && (isttsl_ || (isWjets_ && !isWNjets_) || istsl_)) {
+      if (doLepPlusBSFs && (isttsl_ || (isWjets_ && !isWNjets_) || istsl_ || isWZbb_)) {
 	float tempweight = 1.0;
 	if (mt2bl_ > 200.) {
-	  tempweight *= 0.8;
+	  tempweight *= 0.75;
 	  if (mt_ > 100.) {
-	    if (isWjets_ && !isWNjets_) tempweight *= 1.1;
+	    if ((isWjets_ && !isWNjets_) || isWZbb_) tempweight *= 1.1;
 	    else tempweight *= 1.4;
 	  }
 	}
@@ -1420,7 +1446,11 @@ void WHLooper::loop(TChain *chain, TString name) {
       // require lead jet pt > 50 GeV
       if (jets_.at(0).pt() < 50.) continue;
 
+      // require minimum MET
+      if (met_ <= CUT_MET_PRESEL_) continue;
+
       if (doTobTecVeto && tobtecveto_) continue;
+      ++nPass_PreselCuts;
 
       // try tightening isolation to see CR agreement
       //      if ( stopt.isopf1() > 0.1 ) continue;
@@ -2748,6 +2778,10 @@ void WHLooper::loop(TChain *chain, TString name) {
 	}
 	else fail = true;
 
+	if (!fail && (met_ > 500.) ) {
+	  fillHists1DWrapper(h_1d_cr5_bbmasslast_met500,evtweight1l,"cr5_bbmasslast_met500");
+	}
+
 	if (!fail && (met_ > CUT_MET_) ) {
 	  fillHists1DWrapper(h_1d_cr5_bbmasslast_bbmass_nm1,evtweight1l,"cr5_bbmasslast_bbmass_nm1");
 	}
@@ -3712,6 +3746,7 @@ void WHLooper::loop(TChain *chain, TString name) {
       savePlotsDir(h_1d_cr5_bbmasslast_met100,outfile_,"cr5_bbmasslast_met100");
       savePlotsDir(h_1d_cr5_bbmasslast_met125,outfile_,"cr5_bbmasslast_met125");
       savePlotsDir(h_1d_cr5_bbmasslast_met150,outfile_,"cr5_bbmasslast_met150");
+      savePlotsDir(h_1d_cr5_bbmasslast_met500,outfile_,"cr5_bbmasslast_met500");
       savePlotsDir(h_1d_cr5_bbmasslast_bbmass_nm1,outfile_,"cr5_bbmasslast_bbmass_nm1");
     }
     savePlotsDir(h_1d_cr5_bbmasslast_final,outfile_,"cr5_bbmasslast_final");
@@ -3866,6 +3901,8 @@ void WHLooper::loop(TChain *chain, TString name) {
   bmark->Stop("benchmark");
   cout << endl;
   cout << nEventsTotal << " Events Processed" << endl;
+  cout << nPass_EventCuts << " Events Passing basic event cuts" << endl;
+  cout << nPass_PreselCuts << " Events Passing basic presel cuts" << endl;
   if (!isData)  cout << nEventsPass << " Events Passed" << endl;
   cout << "------------------------------" << endl;
   cout << "CPU  Time:	" << Form( "%.01f s", bmark->GetCpuTime("benchmark")  ) << ", Rate: " << Form( "%.1f Hz", float(nEventsTotal)/bmark->GetCpuTime("benchmark")) << endl;
@@ -3985,9 +4022,9 @@ void WHLooper::fillHists1D(std::map<std::string, TH1F*>& h_1d, const float evtwe
   // plot tau veto result
   plot1D("h_passtauveto"+suffix,  (int)passTauVeto(),  evtweight, h_1d, 2, 0., 2.);
 
-  if (doWJetsPlots && isWjets_) {
-    plot1D("h_nbs",       stopt.nbs(),       evtweight, h_1d, 5, 0, 5);
+  plot1D("h_nbs",       stopt.nbs(),       evtweight, h_1d, 5, 0, 5);
 
+  if (doWJetsPlots && isWjets_) {
     // requires babies V20 or higher
     if (stopt.nbs() == 0) {
       plot1D("h_jet1flavor_0b"+suffix, abs(stopt.pfjets_mcflavorAlgo().at(jets_idx_.at(0))) , evtweight, h_1d, 23, -1., 22.);
