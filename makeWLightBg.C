@@ -1,9 +1,12 @@
 // old, not sure where this came from...
 //const float sf = 8.6e-4;
 // from inc_2j region in wjets_nobb in V24_crs
-const float sf = 9.2e-4;
+const float sf_2med = 9.2e-4;
+const float sf_1med = 3.0e-2;
+const float sf_1med1loose = 4.9e-3;
+const float sf_2loose = 2.6e-2;
 
-void makeBgDir(TString input_region, TString output_region, TFile* fin, TFile* fout) {
+void makeBgDir(TString input_region, TString output_region, TFile* fin, TFile* fout, float sf = sf_2med) {
 
   std::cout << "scaling hists from region " << input_region << " to " << output_region << std::endl;
 
@@ -79,8 +82,14 @@ void makeWLightBg(TString dir = "") {
     TDirectoryFile* dirf = (TDirectoryFile*) obj;
     TString name(dirf->GetName());
     TString newname(name);
+    TString newname2(name);
+    TString newname3(name);
+    TString newname4(name);
     if (name.Contains("cr5_metlast")) {
       makeBgDir(name,newname.ReplaceAll("cr5","sig"),fin,fout);
+      // makeBgDir(name,newname2.ReplaceAll("cr5_metlast","sig_1med"),fin,fout,sf_1med);
+      // makeBgDir(name,newname3.ReplaceAll("cr5_metlast","sig_2loose"),fin,fout,sf_2loose);
+      // makeBgDir(name,newname4.ReplaceAll("cr5_metlast","sig_1med1loose"),fin,fout,sf_1med1loose);
     } else if (name.Contains("cr5_invmass")) {
       makeBgDir(name,newname.ReplaceAll("cr5_invmass","cr14"),fin,fout);
     } else if (name.Contains("cr5_bbmasslast")) {
