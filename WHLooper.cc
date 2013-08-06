@@ -34,7 +34,7 @@
 using namespace Stop;
 
 // selections
-const bool blindSignal = false;
+const bool blindSignal = true;
 const bool doTrkVeto = true;
 const bool doTauVeto = true;
 const bool doLep2Veto = true;
@@ -51,8 +51,9 @@ const bool doTopPtWeight = true; // obsolete variable, automatically applied
 const bool doJetSmearing = false;
 const bool doWbbMtReweight = true;
 const bool doTopPtReweight2 = true;
-const bool doLepPlusBSFs = true;
+const bool doLepPlusBSFs = false;
 const int  doJESVar = 0; // 0 for nominal, 1 for down, 2 for up
+const bool doWbbNLO = true;
 
 // plotting options
 const bool doFlavorPlots = true;
@@ -73,11 +74,11 @@ const bool doCR5MassLast = true; // bveto, mass last
 const bool doCR14 = true; // inverted mbb region
 
 // regions to do: need for CR results/plots
-const bool doCR1METLast = false; // high m(bb), met cut last
-const bool doCR23 = false; // dilep + (lep+track)
-const bool doCR5HighMass = false; // bveto, high mass
-const bool doCR5LowMass = false; // bveto, low mass
-const bool doCR8METLast = false; // low m(bb)
+const bool doCR1METLast = true; // high m(bb), met cut last
+const bool doCR23 = true; // dilep + (lep+track)
+const bool doCR5HighMass = true; // bveto, high mass
+const bool doCR5LowMass = true; // bveto, low mass
+const bool doCR8METLast = true; // low m(bb)
 
 // regions not really used
 const bool doInclusiveMTTail = false;
@@ -183,6 +184,12 @@ void WHLooper::loop(TChain *chain, TString name) {
     isWNjets_ = true;
   } else {
     isWNjets_ = false;
+  }
+
+  if (name.Contains("wbb")) {
+    isWbbMG_ = true;
+  } else {
+    isWbbMG_ = false;
   }
 
   if (name.Contains("wjets_nobb")) {
@@ -1166,6 +1173,9 @@ void WHLooper::loop(TChain *chain, TString name) {
       // correction for W->lnu BR in SM WH->lnubb sample
       if (isWHbb_) evtweight *= 0.33;
 
+      // correction to do NLO weighting for wbb sample: xsec goes from 211 -> (377 * 0.33) = 124
+      if (isWbbMG_ && doWbbNLO) evtweight *= (124./211.);
+
       // trigger effs
       float sltrigeff = isData ? 1. : 
 	getsltrigweight(stopt.id1(), stopt.lep1().Pt(), stopt.lep1().Eta());
@@ -1412,12 +1422,12 @@ void WHLooper::loop(TChain *chain, TString name) {
       }
 
       // scale factors for data/MC disagreements for lep+b backgrounds
-      if (doLepPlusBSFs && (isttsl_ || (isWjets_ && !isWNjets_) || istsl_ || isWZbb_)) {
+      if (doLepPlusBSFs && (isttsl_ || isWbbMG_ || istsl_ || isWZbb_)) {
 	float tempweight = 1.0;
 	if (mt2bl_ > 200.) {
 	  tempweight *= 0.75;
 	  if (mt_ > 100.) {
-	    if ((isWjets_ && !isWNjets_) || isWZbb_) tempweight *= 1.1;
+	    if (isWbbMG_ || isWZbb_) tempweight *= 1.1;
 	    else tempweight *= 1.4;
 	  }
 	}

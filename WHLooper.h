@@ -109,6 +109,7 @@ class WHLooper {
   bool isWNjets_;
   bool isWNjets_nobb_;
   bool isWNjets_onlybb_;
+  bool isWbbMG_;
   bool isWZlight_;
   bool isWZbb_;
   bool isWHbb_;
