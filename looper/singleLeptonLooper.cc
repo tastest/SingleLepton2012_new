@@ -43,9 +43,9 @@ int getMotherIndex(int motherid){
 
 // The following reweighting only makes sense for on-shell stop, top and chi0
 // In the off-shell case top and anti-top may get very different polarizations
-double Reweight_Stop_to_TopChi0 (std::vector<SUSYGenParticle> genParticles, double referenceTopPolarization, double requestedTopPolarization, char* prefix) {
+double Reweight_Stop_to_TopChi0 (std::vector<SUSYGenParticle> genParticles, double referenceTopPolarization, double requestedTopPolarization, const TString& prefix) {
 
-  if( !TString(prefix).Contains("T2tt") ) return 1.0;
+  if( !prefix.Contains("T2tt") ) return 1.0;
 
   double weight = 1.;
   int nFoundStops = 0;
@@ -610,32 +610,32 @@ void singleLeptonLooper::InitBaby(){
 
 //--------------------------------------------------------------------
 
-int getProcessType(char *prefix)
+int getProcessType(const TString& prefix)
 {
   int proc = -1;
 
-  if(strcmp(prefix,"data")   == 0) proc = 0;
-  if(strcmp(prefix,"Zjets")  == 0) proc = 1;
-  if(strcmp(prefix,"ttdil")  == 0) proc = 2;
-  if(strcmp(prefix,"ttotr")  == 0) proc = 3;
-  if(strcmp(prefix,"ww")     == 0) proc = 4;
-  if(strcmp(prefix,"wz")     == 0) proc = 5;
-  if(strcmp(prefix,"zz")     == 0) proc = 6;
-  if(strcmp(prefix,"wjets")  == 0) proc = 7;
-  if(strcmp(prefix,"tW")     == 0) proc = 8;
-  if(strcmp(prefix,"LM0")    == 0) proc = 10;
-  if(strcmp(prefix,"LM1")    == 0) proc = 11;
-  if(strcmp(prefix,"LM2")    == 0) proc = 12;
-  if(strcmp(prefix,"LM3")    == 0) proc = 13;
-  if(strcmp(prefix,"LM4")    == 0) proc = 14;
-  if(strcmp(prefix,"LM5")    == 0) proc = 15;
-  if(strcmp(prefix,"LM6")    == 0) proc = 16;
-  if(strcmp(prefix,"LM7")    == 0) proc = 17;
-  if(strcmp(prefix,"LM8")    == 0) proc = 18;
-  if(strcmp(prefix,"LM9")    == 0) proc = 19;
-  if(strcmp(prefix,"LM10")   == 0) proc = 20;
-  if(strcmp(prefix,"LM11")   == 0) proc = 21;
-  if(strcmp(prefix,"LM12")   == 0) proc = 22;
+  if(prefix.EqualTo("data"))   proc = 0;
+  if(prefix.EqualTo("Zjets"))  proc = 1;
+  if(prefix.EqualTo("ttdil"))  proc = 2;
+  if(prefix.EqualTo("ttotr"))  proc = 3;
+  if(prefix.EqualTo("ww"))     proc = 4;
+  if(prefix.EqualTo("wz"))     proc = 5;
+  if(prefix.EqualTo("zz"))     proc = 6;
+  if(prefix.EqualTo("wjets"))  proc = 7;
+  if(prefix.EqualTo("tW"))     proc = 8;
+  if(prefix.EqualTo("LM0"))    proc = 10;
+  if(prefix.EqualTo("LM1"))    proc = 11;
+  if(prefix.EqualTo("LM2"))    proc = 12;
+  if(prefix.EqualTo("LM3"))    proc = 13;
+  if(prefix.EqualTo("LM4"))    proc = 14;
+  if(prefix.EqualTo("LM5"))    proc = 15;
+  if(prefix.EqualTo("LM6"))    proc = 16;
+  if(prefix.EqualTo("LM7"))    proc = 17;
+  if(prefix.EqualTo("LM8"))    proc = 18;
+  if(prefix.EqualTo("LM9"))    proc = 19;
+  if(prefix.EqualTo("LM10"))   proc = 20;
+  if(prefix.EqualTo("LM11"))   proc = 21;
+  if(prefix.EqualTo("LM12"))   proc = 22;
 
   return proc;
 }
@@ -772,18 +772,18 @@ float getMuTriggerWeightNew( float pt, float eta ) {
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
 
-int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, int prescale, float lumi,
+int singleLeptonLooper::ScanChain(TChain* chain, const TString& prefix, float kFactor, int prescale, float lumi,
 				  FREnum frmode, bool doFakeApp)
 
 {
 
   //  cout << "ciao " << isData << endl;
 
-  bool isLM = TString(prefix).Contains("LM");
+  bool isLM = prefix.Contains("LM");
   bool isData = false;
-  if( TString(prefix).Contains("data") || TString(prefix).Contains("2012") 
-      || TString(prefix).Contains("dimu") || TString(prefix).Contains("diel")
-      || TString(prefix).Contains("mueg") ){
+  if( prefix.Contains("data") || prefix.Contains("2012") 
+      || prefix.Contains("dimu") || prefix.Contains("diel")
+      || prefix.Contains("mueg") ){
     cout << "DATA!!!" << endl;
     isData       = true;
     doTenPercent = false;
@@ -804,7 +804,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
     cout << "setting json " << g_json << endl;
     set_goodrun_file( g_json );
 
-    //    if( TString(prefix).Contains("ttall_massivebin") ) 
+    //    if( prefix.Contains("ttall_massivebin") ) 
     set_vtxreweight_rootfile("vtxreweight/vtxreweight_Summer12MC_PUS10_19fb_Zselection.root",true);
 
     //   weight3D_init( "vtxreweight/Weight3D.root" );
@@ -1041,7 +1041,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       //      cout<<"dataset: "<<datasetname.Data()<<" isperiodA: "<<isperiodA<<endl;
 
       // skip stop-pair events with m(stop) > 850 GeV
-      // if( TString(prefix).Contains("T2") ){
+      // if( prefix.Contains("T2") ){
       // 	if( sparm_mG() > 600.0 ) continue;
       // }
 
@@ -1100,7 +1100,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ngoodel_  = 0;
       ngoodmu_  = 0;
             
-      //if( TString(prefix).Contains("T2") ) useOldIsolation = true;
+      //if( prefix.Contains("T2") ) useOldIsolation = true;
       for( unsigned int iel = 0 ; iel < els_p4().size(); ++iel ){
 
 	//-------------------------------------------
@@ -1396,8 +1396,10 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	qscale_ = genps_qScale();
 	
 	//store W flavor history
-	if (!TString(prefix).Contains("mcatnlo"))
+	if (!prefix.Contains("mcatnlo")) {
+	  std::cout << "WARNING: didn't find substring mcatnlo in TString prefix: " << prefix << std::endl;
 	  wflav_ = (int)genps_flavorHistoryFilterResult();
+	}
 
 	//splitting ttbar into ttdil/ttotr
 	//nleps = leptonGenpCount_lepTauDecays(nels, nmus, ntaus);
@@ -1409,19 +1411,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	nleps_ = nleps;
 
 	// this is a weight which corrects for the wrong MG W->lnu BF
-	if( TString(prefix).Contains("ttall") ||
-	    TString(prefix).Contains("tt_") ){
+	if( prefix.Contains("ttall") ||
+	    prefix.Contains("tt_") ){
 	  if( nleps == 0 ) mgcor_ = 1.028;
 	  if( nleps == 1 ) mgcor_ = 0.986;
 	  if( nleps == 2 ) mgcor_ = 0.945;
 	}
-	if( TString(prefix).Contains("powheg") ||
-	    TString(prefix).Contains("sherpa") ) 
+	if( prefix.Contains("powheg") ||
+	    prefix.Contains("sherpa") ) 
 	  mgcor_ = 1.0;
 
-	if( strcmp(prefix,"ttem")  == 0 && ( nels + nmus ) != 2 ) continue;
-	if( strcmp(prefix,"ttdil") == 0 && nleps != 2           ) continue;
-	if( strcmp(prefix,"ttotr") == 0 && nleps == 2           ) continue;
+	if( prefix.EqualTo("ttem")  && ( nels + nmus ) != 2 ) continue;
+	if( prefix.EqualTo("ttdil") && nleps != 2           ) continue;
+	if( prefix.EqualTo("ttotr") && nleps == 2           ) continue;
 	
 	LorentzVector vdilepton(0,0,0,0);
 	LorentzVector vttbar(0,0,0,0);
@@ -1574,12 +1576,12 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	
 	if( nels + nmus == 2) dilptgen = vdilepton.pt();
         
-	if ( strcmp(prefix , "DYee"     ) == 0 &&  nels  != 2  ) continue;
-	if ( strcmp(prefix , "DYmm"     ) == 0 &&  nmus  != 2  ) continue;
-	if ( strcmp(prefix , "DYtautau" ) == 0 &&  ntaus != 2  ) continue;
+	if ( prefix.EqualTo("DYee"     ) &&  nels  != 2  ) continue;
+	if ( prefix.EqualTo("DYmm"     ) &&  nmus  != 2  ) continue;
+	if ( prefix.EqualTo("DYtautau" ) &&  ntaus != 2  ) continue;
 	
 	//splice together the DY samples - if its madgraph, then we do nothing
-	if(TString(prefix).Contains("DY") && TString(evt_dataset().at(0)).Contains("madgraph") == false) {	
+	if(prefix.Contains("DY") && TString(evt_dataset().at(0)).Contains("madgraph") == false) {	
 	  bool doNotContinue = false;
 	  for(unsigned int i = 0; i < genps_p4().size(); i++){
 	    if(abs(genps_id()[i]) == 23 && genps_p4()[i].M() > 50.)
@@ -1590,7 +1592,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	}
 	
 	//extract pthat
-	if(TString(prefix).Contains("DY")){
+	if(prefix.Contains("DY")){
 	  int nz = 0;
 	  for(unsigned int i = 0; i < genps_p4().size(); i++){
 	    if(abs(genps_id()[i]) == 23){
@@ -2924,7 +2926,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       //store njets kscaling - for ttbar dilepton
       //K3 = 0.92 pm 0.03 and K4 = 0.83 pm 0.03
-     if( TString(prefix).Contains("ttall") && nleps_==2 && npfjets30_>3){
+     if( prefix.Contains("ttall") && nleps_==2 && npfjets30_>3){
        if (npfjets30lepcorr_==3)      knjets_=0.92;
        else if (npfjets30lepcorr_>=4) knjets_=0.83;
      }
@@ -3323,19 +3325,19 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       weight_ = -1.;
 
-      if( TString(prefix).Contains("T2") ){
+      if( prefix.Contains("T2") ){
 	mG_ = -999; //sparm_mG();
         mL_ = -999; //sparm_mL();
         x_  = -999; //sparm_mf();
 
-	if( TString(prefix).Contains("T2tt") ){
+	if( prefix.Contains("T2tt") ){
 	  for (int i=0; i<(int)sparm_values().size(); ++i) {
 	    if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
 	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
 	  }
 	}
 	
-	if( TString(prefix).Contains("T2bw") ){
+	if( prefix.Contains("T2bw") ){
 	  for (int i=0; i<(int)sparm_values().size(); ++i) {
 	    if (sparm_names().at(i).Contains("mstop")) mG_ = sparm_values().at(i);
 	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
@@ -3359,13 +3361,13 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	if( doTenPercent )	  weight_ *= 10;
       }
 
-      else if(TString(prefix).Contains("TChiwh")) {
+      else if(prefix.Contains("TChiwh")) {
         // need to put some reasonable numbers here..
 	// currently applying xsecs downstream
 	weight_ = 1.;
       }
 
-      else if(TString(prefix).Contains("TChiWH")) {
+      else if(prefix.Contains("TChiWH")) {
 	  for (int i=0; i<(int)sparm_values().size(); ++i) {
 	    if (sparm_names().at(i).Contains("mchargino")) mG_ = sparm_values().at(i);
 	    if (sparm_names().at(i).Contains("mlsp")) mL_ = sparm_values().at(i);
@@ -3378,7 +3380,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
       }
 
-      else if(TString(prefix).Contains("HHWWbb")) {
+      else if(prefix.Contains("HHWWbb")) {
 
 	mG_ = cms2.sparm_values().at(0);
         mL_ = -999; //cms2.sparm_values().at(1);
@@ -3422,25 +3424,25 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 	weight_ = kFactor * evt_scale1fb() * lumi;
         //do a signed weight for mcatnlo
-        if ( TString(prefix).Contains("mcatnlo") && genps_weight()<0) weight_ *= -1.;
+        if ( prefix.Contains("mcatnlo") && genps_weight()<0) weight_ *= -1.;
 
 	if( doTenPercent )	  weight_ *= 10;
 
-	if( TString(prefix).Contains("LM") ){
-	  if( strcmp( prefix , "LM0" )  == 0 ) weight_ *= kfactorSUSY( "lm0" );
-	  if( strcmp( prefix , "LM1" )  == 0 ) weight_ *= kfactorSUSY( "lm1" );
-	  if( strcmp( prefix , "LM2" )  == 0 ) weight_ *= kfactorSUSY( "lm2" );
-	  if( strcmp( prefix , "LM3" )  == 0 ) weight_ *= kfactorSUSY( "lm3" );
-	  if( strcmp( prefix , "LM4" )  == 0 ) weight_ *= kfactorSUSY( "lm4" );
-	  if( strcmp( prefix , "LM5" )  == 0 ) weight_ *= kfactorSUSY( "lm5" );
-	  if( strcmp( prefix , "LM6" )  == 0 ) weight_ *= kfactorSUSY( "lm6" );
-	  if( strcmp( prefix , "LM7" )  == 0 ) weight_ *= kfactorSUSY( "lm7" );
-	  if( strcmp( prefix , "LM8" )  == 0 ) weight_ *= kfactorSUSY( "lm8" );
-	  if( strcmp( prefix , "LM9" )  == 0 ) weight_ *= kfactorSUSY( "lm9" );
-	  if( strcmp( prefix , "LM10" ) == 0 ) weight_ *= kfactorSUSY( "lm10");
-	  if( strcmp( prefix , "LM11" ) == 0 ) weight_ *= kfactorSUSY( "lm11");
-	  if( strcmp( prefix , "LM12" ) == 0 ) weight_ *= kfactorSUSY( "lm12");
-	  if( strcmp( prefix , "LM13" ) == 0 ) weight_ *= kfactorSUSY( "lm13");
+	if( prefix.Contains("LM") ){
+	  if( prefix.EqualTo("LM0" )  ) weight_ *= kfactorSUSY( "lm0" );
+	  if( prefix.EqualTo("LM1" )  ) weight_ *= kfactorSUSY( "lm1" );
+	  if( prefix.EqualTo("LM2" )  ) weight_ *= kfactorSUSY( "lm2" );
+	  if( prefix.EqualTo("LM3" )  ) weight_ *= kfactorSUSY( "lm3" );
+	  if( prefix.EqualTo("LM4" )  ) weight_ *= kfactorSUSY( "lm4" );
+	  if( prefix.EqualTo("LM5" )  ) weight_ *= kfactorSUSY( "lm5" );
+	  if( prefix.EqualTo("LM6" )  ) weight_ *= kfactorSUSY( "lm6" );
+	  if( prefix.EqualTo("LM7" )  ) weight_ *= kfactorSUSY( "lm7" );
+	  if( prefix.EqualTo("LM8" )  ) weight_ *= kfactorSUSY( "lm8" );
+	  if( prefix.EqualTo("LM9" )  ) weight_ *= kfactorSUSY( "lm9" );
+	  if( prefix.EqualTo("LM10" ) ) weight_ *= kfactorSUSY( "lm10");
+	  if( prefix.EqualTo("LM11" ) ) weight_ *= kfactorSUSY( "lm11");
+	  if( prefix.EqualTo("LM12" ) ) weight_ *= kfactorSUSY( "lm12");
+	  if( prefix.EqualTo("LM13" ) ) weight_ *= kfactorSUSY( "lm13");
 	}
       }
 
@@ -3527,7 +3529,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       ecallasernew_   = passECALLaserFilter();
 
       //for SCs above 20 GeV, store the max. ECAL laser correction and the eta/pT of this SC
-      if( !TString(prefix).Contains("T2") ) {
+      if( !prefix.Contains("T2") ) {
 	scslasercormax_ = -99999.;
 	for (int isc= 0; isc<scs_p4().size(); ++isc) {
 	  if (scs_p4()[isc].pt()<20.) continue;
@@ -3540,20 +3542,20 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
       }
 
       k_ = 1;
-      if     ( strcmp( prefix , "LM0"  )    == 0 ) k_ = kfactorSUSY( "lm0"  );
-      else if( strcmp( prefix , "LM1"  )    == 0 ) k_ = kfactorSUSY( "lm1"  );
-      else if( strcmp( prefix , "LM2"  )    == 0 ) k_ = kfactorSUSY( "lm2"  );
-      else if( strcmp( prefix , "LM3"  )    == 0 ) k_ = kfactorSUSY( "lm3"  );
-      else if( strcmp( prefix , "LM4"  )    == 0 ) k_ = kfactorSUSY( "lm4"  );
-      else if( strcmp( prefix , "LM5"  )    == 0 ) k_ = kfactorSUSY( "lm5"  );
-      else if( strcmp( prefix , "LM6"  )    == 0 ) k_ = kfactorSUSY( "lm6"  );
-      else if( strcmp( prefix , "LM7"  )    == 0 ) k_ = kfactorSUSY( "lm7"  );
-      else if( strcmp( prefix , "LM8"  )    == 0 ) k_ = kfactorSUSY( "lm8"  );
-      else if( strcmp( prefix , "LM9"  )    == 0 ) k_ = kfactorSUSY( "lm9"  );
-      else if( strcmp( prefix , "LM10" )    == 0 ) k_ = kfactorSUSY( "lm10" );
-      else if( strcmp( prefix , "LM11" )    == 0 ) k_ = kfactorSUSY( "lm11" );
-      else if( strcmp( prefix , "LM12" )    == 0 ) k_ = kfactorSUSY( "lm12" );
-      else if( strcmp( prefix , "LMscan" )  == 0 ) k_ = kfactorSUSY(m0_,m12_,"tanbeta10");
+      if     ( prefix.EqualTo( "LM0"  )    ) k_ = kfactorSUSY( "lm0"  );
+      else if( prefix.EqualTo( "LM1"  )    ) k_ = kfactorSUSY( "lm1"  );
+      else if( prefix.EqualTo( "LM2"  )    ) k_ = kfactorSUSY( "lm2"  );
+      else if( prefix.EqualTo( "LM3"  )    ) k_ = kfactorSUSY( "lm3"  );
+      else if( prefix.EqualTo( "LM4"  )    ) k_ = kfactorSUSY( "lm4"  );
+      else if( prefix.EqualTo( "LM5"  )    ) k_ = kfactorSUSY( "lm5"  );
+      else if( prefix.EqualTo( "LM6"  )    ) k_ = kfactorSUSY( "lm6"  );
+      else if( prefix.EqualTo( "LM7"  )    ) k_ = kfactorSUSY( "lm7"  );
+      else if( prefix.EqualTo( "LM8"  )    ) k_ = kfactorSUSY( "lm8"  );
+      else if( prefix.EqualTo( "LM9"  )    ) k_ = kfactorSUSY( "lm9"  );
+      else if( prefix.EqualTo( "LM10" )    ) k_ = kfactorSUSY( "lm10" );
+      else if( prefix.EqualTo( "LM11" )    ) k_ = kfactorSUSY( "lm11" );
+      else if( prefix.EqualTo( "LM12" )    ) k_ = kfactorSUSY( "lm12" );
+      else if( prefix.EqualTo( "LMscan" )  ) k_ = kfactorSUSY(m0_,m12_,"tanbeta10");
       
 
       ecalveto1_ = -1.;
@@ -3587,7 +3589,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	phiSC_ = els_phiSC()[index1];
 	eSCRaw_ = els_eSCRaw()[index1];
 	eSCPresh_ = els_eSCPresh()[index1];
-	if( !TString(prefix).Contains("T2") ) {
+	if( !prefix.Contains("T2") ) {
 	  //      lep1_scslasercormean_ = scs_laserCorMean()[index1];
 	  //      lep1_scslasercormax_  = scs_laserCorMax()[index1];
 	  lep1_scslasercormean_ = scs_laserCorMean()[els_scindex()[index1]];
@@ -3632,7 +3634,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 	phiSC2_ = els_phiSC()[index2];
 	eSCRaw2_ = els_eSCRaw()[index2];
 	eSCPresh2_ = els_eSCPresh()[index2];
-	if( !TString(prefix).Contains("T2") ) {
+	if( !prefix.Contains("T2") ) {
 	  lep2_scslasercormean_ = scs_laserCorMean()[els_scindex()[index2]];
 	  lep2_scslasercormax_  = scs_laserCorMax()[els_scindex()[index2]];
 	  if (((fabs(scs_eta()[els_scindex()[index2]])<1.4442)&&(lep2_scslasercormax_>2.0)) ||
@@ -3798,7 +3800,7 @@ int singleLeptonLooper::ScanChain(TChain* chain, char *prefix, float kFactor, in
 
 //--------------------------------------------------------------------
  
-void singleLeptonLooper::BookHistos(char *prefix)
+void singleLeptonLooper::BookHistos(const TString& prefix)
 {
   // Prefix comes from the sample and it is passed to the scanning function
   // Suffix is "ee" "em" "em" "all" which depends on the final state
@@ -3810,14 +3812,14 @@ void singleLeptonLooper::BookHistos(char *prefix)
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
-  h_PU_trkpt = new TH1F(Form("%s_PU_trkpt",prefix),"track pt from PU interactions",100,0,100);
-  h_dz_vtx_trk = new TH1F(Form("%s_dz_vtx_trk",prefix),"dZ between vtx and tracks",200,-0.1,0.1);
+  h_PU_trkpt = new TH1F(Form("%s_PU_trkpt",prefix.Data()),"track pt from PU interactions",100,0,100);
+  h_dz_vtx_trk = new TH1F(Form("%s_dz_vtx_trk",prefix.Data()),"dZ between vtx and tracks",200,-0.1,0.1);
  
   cout << "End book histos..." << endl;
 }// CMS2::BookHistos()
 
 
-void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
+void singleLeptonLooper::makeTree(const TString& prefix, bool doFakeApp, FREnum frmode ){
   TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
   rootdir->cd();
 
@@ -3836,8 +3838,8 @@ void singleLeptonLooper::makeTree(char *prefix, bool doFakeApp, FREnum frmode ){
   char* tpsuffix = (char*) "";
   if( doTenPercent ) tpsuffix = (char*) "_tenPercent";
 
-  outFile   = new TFile(Form("output/%s_smallTree%s%s.root",prefix,frsuffix,tpsuffix), "RECREATE");
-  //  outFile   = new TFile(Form("output/%s/%s_smallTree%s%s.root",g_version,prefix,frsuffix,tpsuffix), "RECREATE");
+  outFile   = new TFile(Form("output/%s_smallTree%s%s.root",prefix.Data(),frsuffix,tpsuffix), "RECREATE");
+  //  outFile   = new TFile(Form("output/%s/%s_smallTree%s%s.root",g_version,prefix.Data(),frsuffix,tpsuffix), "RECREATE");
   //  outFile   = new TFile("baby.root","RECREATE");
   outFile->cd();
   outTree = new TTree("t","Tree");

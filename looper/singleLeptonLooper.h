@@ -92,12 +92,12 @@ class singleLeptonLooper
         // e_qcd     :   derive prediction for 2 fake leptons
         // e_wjets   :   derive prediction for 1 real and one fake lepton
 	
-        int  ScanChain(TChain *chain, char *prefix = "", float kFactor = 1., 
+        int  ScanChain(TChain *chain, const TString& prefix = "", float kFactor = 1., 
 		       int prescale = 1., float lumi = 1.,
                        FREnum frmode  = e_wjets,
                        bool doFakeApp = false
                        );
-        void BookHistos (char *prefix);
+        void BookHistos (const TString& prefix);
 	void InitBaby();
 	//	float dz_trk_vtx( const unsigned int trkidx, const unsigned int vtxidx = 0 );
 
@@ -110,7 +110,7 @@ class singleLeptonLooper
         //void set_trigger      (TrigEnum t) { g_trig         = t; } 
 
         // Baby ntuple methods
-        void makeTree (char *prefix,bool doFakeApp, FREnum frmode );
+        void makeTree (const TString& prefix,bool doFakeApp, FREnum frmode );
 	float stopPairCrossSection( float stopmass );
 	float c1n2CrossSection( float c1mass );
         void closeTree ();
